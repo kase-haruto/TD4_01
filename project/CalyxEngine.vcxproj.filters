@@ -2433,7 +2433,9 @@
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Foundation\HotReload\LivePP\LivePPService.cpp" />
-    <ClCompile Include="Engine\Foundation\Utility\FileSystem\FileDirectoryWatcher\FileDirectoryWatcher.cpp" />
+    <ClCompile Include="Engine\Assets\File\AssetChange.cpp" />
+    <ClCompile Include="Engine\Assets\File\IAssetChangeHandler.cpp" />
+    <ClCompile Include="Engine\Assets\Manager\AssetManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Application\System\Environment.h" />
@@ -2455,7 +2457,9 @@
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Foundation\HotReload\LivePP\LivePPService.h" />
-    <ClInclude Include="Engine\Foundation\Utility\FileSystem\FileDirectoryWatcher\FileDirectoryWatcher.h" />
+    <ClInclude Include="Engine\Assets\File\AssetChange.h" />
+    <ClInclude Include="Engine\Assets\File\IAssetChangeHandler.h" />
+    <ClInclude Include="Engine\Assets\Manager\AssetManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ObjectPicking.PS.hlsl" />
