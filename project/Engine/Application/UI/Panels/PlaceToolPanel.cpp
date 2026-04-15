@@ -35,7 +35,7 @@ namespace CalyxEngine {
 		auto&													shapeItems = categoryItems_[PlaceItemCategory::Shape];
 		const std::vector<std::pair<ShapeObjType, std::string>> shapes	   = {
 			{ShapeObjType::Plane, "plane"},
-			{ShapeObjType::Cube,  "cube"},
+			{ShapeObjType::Cube, "cube"},
 			{ShapeObjType::Sphere, "sphere"},
 			{ShapeObjType::Cylinder, "cylinder"},
 			{ShapeObjType::Cone, "cone"},
