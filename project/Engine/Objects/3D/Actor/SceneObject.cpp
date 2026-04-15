@@ -1,0 +1,180 @@
+
+
+#include "SceneObject.h"
+#include <Engine/Foundation/Json/JsonUtils.h>
+#include <Engine/Foundation/Utility/Func/MyFunc.h>
+#include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include <Engine/Objects/ConfigurableObject/IConfigurable.h>
+#include <Engine/Objects/Event/Destroying/ObjectDestroying.h>
+#include <Engine/System/Event/EventBus.h>
+#include <Engine/graphics/Camera/Manager/CameraManager.h>
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		オブジェクトタイプからストリグに
+/////////////////////////////////////////////////////////////////////////////////////////
+static const char* ObjectTypeToString(ObjectType type) {
+	switch(type) {
+	case ObjectType::Camera:
+		return "Camera";
+	case ObjectType::Light:
+		return "Light";
+	case ObjectType::GameObject:
+		return "GameObject";
+	case ObjectType::Effect:
+		return "ParticleSystem";
+	case ObjectType::Event:
+		return "Event";
+	default:
+		return "None";
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		ctr
+/////////////////////////////////////////////////////////////////////////////////////////
+SceneObject::SceneObject() {
+	worldTransform_.Initialize();
+	id_ = Guid::New();
+}
+
+SceneObject::~SceneObject() = default;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		デバッグui
+/////////////////////////////////////////////////////////////////////////////////////////
+void SceneObject::ShowGui() {}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+///		子を含めて階層階層から完全に切り離すObject破棄
+/////////////////////////////////////////////////////////////////////////////////////////
+void SceneObject::Destroy() {
+	DestroyRecursive();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		セーブ
+/////////////////////////////////////////////////////////////////////////////////////////
+bool SceneObject::Save() const { return false; }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		ロード
+/////////////////////////////////////////////////////////////////////////////////////////
+bool SceneObject::Load() { return false; }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		トランスフォームからaabbを構築して返す
+/////////////////////////////////////////////////////////////////////////////////////////
+AABB SceneObject::FallbackAABBFromTransform() const {
+	CalyxEngine::Vector3 center	 = worldTransform_.GetWorldPosition();
+	CalyxEngine::Vector3 halfScale = worldTransform_.scale * 0.5f;
+	CalyxEngine::Vector3 min		 = center - halfScale;
+	CalyxEngine::Vector3 max		 = center + halfScale;
+	return AABB(min, max);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		タイプを返す
+/////////////////////////////////////////////////////////////////////////////////////////
+std::string SceneObject::GetObjectTypeName() const {
+	return ObjectTypeToString(objectType_);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		名前の設定
+/////////////////////////////////////////////////////////////////////////////////////////
+void SceneObject::SetName(const std::string& name, std::optional<ObjectType> type) {
+	if(!name.empty()) { // 空文字なら上書きしない
+		name_ = name;
+	}
+	if(type.has_value()) objectType_ = type.value();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		パラメータ適用Interfaceを持っているか
+/////////////////////////////////////////////////////////////////////////////////////////
+bool SceneObject::HasConfigInterface() const {
+	return dynamic_cast<const IConfigurable*>(this) != nullptr;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		パラメータ保存先のパスの取得
+/////////////////////////////////////////////////////////////////////////////////////////
+const std::string& SceneObject::GetConfigPath() const {
+	// パスが入っていたらパスを返す
+	if(configPath_.has_value()) return configPath_.value();
+	static const std::string kEmpty; // = ""
+	return kEmpty;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		親子関係構築
+/////////////////////////////////////////////////////////////////////////////////////////
+void SceneObject::SetParent(const std::shared_ptr<SceneObject>& newParentSp, bool inheritScale) {
+	auto self = shared_from_this();
+
+	// 同じ or 自分自身
+	if(parent_.lock() == newParentSp || newParentSp.get() == this) {
+		return;
+	}
+
+	// 旧親から削除
+	if(auto oldParent = parent_.lock()) {
+		auto& siblings = oldParent->children_;
+		siblings.erase(std::remove(siblings.begin(), siblings.end(), self),
+					   siblings.end());
+	}
+
+	if(newParentSp) {
+		// 新しい親へ登録
+		newParentSp->children_.push_back(self);
+		worldTransform_.parent		 = &newParentSp->worldTransform_;
+		worldTransform_.inheritScale = inheritScale;
+		parentId_					 = newParentSp->GetGuid();
+	} else {
+		worldTransform_.parent		 = nullptr;
+		worldTransform_.inheritScale = true;
+		parentId_					 = Guid{};
+	}
+
+	// 親だけ書き換え（Transform Update は呼ばない）
+	parent_ = newParentSp;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		子供を追加
+/////////////////////////////////////////////////////////////////////////////////////////
+void SceneObject::AddChild(const std::shared_ptr<SceneObject>& child) {
+	if(!child || child.get() == this) return;
+
+	child->SetParent(shared_from_this());
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/// 		自分と子オブジェクトを再帰的に破棄する
+/////////////////////////////////////////////////////////////////////////////////////////
+void SceneObject::DestroyRecursive() {
+
+	// 自分の破棄を通知（Library が拾う）
+	EventBus::Publish(ObjectDestroying{shared_from_this()});
+
+	// 子供の破棄
+	for(auto& child : children_) {
+		if(child) {
+			child->DestroyRecursive();
+		}
+	}
+	children_.clear();
+
+	// 親とのリンク解除
+	if(auto p = parent_.lock()) {
+		auto& siblings = p->children_;
+		siblings.erase(std::remove(siblings.begin(), siblings.end(), shared_from_this()), siblings.end());
+	}
+
+	// 自分のリンク解除
+	parent_.reset();
+	worldTransform_.parent = nullptr;
+	parentId_			   = Guid{};
+}
+
+REGISTER_SCENE_OBJECT(SceneObject)
