@@ -44,9 +44,6 @@ namespace CalyxEngine {
 			Shape,			 //< 単純図形オブジェクト
 			Light,			 //< ライト
 			Particle,		 //< パーティクル
-			InGameObject,	 //< インゲームのオブジェクト
-			BackgroundActor, //< 背景オブジェクト
-			GimmickActor,	 //< ギミックオブジェクト
 			Event,			 //< イベント
 			Count
 		};

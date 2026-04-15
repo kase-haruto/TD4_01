@@ -177,9 +177,6 @@ namespace CalyxEngine {
 			{PlaceItemCategory::Shape, "Shapes"},
 			{PlaceItemCategory::Light, "Lights"},
 			{PlaceItemCategory::Particle, "Particles"},
-			{PlaceItemCategory::InGameObject, "Game Objects"},
-			{PlaceItemCategory::BackgroundActor, "Background Actors"},
-			{PlaceItemCategory::GimmickActor, "Gimmick Actors"},
 			{PlaceItemCategory::Event, "Events"},
 		};
 
