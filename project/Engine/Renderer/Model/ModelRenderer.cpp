@@ -158,8 +158,6 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = camera->IsVisible(inst.worldAABB);
-
-			inst.visible = camera->IsVisible(inst.worldAABB);
 		}
 	}
 
@@ -191,8 +189,6 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
-			inst.visible = camera->IsVisible(inst.worldAABB);
-
 			inst.visible = camera->IsVisible(inst.worldAABB);
 		}
 	}

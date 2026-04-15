@@ -1,13 +1,17 @@
 #include "ModelManager.h"
 
+// engine
 #include "Engine/Foundation/Math/MathUtil.h"
 #include "Engine/Graphics/Context/GraphicsGroup.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
 #include <Engine/Graphics/Buffer/DxIndexBuffer.h>
 #include <Engine/Graphics/Buffer/DxVertexBuffer.h>
 #include <Engine/Graphics/Pipeline/PipelineDesc/Input/VertexLayout.h>
+#include <Engine/Foundation/Utility/FileSystem/FileScanner.h>
+
+// externals
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
 
 
 
@@ -29,7 +33,9 @@ ModelManager::~ModelManager() {
 	}
 }
 
-void ModelManager::Initialize() {  }
+void ModelManager::Initialize() {
+	LoadAllModels();
+}
 
 
 //----------------------------------------------------------------------------
@@ -190,13 +196,65 @@ std::vector<std::string> ModelManager::GetLoadedModelNames() const {
 }
 
 //=============================================================================
-//
+//	ファイルを走破してすべてのモデルファイルをload
 //=============================================================================
+void ModelManager::LoadAllModels() {
+	// ファイルを走破してモデルをロードする なければエラーをはく
+	if(!CalyxEngine::FileScanner::EnsureDirectoryExists(directoryPath_)) {
+		throw std::runtime_error("Model directory does not exist: " + directoryPath_);
+	}
+	
+	// Assimでサポートされているモデル形式の拡張子
+	const std::vector<std::string> supportedExtensions = {
+		".obj",   // OBJ format
+		".fbx",   // Autodesk FBX
+		".gltf",  // glTF
+	};
+	
+	// ディレクトリ内のすべてのファイルをスキャン
+	auto allFiles = CalyxEngine::FileScanner::ScanFiles(directoryPath_, "");
+	
+	for(const auto& filePath : allFiles) {
+		std::string ext = filePath.extension().string();
+		
+		// 拡張子を小文字に変換してチェック（比較用のみ）
+		std::string extLower = ext;
+		std::transform(extLower.begin(), extLower.end(), extLower.begin(), 
+			[](unsigned char c) -> char { return static_cast<char>(std::tolower(c)); });
+		
+		// サポートされている拡張子か確認
+		bool isSupported = false;
+		for(const auto& supportedExt : supportedExtensions) {
+			if(extLower == supportedExt) {
+				isSupported = true;
+				break;
+			}
+		}
+	
+		if(isSupported) {
+			// ファイル名（拡張子含む）を取得してロード開始（元のファイル名をそのまま使用）
+			std::string fileName = filePath.filename().string();
+			LoadModel(fileName);
+		}
+	}
+}
+
+//=============================================================================
+//
+//=============================================================================ｔ
 ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const std::string& fileNameWithExt) {
 	Assimp::Importer importer;
 
+	// ファイル名から拡張子を除いた部分を取得
+	std::string modelNameBase = fileNameWithExt.substr(0, fileNameWithExt.find_last_of('.'));
+	
+	// ディレクトリ名用に小文字に変換（サブディレクトリが小文字であるため）
+	std::string modelNameLower = modelNameBase;
+	std::transform(modelNameLower.begin(), modelNameLower.end(), modelNameLower.begin(), 
+		[](unsigned char c) -> char { return static_cast<char>(std::tolower(c)); });
+
 	// パスを組み立て
-	std::string filePath = directoryPath + "/" + fileNameWithExt.substr(0, fileNameWithExt.find_last_of('.')) + "/" + fileNameWithExt;
+	std::string filePath = directoryPath + "/" + modelNameLower + "/" + fileNameWithExt;
 
 	const aiScene* scene = importer.ReadFile(
 		filePath.c_str(),

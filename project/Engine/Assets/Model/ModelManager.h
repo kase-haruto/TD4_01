@@ -84,7 +84,10 @@ public:
 	std::vector<std::string> GetLoadedModelNames() const;
 
 private:
-
+	/**
+	 * \brief ディレクトリ内の全モデルファイルをロードするサンプル
+	 */
+	void LoadAllModels();
 
 	/// ファイル読み込み → CPU側 ModelData を構築（Assimp使用）
 	ModelData LoadModelFile(const std::string& directoryPath, const std::string& fileNameWithExt);
