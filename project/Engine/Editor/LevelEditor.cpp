@@ -530,11 +530,11 @@ namespace CalyxEngine {
 			if(debugViewport_ && debugViewport_->IsShow()) {
 				debugViewport_->Render(tex);
 			}
-		} else if(type == ViewportType::VIEWPORT_PICKING) {
-			if(pickingViewport_ && pickingViewport_->IsShow()) {
-				pickingViewport_->Render(tex);
-			}
-		}
+		} //else if(type == ViewportType::VIEWPORT_PICKING) {
+		// 	if(pickingViewport_ && pickingViewport_->IsShow()) {
+		// 		pickingViewport_->Render(tex);
+		// 	}
+		// }
 	}
 
 	void LevelEditor::SetCameraForViewport(BaseCamera* mainCamera, BaseCamera* debugCamera) {

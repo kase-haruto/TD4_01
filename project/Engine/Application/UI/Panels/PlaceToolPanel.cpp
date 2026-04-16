@@ -37,9 +37,9 @@ namespace CalyxEngine {
 			{ShapeObjType::Plane, "plane"},
 			{ShapeObjType::Cube, "cube"},
 			{ShapeObjType::Sphere, "sphere"},
-			{ShapeObjType::Cylinder, "cylinder"},
+			{ShapeObjType::Cylinder, "Cylinder"},
 			{ShapeObjType::Cone, "cone"},
-			{ShapeObjType::Torus, "torus"}};
+			{ShapeObjType::Torus, "Torus"}};
 
 		for(auto& [type, name] : shapes) {
 			std::string objName	  = name;
