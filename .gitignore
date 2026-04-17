@@ -40,6 +40,16 @@ ipch/
 *.ilk
 
 ###############################################################################
+# EXCEPTION: Live++ Agent files (required for hot reload)
+# These files must be included in git despite *.exe, *.dll, *.pdb rules above
+###############################################################################
+!project/externals/LivePP/Agent/**
+!project/externals/LivePP/Agent/**/*.exe
+!project/externals/LivePP/Agent/**/*.dll
+!project/externals/LivePP/Agent/**/*.pdb
+!project/externals/LivePP/Agent/**/*.lib
+
+###############################################################################
 # External libraries (ignore build outputs only)
 ###############################################################################
 project/externals/**/bin/
