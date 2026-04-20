@@ -56,8 +56,6 @@ void TestScene::Initialize(){
 /////////////////////////////////////////////////////////////////////////////////////////
 void TestScene::Update([[maybe_unused]]float dt){
 
-	player_->Update(dt);
-
 	//衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }
