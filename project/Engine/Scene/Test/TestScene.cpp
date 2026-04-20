@@ -39,7 +39,7 @@ void TestScene::Initialize(){
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/TestScene.scene");
+	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/test.scene");
 
 	LoadAssets();
 
@@ -47,8 +47,6 @@ void TestScene::Initialize(){
 	// グラフィック関連
 	//=========================
 
-	player_ = SceneAPI::Instantiate<DemoPlayer>("human.obj", "DemoPlayer");
-	player_->Initialize();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
