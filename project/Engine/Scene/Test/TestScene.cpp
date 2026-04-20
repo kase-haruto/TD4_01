@@ -6,11 +6,13 @@
 
 // scene
 #include <Engine/Scene/Test/TestScene.h>
+#include <Game/DemoPlayer/DemoPlayer.h>
 
 // engine
 #include <Engine/Collision/CollisionManager.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <Engine/Scene/Serializer/SceneSerializer.h>
+#include <Engine/Scene/Context/SceneContext.h>
 // lib
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -44,12 +46,17 @@ void TestScene::Initialize(){
 	//=========================
 	// グラフィック関連
 	//=========================
+
+	player_ = SceneAPI::Instantiate<DemoPlayer>("human.obj", "DemoPlayer");
+	player_->Initialize();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //	更新処理
 /////////////////////////////////////////////////////////////////////////////////////////
 void TestScene::Update([[maybe_unused]]float dt){
+
+	player_->Update(dt);
 
 	//衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();

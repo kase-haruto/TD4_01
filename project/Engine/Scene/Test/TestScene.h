@@ -11,6 +11,8 @@
 #include <memory>
 #include <vector>
 
+#include <Game\DemoPlayer\DemoPlayer.h>
+
 ///デバッグ関連///
 #ifdef _DEBUG
 
@@ -42,6 +44,6 @@ private:
 	std::shared_ptr<BaseGameObject> modelField_;
 	std::unique_ptr<Sprite> testSprite_;
 	std::shared_ptr<CalyxHuman> animationHuman_;
-
+	std::shared_ptr<DemoPlayer> player_;
 };
 
