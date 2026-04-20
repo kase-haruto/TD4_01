@@ -43,7 +43,7 @@ namespace CalyxEngine {
 		bool				GetClamp01() const { return clamp01_; }
 		void				SetInvert(bool v) { invert_ = v; }
 		bool				GetInvert() const { return invert_; }
-		virtual const char* GetTypeName() const override { return "OverLifetimeModule"; }
+		virtual const char* GetObjectClassName() const override { return "OverLifetimeModule"; }
 		void				SetStart(const CalyxEngine::Vector4& v) { start_ = v; }
 		void				SetEnd(const CalyxEngine::Vector4& v) { end_ = v; }
 		CalyxEngine::Vector4	GetStart() const { return start_; }

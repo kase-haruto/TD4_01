@@ -30,7 +30,7 @@ namespace CalyxEngine{
 		// setter
 		bool				GetIsGrowing() const { return isGrowing_; }
 		CalyxEngine::EaseType	GetEaseType() const { return easeType_; }
-		virtual const char* GetTypeName() const override { return "SizeOverLiftimeModule"; }
+		virtual const char* GetObjectClassName() const override { return "SizeOverLiftimeModule"; }
 
 	private:
 		//===================================================================*/

@@ -1,7 +1,8 @@
 #pragma once
 #include "Engine\Objects\3D\Actor\Actor.h"
 
-class DemoPlayer : public Actor {
+class DemoPlayer :
+public Actor {
 public:
 	DemoPlayer();
 	DemoPlayer(const std::string&		  modelName,
@@ -19,7 +20,7 @@ public:
 	//--------- config ------------------------------------------------
 
 	//--------- accessor ------------------------------------------------
-
+	std::string_view GetObjectClassName() const override { return "DemoPlayer"; }
 private:
 	void Move(float dt);
 	void ApplyGravity(float dt);

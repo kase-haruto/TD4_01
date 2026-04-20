@@ -45,7 +45,7 @@ public:
 
 	void StartShake(float duration,float intensity) override; // カメラシェイク開始
 
-	std::string_view GetTypeName() const override { return "BaseCamera"; }
+	std::string_view GetObjectClassName() const override { return "BaseCamera"; }
 	// config ============================================================
 	void ApplyConfig();
 	void ExtractConfig();

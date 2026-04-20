@@ -97,7 +97,7 @@ public:
 	 * \brief タイプ名を取得
 	 * \return タイプ名
 	 */
-	std::string_view GetTypeName() const override{ return "PointLight"; }
+	std::string_view GetObjectClassName() const override{ return "PointLight"; }
 
 	/**
 	 * \brief オブジェクトタイプ名を取得
@@ -139,4 +139,3 @@ private:
 
 	ConfigurableObject<PointLightConfig> config_; //< コンフィグ管理
 };
-

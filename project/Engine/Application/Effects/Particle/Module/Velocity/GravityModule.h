@@ -26,7 +26,7 @@ namespace CalyxEngine {
 
 		//--------- setters -----------------------------------------------------
 		void				SetGravity(const CalyxEngine::Vector3& grav) { gravity_ = grav; }
-		virtual const char* GetTypeName() const override { return "GravityModule"; }
+		virtual const char* GetObjectClassName() const override { return "GravityModule"; }
 
 	private:
 		//===================================================================*/

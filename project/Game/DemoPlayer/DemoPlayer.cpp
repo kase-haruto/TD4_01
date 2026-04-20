@@ -8,13 +8,12 @@ DemoPlayer::DemoPlayer() : Actor() {
 	moveSpeed_ = 7.0f;
 }
 
-DemoPlayer::DemoPlayer(const std::string& modelName, std::optional<std::string> objectName) {
-	Actor(modelName, objectName);
+DemoPlayer::DemoPlayer(const std::string& modelName, std::optional<std::string> objectName) :
+Actor::Actor(modelName, objectName){
 	moveSpeed_ = 7.0f;
 }
 
-DemoPlayer::~DemoPlayer() {
-}
+DemoPlayer::~DemoPlayer() = default;
 
 void DemoPlayer::Initialize() {
 	worldTransform_.translation = {0.0f, 0.0f, 0.0f};

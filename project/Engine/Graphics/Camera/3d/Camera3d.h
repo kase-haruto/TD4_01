@@ -64,7 +64,7 @@ public:
      * \brief タイプ名を取得
      * \return タイプ名
      */
-    std::string_view GetTypeName() const override { return "Camera3d"; }
+    std::string_view GetObjectClassName() const override { return "Camera3d"; }
 
     //--------- follow target -------------------------------------------------
     /**

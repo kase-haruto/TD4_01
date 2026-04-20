@@ -36,7 +36,7 @@ public:
 	void SetDistance(float dist) { distance_ = dist; }
 	void SetInputEnabled(bool enable) { isInputEnabled_ = enable; }
 
-	std::string_view GetTypeName() const override { return "DebugCamera"; }
+	std::string_view GetObjectClassName() const override { return "DebugCamera"; }
 
 private:
 	//===================================================================//

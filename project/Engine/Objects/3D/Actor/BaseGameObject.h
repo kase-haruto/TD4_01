@@ -134,7 +134,7 @@ public:
 	 * \brief タイプ名を取得
 	 * \return タイプ名
 	 */
-	std::string_view	  GetTypeName() const override { return "BaseGameObject"; }
+	std::string_view	  GetObjectClassName() const override { return "BaseGameObject"; }
 	/**
 	 * \brief ワールド座標を取得
 	 * \return ワールド座標
