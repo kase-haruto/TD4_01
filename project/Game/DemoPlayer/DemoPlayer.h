@@ -24,10 +24,11 @@ public:
 private:
 	void Move(float dt);
 	void ApplyGravity(float dt);
+	void UpdatePopScale(float dt);
 
 private:
-	float jumpForce_	 = 20.0f;
-	float diveForce_	 = -40.0f;
+	float jumpForce_	 = 15.0f;
+	float diveForce_	 = -30.0f;
 	float gravity_		 = 40.0f;
 	bool  isJumping_	 = false;
 	bool  isDiving_		 = false;
@@ -40,4 +41,11 @@ private:
 	float jumpRotation_			= 0.0f; // 現在の回転角
 	float jumpRotationSpeed_	= 0.0f; // 現在の回転速度
 	float jumpRotationRemaining_ = 0.0f; // 残りの回転量
+
+	// Pop Effects
+	CalyxEngine::Vector3 targetScale_ = {1.0f, 1.0f, 1.0f};
+	CalyxEngine::Vector3 scaleVelocity_ = {0.0f, 0.0f, 0.0f};
+	float leanAngle_ = 0.0f;
+	float targetLeanAngle_ = 0.0f;
+	float walkTimer_ = 0.0f;
 };

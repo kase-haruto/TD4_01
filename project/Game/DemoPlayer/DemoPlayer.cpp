@@ -28,21 +28,29 @@ void DemoPlayer::Initialize() {
 	jumpRotation_				= 0.0f;
 	jumpRotationSpeed_			= 0.0f;
 	jumpRotationRemaining_		= 0.0f;
+
+	// Pop Scale
+	targetScale_   = {1.0f, 1.0f, 1.0f};
+	scaleVelocity_ = {0.0f, 0.0f, 0.0f};
+	leanAngle_	   = 0.0f;
+	targetLeanAngle_ = 0.0f;
+	walkTimer_	   = 0.0f;
 }
 
 void DemoPlayer::Update(float dt) {
 	Move(dt);
 	ApplyGravity(dt);
+	UpdatePopScale(dt);
 }
 
 void DemoPlayer::Move(float dt) {
 	// 水平移動の入力
 	CalyxEngine::Vector3 horizonVelocity = {0.0f, 0.0f, 0.0f};
 
-	if(CalyxFoundation::Input::PushKey(DIK_A)) {horizonVelocity.x -= 1.0f;}
-	if(CalyxFoundation::Input::PushKey(DIK_D)) {horizonVelocity.x += 1.0f;}
+	if(CalyxFoundation::Input::PushKey(DIK_A)) {horizonVelocity.x -= 0.2f;}
+	if(CalyxFoundation::Input::PushKey(DIK_D)) {horizonVelocity.x += 0.2f;}
 	// ずっと前へすすむ
-	horizonVelocity.z += 1.0f;
+	horizonVelocity.z += 0.2f;
 
 	CalyxEngine::Vector2 leftStick = CalyxFoundation::Input::GetInstance()->GetLeftStick();
 	horizonVelocity.x += leftStick.x;
@@ -78,13 +86,18 @@ void DemoPlayer::Move(float dt) {
 			float airTime = 2.0f * jumpForce_ / gravity_;
 			jumpRotationSpeed_ = (2.0f * pi) / airTime;
 			jumpRotationRemaining_ = 2.0f * pi;
+
+			// ジャンプ時に縦に伸びる
+			worldTransform_.scale = {0.8f, 1.3f, 0.8f};
+			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
-			velocity_.y = jumpForce_ / 2.0f;
+			velocity_.y = jumpForce_;
 			isDiving_	= true;
 			// 2回追加で回る
 			float rotationTime = 0.5f; // 0.5秒で回りきる
 			jumpRotationSpeed_ = (4.0f * pi) / rotationTime;
 			jumpRotationRemaining_ = 4.0f * pi;
+
 		}
 	}
 
@@ -102,13 +115,20 @@ void DemoPlayer::Move(float dt) {
 			if(isDiving_ && jumpRotationRemaining_ <= 0.0f) {
 				velocity_.y = diveForce_;
 				jumpRotation_ = 0.0f; // 回転をデフォルトに戻す
+
+				// 急降下開始時に少し縦に伸ばす
+				worldTransform_.scale = {0.9f, 1.2f, 0.9f};
 			}
 		}
 	}
 
-	// 最終的な回転を適用 (向き + ジャンプ回転)
+	// POP: 移動時の傾き設定
+	targetLeanAngle_ = -horizonVelocity.x * 0.2f;
+
+	// 最終的な回転を適用 (向き + ジャンプ回転 + 傾き)
 	CalyxEngine::Quaternion flipRotation = CalyxEngine::Quaternion::MakeRotateX(jumpRotation_);
-	worldTransform_.rotation = baseRotation_ * flipRotation;
+	CalyxEngine::Quaternion leanRotation = CalyxEngine::Quaternion::MakeRotateZ(leanAngle_);
+	worldTransform_.rotation = baseRotation_ * leanRotation * flipRotation;
 
 	worldTransform_.translation += velocity_ * dt;
 }
@@ -119,6 +139,12 @@ void DemoPlayer::ApplyGravity(float dt) {
 
 	// 接地判定（Y=0を床とする）
 	if(worldTransform_.translation.y <= 0.0f) {
+		// 着地した瞬間
+		if(isJumping_) {
+			worldTransform_.scale = {1.4f, 0.5f, 1.4f};
+			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
+		}
+
 		worldTransform_.translation.y = 0.0f;
 		velocity_.y					  = 0.0f;
 		isJumping_					  = false;
@@ -126,4 +152,16 @@ void DemoPlayer::ApplyGravity(float dt) {
 		jumpRotation_				  = 0.0f;
 		jumpRotationRemaining_		  = 0.0f;
 	}
+}
+
+void DemoPlayer::UpdatePopScale(float dt) {
+	float stiffness = 400.0f;
+	float damping	= 20.0f;
+
+	CalyxEngine::Vector3 diff = worldTransform_.scale - targetScale_;
+	CalyxEngine::Vector3 acceleration = (diff * -stiffness) - (scaleVelocity_ * damping);
+
+	scaleVelocity_ += acceleration * dt;
+	worldTransform_.scale += scaleVelocity_ * dt;
+
 }
