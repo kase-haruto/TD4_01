@@ -30,13 +30,14 @@ private:
 	float diveForce_	 = -40.0f;
 	float gravity_		 = 40.0f;
 	bool  isJumping_	 = false;
-	bool  isDoubleJumping_ = false;
+	bool  isDiving_		 = false;
 
 	// 回転補間用
 	float rotationSpeed_ = 10.0f;
 	CalyxEngine::Quaternion baseRotation_ = CalyxEngine::Quaternion::MakeIdentity();
 
 	// ジャンプ回転用
-	float jumpRotation_		  = 0.0f; // 現在の回転角
-	float jumpRotationTarget_ = 0.0f; // 目標の回転角
+	float jumpRotation_			= 0.0f; // 現在の回転角
+	float jumpRotationSpeed_	= 0.0f; // 現在の回転速度
+	float jumpRotationRemaining_ = 0.0f; // 残りの回転量
 };
