@@ -46,6 +46,4 @@ private:
 	CalyxEngine::Vector3 targetScale_ = {1.0f, 1.0f, 1.0f};
 	CalyxEngine::Vector3 scaleVelocity_ = {0.0f, 0.0f, 0.0f};
 	float leanAngle_ = 0.0f;
-	float targetLeanAngle_ = 0.0f;
-	float walkTimer_ = 0.0f;
 };

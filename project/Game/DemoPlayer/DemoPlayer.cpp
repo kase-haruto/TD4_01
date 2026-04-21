@@ -33,8 +33,6 @@ void DemoPlayer::Initialize() {
 	targetScale_   = {1.0f, 1.0f, 1.0f};
 	scaleVelocity_ = {0.0f, 0.0f, 0.0f};
 	leanAngle_	   = 0.0f;
-	targetLeanAngle_ = 0.0f;
-	walkTimer_	   = 0.0f;
 }
 
 void DemoPlayer::Update(float dt) {
@@ -121,9 +119,6 @@ void DemoPlayer::Move(float dt) {
 			}
 		}
 	}
-
-	// POP: 移動時の傾き設定
-	targetLeanAngle_ = -horizonVelocity.x * 0.2f;
 
 	// 最終的な回転を適用 (向き + ジャンプ回転 + 傾き)
 	CalyxEngine::Quaternion flipRotation = CalyxEngine::Quaternion::MakeRotateX(jumpRotation_);
