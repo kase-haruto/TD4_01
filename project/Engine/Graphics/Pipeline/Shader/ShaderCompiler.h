@@ -5,6 +5,7 @@
 #include <dxcapi.h>
 #include <string>
 #include <wrl.h>
+#include <unordered_map>
 
 #pragma comment(lib,"dxcompiler.lib")
 
@@ -15,11 +16,25 @@ public://メンバ関数
 
 	void InitializeDXC();
 
+	/// <summary>
+	/// シェーダーディレクトリ（Resources/shaders など）をスキャンし、ファイルキャッシュを構築
+	/// </summary>
+	void InitializeShaderCache(const std::wstring& shaderRootDir);
+
 	void LoadHLSL(const std::wstring& filePath, const wchar_t* profile);
 
 	 Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile);
+
+	 /// <summary>
+	 /// ファイル名またはサブディレクトリを含む相対パスからシェーダーをコンパイル
+	 /// 例: "Fragment.VS.hlsl" や "Skybox/Skybox.VS.hlsl"
+	 /// </summary>
+	 Microsoft::WRL::ComPtr<IDxcBlob> CompileShaderByName(
+		const std::wstring& shaderName,
+		const wchar_t* profile);
+
 	void Compile(const std::wstring& filePath,
 				 const wchar_t* profile);
 	void CheckNoError();
@@ -40,4 +55,8 @@ private://メンバ変数
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandle = nullptr;
 	DxcBuffer shaderSourceBuffer {};
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding>   shaderSource = nullptr;
+
+	// シェーダーファイルキャッシュ: ファイル名 -> フルパス
+	std::unordered_map<std::wstring, std::wstring> shaderCache;
+	std::wstring shaderRootPath;
 };

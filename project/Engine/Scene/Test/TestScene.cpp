@@ -6,11 +6,13 @@
 
 // scene
 #include <Engine/Scene/Test/TestScene.h>
+#include <Game/DemoPlayer/DemoPlayer.h>
 
 // engine
 #include <Engine/Collision/CollisionManager.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <Engine/Scene/Serializer/SceneSerializer.h>
+#include <Engine/Scene/Context/SceneContext.h>
 // lib
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -37,13 +39,14 @@ void TestScene::Initialize(){
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/TestScene.scene");
+	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/test.scene");
 
 	LoadAssets();
 
 	//=========================
 	// グラフィック関連
 	//=========================
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -160,7 +160,7 @@ void BaseEventObject::ApplyConfigFromJson(const nlohmann::json& j) {
 	ApplyConfig();
 
 	// 派生クラスの適用
-	const std::string	  typeKey(GetTypeName()); // クラス名
+	const std::string	  typeKey(GetObjectClassName()); // クラス名
 	const nlohmann::json* derived = j.contains(typeKey) ? &j.at(typeKey) : nullptr;
 	ApplyDerivedConfigFromJson(j, derived);
 }
@@ -186,7 +186,7 @@ void BaseEventObject::ExtractConfigToJson(nlohmann::json& j) const {
 	baseConfig_.ExtractConfigToJson(j);
 
 	// 派生部分
-	const std::string typeKey(GetTypeName());
+	const std::string typeKey(GetObjectClassName());
 	nlohmann::json	  derived;
 	ExtractDerivedConfigToJson(j, derived);
 	if(!derived.is_null() && !derived.empty()) {

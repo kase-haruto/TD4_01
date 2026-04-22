@@ -274,7 +274,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//		クラス名取得
 	/////////////////////////////////////////////////////////////////////////////////////////
-	std::string_view FxObject::GetTypeName() const { return "FxObject"; }
+	std::string_view FxObject::GetObjectClassName() const { return "FxObject"; }
 
 	void FxObject::SetWorldPosition(const CalyxEngine::Vector3& pos) {
 		worldTransform_.translation = pos;
@@ -367,4 +367,3 @@ namespace CalyxEngine {
 	}
 
 } // namespace CalyxEngine
-

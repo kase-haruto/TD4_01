@@ -112,7 +112,7 @@ public:
 	const WorldTransform&							 GetWorldTransform() const { return worldTransform_; }
 	WorldTransform&									 GetWorldTransform() { return worldTransform_; }
 	std::shared_ptr<SceneObject>					 GetParent() const { return parent_.lock(); }
-	virtual std::string_view						 GetTypeName() const { return "SceneObject"; }
+	virtual std::string_view						 GetObjectClassName() const { return "SceneObject"; }
 	ObjectType										 GetObjectType() const { return objectType_; }
 	const Guid&										 GetGuid() const { return id_; }
 	const std::string&								 GetName() const { return name_; }

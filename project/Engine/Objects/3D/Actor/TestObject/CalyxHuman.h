@@ -13,7 +13,7 @@ public:
 	void Update(float dt)override;
 
 	std::optional<CalyxEngine::Vector3> GetJointWorldPos(const std::string& name) const;
-	std::string_view GetTypeName() const override{ return "CalyxHuman"; }
+	std::string_view GetObjectClassName() const override{ return "CalyxHuman"; }
 private:
 	void TransitionAnimation();
 	void Move(float dt);

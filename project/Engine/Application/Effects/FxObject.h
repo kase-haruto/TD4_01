@@ -69,7 +69,7 @@ namespace CalyxEngine {
 		void ExtractConfigToJson(nlohmann::json& j) const override;
 
 		//--------- accessor --------------------------------------------------
-		std::string_view GetTypeName() const override;
+		std::string_view GetObjectClassName() const override;
 		void			 SetWorldPosition(const CalyxEngine::Vector3& pos);
 
 	private:

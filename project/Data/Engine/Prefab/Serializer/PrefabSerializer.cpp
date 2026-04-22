@@ -21,7 +21,7 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 		if (auto* cfg = dynamic_cast< IConfigurable* >(obj)){
 			nlohmann::json j;
 			cfg->ExtractConfigToJson(j);
-			j["type"] = obj->GetTypeName();  // 型名を保存
+			j["type"] = obj->GetObjectClassName();  // 型名を保存
 			j["guid"] = obj->GetGuid();
 			if (auto parent = obj->GetParent()){
 				j["parentGuid"] = parent->GetGuid();

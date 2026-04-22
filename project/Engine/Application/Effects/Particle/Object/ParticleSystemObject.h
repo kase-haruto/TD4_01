@@ -56,7 +56,7 @@ namespace CalyxEngine {
 		/* -------- accessors -------- */
 		void			 SetDrawEnable(bool isDrawEnable) override;
 		void			 SetPosition(const CalyxEngine::Vector3& pos);
-		std::string_view GetTypeName() const override { return "ParticleSystemObject"; }
+		std::string_view GetObjectClassName() const override { return "ParticleSystemObject"; }
 
 		const ConfigurableObject<ParticleSystemObjectConfig>& GetConfigObject() const { return config_; }
 

@@ -118,7 +118,7 @@ namespace CalyxEngine {
 			if(!cfg) continue;
 
 			cfg->guid = mod->GetGuid();
-			cfg->name = mod->GetTypeName();
+			cfg->name = mod->GetObjectClassName();
 
 			result.push_back(std::move(cfg));
 		}

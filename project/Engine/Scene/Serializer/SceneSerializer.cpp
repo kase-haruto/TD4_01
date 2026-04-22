@@ -51,7 +51,7 @@ nlohmann::json SceneSerializer::DumpJson(const SceneContext& context) {
 			nlohmann::json jOne;
 
 			// ---- 基本メタ ----
-			jOne["type"] = sp->GetTypeName();
+			jOne["type"] = sp->GetObjectClassName();
 			jOne["guid"] = sp->GetGuid();
 			if(auto parent = sp->GetParent()) {
 				jOne["parentGuid"] = parent->GetGuid();
