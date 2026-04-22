@@ -846,39 +846,6 @@
     <ClCompile Include="Data\Engine\Configs\Scene\Objects\Particle\Module\ModuleConfig.cpp">
       <Filter>Data\Engine\Configs\Scene\Objects\Particle\Module</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Game\Config\Background\ResultBackgroundObjectConfig.cpp">
-      <Filter>Data\Game\Config\Background</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\DimFilter\DimFilterConfig.cpp">
-      <Filter>Data\Game\Config\DimFilter</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Hud\ClearHudConfig.cpp">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Hud\EnemyResultConfig.cpp">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Hud\HudTransformMotionConfig.cpp">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Hud\ScoreResultConfig.cpp">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Player\PlayerDamageConfig.cpp">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Player\PlayerDangerSceneConfig.cpp">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Player\PlayerDodgeConfig.cpp">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Player\PlayerLockOnConfig.cpp">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Game\Config\Title\TitleMenueConfig.cpp">
-      <Filter>Data\Game\Config\Title</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Application\Effects\FxGuiHelpers.cpp">
       <Filter>Engine\Application\Effects</Filter>
     </ClCompile>
@@ -1486,39 +1453,6 @@
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Particle\EffectConfig.h">
       <Filter>Data\Engine\Configs\Scene\Objects\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Game\Config\Background\ResultBackgroundObjectConfig.h">
-      <Filter>Data\Game\Config\Background</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\DimFilter\DimFilterConfig.h">
-      <Filter>Data\Game\Config\DimFilter</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Hud\ClearHudConfig.h">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Hud\EnemyResultConfig.h">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Hud\HudTransformMotionConfig.h">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Hud\ScoreResultConfig.h">
-      <Filter>Data\Game\Config\Hud</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Player\PlayerDamageConfig.h">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Player\PlayerDangerSceneConfig.h">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Player\PlayerDodgeConfig.h">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Player\PlayerLockOnConfig.h">
-      <Filter>Data\Game\Config\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Title\TitleMenueConfig.h">
-      <Filter>Data\Game\Config\Title</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Application\Effects\FxGuiHelpers.h">
       <Filter>Engine\Application\Effects</Filter>
     </ClInclude>
@@ -1722,9 +1656,6 @@
     </ClInclude>
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Particle\ParticleSystemObjectConfig.h">
       <Filter>Data\Engine\Configs\Scene\Objects\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Game\Config\Enemy\EnemySpawnerConfig.h">
-      <Filter>Data\Game\Config\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\RenderTarget\Detail\RenderTargetDetail.h">
       <Filter>Engine\Graphics\RenderTarget\Detail</Filter>
@@ -2467,5 +2398,46 @@
     <FxCompile Include="Resources\shaders\ObjectPicking.PS.hlsl" />
     <FxCompile Include="Resources\shaders\Wireframe.GS.hlsl" />
     <FxCompile Include="Resources\shaders\Wireframe.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object2d.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object2d.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object3d.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object3d.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Enviroment\Skybox.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Enviroment\Skybox.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Lighting\Effect.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Lighting\Effect.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Lighting\Fragment.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Lighting\Fragment.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\EmitParticle.CS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\GpuParticle.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\InitializeParticle.CS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\Particle.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\Particle.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\UpdateParticle.CS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\ChromaticAberration\ChromaticAberration.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Copy\CopyImage.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Copy\CopyImage.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\CRT\CRT.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Grayscale\Grayscale.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\RadialBlur\RadialBlur.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Vignette\Vignette.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Skinning\ShadowSkinned.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Skinning\ShadowStatic.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Skinning\SkinningObject3d.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Debug\Wireframe.GS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Debug\Wireframe.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Picking\ObjectPicking.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Picking\Picking.VS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shaders\Core\Object2d.hlsli" />
+    <None Include="Resources\shaders\Core\Object3d.hlsli" />
+    <None Include="Resources\shaders\Enviroment\Skybox.hlsli" />
+    <None Include="Resources\shaders\Lighting\Effect.hlsli" />
+    <None Include="Resources\shaders\Lighting\Fragment.hlsli" />
+    <None Include="Resources\shaders\Particles\GpuParticle.hlsli" />
+    <None Include="Resources\shaders\Particles\Particle.hlsli" />
+    <None Include="Resources\shaders\PostProcess\Copy\CopyImage.hlsli" />
+    <None Include="Resources\shaders\Skinning\SkinningObject3d.hlsli" />
   </ItemGroup>
 </Project>
