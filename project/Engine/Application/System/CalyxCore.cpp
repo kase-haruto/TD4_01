@@ -238,6 +238,13 @@ namespace CalyxEngine {
 	//=============================================================================================================
 	void CalyxCore::CreatePipelines() {
 		shaderManager_->InitializeDXC();
+		shaderManager_->InitializeShaderCache(L"Resources/shaders");
+
+		//========================================================================
+		//	シェーダーキャッシュが構築されたので、以降のシェーダーは
+		//	ファイル名だけで自動的に検索・コンパイルされる
+		//========================================================================
+
 		LinePipeline();
 		EffectPipeline();
 		SkyBoxPipeline();

@@ -2,9 +2,11 @@
 
 // lib
 #include <Engine/Foundation/Utility/Converter/ConvertString.h>
+#include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
 
 /* c++ */
 #include<format>
+#include<filesystem>
 
 ShaderManager::~ShaderManager() {
 	dxcUtils.Reset();
@@ -24,8 +26,13 @@ void ShaderManager::InitializeDXC() {
 	assert(SUCCEEDED(hr));
 }
 
-IDxcBlob* ShaderManager:://CompilerするShaderファイルへのパス
-CompileShader(const std::wstring& filePath, const wchar_t* profile) {
+void ShaderManager::InitializeShaderCache(const std::wstring& shaderRootDir) {
+	shaderRootPath = shaderRootDir;
+	shaderCache = FileSystemHelper::BuildFileCacheW(shaderRootDir);
+	Log(ConvertString(std::format(L"Shader cache initialized: {} files found\n", shaderCache.size())));
+}
+
+IDxcBlob* ShaderManager::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 
 	HRESULT hr;
 	//==============================
@@ -98,11 +105,96 @@ CompileShader(const std::wstring& filePath, const wchar_t* profile) {
 	return shaderBlob.Detach();
 }
 
+IDxcBlob* ShaderManager::CompileShaderByName(const std::wstring& shaderName, const wchar_t* profile) {
+	//========================================================================
+	//	相対パスの場合はルートディレクトリと結合
+	//========================================================================
+	std::wstring fullPath;
+
+	// パスセパレータを正規化
+	std::wstring normalizedName = shaderName;
+	for (auto& c : normalizedName) {
+		if (c == L'/') {
+			c = L'\\';
+		}
+	}
+
+	// シェーダールートからの相対パス（例: postEffects\exampleEffect.hlsl）を処理
+	if (normalizedName.find(L'\\') != std::wstring::npos) {
+		// サブディレクトリを含む相対パスの場合
+		std::wstring relativePath = shaderRootPath + L"\\" + normalizedName;
+
+		// パスを正規化
+		std::filesystem::path p(relativePath);
+		fullPath = p.wstring();
+
+		// ファイルが存在するか確認
+		if (!std::filesystem::exists(fullPath)) {
+			Log(ConvertString(std::format(L"Failed to find shader file: {} (resolved to: {})\n", shaderName, fullPath)));
+			assert(false && "Shader file not found");
+			return nullptr;
+		}
+	} else {
+		// ファイル名のみの場合はキャッシュから検索
+		auto it = shaderCache.find(normalizedName);
+		if (it != shaderCache.end()) {
+			fullPath = it->second;
+		} else {
+			// キャッシュにない場合は再帰検索を試みる
+			auto result = FileSystemHelper::FindFileRecursiveW(shaderRootPath, normalizedName);
+			if (result.has_value()) {
+				fullPath = result.value();
+				// キャッシュに追加
+				shaderCache[normalizedName] = fullPath;
+			} else {
+				Log(ConvertString(std::format(L"Failed to find shader file: {}\n", shaderName)));
+				assert(false && "Shader file not found");
+				return nullptr;
+			}
+		}
+	}
+
+	//========================================================================
+	//	フルパスからコンパイル
+	//========================================================================
+	return CompileShader(fullPath, profile);
+}
+
+void ShaderManager::RegisterPipelineShaders(const PipelineType& type, const std::wstring& vsPath, const std::wstring& psPath) {
+	//========================================================================
+	//	PipelineType とシェーダーパスの対応を登録
+	//========================================================================
+	pipelineShaderMap[static_cast<int>(type)] = {vsPath, psPath};
+	Log(ConvertString(std::format(L"Registered pipeline shaders: type={}, VS={}, PS={}\n",
+		static_cast<int>(type), vsPath, psPath)));
+}
+
+bool ShaderManager::LoadShaderAuto(const PipelineType& type) {
+	//========================================================================
+	//	登録済みのシェーダーパスから自動ロード
+	//========================================================================
+	auto it = pipelineShaderMap.find(static_cast<int>(type));
+	if (it == pipelineShaderMap.end()) {
+		Log(ConvertString(std::format(L"Pipeline type {} is not registered\n", static_cast<int>(type))));
+		return false;
+	}
+
+	const auto& vsPath = it->second.first;
+	const auto& psPath = it->second.second;
+
+	return LoadShader(type, vsPath, psPath);
+}
+
 bool ShaderManager::LoadShader(const PipelineType& type, const std::wstring& vsPath, const std::wstring& psPath) {
-	//ファイルパスをワイド文字列として結合
-	//ファイルパスをワイド文字列として結合
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShader = CompileShader(L"Resources/shaders/" + vsPath, L"vs_6_5");
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShader = CompileShader(L"Resources/shaders/" + psPath, L"ps_6_5");
+	//========================================================================
+	//	ファイル名またはパスからシェーダーをコンパイル
+	//========================================================================
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShader = CompileShaderByName(vsPath, L"vs_6_5");
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShader = CompileShaderByName(psPath, L"ps_6_5");
+
+	if (!vertexShader || !pixelShader) {
+		return false;
+	}
 
 	vertexShaders[type] = vertexShader;
 	pixelShaders[type] = pixelShader;
@@ -114,7 +206,6 @@ const Microsoft::WRL::ComPtr<IDxcBlob>& ShaderManager::GetVertexShader(const Pip
 	if (it != vertexShaders.end()) {
 		return it->second;
 	}
-	assert("Vertex shader not found: ");
 	static Microsoft::WRL::ComPtr<IDxcBlob> nullShader;
 	return nullShader;
 }
@@ -124,7 +215,6 @@ const Microsoft::WRL::ComPtr<IDxcBlob>& ShaderManager::GetPixelShader(const Pipe
 	if (it != pixelShaders.end()) {
 		return it->second;
 	}
-	assert("Pixel shader not found: ");
 	static Microsoft::WRL::ComPtr<IDxcBlob> nullShader;
 	return nullShader;
 }

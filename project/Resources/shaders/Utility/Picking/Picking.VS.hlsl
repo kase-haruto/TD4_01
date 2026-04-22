@@ -1,4 +1,4 @@
-#include "Object3D.hlsli"
+#include "../../Core/Object3D.hlsli"
 
 struct VertexShaderInput {
     float4 position : POSITION0;

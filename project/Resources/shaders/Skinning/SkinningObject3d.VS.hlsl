@@ -1,4 +1,4 @@
-#include "Object3D.hlsli"
+#include "../Core/Object3D.hlsli"
 
 struct Well {
 	float4x4 skeletonSpaceMatrix;

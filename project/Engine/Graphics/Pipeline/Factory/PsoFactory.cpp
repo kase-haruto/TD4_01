@@ -32,7 +32,7 @@ PsoFactory::Create(const GraphicsPipelineDesc& desc) {
 		if (desc.cs_.empty()) {
 			throw std::runtime_error("Compute pipeline requires CS.");
 		}
-		auto csBlob = shaderCompiler_->CompileShader(L"Resources/shaders/" + desc.cs_, L"cs_6_0");
+		auto csBlob = shaderCompiler_->CompileShaderByName(desc.cs_, L"cs_6_0");
 
 		D3D12_COMPUTE_PIPELINE_STATE_DESC cpso{};
 		cpso.pRootSignature = rootSig.Get();
@@ -63,21 +63,21 @@ PsoFactory::Create(const GraphicsPipelineDesc& desc) {
 	pso.DSVFormat = desc.dsvFormat_;
 
 	auto compile = [&](const std::wstring& path, const wchar_t* profile) -> ComPtr<IDxcBlob> {
-		return shaderCompiler_->CompileShader(L"Resources/shaders/" + path, profile);
+		return shaderCompiler_->CompileShaderByName(path, profile);
 	};
 
 	ComPtr<IDxcBlob> vsBlob, psBlob, gsBlob;
 	if (!desc.vs_.empty()) {
 		vsBlob = compile(desc.vs_, L"vs_6_5");
-		pso.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
+		if (vsBlob) pso.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
 	}
 	if (!desc.ps_.empty()) {
 		psBlob = compile(desc.ps_, L"ps_6_5");
-		pso.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
+		if (psBlob) pso.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
 	}
 	if (!desc.gs_.empty()) {
 		gsBlob = compile(desc.gs_, L"gs_6_5");
-		pso.GS = { gsBlob->GetBufferPointer(), gsBlob->GetBufferSize() };
+		if (gsBlob) pso.GS = { gsBlob->GetBufferPointer(), gsBlob->GetBufferSize() };
 	}
 
 	if (!psoObj->Initialize(pso)) {

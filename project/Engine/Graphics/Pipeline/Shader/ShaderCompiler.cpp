@@ -1,5 +1,6 @@
 #include "ShaderCompiler.h"
 #include <Engine/Foundation/Utility/Converter/ConvertString.h>
+#include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
 
 // c++
 #include <format>
@@ -24,6 +25,24 @@ void ShaderCompiler::InitializeDXC() {
 		Log("Failed to create default include handler");
 		assert(false && "Failed to create default include handler");
 	}
+}
+
+void ShaderCompiler::InitializeShaderCache(const std::wstring& shaderRootDir) {
+	shaderRootPath = shaderRootDir;
+	shaderCache = FileSystemHelper::BuildFileCacheW(shaderRootDir);
+	Log(ConvertString(std::format(L"========== InitializeShaderCache called ==========\n")));
+	Log(ConvertString(std::format(L"Shader Root: {}\n", shaderRootDir)));
+	Log(ConvertString(std::format(L"Shader cache initialized: {} files found\n", shaderCache.size())));
+
+	//========================================================================
+	//	デバッグ：全キャッシュ内容をログ出力
+	//========================================================================
+	int count = 0;
+	for (const auto& pair : shaderCache) {
+		Log(ConvertString(std::format(L"  [{}] {}\n", count + 1, pair.first)));
+		count++;
+	}
+	Log(ConvertString(std::format(L"========== End InitializeShaderCache ==========\n")));
 }
 
 void ShaderCompiler::LoadHLSL(const std::wstring& filePath,[[maybe_unused]] const wchar_t* profile) {
@@ -75,6 +94,58 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(
 	//	コンパイル結果を返す
 	//========================================================================
 	return GetCompileResult(filePath,profile);
+}
+
+Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShaderByName(
+	const std::wstring& shaderName,
+	const wchar_t* profile) {
+
+	// 1. デフォルト設定
+	if (shaderRootPath.empty()) {
+		shaderRootPath = L"Resources/shaders";
+	}
+
+	// 2. パス正規化
+	std::wstring normalizedName = shaderName;
+	for (auto& c : normalizedName) { if (c == L'/') c = L'\\'; }
+
+	// 3. キャッシュ確認
+	auto it = shaderCache.find(normalizedName);
+	if (it != shaderCache.end()) {
+		return CompileShader(it->second, profile);
+	}
+
+	// 4. 検索
+	std::filesystem::path root(shaderRootPath);
+	std::wstring fullPath;
+
+	// 直接のパス確認
+	std::filesystem::path directPath = root / normalizedName;
+	if (std::filesystem::exists(directPath)) {
+		fullPath = directPath.wstring();
+	} else {
+		// 再帰検索 (core/ などのサブフォルダを掘る)
+		if (std::filesystem::exists(root)) {
+			for (const auto& entry : std::filesystem::recursive_directory_iterator(root)) {
+				if (entry.is_regular_file()) {
+					if (_wcsicmp(entry.path().filename().c_str(), normalizedName.c_str()) == 0) {
+						fullPath = entry.path().wstring();
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	if (fullPath.empty()) {
+		// 見つからない場合はエラーログを出して止める
+		Log(ConvertString(std::format(L"[Error] Shader not found in {}: {}\n", shaderRootPath, shaderName)));
+		assert(false && "Shader file not found");
+		return nullptr;
+	}
+
+	shaderCache[normalizedName] = fullPath;
+	return CompileShader(fullPath, profile);
 }
 
 void ShaderCompiler::Compile(const std::wstring& filePath,
