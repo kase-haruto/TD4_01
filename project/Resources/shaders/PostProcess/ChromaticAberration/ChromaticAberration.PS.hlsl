@@ -1,4 +1,4 @@
-#include "CopyImage.hlsli"
+#include "../Copy/CopyImage.hlsli"
 
 ///////////////////////////////////////////////////////////////////////////////
 //                            structs
