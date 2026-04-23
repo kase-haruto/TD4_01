@@ -97,20 +97,31 @@ void ComputeDirectionalLight(
     float rawNdotL = dot(normal, L);
     float NdotL    = saturate(rawNdotL);
 
-    if(gMaterial.enableLighting == 0) {
-        float halfLambert = pow(rawNdotL * 0.5f + 0.5f, 2.0f);
-        diffuse = albedo * gDirectionalLight.color.rgb * halfLambert * gDirectionalLight.intensity;
+    if(gMaterial.enableLighting == 0 || gMaterial.enableLighting == 1) {
+        // --- アニメ調（トゥーン）ライティング ---
+        float halfLambert = rawNdotL * 0.5f + 0.5f;
+        // 0.5付近でパキっと分かれるステップ
+        float toonStep = smoothstep(0.48f, 0.52f, halfLambert);
+        
+        // 影色の最低輝度（真っ暗にせずベースカラーを残す）
+        float shadowIntensity = 0.4f; 
+        float toonDiffuseFactor = lerp(shadowIntensity, 1.0f, toonStep);
+        
+        diffuse = albedo * gDirectionalLight.color.rgb * toonDiffuseFactor * gDirectionalLight.intensity;
 
+        // アニメ調のパキッとしたハイライト（スペキュラ）
         float3 H    = normalize(L + toEye);
         float NdotH = saturate(dot(normal, H));
-        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity;
-    }
-    else if(gMaterial.enableLighting == 1) {
-        diffuse = albedo * gDirectionalLight.color.rgb * NdotL * gDirectionalLight.intensity;
+        float specPower = pow(NdotH, gMaterial.shiniess);
+        float toonSpec = smoothstep(0.5f, 0.6f, specPower);
+        specular = gDirectionalLight.color.rgb * toonSpec * gDirectionalLight.intensity;
 
-        float3 H    = normalize(L + toEye);
-        float NdotH = saturate(dot(normal, H));
-        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity;
+        // ささやかなリムライト（輪郭付近の光）
+        float NdotV = saturate(dot(normal, toEye));
+        float rimWeight = smoothstep(0.7f, 0.85f, 1.0f - NdotV);
+        // 光が当たる側だけリムライトを乗せる
+        float rimLight = rimWeight * toonStep;
+        diffuse += albedo * rimLight * 0.5f * gDirectionalLight.intensity;
     }
 }
 
@@ -132,12 +143,23 @@ void ComputePointLight(
     float  distance    = length(gPointLight.position - worldPos);
     float  attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
 
-    float NdotL = saturate(dot(normal, -lightDir));
-    diffuse     = albedo * gPointLight.color.rgb * NdotL * gPointLight.intensity * attenuation;
+    // --- アニメ調（トゥーン）ライティング ---
+    float rawNdotL = dot(normal, -lightDir);
+    float halfLambert = rawNdotL * 0.5f + 0.5f;
+    float toonStep = smoothstep(0.48f, 0.52f, halfLambert);
+    
+    // 影色の最低輝度
+    float shadowIntensity = 0.4f; 
+    float toonDiffuseFactor = lerp(shadowIntensity, 1.0f, toonStep);
 
+    diffuse = albedo * gPointLight.color.rgb * toonDiffuseFactor * gPointLight.intensity * attenuation;
+
+    // アニメ調スペキュラ
     float3 halfVec = normalize(-lightDir + toEye);
     float  NdotH   = saturate(dot(normal, halfVec));
-    specular       = gPointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gPointLight.intensity * attenuation;
+    float specPower = pow(NdotH, gMaterial.shiniess);
+    float toonSpec = smoothstep(0.5f, 0.6f, specPower);
+    specular = gPointLight.color.rgb * toonSpec * gPointLight.intensity * attenuation;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -351,8 +373,12 @@ PixelShaderOutput main(VertexShaderOutput input) {
             : ComputeDirectionalHardShadow_RT(input.worldPosition, normal, L);
     }
 
-    directionalDiffuse  *= shadow;
-    directionalSpecular *= shadow;
+    // アニメ調: レイトレの落ち影もシャープに2値化し、真っ暗になるのを防ぐ
+    float toonShadow = smoothstep(0.4f, 0.6f, shadow);
+    float shadowFactor = lerp(0.5f, 1.0f, toonShadow);
+
+    directionalDiffuse  *= shadowFactor;
+    directionalSpecular *= toonShadow > 0.5f ? 1.0f : 0.0f;
 
     float3 litColor = directionalDiffuse + directionalSpecular + pointDiffuse + pointSpecular;
 
