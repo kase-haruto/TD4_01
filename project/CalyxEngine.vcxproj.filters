@@ -2404,10 +2404,10 @@
     <FxCompile Include="Resources\shaders\Core\Object3d.VS.hlsl" />
     <FxCompile Include="Resources\shaders\Enviroment\Skybox.VS.hlsl" />
     <FxCompile Include="Resources\shaders\Enviroment\Skybox.PS.hlsl" />
-    <FxCompile Include="Resources\shaders\Lighting\Effect.PS.hlsl" />
-    <FxCompile Include="Resources\shaders\Lighting\Effect.VS.hlsl" />
-    <FxCompile Include="Resources\shaders\Lighting\Fragment.PS.hlsl" />
-    <FxCompile Include="Resources\shaders\Lighting\Fragment.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Effect.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Effect.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Fragment.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Fragment.VS.hlsl" />
     <FxCompile Include="Resources\shaders\Particles\EmitParticle.CS.hlsl" />
     <FxCompile Include="Resources\shaders\Particles\GpuParticle.VS.hlsl" />
     <FxCompile Include="Resources\shaders\Particles\InitializeParticle.CS.hlsl" />
@@ -2433,11 +2433,13 @@
     <None Include="Resources\shaders\Core\Object2d.hlsli" />
     <None Include="Resources\shaders\Core\Object3d.hlsli" />
     <None Include="Resources\shaders\Enviroment\Skybox.hlsli" />
-    <None Include="Resources\shaders\Lighting\Effect.hlsli" />
-    <None Include="Resources\shaders\Lighting\Fragment.hlsli" />
+    <None Include="Resources\shaders\Graphics\Lighting\Effect.hlsli" />
+    <None Include="Resources\shaders\Graphics\Lighting\Fragment.hlsli" />
     <None Include="Resources\shaders\Particles\GpuParticle.hlsli" />
     <None Include="Resources\shaders\Particles\Particle.hlsli" />
     <None Include="Resources\shaders\PostProcess\Copy\CopyImage.hlsli" />
     <None Include="Resources\shaders\Skinning\SkinningObject3d.hlsli" />
+    <None Include="Resources\shaders\Graphics\Shadow\ShadowTypes.hlsli" />
+    <None Include="Resources\shaders\Graphics\Shadow\InlineRaytracingShadow.hlsl" />
   </ItemGroup>
 </Project>
