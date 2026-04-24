@@ -1,6 +1,46 @@
 {
     "objects": [
         {
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "direction": {
+                "x": -0.07999999821186066,
+                "y": -1.0,
+                "z": 0.3400000035762787
+            },
+            "guid": "407f30a9-348b-4bf4-9004-6746260f40e4",
+            "intensity": 0.4860000014305115,
+            "name": "DirectionalLight",
+            "objectType": 5,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "DirectionalLight"
+        },
+        {
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -34,7 +74,7 @@
                         "z": 1.0
                     },
                     "currentLightingMode_": 0,
-                    "enableLighting": 0,
+                    "enableLighting": 2,
                     "enviromentCoefficient": 0.5,
                     "isReflect": false,
                     "shininess": 20.0
@@ -54,108 +94,26 @@
             "parentGuid": "4b70fc29-0334-43f8-bfd6-bce83e1e991c",
             "transform": {
                 "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
+                "inheritScale": false,
+                "inheritTranslate": false,
                 "rotation": {
                     "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
+                    "x": 2.9802322387695313e-08,
+                    "y": -6.332993507385254e-08,
+                    "z": 1.1920928955078125e-07
                 },
                 "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 2.45061993598938,
+                    "y": 2.450620174407959,
+                    "z": 2.45061993598938
                 },
                 "translation": {
-                    "x": 0.11980985105037689,
-                    "y": 0.5022926926612854,
-                    "z": 3.6231541633605957
+                    "x": -19.11373519897461,
+                    "y": -0.425689697265625,
+                    "z": 12.644915580749512
                 }
             },
             "type": "BaseGameObject"
-        },
-        {
-            "color": {
-                "w": 1.0,
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "direction": {
-                "x": -0.07999999821186066,
-                "y": -1.0,
-                "z": 0.3400000035762787
-            },
-            "guid": "407f30a9-348b-4bf4-9004-6746260f40e4",
-            "intensity": 1.0,
-            "name": "DirectionalLight",
-            "objectType": 5,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "DirectionalLight"
-        },
-        {
-            "color": {
-                "w": 1.0,
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "decay": 1.0,
-            "guid": "f7440fd4-c2c5-48bd-a8ce-b192e2618fe9",
-            "intensity": 0.25,
-            "name": "PointLight",
-            "objectType": 0,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "position": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 20.0,
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "PointLight"
         },
         {
             "colliderConfig": {
@@ -231,6 +189,48 @@
                 }
             },
             "type": "BaseGameObject"
+        },
+        {
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 1.0,
+            "guid": "f7440fd4-c2c5-48bd-a8ce-b192e2618fe9",
+            "intensity": 0.0,
+            "name": "PointLight",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 20.0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "PointLight"
         },
         {
             "guid": "af9fb71b-81ae-4d76-a20d-93636d6bd101",
@@ -322,13 +322,13 @@
                         "z": 1.0
                     },
                     "currentLightingMode_": 0,
-                    "enableLighting": 0,
+                    "enableLighting": 2,
                     "enviromentCoefficient": 0.5,
                     "isReflect": false,
                     "shininess": 20.0
                 },
                 "modelName": "human.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "textureGuid": "4d294822-af4c-4da4-872f-4caebf7dd058",
                 "uvTransConfig": {
                     "rotation": 0.0,
                     "scale": {
@@ -358,7 +358,7 @@
                 "translation": {
                     "x": 0.0,
                     "y": 0.0,
-                    "z": 67.36827850341797
+                    "z": 0.0
                 }
             },
             "type": "DemoPlayer"
@@ -403,7 +403,7 @@
                     "shininess": 20.0
                 },
                 "modelName": "debugCube.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "textureGuid": "4d294822-af4c-4da4-872f-4caebf7dd058",
                 "uvTransConfig": {
                     "rotation": 0.0,
                     "scale": {
@@ -420,20 +420,20 @@
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
+                    "w": 0.85359787940979,
+                    "x": 0.13504792749881744,
+                    "y": 0.27260491251945496,
+                    "z": -0.4228704273700714
                 },
                 "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 12.189777374267578,
+                    "y": 12.189777374267578,
+                    "z": 12.189776420593262
                 },
                 "translation": {
-                    "x": 7.450580596923828e-09,
-                    "y": 2.9802322387695313e-08,
-                    "z": 3.772191286087036
+                    "x": 8.090425491333008,
+                    "y": 1.9760146141052246,
+                    "z": 26.12471580505371
                 }
             },
             "type": "BaseGameObject"
@@ -472,7 +472,7 @@
                         "z": 1.0
                     },
                     "currentLightingMode_": 0,
-                    "enableLighting": 0,
+                    "enableLighting": 2,
                     "enviromentCoefficient": 0.5,
                     "isReflect": false,
                     "shininess": 20.0
@@ -509,6 +509,81 @@
                     "x": 0.0,
                     "y": -0.004099011421203613,
                     "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "48c6b10d-440f-4a15-9b3e-4d2543140df7",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialConfig": {
+                    "color": {
+                        "w": 1.0,
+                        "x": 1.0,
+                        "y": 1.0,
+                        "z": 1.0
+                    },
+                    "currentLightingMode_": 0,
+                    "enableLighting": 2,
+                    "enviromentCoefficient": 0.5,
+                    "isReflect": false,
+                    "shininess": 20.0
+                },
+                "modelName": "building.obj",
+                "textureGuid": "4d294822-af4c-4da4-872f-4caebf7dd058",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "building.objobject",
+            "objectType": 2,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.3602330982685089,
+                    "x": 0.0,
+                    "y": 0.9328623414039612,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.8540384769439697,
+                    "y": 0.3500000238418579,
+                    "z": 1.0032145977020264
+                },
+                "translation": {
+                    "x": -2.7790777683258057,
+                    "y": 0.0,
+                    "z": 3.1360838413238525
                 }
             },
             "type": "BaseGameObject"

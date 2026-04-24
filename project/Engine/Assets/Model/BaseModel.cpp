@@ -8,6 +8,7 @@
 #include <Engine/Assets/Model/ModelManager.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
 #include <Engine/Assets/Texture/TextureManager.h>
+#include <Engine/Assets/DataAsset/MaterialAsset.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 
 
@@ -46,8 +47,7 @@ void BaseModel::Update(float deltaTime) {
 		uvTransformMatrix					   = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeRotateZMatrix(uvTransform.rotate));
 		uvTransformMatrix					   = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 
-		materialData_.uvTransform = uvTransformMatrix;
-		materialBuffer_.TransferData(materialData_);
+		TransferMaterial();
 
 		// カメラ行列との掛け合わせ
 		// modelData_->vertexBuffer.TransferVectorData(modelData_->meshData.vertices);
@@ -112,7 +112,8 @@ void BaseModel::ShowImGuiInterface() {
 	uvTransform.ShowImGui("uvTransform");
 
 	if(GuiCmd::CollapsingHeader("Material")) {
-		materialData_.ShowImGui();
+		ImGui::Text("Material GUID: %s", materialGuid_.ToString().c_str());
+		// TODO: MaterialAsset の編集 UI や選択 UI を追加
 
 		auto& textures = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetLoadedTextures();
 		if(ImGui::BeginCombo("Texture", textureName_.c_str())) {
@@ -162,7 +163,7 @@ void BaseModel::Draw(const WorldTransform& transform) {
 }
 
 void BaseModel::ApplyConfig(const BaseModelConfig& config) {
-	materialData_.ApplyConfig(config.materialConfig);
+	materialGuid_ = config.materialGuid;
 	uvTransform.ApplyConfig(config.uvTransConfig);
 	blendMode_ = static_cast<BlendMode>(config.blendMode);
 	fileName_  = config.modelName;
@@ -202,7 +203,7 @@ void BaseModel::ApplyConfig(const BaseModelConfig& config) {
 
 BaseModelConfig BaseModel::ExtractConfig() const {
 	BaseModelConfig config;
-	config.materialConfig = materialData_.ExtractConfig();
+	config.materialGuid = materialGuid_;
 	config.uvTransConfig  = uvTransform.ExtractConfig();
 	config.blendMode	  = static_cast<int>(blendMode_);
 	config.modelName	  = fileName_;
@@ -278,7 +279,7 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 		ImGui::TreePop();
 	}
 
-	materialData_.ShowImGui(config.materialConfig);
+	// materialData_.ShowImGui(config.materialConfig); // TODO: マテリアルアセットの切り替えUIをここに実装
 
 	// ブレンドモード
 	if(ImGui::TreeNodeEx("BlendMode", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -375,5 +376,52 @@ void BaseModel::UploadBillboardParams(const std::vector<GpuBillboardParams>& par
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetBillboardSrv() const { return billboardBuffer_.GetGpuSrvHandle(); }
 
 void BaseModel::TransferMaterial() {
-	materialBuffer_.TransferData(materialData_);
+	auto am = CalyxEngine::AssetManager::GetInstance();
+	auto ma = am->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+
+	Material data;
+	if (ma) {
+		data.color = ma->color;
+		data.lightingMode = ma->lightingMode;
+		data.shininess = ma->shininess;
+		data.isReflect = ma->isReflect;
+		data.envirometCoefficient = ma->envirometCoefficient;
+		data.roughness = ma->roughness;
+	} else {
+		// Default fallback
+		data.color = {1, 1, 1, 1};
+		data.lightingMode = 0;
+		data.shininess = 20.0f;
+	}
+
+	// UV transform を適用
+	CalyxEngine::Matrix4x4 uvTransformMatrix = CalyxEngine::MakeScaleMatrix(CalyxEngine::Vector3(uvTransform.scale.x, uvTransform.scale.y, 1.0f));
+	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeRotateZMatrix(uvTransform.rotate));
+	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
+	data.uvTransform = uvTransformMatrix;
+
+	materialBuffer_.TransferData(data);
+}
+
+const CalyxEngine::Vector4& BaseModel::GetColor() const {
+	auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+	if (ma) return ma->color;
+	static CalyxEngine::Vector4 fallback = {1, 1, 1, 1};
+	return fallback;
+}
+
+void BaseModel::SetColor(const CalyxEngine::Vector4& color) {
+	auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+	if (ma) ma->color = color;
+}
+
+void BaseModel::SetLightingMode(LightingMode mode) {
+	auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+	if (ma) ma->lightingMode = static_cast<int32_t>(mode);
+}
+
+LightingMode BaseModel::GetLightingMode() const {
+	auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+	if (ma) return static_cast<LightingMode>(ma->lightingMode);
+	return LightingMode::HalfLambert;
 }

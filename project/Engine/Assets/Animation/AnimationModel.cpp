@@ -509,20 +509,11 @@ namespace CalyxEngine {
 
 	void AnimationModel::CreateMaterialBuffer() {
 		ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
-		// materialData_ に初期値をセットする
-		materialData_.color		   = CalyxEngine::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-		materialData_.shininess	   = 20.0f;
-		materialData_.lightingMode = LightingMode::HalfLambert;
-		materialData_.uvTransform  = CalyxEngine::Matrix4x4::MakeIdentity();
-
-		// materialData_ の内容で GPU に転送
 		materialBuffer_.Initialize(device);
 	}
 
 	void AnimationModel::MaterialBufferMap() {
-		// materialData_ の内容で GPU に転送
-		// マテリアルのデータを転送
-		materialBuffer_.TransferData(materialData_);
+		TransferMaterial();
 	}
 
 	//-----------------------------------------------------------------------------
