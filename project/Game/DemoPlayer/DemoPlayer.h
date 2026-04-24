@@ -2,6 +2,8 @@
 #include "Engine\Objects\3D\Actor\Actor.h"
 #include "Engine\Foundation\Serialization\SerializableObject.h"
 
+#include <Game\DemoHammer\DemoHammer.h>
+
 class DemoPlayer :
 public Actor {
 public:
@@ -32,6 +34,7 @@ private:
 private:
 
 	struct PlayerParameter : public CalyxEngine::SerializableObject {
+		int	  playerHP_ = 10;
 		float moveSpeed = 2.0f;
 		float jumpForce = 15.0f;
 		float diveForce = -30.0f;
@@ -47,6 +50,7 @@ private:
 		CalyxEngine::Vector3 landScale = {1.4f, 0.5f, 1.4f};
 
 		PlayerParameter() {
+			AddField("HP", moveSpeed).Category("Base Param");
 			AddField("Move Speed", moveSpeed).Category("Move Param");
 			AddField("Jump Force", jumpForce).Category("Move Param");
 			AddField("Dive Force", diveForce).Category("Move Param");
@@ -80,4 +84,7 @@ private:
 	// Pop Scale
 	CalyxEngine::Vector3 targetScale_ = {1.0f, 1.0f, 1.0f};
 	CalyxEngine::Vector3 scaleVelocity_ = {0.0f, 0.0f, 0.0f};
+
+	// ハンマー
+	std::shared_ptr<DemoHammer> hammer_;
 };

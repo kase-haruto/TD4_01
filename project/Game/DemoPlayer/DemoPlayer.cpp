@@ -1,6 +1,7 @@
 #include "DemoPlayer.h"
 #include "Engine/Foundation/Input/Input.h"
 #include "Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h"
+#include "Engine/Scene/Utility/SceneUtility.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
