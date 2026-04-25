@@ -92,6 +92,9 @@ namespace CalyxEngine {
 		if(ReadJsonFile(path, root)) {
 			material->SetName(root.value("name", material->GetName()));
 			ApplyFieldsFromJson(*material, root);
+			if(root.contains("graph")) {
+				material->graph = root.at("graph").get<NodeGraph>();
+			}
 		} else {
 			SaveAsset(*material, path);
 		}
@@ -106,6 +109,9 @@ namespace CalyxEngine {
 		root["guid"] = asset.GetGuid();
 		root["name"] = asset.GetName();
 		root["fields"] = FieldsToJson(asset);
+		if(auto material = dynamic_cast<const MaterialAsset*>(&asset)) {
+			root["graph"] = material->graph;
+		}
 		return WriteJsonFile(path, root);
 	}
 

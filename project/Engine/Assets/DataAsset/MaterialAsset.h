@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DataAsset.h"
+#include <Engine/Editor/NodeEditor/NodeGraph.h>
 #include <Engine/Foundation/Math/Vector4.h>
 #include <Engine/Foundation/Math/Matrix4x4.h>
 #include <Engine/Lighting/LightData.h>
@@ -25,6 +26,7 @@ namespace CalyxEngine {
 		float   envirometCoefficient = 0.5f;
 		float   roughness = 0.5f;
 		Matrix4x4 uvTransform = Matrix4x4::MakeIdentity();
+		NodeGraph graph;
 
 	private:
 		void RegisterFields();
