@@ -43,6 +43,9 @@ void TestScene::Initialize(){
 
 	LoadAssets();
 
+	stageGimmickManager_ = std::make_unique<StageGimmickManager>();
+	stageGimmickManager_->Initialize();
+
 	//=========================
 	// グラフィック関連
 	//=========================
@@ -53,6 +56,9 @@ void TestScene::Initialize(){
 //	更新処理
 /////////////////////////////////////////////////////////////////////////////////////////
 void TestScene::Update([[maybe_unused]]float dt){
+
+	stageGimmickManager_->ShowGui();
+	stageGimmickManager_->Update(dt);
 
 	//衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();

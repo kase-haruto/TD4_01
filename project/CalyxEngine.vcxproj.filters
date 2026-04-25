@@ -2368,6 +2368,11 @@
     <ClCompile Include="Engine\Assets\File\IAssetChangeHandler.cpp" />
     <ClCompile Include="Engine\Assets\Manager\AssetManager.cpp" />
     <ClCompile Include="Game\DemoPlayer\DemoPlayer.cpp" />
+    <ClCompile Include="Game\StageGimmick\Base\StageGimmickEventBase.cpp" />
+    <ClCompile Include="Game\StageGimmick\Base\StageGimmickObjectBase.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Manager\StageGimmickManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Application\System\Environment.h" />
@@ -2393,6 +2398,11 @@
     <ClInclude Include="Engine\Assets\File\IAssetChangeHandler.h" />
     <ClInclude Include="Engine\Assets\Manager\AssetManager.h" />
     <ClInclude Include="Game\DemoPlayer\DemoPlayer.h" />
+    <ClInclude Include="Game\StageGimmick\Base\StageGimmickEventBase.h" />
+    <ClInclude Include="Game\StageGimmick\Base\StageGimmickObjectBase.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorObject.h" />
+    <ClInclude Include="Game\StageGimmick\Manager\StageGimmickManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ObjectPicking.PS.hlsl" />
@@ -2439,7 +2449,5 @@
     <None Include="Resources\shaders\Particles\Particle.hlsli" />
     <None Include="Resources\shaders\PostProcess\Copy\CopyImage.hlsli" />
     <None Include="Resources\shaders\Skinning\SkinningObject3d.hlsli" />
-    <None Include="Resources\shaders\Graphics\Shadow\ShadowTypes.hlsli" />
-    <None Include="Resources\shaders\Graphics\Shadow\InlineRaytracingShadow.hlsl" />
   </ItemGroup>
 </Project>

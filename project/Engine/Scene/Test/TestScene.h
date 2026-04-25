@@ -12,6 +12,8 @@
 #include <vector>
 
 #include <Game\DemoPlayer\DemoPlayer.h>
+#include <Game\StageGimmick\Manager\StageGimmickManager.h>
+
 
 ///デバッグ関連///
 #ifdef _DEBUG
@@ -45,5 +47,7 @@ private:
 	std::unique_ptr<Sprite> testSprite_;
 	std::shared_ptr<CalyxHuman> animationHuman_;
 	std::shared_ptr<DemoPlayer> player_;
+
+	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 };
 

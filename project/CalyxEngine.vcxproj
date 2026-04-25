@@ -215,6 +215,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorObject.cpp" />
     <ClCompile Include="Data\Engine\Configs\Scene\Objects\Particle\Module\ModuleConfig.cpp">
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -450,8 +452,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Application\UI\Panels\SplineEditorPanel.cpp" />
     <ClCompile Include="Engine\Objects\2D\NumbersSprite\NumbersSprite.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\LivePPPanel.cpp" />
+    <ClCompile Include="Game\StageGimmick\Base\StageGimmickEventBase.cpp" />
+    <ClCompile Include="Game\StageGimmick\Base\StageGimmickObjectBase.cpp" />
+    <ClCompile Include="Game\StageGimmick\Manager\StageGimmickManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorObject.h" />
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Event\EventConfig.h" />
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Particle\EffectConfig.h" />
     <ClInclude Include="Engine\Application\Effects\FxGuiHelpers.h" />
@@ -749,6 +756,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Application\UI\Panels\SplineEditorPanel.h" />
     <ClInclude Include="Engine\Objects\2D\NumbersSprite\NumbersSprite.h" />
     <ClInclude Include="Engine\Application\UI\Panels\LivePPPanel.h" />
+    <ClInclude Include="Game\StageGimmick\Base\StageGimmickEventBase.h" />
+    <ClInclude Include="Game\StageGimmick\Base\StageGimmickObjectBase.h" />
+    <ClInclude Include="Game\StageGimmick\Manager\StageGimmickManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
