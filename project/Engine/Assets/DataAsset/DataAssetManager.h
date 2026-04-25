@@ -42,6 +42,7 @@ namespace CalyxEngine {
 		/**
 		 * @brief 全アセットのマップを取得
 		 */
+		
 		const std::unordered_map<Guid, std::shared_ptr<DataAsset>>& GetAssets() const { return assets_; }
 
 		/**

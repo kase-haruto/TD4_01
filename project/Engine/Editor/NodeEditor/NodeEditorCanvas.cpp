@@ -36,13 +36,17 @@ namespace CalyxEngine {
 		return true;
 	}
 
-	bool NodeEditorCanvas::Draw(NodeGraph& graph, const DrawNodeBody& drawBody) {
+	bool NodeEditorCanvas::Draw(NodeGraph& graph, const DrawNodeBody& drawBody, const DrawContextMenu& drawContextMenu) {
 		bool changed = false;
+		backgroundContextRequested_ = false;
+		nodeContextRequested_ = false;
 		if(lastGraph_ != &graph) {
 			lastGraph_ = &graph;
 			positionedNodes_.clear();
 		}
 		ed::SetCurrentEditor(context_);
+		const ImVec2 canvasMin = ImGui::GetCursorScreenPos();
+		const ImVec2 canvasSize = ImGui::GetContentRegionAvail();
 		ed::Begin(id_.c_str());
 
 		for(auto& node : graph.nodes) {
@@ -87,6 +91,19 @@ namespace CalyxEngine {
 		ed::EndCreate();
 
 		if(ed::BeginDelete()) {
+			ed::NodeId deletedNode;
+			while(ed::QueryDeletedNode(&deletedNode)) {
+				if(ed::AcceptDeletedItem()) {
+					const int32_t nodeId = static_cast<int32_t>(deletedNode.Get());
+					std::erase_if(graph.nodes, [nodeId](const Node& n) { return n.id == nodeId; });
+					std::erase_if(graph.links, [&graph](const NodeLink& l) {
+						return graph.FindPin(l.fromPinId) == nullptr || graph.FindPin(l.toPinId) == nullptr;
+					});
+					positionedNodes_.erase(nodeId);
+					changed = true;
+				}
+			}
+
 			ed::LinkId deletedLink;
 			while(ed::QueryDeletedLink(&deletedLink)) {
 				if(ed::AcceptDeletedItem()) {
@@ -98,8 +115,69 @@ namespace CalyxEngine {
 		}
 		ed::EndDelete();
 
+		const ImVec2 mousePos = ImGui::GetMousePos();
+		const bool isMouseInCanvas =
+			mousePos.x >= canvasMin.x && mousePos.y >= canvasMin.y &&
+			mousePos.x <= canvasMin.x + canvasSize.x && mousePos.y <= canvasMin.y + canvasSize.y;
+		const bool openContextMenu = isMouseInCanvas && ImGui::IsMouseClicked(ImGuiMouseButton_Right);
+		const ed::NodeId hoveredNode = ed::GetHoveredNode();
+		const ed::PinId hoveredPin = ed::GetHoveredPin();
+		const ed::LinkId hoveredLink = ed::GetHoveredLink();
+
+		if(openContextMenu && hoveredNode.Get() != 0) {
+			nodeContextRequested_ = true;
+			contextNodeId_ = static_cast<int32_t>(hoveredNode.Get());
+			activeContextMenu_ = {ContextMenuType::Node, {}, contextNodeId_};
+			hasActiveContextMenu_ = true;
+			ed::Suspend();
+			ImGui::OpenPopup("NodeEditorNodeContextMenu");
+			ed::Resume();
+		}
+		if(openContextMenu && hoveredNode.Get() == 0 && hoveredPin.Get() == 0 && hoveredLink.Get() == 0) {
+			backgroundContextRequested_ = true;
+			ImVec2 pos = ed::ScreenToCanvas(ImGui::GetMousePos());
+			contextCanvasPos_ = {pos.x, pos.y};
+			activeContextMenu_ = {ContextMenuType::Background, contextCanvasPos_, 0};
+			hasActiveContextMenu_ = true;
+			ed::Suspend();
+			ImGui::OpenPopup("NodeEditorBackgroundContextMenu");
+			ed::Resume();
+		}
+
+		if(drawContextMenu) {
+			ed::Suspend();
+			if(ImGui::BeginPopup("NodeEditorBackgroundContextMenu")) {
+				activeContextMenu_.type = ContextMenuType::Background;
+				changed |= drawContextMenu(activeContextMenu_);
+				ImGui::EndPopup();
+			}
+			if(ImGui::BeginPopup("NodeEditorNodeContextMenu")) {
+				activeContextMenu_.type = ContextMenuType::Node;
+				changed |= drawContextMenu(activeContextMenu_);
+				ImGui::EndPopup();
+			}
+			if(!ImGui::IsPopupOpen("NodeEditorBackgroundContextMenu") && !ImGui::IsPopupOpen("NodeEditorNodeContextMenu")) {
+				hasActiveContextMenu_ = false;
+			}
+			ed::Resume();
+		}
+
 		ed::End();
 		ed::SetCurrentEditor(nullptr);
 		return changed;
+	}
+
+	bool NodeEditorCanvas::ConsumeBackgroundContextRequest(Vector2& outCanvasPos) {
+		if(!backgroundContextRequested_) return false;
+		backgroundContextRequested_ = false;
+		outCanvasPos = contextCanvasPos_;
+		return true;
+	}
+
+	bool NodeEditorCanvas::ConsumeNodeContextRequest(int32_t& outNodeId) {
+		if(!nodeContextRequested_) return false;
+		nodeContextRequested_ = false;
+		outNodeId = contextNodeId_;
+		return true;
 	}
 }

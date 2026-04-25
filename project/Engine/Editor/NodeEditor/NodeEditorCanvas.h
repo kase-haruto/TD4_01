@@ -12,6 +12,16 @@ namespace CalyxEngine {
 	class NodeEditorCanvas {
 	public:
 		using DrawNodeBody = std::function<bool(Node&)>;
+		enum class ContextMenuType {
+			Background,
+			Node
+		};
+		struct ContextMenu {
+			ContextMenuType type = ContextMenuType::Background;
+			Vector2 canvasPosition{};
+			int32_t nodeId = 0;
+		};
+		using DrawContextMenu = std::function<bool(const ContextMenu&)>;
 
 		explicit NodeEditorCanvas(std::string id);
 		~NodeEditorCanvas();
@@ -19,7 +29,9 @@ namespace CalyxEngine {
 		NodeEditorCanvas(const NodeEditorCanvas&) = delete;
 		NodeEditorCanvas& operator=(const NodeEditorCanvas&) = delete;
 
-		bool Draw(NodeGraph& graph, const DrawNodeBody& drawBody = {});
+		bool Draw(NodeGraph& graph, const DrawNodeBody& drawBody = {}, const DrawContextMenu& drawContextMenu = {});
+		bool ConsumeBackgroundContextRequest(Vector2& outCanvasPos);
+		bool ConsumeNodeContextRequest(int32_t& outNodeId);
 
 	private:
 		bool CanCreateLink(const NodeGraph& graph, int32_t a, int32_t b, int32_t& from, int32_t& to) const;
@@ -30,5 +42,11 @@ namespace CalyxEngine {
 		ax::NodeEditor::EditorContext* context_ = nullptr;
 		const NodeGraph* lastGraph_ = nullptr;
 		std::unordered_set<int32_t> positionedNodes_;
+		bool backgroundContextRequested_ = false;
+		bool nodeContextRequested_ = false;
+		Vector2 contextCanvasPos_{};
+		int32_t contextNodeId_ = 0;
+		ContextMenu activeContextMenu_{};
+		bool hasActiveContextMenu_ = false;
 	};
 }
