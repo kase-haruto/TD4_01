@@ -22,6 +22,8 @@ public:
 
 	//--------- Collision -----------------------------------------------
 
+	void OnCollisionEnter(Collider* other) override;
+
 	//--------- config ------------------------------------------------
 
 	//--------- accessor ------------------------------------------------
@@ -45,6 +47,9 @@ private:
 
 		float diveRotationTime = 0.5f;
 
+		float defaultShockScale = 1.0f;
+		float strongShockScale = 1.5f;
+
 		CalyxEngine::Vector3 jumpScale = {0.8f, 1.3f, 0.8f};
 		CalyxEngine::Vector3 diveScale = {0.9f, 1.2f, 0.9f};
 		CalyxEngine::Vector3 landScale = {1.4f, 0.5f, 1.4f};
@@ -58,6 +63,8 @@ private:
 			AddField("Stiffness", stiffness).Category("Pop Scale");
 			AddField("Damping", damping).Category("Pop Scale");
 			AddField("Dive Rotation Time", diveRotationTime).Category("Move Param");
+			AddField("Default ShockScale", defaultShockScale).Category("Shock Power");
+			AddField("Strong ShockScale", strongShockScale).Category("Shock Power");
 			AddField("Jump Scale", jumpScale).Category("Pop Scale");
 			AddField("Dive Scale", diveScale).Category("Pop Scale");
 			AddField("Land Scale", landScale).Category("Pop Scale");

@@ -2,6 +2,7 @@
 #include "Engine/Foundation/Input/Input.h"
 #include "Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h"
 #include "Engine/Scene/Utility/SceneUtility.h"
+#include <Game/DemoShockwave/ShockwaveManager.h>
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -13,8 +14,7 @@ DemoPlayer::DemoPlayer() : Actor() {
 	moveSpeed_ = param_.moveSpeed;
 }
 
-DemoPlayer::DemoPlayer(const std::string& modelName, std::optional<std::string> objectName) :
-Actor::Actor(modelName, objectName){
+DemoPlayer::DemoPlayer(const std::string& modelName, std::optional<std::string> objectName) : Actor::Actor(modelName, objectName) {
 	param_.LoadParams();
 	moveSpeed_ = param_.moveSpeed;
 }
@@ -37,6 +37,9 @@ void DemoPlayer::Initialize() {
 	// Pop Scale
 	targetScale_   = {1.0f, 1.0f, 1.0f};
 	scaleVelocity_ = {0.0f, 0.0f, 0.0f};
+
+	// 衝撃波マネージャーの初期化（プール作成）
+	ShockwaveManager::GetInstance()->Initialize(10);
 }
 
 void DemoPlayer::Update(float dt) {
@@ -51,13 +54,26 @@ void DemoPlayer::DerivativeGui() {
 	param_.ShowGui();
 }
 
+void DemoPlayer::OnCollisionEnter(Collider* other) {
+	BaseGameObject* otherObj = other->GetOwner();
+	if(otherObj) {
+
+	}
+}
+
 void DemoPlayer::Move(float dt) {
 	// 水平移動の入力
 	CalyxEngine::Vector3 horizonVelocity = {0.0f, 0.0f, 0.0f};
 
-	if(CalyxFoundation::Input::PushKey(DIK_A)) {horizonVelocity.x -= 1.0f;}
-	if(CalyxFoundation::Input::PushKey(DIK_D)) {horizonVelocity.x += 1.0f;}
-	if(CalyxFoundation::Input::PushKey(DIK_L)) {worldTransform_.translation = {0.0f, 0.0f, 0.0f};}
+	if(CalyxFoundation::Input::PushKey(DIK_A)) {
+		horizonVelocity.x -= 1.0f;
+	}
+	if(CalyxFoundation::Input::PushKey(DIK_D)) {
+		horizonVelocity.x += 1.0f;
+	}
+	if(CalyxFoundation::Input::PushKey(DIK_L)) {
+		worldTransform_.translation = {0.0f, 0.0f, 0.0f};
+	}
 	// ずっと前へすすむ
 	horizonVelocity.z += 1.0f;
 
@@ -68,8 +84,8 @@ void DemoPlayer::Move(float dt) {
 		horizonVelocity.Normalize();
 
 		// 回転（移動方向を向く目標）
-		CalyxEngine::Vector3 from = CalyxEngine::Vector3::Forward();
-		CalyxEngine::Vector3 to	  = horizonVelocity;
+		CalyxEngine::Vector3	from		   = CalyxEngine::Vector3::Forward();
+		CalyxEngine::Vector3	to			   = horizonVelocity;
 		CalyxEngine::Quaternion targetRotation = CalyxEngine::Quaternion::FromToQuaternion(from, to);
 
 		// 線形補間(SLERP)による滑らかな回転
@@ -87,25 +103,27 @@ void DemoPlayer::Move(float dt) {
 	if(jumpTrigger) {
 		if(!isJumping_) {
 			// ジャンプ開始
-			velocity_.y			= param_.jumpForce;
-			isJumping_			= true;
-			isDiving_			= false;
-			jumpRotation_		= 0.0f;
+			velocity_.y	  = param_.jumpForce;
+			isJumping_	  = true;
+			isDiving_	  = false;
+			jumpRotation_ = 0.0f;
 			// 接地状態からジャンプして着地するまでの時間を計算
-			float airTime		= 2.0f * param_.jumpForce / param_.gravity;
-			jumpRotationSpeed_  = (2.0f * pi) / airTime;
+			float airTime		   = 2.0f * param_.jumpForce / param_.gravity;
+			jumpRotationSpeed_	   = (2.0f * pi) / airTime;
 			jumpRotationRemaining_ = 2.0f * pi;
 
 			// ジャンプ時に縦に伸びる
 			worldTransform_.scale = param_.jumpScale;
 			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
+
+			// 衝撃波を発生（ハンマー振り下ろし）
+			ShockwaveManager::GetInstance()->Emit(worldTransform_.translation, param_.defaultShockScale);
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
 			velocity_.y = param_.jumpForce;
 			isDiving_	= true;
 			// 2回追加で回る
-			jumpRotationSpeed_ = (4.0f * pi) / param_.diveRotationTime;
+			jumpRotationSpeed_	   = (4.0f * pi) / param_.diveRotationTime;
 			jumpRotationRemaining_ = 4.0f * pi;
-
 		}
 	}
 
@@ -132,7 +150,7 @@ void DemoPlayer::Move(float dt) {
 
 	// 最終的な回転を適用 (向き + ジャンプ回転 + 傾き)
 	CalyxEngine::Quaternion flipRotation = CalyxEngine::Quaternion::MakeRotateX(jumpRotation_);
-	worldTransform_.rotation = baseRotation_ * flipRotation;
+	worldTransform_.rotation			 = baseRotation_ * flipRotation;
 
 	worldTransform_.translation += velocity_ * dt;
 }
@@ -145,6 +163,11 @@ void DemoPlayer::ApplyGravity(float dt) {
 	if(worldTransform_.translation.y <= 0.0f) {
 		// 着地した瞬間
 		if(isJumping_) {
+			// 着地衝撃波（急降下中なら大きく、通常なら少し大きめ）
+			if(isDiving_) {
+				ShockwaveManager::GetInstance()->Emit(worldTransform_.translation, param_.strongShockScale);
+			}
+
 			worldTransform_.scale = param_.landScale;
 			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
 		}
@@ -160,10 +183,9 @@ void DemoPlayer::ApplyGravity(float dt) {
 
 void DemoPlayer::UpdatePopScale(float dt) {
 
-	CalyxEngine::Vector3 diff = worldTransform_.scale - targetScale_;
+	CalyxEngine::Vector3 diff		  = worldTransform_.scale - targetScale_;
 	CalyxEngine::Vector3 acceleration = (diff * -param_.stiffness) - (scaleVelocity_ * param_.damping);
 
 	scaleVelocity_ += acceleration * dt;
 	worldTransform_.scale += scaleVelocity_ * dt;
-
 }

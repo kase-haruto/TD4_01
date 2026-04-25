@@ -2368,6 +2368,9 @@
     <ClCompile Include="Engine\Assets\File\IAssetChangeHandler.cpp" />
     <ClCompile Include="Engine\Assets\Manager\AssetManager.cpp" />
     <ClCompile Include="Game\DemoPlayer\DemoPlayer.cpp" />
+    <ClCompile Include="Game\DemoHammer\DemoHammer.cpp" />
+    <ClCompile Include="Game\DemoShockwave\ShockwaveManager.cpp" />
+    <ClCompile Include="Game\DemoShockwave\Shockwave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Application\System\Environment.h" />
@@ -2393,6 +2396,9 @@
     <ClInclude Include="Engine\Assets\File\IAssetChangeHandler.h" />
     <ClInclude Include="Engine\Assets\Manager\AssetManager.h" />
     <ClInclude Include="Game\DemoPlayer\DemoPlayer.h" />
+    <ClInclude Include="Game\DemoHammer\DemoHammer.h" />
+    <ClInclude Include="Game\DemoShockwave\ShockwaveManager.h" />
+    <ClInclude Include="Game\DemoShockwave\Shockwave.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ObjectPicking.PS.hlsl" />
@@ -2439,7 +2445,5 @@
     <None Include="Resources\shaders\Particles\Particle.hlsli" />
     <None Include="Resources\shaders\PostProcess\Copy\CopyImage.hlsli" />
     <None Include="Resources\shaders\Skinning\SkinningObject3d.hlsli" />
-    <None Include="Resources\shaders\Graphics\Shadow\ShadowTypes.hlsli" />
-    <None Include="Resources\shaders\Graphics\Shadow\InlineRaytracingShadow.hlsl" />
   </ItemGroup>
 </Project>

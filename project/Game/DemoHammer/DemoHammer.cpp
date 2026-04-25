@@ -13,7 +13,6 @@ Actor::Actor(modelName, objectName) {
 
 void DemoHammer::Initialize() {
 	param_.LoadParams();
-	worldTransform_.scale = {0.2f, 2.0f, 0.2f};
 }
 
 void DemoHammer::Update(float dt) {

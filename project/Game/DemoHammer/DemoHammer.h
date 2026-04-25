@@ -24,6 +24,8 @@ public:
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoHammer"; }
 
+
+
 private:
 	struct HammerParameter : public CalyxEngine::SerializableObject {
 		float moveSpeed = 2.0f;
