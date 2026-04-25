@@ -13,11 +13,16 @@ Actor::Actor(modelName, objectName) {
 
 void DemoHammer::Initialize() {
 	param_.LoadParams();
+	swingAxis_	= {1.0f, 0.0f, 0.0f};
+	swingAngle_ = 0.0f;
 }
 
 void DemoHammer::Update(float dt) {
+	// Playerで計算された角度を適用
 	float t = dt;
-	t		= 1.0f;
+	t		= 1;
+
+	worldTransform_.rotation = CalyxEngine::Quaternion::MakeRotateAxisQuaternion(swingAxis_, swingAngle_);
 }
 
 void DemoHammer::DerivativeGui() {

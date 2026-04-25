@@ -23,7 +23,10 @@ public:
 
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoHammer"; }
-
+	void			 SetSwingAngle(const CalyxEngine::Vector3& axis, float angle) {
+		swingAxis_	= axis;
+		swingAngle_ = angle;
+	}
 
 
 private:
@@ -41,5 +44,6 @@ private:
 
 	HammerParameter param_;
 
-
+	CalyxEngine::Vector3 swingAxis_	 = {1.0f, 0.0f, 0.0f};
+	float				 swingAngle_ = 0.0f;
 };

@@ -29,6 +29,9 @@ void DemoPlayer::Initialize() {
 	velocity_					= {0.0f, 0.0f, 0.0f};
 	isJumping_					= false;
 	isDiving_					= false;
+	isRecovering_				= false;
+	recoveryTimer_				= 0.0f;
+
 	baseRotation_				= CalyxEngine::Quaternion::MakeIdentity();
 	jumpRotation_				= 0.0f;
 	jumpRotationSpeed_			= 0.0f;
@@ -43,11 +46,24 @@ void DemoPlayer::Initialize() {
 }
 
 void DemoPlayer::Update(float dt) {
+	if(firstSetting_) {
+		// 子オブジェクトからハンマーを探す
+		hammer_ = nullptr;
+		for(auto& child : children_) {
+			if(auto h = std::dynamic_pointer_cast<DemoHammer>(child)) {
+				hammer_ = h;
+				firstSetting_ = false;
+				break;
+			}
+		}
+	}
+
 	moveSpeed_ = param_.moveSpeed;
 
 	Move(dt);
 	ApplyGravity(dt);
 	UpdatePopScale(dt);
+	HammerControl(dt);
 }
 
 void DemoPlayer::DerivativeGui() {
@@ -65,14 +81,10 @@ void DemoPlayer::Move(float dt) {
 	// 水平移動の入力
 	CalyxEngine::Vector3 horizonVelocity = {0.0f, 0.0f, 0.0f};
 
-	if(CalyxFoundation::Input::PushKey(DIK_A)) {
-		horizonVelocity.x -= 1.0f;
-	}
-	if(CalyxFoundation::Input::PushKey(DIK_D)) {
-		horizonVelocity.x += 1.0f;
-	}
+	if(CalyxFoundation::Input::PushKey(DIK_A)) {horizonVelocity.x -= 1.0f;}
+	if(CalyxFoundation::Input::PushKey(DIK_D)) {horizonVelocity.x += 1.0f;}
 	if(CalyxFoundation::Input::PushKey(DIK_L)) {
-		worldTransform_.translation = {0.0f, 0.0f, 0.0f};
+		worldTransform_.translation = {0.0f, worldTransform_.translation.y, 0.0f};
 	}
 	// ずっと前へすすむ
 	horizonVelocity.z += 1.0f;
@@ -100,7 +112,7 @@ void DemoPlayer::Move(float dt) {
 	bool jumpTrigger = CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A);
 
 	float pi = std::numbers::pi_v<float>;
-	if(jumpTrigger) {
+	if(jumpTrigger && !isRecovering_) {
 		if(!isJumping_) {
 			// ジャンプ開始
 			velocity_.y	  = param_.jumpForce;
@@ -166,6 +178,9 @@ void DemoPlayer::ApplyGravity(float dt) {
 			// 着地衝撃波（急降下中なら大きく、通常なら少し大きめ）
 			if(isDiving_) {
 				ShockwaveManager::GetInstance()->Emit(worldTransform_.translation, param_.strongShockScale);
+				// リカバリー開始
+				isRecovering_  = true;
+				recoveryTimer_ = 0.0f;
 			}
 
 			worldTransform_.scale = param_.landScale;
@@ -188,4 +203,41 @@ void DemoPlayer::UpdatePopScale(float dt) {
 
 	scaleVelocity_ += acceleration * dt;
 	worldTransform_.scale += scaleVelocity_ * dt;
+}
+
+void DemoPlayer::HammerControl(float dt) {
+	if(hammer_) {
+		float hammerAngle = 0.0f;
+		float pi		  = std::numbers::pi_v<float>;
+
+		if(isRecovering_) {
+			// 着地後のリカバリー
+			recoveryTimer_ += dt;
+			float progress = std::clamp(recoveryTimer_ / recoveryDuration_, 0.0f, 1.0f);
+			// 90度(pi/2)から0度へ
+			hammerAngle = std::lerp(pi * 0.5f, 0.0f, progress);
+
+			if(progress >= 1.0f) {
+				isRecovering_ = false;
+			}
+		} else if(isJumping_) {
+			if(isDiving_) {
+				// 急降下中は90度
+				hammerAngle = pi * 0.5f;
+			} else {
+				if(jumpRotation_ <= pi / 6.0f) {
+					float t		= jumpRotation_ / (pi / 6.0f);
+					hammerAngle = std::lerp(0.0f, pi * 0.5f, t);
+				} else if(jumpRotation_ <= pi) {
+					hammerAngle = pi * 0.5f;
+				} else {
+					float t		= (jumpRotation_ - pi) / pi;
+					hammerAngle = std::lerp(pi * 0.5f, 0.0f, t);
+				}
+			}
+		}
+
+		CalyxEngine::Vector3 swingAxis = CalyxEngine::Quaternion::RotateVector({1.0f, 0.0f, .0f}, worldTransform_.rotation);
+		hammer_->SetSwingAngle(swingAxis, -hammerAngle);
+	}
 }

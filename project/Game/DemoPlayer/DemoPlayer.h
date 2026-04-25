@@ -32,6 +32,7 @@ private:
 	void Move(float dt);
 	void ApplyGravity(float dt);
 	void UpdatePopScale(float dt);
+	void HammerControl(float dt);
 
 private:
 
@@ -79,6 +80,11 @@ private:
 	bool  isJumping_	 = false;
 	bool  isDiving_		 = false;
 
+	// ハンマーリカバリー用
+	bool  isRecovering_	 = false;
+	float recoveryTimer_ = 0.0f;
+	float recoveryDuration_ = 0.3f; // リカバリー時間（秒）
+
 	// 回転補間用
 	float rotationSpeed_ = 10.0f;
 	CalyxEngine::Quaternion baseRotation_ = CalyxEngine::Quaternion::MakeIdentity();
@@ -94,4 +100,5 @@ private:
 
 	// ハンマー
 	std::shared_ptr<DemoHammer> hammer_;
+	bool						firstSetting_ = true;
 };
