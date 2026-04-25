@@ -5,6 +5,7 @@
 
 // engine
 #include <Engine/Assets/Database/AssetDatabase.h>
+#include <Engine/Application/UI/Panels/AssetPanel.h>
 #include <Engine/Assets/Model/ModelManager.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
 #include <Engine/Assets/Texture/TextureManager.h>
@@ -217,6 +218,53 @@ BaseModelConfig BaseModel::ExtractConfig() const {
 
 void BaseModel::ShowImGui(BaseModelConfig& config) {
 	uvTransform.ShowImGui("uvTransform");
+
+	if(ImGui::TreeNodeEx("Material Asset (Drag & Drop from Assets)", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+		auto labelFromGuid = [](const Guid& g) -> std::string {
+			if(!g.isValid()) return "(none)";
+			auto* db = AssetDatabase::GetInstance();
+			for(auto* r : db->GetView()) {
+				if(r && r->type == AssetType::Material && r->guid == g) {
+					return r->sourcePath.filename().string();
+				}
+			}
+			return "(missing)";
+		};
+
+		Guid droppedGuid = materialGuid_;
+		if(CalyxEngine::AssetPanel::DrawAssetDropTarget(AssetType::Material, &droppedGuid)) {
+			materialGuid_ = droppedGuid;
+			config.materialGuid = droppedGuid;
+			TransferMaterial();
+		}
+
+		ImGui::TextDisabled("Current: %s", labelFromGuid(materialGuid_).c_str());
+		ImGui::SameLine();
+		if(materialGuid_.isValid() && ImGui::SmallButton("Copy GUID##material")) {
+			ImGui::SetClipboardText(materialGuid_.ToString().c_str());
+		}
+
+		if(auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_)) {
+			if(ImGui::TreeNodeEx("Edit Shared Material", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				if(ma->ShowGui()) {
+					TransferMaterial();
+				}
+
+				auto* db = AssetDatabase::GetInstance();
+				for(auto* r : db->GetView()) {
+					if(r && r->type == AssetType::Material && r->guid == materialGuid_) {
+						if(ImGui::Button("Save Material")) {
+							CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->SaveAsset(*ma, r->sourcePath);
+						}
+						break;
+					}
+				}
+				ImGui::TreePop();
+			}
+		}
+
+		ImGui::TreePop();
+	}
 
 	if(ImGui::TreeNodeEx("Texture (Drag & Drop from Assets)", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
 		// ---- ドラッグ&ドロップでテクスチャ適用 ----

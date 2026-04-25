@@ -2,6 +2,7 @@
 
 #include "Engine/Assets/Manager/AssetManager.h"
 
+#include <Engine/Assets/DataAsset/DataAssetManager.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <externals/nlohmann/json.hpp>
 
@@ -215,6 +216,12 @@ AssetGUID AssetDatabase::RegisterOrUpdate(const std::filesystem::path& absOrRelP
 		r.lastWrite			  = ft;
 		normPathToGuid_[norm] = guid;
 		if(needPreview) BuildPreview(r);
+	}
+
+	if(type == AssetType::Material) {
+		if(auto* manager = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()) {
+			manager->LoadMaterialAsset(abs, guid);
+		}
 	}
 
 	RebuildViewCache();

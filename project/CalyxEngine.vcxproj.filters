@@ -133,6 +133,9 @@
     <Filter Include="Engine\Assets\Database">
       <UniqueIdentifier>{9C4A3511-63FC-40BD-B4BA-11FFA107FDF0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Assets\DataAsset">
+      <UniqueIdentifier>{A1CBA210-10F5-4D31-9C7B-420F43B8B0E1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Assets\Model">
       <UniqueIdentifier>{8F93D651-864B-4DFE-9B11-2E75C441DB98}</UniqueIdentifier>
     </Filter>
@@ -966,6 +969,12 @@
     <ClCompile Include="Engine\Assets\Database\AssetDatabase.cpp">
       <Filter>Engine\Assets\Database</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Assets\DataAsset\DataAssetManager.cpp">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Assets\DataAsset\MaterialAsset.cpp">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Application\UI\Panels\AssetPanel.cpp">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClCompile>
@@ -1599,6 +1608,18 @@
     </ClInclude>
     <ClInclude Include="Engine\Assets\Database\AssetDatabase.h">
       <Filter>Engine\Assets\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\Archetype.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\DataAsset.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\DataAssetManager.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\MaterialAsset.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\AssetPanel.h">
       <Filter>Engine\Application\UI\Panels</Filter>

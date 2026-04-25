@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
+#include <filesystem>
 
 namespace CalyxEngine {
 
@@ -18,21 +19,12 @@ namespace CalyxEngine {
 		/**
 		 * @brief アセットを登録する
 		 */
-		inline void RegisterAsset(const std::shared_ptr<DataAsset>& asset) {
-			if (!asset) return;
-			assets_[asset->GetGuid()] = asset;
-		}
+		void RegisterAsset(const std::shared_ptr<DataAsset>& asset);
 
 		/**
 		 * @brief GUIDからアセットを取得する
 		 */
-		inline std::shared_ptr<DataAsset> GetAsset(const Guid& guid) const {
-			auto it = assets_.find(guid);
-			if (it != assets_.end()) {
-				return it->second;
-			}
-			return nullptr;
-		}
+		std::shared_ptr<DataAsset> GetAsset(const Guid& guid) const;
 
 		/**
 		 * @brief 型を指定してアセットを取得する（内部でキャスト）
@@ -45,14 +37,7 @@ namespace CalyxEngine {
 		/**
 		 * @brief 名前からアセットを取得する（主にデバッグ・初期化用）
 		 */
-		inline std::shared_ptr<DataAsset> GetAssetByName(const std::string& name) const {
-			for (auto& pair : assets_) {
-				if (pair.second->GetName() == name) {
-					return pair.second;
-				}
-			}
-			return nullptr;
-		}
+		std::shared_ptr<DataAsset> GetAssetByName(const std::string& name) const;
 
 		/**
 		 * @brief 全アセットのマップを取得
@@ -62,9 +47,11 @@ namespace CalyxEngine {
 		/**
 		 * @brief アセットを削除する
 		 */
-		inline void UnregisterAsset(const Guid& guid) {
-			assets_.erase(guid);
-		}
+		void UnregisterAsset(const Guid& guid);
+
+		std::shared_ptr<class MaterialAsset> LoadMaterialAsset(const std::filesystem::path& path, const Guid& guid);
+		bool SaveAsset(const DataAsset& asset, const std::filesystem::path& path) const;
+		std::shared_ptr<class MaterialAsset> CreateMaterialAsset(const std::filesystem::path& path, const Guid& guid, const std::string& name);
 
 	private:
 		std::unordered_map<Guid, std::shared_ptr<DataAsset>> assets_;
