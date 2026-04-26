@@ -1,4 +1,5 @@
 #include "BreakableFloorObject.h"
+
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
 REGISTER_SCENE_OBJECT(BreakableFloorObject)
@@ -30,6 +31,9 @@ void BreakableFloorObject::Break() {
 }
 
 void BreakableFloorObject::ObjectInitialize() {
+
+	// コライダーの初期化
+	BaseGameObject::InitializeCollider(ColliderKind::Box);
 	isBroken_ = false;
 }
 

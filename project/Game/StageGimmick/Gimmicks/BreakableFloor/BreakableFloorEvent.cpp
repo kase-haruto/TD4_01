@@ -9,33 +9,29 @@ REGISTER_SCENE_OBJECT(BreakableFloorEvent)
 BreakableFloorEvent::BreakableFloorEvent(const std::string& name) : StageGimmickEventBase(name) {}
 
 void BreakableFloorEvent::SetTarget(const std::shared_ptr<BreakableFloorObject>& target) {
-	targetFloor_ = target;
+	targetObject_ = target;
 }
 
 void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
-	if(!other) {
-		return;
-	}
 
+	other;
 	// ハンマー判定かどうか確認する
-	// if (other->GetType() != ColliderType::Type_PlayerAttack) return;
+	if(other->GetType() != ColliderType::Type_Player) return;
 
 	// プレイヤーの攻撃に当たったら床を壊す
-	auto floor = targetFloor_.lock();
+	auto floor = targetObject_.lock();
 	if(!floor) {
 		return;
 	}
 	floor->Break();
 
 	// イベントを無効化する
-	if(collider_) {
-		collider_->SetCollisionEnabled(false);
-	}
+	
 	isActive_ = false;
 }
 
 void BreakableFloorEvent::EventInitialize() {
-	if(!targetFloor_.expired()) {
+	if(!targetObject_.expired()) {
 		return;
 	}
 
@@ -53,7 +49,7 @@ void BreakableFloorEvent::EventInitialize() {
 	// 対応するオブジェクト名を作る
 	std::string targetName = objectPrefix + suffix;
 	// シーンから対応するオブジェクトを探す
-	targetFloor_ =
+	targetObject_ =
 		SceneContext::Current()->FindObjectByName<BreakableFloorObject>(targetName);
 }
 

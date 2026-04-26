@@ -35,6 +35,6 @@ protected:
 private:
 
 	// ターゲットの壊れる床オブジェクト
-	std::weak_ptr<BreakableFloorObject> targetFloor_;
+	std::weak_ptr<BreakableFloorObject> targetObject_;
 
 };

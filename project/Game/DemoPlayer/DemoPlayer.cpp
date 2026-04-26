@@ -36,6 +36,10 @@ void DemoPlayer::Initialize() {
 	// Pop Scale
 	targetScale_   = {1.0f, 1.0f, 1.0f};
 	scaleVelocity_ = {0.0f, 0.0f, 0.0f};
+
+	InitializeCollider(BaseGameObject::ColliderKind::Sphere);
+	collider_->SetType(ColliderType::Type_Player);
+	collider_->SetTargetType(ColliderType::Type_EventObject);
 }
 
 void DemoPlayer::Update(float dt) {

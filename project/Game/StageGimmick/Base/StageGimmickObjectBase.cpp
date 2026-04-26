@@ -7,7 +7,6 @@ StageGimmickObjectBase::StageGimmickObjectBase
 void StageGimmickObjectBase::Initialize() {
 	// 実体オブジェの初期化
 	BaseGameObject::Initialize();
-	BaseGameObject::InitializeCollider(ColliderKind::Box);
 	ObjectInitialize();
 }
 
