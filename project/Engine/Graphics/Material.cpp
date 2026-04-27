@@ -34,7 +34,7 @@ void Material::ShowImGui() {
     static constexpr const char* lightingModes[] = {
         "Half-Lambert",
         "Lambert",
-        "SpecularReflection",
+        "Toon",
         "No Lighting (Black)",
         "Unlit Color"
     };
@@ -84,7 +84,7 @@ void Material::ShowImGui(MaterialConfig& config) {
         static constexpr const char* lightingModes[] = {
             "Half-Lambert",
             "Lambert",
-            "SpecularReflection",
+            "Toon",
             "No Lighting (Black)",
             "Unlit Color"
         };

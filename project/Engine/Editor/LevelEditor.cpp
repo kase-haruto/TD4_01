@@ -58,6 +58,7 @@ namespace CalyxEngine {
 		placeToolPanel_		= std::make_unique<PlaceToolPanel>();
 		splineEditor_		= std::make_unique<SplineEditorPanel>();
 		assetPanel_			= std::make_unique<AssetPanel>();
+		materialNodeEditorPanel_ = std::make_unique<MaterialNodeEditorPanel>();
 		livePPPanel_		= std::make_unique<LivePPPanel>();
 		sceneSwitchOverlay_ = std::make_unique<SceneSwitchOverlay>();
 
@@ -183,6 +184,7 @@ namespace CalyxEngine {
 		editorPanels_.push_back(placeToolPanel_.get());
 		editorPanels_.push_back(splineEditor_.get());
 		editorPanels_.push_back(assetPanel_.get());
+		editorPanels_.push_back(materialNodeEditorPanel_.get());
 		editorPanels_.push_back(livePPPanel_.get());
 
 		// Editors メニュー（MenuCategory::Tools）に各パネルのトグルを追加

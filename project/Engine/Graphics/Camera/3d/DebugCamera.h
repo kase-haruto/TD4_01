@@ -23,7 +23,6 @@ public:
 	~DebugCamera() = default;
 
 	void AlwaysUpdate(float dt) override;
-	;
 	void ShowGui() override; //< ImGuiによるGUI表示
 
 	//===================================================================//
@@ -55,8 +54,8 @@ private:
 
 	// 操作速度
 	float rotateSpeed_ = 0.005f; //* 回転速度
-	float panSpeed_    = 1.0f;  //* パンスピード
-	float zoomSpeed_   = 1.0f;   //* ズーム速度
+	float panSpeed_    = 0.1f;  //* パンスピード
+	float zoomSpeed_   = 0.1f;   //* ズーム速度
 
 	// ドラッグ状態の管理（Rotate用）
 	CalyxEngine::Vector2 lastMousePosRotate_{0.0f,0.0f}; //* Rotate用の前フレームのマウス位置

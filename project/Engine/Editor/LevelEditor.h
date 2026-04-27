@@ -11,6 +11,7 @@
 #include <Engine/Application/UI/Panels/HierarchyPanel.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
 #include <Engine/Application/UI/Panels/LivePPPanel.h>
+#include <Engine/Application/UI/Panels/MaterialNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Editor/ImGuiLayoutSwitcher.h>
@@ -116,6 +117,7 @@ namespace CalyxEngine {
 		std::unique_ptr<PlaceToolPanel>		 placeToolPanel_;
 		std::unique_ptr<SplineEditorPanel>	 splineEditor_;
 		std::unique_ptr<AssetPanel>			 assetPanel_;
+		std::unique_ptr<MaterialNodeEditorPanel> materialNodeEditorPanel_;
 		std::unique_ptr<LivePPPanel>		 livePPPanel_;
 		std::unique_ptr<SceneSwitchOverlay>	 sceneSwitchOverlay_;
 		std::unique_ptr<ImGuiLayoutSwitcher> layoutSwitcher_;
