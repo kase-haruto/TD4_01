@@ -182,6 +182,74 @@ GraphicsPipelineDesc PipelinePresets::MakeWireframeSkinnedObject3D(BlendMode mod
 	return desc;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+//		anime style outline static object
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeOutlineObject3D() {
+	GraphicsPipelineDesc desc;
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthDesc.StencilEnable = FALSE;
+
+	desc.VS(L"OutlineObject3D.VS.hlsl")
+		.PS(L"Outline.PS.hlsl")
+		.Input(VertexInputLayout<VertexPosUvN>::Get())
+		.Blend(BlendMode::NORMAL)
+		.CullFront()
+		.DepthState(depthDesc)
+		.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+		.Samples(1);
+
+	desc.root_
+		.AllowIA()
+		.CBV(9, D3D12_SHADER_VISIBILITY_PIXEL)											 // [0] unused material slot
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX) // [1] transforms
+		.SRVTable(9, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [2] unused texture slot
+		.Constants(2, 5, D3D12_SHADER_VISIBILITY_ALL)									 // [3] OutlineConstants
+		.CBV(1, D3D12_SHADER_VISIBILITY_ALL)											 // [4] Camera
+		.CBV(10, D3D12_SHADER_VISIBILITY_PIXEL)										 // [5] unused light slot
+		.SRVTable(10, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL) // [6] unused env slot
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX);// [7] billboard
+
+	return desc;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		anime style outline skinned object
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeOutlineSkinnedObject3D() {
+	GraphicsPipelineDesc desc;
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthDesc.StencilEnable = FALSE;
+
+	desc.VS(L"OutlineSkinnedObject3D.VS.hlsl")
+		.PS(L"Outline.PS.hlsl")
+		.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+		.Blend(BlendMode::NORMAL)
+		.CullFront()
+		.DepthState(depthDesc)
+		.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+		.Samples(1);
+
+	desc.root_
+		.AllowIA()
+		.CBV(9, D3D12_SHADER_VISIBILITY_PIXEL)											 // [0] unused material slot
+		.CBV(0, D3D12_SHADER_VISIBILITY_VERTEX)											 // [1] World
+		.SRVTable(9, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [2] unused texture slot
+		.Constants(2, 5, D3D12_SHADER_VISIBILITY_ALL)									 // [3] OutlineConstants
+		.CBV(1, D3D12_SHADER_VISIBILITY_ALL)											 // [4] Camera
+		.CBV(10, D3D12_SHADER_VISIBILITY_PIXEL)										 // [5] unused light slot
+		.SRVTable(10, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL) // [6] unused env slot
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX);// [7] SkinningBuffer
+
+	return desc;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //		3d スキニング shadowMap用
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -133,6 +133,12 @@
     <Filter Include="Engine\Assets\Database">
       <UniqueIdentifier>{9C4A3511-63FC-40BD-B4BA-11FFA107FDF0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Assets\DataAsset">
+      <UniqueIdentifier>{A1CBA210-10F5-4D31-9C7B-420F43B8B0E1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Editor\NodeEditor">
+      <UniqueIdentifier>{F836AF39-3677-4F8C-98C0-A76874883399}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Assets\Model">
       <UniqueIdentifier>{8F93D651-864B-4DFE-9B11-2E75C441DB98}</UniqueIdentifier>
     </Filter>
@@ -966,8 +972,23 @@
     <ClCompile Include="Engine\Assets\Database\AssetDatabase.cpp">
       <Filter>Engine\Assets\Database</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Assets\DataAsset\DataAssetManager.cpp">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Assets\DataAsset\MaterialAsset.cpp">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Application\UI\Panels\AssetPanel.cpp">
       <Filter>Engine\Application\UI\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.cpp">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\NodeEditor\NodeEditorCanvas.cpp">
+      <Filter>Engine\Editor\NodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\NodeEditor\NodeGraph.cpp">
+      <Filter>Engine\Editor\NodeEditor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Objects\3D\Geometory\Spline\SplineData.cpp">
       <Filter>Engine\Objects\3D\Geometory\Spline</Filter>
@@ -1240,6 +1261,18 @@
       <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_node_editor.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_node_editor_api.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\crude_json.cpp">
+      <Filter>externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="externals\imgui\imgui_canvas.cpp">
       <Filter>externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_tables.cpp">
@@ -1600,8 +1633,29 @@
     <ClInclude Include="Engine\Assets\Database\AssetDatabase.h">
       <Filter>Engine\Assets\Database</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\Archetype.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\DataAsset.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\DataAssetManager.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\MaterialAsset.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\AssetPanel.h">
       <Filter>Engine\Application\UI\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.h">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\NodeEditor\NodeEditorCanvas.h">
+      <Filter>Engine\Editor\NodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\NodeEditor\NodeGraph.h">
+      <Filter>Engine\Editor\NodeEditor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Assets\System\AssetDragPayload.h">
       <Filter>Engine\Assets\System</Filter>
@@ -2012,6 +2066,30 @@
       <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imgui_internal.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_node_editor.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_node_editor_internal.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\crude_json.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_bezier_math.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_bezier_math.inl">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_canvas.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_extra_math.h">
+      <Filter>externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="externals\imgui\imgui_extra_math.inl">
       <Filter>externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imstb_rectpack.h">
@@ -2439,7 +2517,7 @@
     <None Include="Resources\shaders\Particles\Particle.hlsli" />
     <None Include="Resources\shaders\PostProcess\Copy\CopyImage.hlsli" />
     <None Include="Resources\shaders\Skinning\SkinningObject3d.hlsli" />
-    <None Include="Resources\shaders\Graphics\Shadow\ShadowTypes.hlsli" />
-    <None Include="Resources\shaders\Graphics\Shadow\InlineRaytracingShadow.hlsl" />
+    <None Include="Resources\shaders\Core\StandardLighting.hlsli" />
+    <None Include="Resources\shaders\Core\ToonLighting.hlsli" />
   </ItemGroup>
 </Project>

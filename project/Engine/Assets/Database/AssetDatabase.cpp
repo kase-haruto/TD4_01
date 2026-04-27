@@ -2,11 +2,13 @@
 
 #include "Engine/Assets/Manager/AssetManager.h"
 
+#include <Engine/Assets/DataAsset/DataAssetManager.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <externals/nlohmann/json.hpp>
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 using json = nlohmann::json;
 
@@ -217,6 +219,12 @@ AssetGUID AssetDatabase::RegisterOrUpdate(const std::filesystem::path& absOrRelP
 		if(needPreview) BuildPreview(r);
 	}
 
+	if(type == AssetType::Material) {
+		if(auto* manager = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()) {
+			manager->LoadMaterialAsset(abs, guid);
+		}
+	}
+
 	RebuildViewCache();
 	return guid;
 }
@@ -226,6 +234,13 @@ AssetGUID AssetDatabase::RegisterOrUpdate(const std::filesystem::path& absOrRelP
 /////////////////////////////////////////////////////////////////////////////////////////
 void AssetDatabase::Scan() {
 	if(!std::filesystem::exists(assetsRoot_)) return;
+
+	std::erase_if(records_, [this](const auto& item) {
+		const auto& rec = item.second;
+		if(rec && std::filesystem::exists(rec->sourcePath)) return false;
+		if(rec) normPathToGuid_.erase(NormalizePath(rec->sourcePath));
+		return true;
+	});
 
 	for(auto& entry : std::filesystem::recursive_directory_iterator(assetsRoot_)) {
 		if(!entry.is_regular_file()) continue;

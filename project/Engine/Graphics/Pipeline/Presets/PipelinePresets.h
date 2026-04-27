@@ -13,6 +13,8 @@ namespace PipelinePresets {
 
 	GraphicsPipelineDesc MakeWireframeObject3D(BlendMode mode);
 	GraphicsPipelineDesc MakeWireframeSkinnedObject3D(BlendMode mode);
+	GraphicsPipelineDesc MakeOutlineObject3D();
+	GraphicsPipelineDesc MakeOutlineSkinnedObject3D();
 	// shadow
 	GraphicsPipelineDesc MakeShadowStatic();
 	GraphicsPipelineDesc MakeShadowSkinned();

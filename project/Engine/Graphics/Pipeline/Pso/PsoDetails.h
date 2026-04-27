@@ -24,6 +24,8 @@ namespace PipelineTag {
 		SkinningObject3D,
 		WireframeObject3D,
 		WireframeSkinnedObject3D,
+		OutlineObject3D,
+		OutlineSkinnedObject3D,
 		ShadowStatic,
 		ShadowSkinned,
 		PickingObject3D,

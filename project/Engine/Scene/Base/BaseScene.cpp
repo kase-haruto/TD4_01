@@ -17,6 +17,7 @@
 BaseScene::BaseScene() {
 	spriteRenderer_	 = std::make_unique<SpriteRenderer>();
 	modelRenderer_	 = std::make_unique<ModelRenderer>();
+	outlineRenderer_ = std::make_unique<OutlineRenderer>();
 	shadowMapSystem_ = std::make_unique<CalyxEngine::ShadowMapSystem>();
 	shadowMapSystem_->Initialize(
 		GraphicsGroup::GetInstance()->GetDevice().Get(),
@@ -76,7 +77,11 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 #endif
 	}
 
-	const Camera3d* cam = static_cast<Camera3d*>(CameraManager::GetMain3d());
+	const Camera3d* cam = dynamic_cast<Camera3d*>(CameraManager::GetActive());
+	if(!cam) {
+		cam = CameraManager::GetMain3d();
+	}
+	if(!cam) return;
 	modelRenderer_->PreCullAndBatch(cam);
 
 	// =========================================================
@@ -120,6 +125,14 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 
 	// Particles
 	sceneContext_->GetFxSystem()->Render(pso, cmd);
+
+	// OutlinePass
+	outlineRenderer_->Render(cmd,
+							 GraphicsGroup::GetInstance()->GetDevice().Get(),
+							 rt,
+							 pso,
+							 cam,
+							 *modelRenderer_);
 
 #if defined(_DEBUG) || defined(DEVELOP)
 	// lightのデバッグ描画

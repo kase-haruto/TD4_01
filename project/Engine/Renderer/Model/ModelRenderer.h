@@ -39,6 +39,7 @@ public:
 		BaseModel*			  model;
 		const WorldTransform* transform;
 		SceneObject*		  owner;
+		BillboardMode		  billboardMode = BillboardMode::None;
 	};
 
 private:

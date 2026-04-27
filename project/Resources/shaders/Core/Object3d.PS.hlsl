@@ -79,66 +79,8 @@ float3 ApplyToneMappingAndGamma(float3 color, float exposure) {
     return pow(toneMapped, 1.0 / 2.2);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//                    関数: ディレクショナルライト
-///////////////////////////////////////////////////////////////////////////////
-void ComputeDirectionalLight(
-    float3 normal,
-    float3 toEye,
-    float3 albedo,
-    out float3 diffuse,
-    out float3 specular
-) {
-    diffuse  = 0.0f;
-    specular = 0.0f;
-
-    float3 L = -gDirectionalLight.direction;
-
-    float rawNdotL = dot(normal, L);
-    float NdotL    = saturate(rawNdotL);
-
-    if(gMaterial.enableLighting == 0) {
-        float halfLambert = pow(rawNdotL * 0.5f + 0.5f, 2.0f);
-        diffuse = albedo * gDirectionalLight.color.rgb * halfLambert * gDirectionalLight.intensity;
-
-        float3 H    = normalize(L + toEye);
-        float NdotH = saturate(dot(normal, H));
-        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity;
-    }
-    else if(gMaterial.enableLighting == 1) {
-        diffuse = albedo * gDirectionalLight.color.rgb * NdotL * gDirectionalLight.intensity;
-
-        float3 H    = normalize(L + toEye);
-        float NdotH = saturate(dot(normal, H));
-        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity;
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//                    関数: ポイントライト
-///////////////////////////////////////////////////////////////////////////////
-void ComputePointLight(
-    float3 normal,
-    float3 toEye,
-    float3 worldPos,
-    float3 albedo,
-    out float3 diffuse,
-    out float3 specular
-) {
-    diffuse  = 0.0f;
-    specular = 0.0f;
-
-    float3 lightDir    = normalize(worldPos - gPointLight.position);
-    float  distance    = length(gPointLight.position - worldPos);
-    float  attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
-
-    float NdotL = saturate(dot(normal, -lightDir));
-    diffuse     = albedo * gPointLight.color.rgb * NdotL * gPointLight.intensity * attenuation;
-
-    float3 halfVec = normalize(-lightDir + toEye);
-    float  NdotH   = saturate(dot(normal, halfVec));
-    specular       = gPointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gPointLight.intensity * attenuation;
-}
+#include "StandardLighting.hlsli"
+#include "ToonLighting.hlsli"
 
 ///////////////////////////////////////////////////////////////////////////////
 //                    小物: ハッシュ / 回転
@@ -335,11 +277,20 @@ PixelShaderOutput main(VertexShaderOutput input) {
     float3 normal = normalize(input.normal);
     float3 toEye  = normalize(cameraPosition - input.worldPosition);
 
-    float3 directionalDiffuse, directionalSpecular;
-    ComputeDirectionalLight(normal, toEye, albedo, directionalDiffuse, directionalSpecular);
+    float3 directionalDiffuse = 0.0f;
+    float3 directionalSpecular = 0.0f;
+    float3 pointDiffuse = 0.0f;
+    float3 pointSpecular = 0.0f;
 
-    float3 pointDiffuse, pointSpecular;
-    ComputePointLight(normal, toEye, input.worldPosition, albedo, pointDiffuse, pointSpecular);
+    if (gMaterial.enableLighting == 2) {
+        // Toon
+        ComputeToonDirectionalLight(normal, toEye, albedo, directionalDiffuse, directionalSpecular);
+        ComputeToonPointLight(normal, toEye, input.worldPosition, albedo, pointDiffuse, pointSpecular);
+    } else {
+        // Standard (Lambert / Half-Lambert)
+        ComputeStandardDirectionalLight(normal, toEye, albedo, directionalDiffuse, directionalSpecular);
+        ComputeStandardPointLight(normal, toEye, input.worldPosition, albedo, pointDiffuse, pointSpecular);
+    }
 
     //================= ソフトシャドウ（Directional: Inline Raytracing） =================
     float3 L = normalize(-gDirectionalLight.direction);

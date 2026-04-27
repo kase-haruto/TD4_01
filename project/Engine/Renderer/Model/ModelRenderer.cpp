@@ -566,7 +566,8 @@ void ModelRenderer::CollectVisibleStatic(std::vector<RenderInstance>& out) const
 			out.push_back(RenderInstance{
 				model,
 				&inst.tf,
-				inst.owner});
+				inst.owner,
+				inst.mode});
 		}
 	}
 }
@@ -585,7 +586,8 @@ void ModelRenderer::CollectVisibleSkinned(std::vector<RenderInstance>& out) cons
 			out.push_back(RenderInstance{
 				model,
 				&inst.tf,
-				inst.owner});
+				inst.owner,
+				BillboardMode::None});
 		}
 	}
 }
