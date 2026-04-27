@@ -46,6 +46,13 @@ void DemoPlayer::Initialize() {
 	targetScale_   = {1.0f, 1.0f, 1.0f};
 	scaleVelocity_ = {0.0f, 0.0f, 0.0f};
 
+	InitializeCollider(ColliderKind::Box);
+	if(collider_) {
+		collider_->SetType(ColliderType::Type_Player);
+		// 敵、イベントオブジェクト、ステージギミックを対象にする
+		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack | ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
+	}
+
 	// 衝撃波マネージャーの初期化（プール作成）
 	ShockwaveManager::GetInstance()->Initialize(10);
 }
