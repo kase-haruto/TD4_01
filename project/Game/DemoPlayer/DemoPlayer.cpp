@@ -49,8 +49,10 @@ void DemoPlayer::Initialize() {
 	InitializeCollider(ColliderKind::Box);
 	if(collider_) {
 		collider_->SetType(ColliderType::Type_Player);
+		collider_->SetOwner(this);
 		// 敵、イベントオブジェクト、ステージギミックを対象にする
 		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack | ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
+		collider_->SetOffset(param_.colliderOffset);
 	}
 
 	// 衝撃波マネージャーの初期化（プール作成）

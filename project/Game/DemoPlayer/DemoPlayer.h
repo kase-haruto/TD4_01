@@ -56,6 +56,9 @@ private:
 
 		float damageFlashDuration = 1.0f;
 
+		CalyxEngine::Vector3 colliderOffset = {0.0f, 0.4f, 0.0f};
+		CalyxEngine::Vector3 colliderSize = {0.8f, 1.6f, 0.5f};
+
 		CalyxEngine::Vector3 jumpScale = {0.8f, 1.3f, 0.8f};
 		CalyxEngine::Vector3 diveScale = {0.9f, 1.2f, 0.9f};
 		CalyxEngine::Vector3 landScale = {1.4f, 0.5f, 1.4f};
@@ -72,6 +75,8 @@ private:
 			AddField("Default ShockScale", defaultShockScale).Category("Shock Power");
 			AddField("Strong ShockScale", strongShockScale).Category("Shock Power");
 			AddField("Damage Flash Duration", damageFlashDuration).Category("Damage Param");
+			AddField("Collider Offset", colliderOffset).Category("Collider Param");
+			AddField("Collider Size", colliderSize).Category("Collider Param");
 			AddField("Jump Scale", jumpScale).Category("Pop Scale");
 			AddField("Dive Scale", diveScale).Category("Pop Scale");
 			AddField("Land Scale", landScale).Category("Pop Scale");
