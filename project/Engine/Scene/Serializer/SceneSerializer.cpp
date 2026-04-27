@@ -175,7 +175,10 @@ bool SceneSerializer::LoadJson(SceneContext&		 context,
 
 		auto cIt = guidMap.find(child);
 		auto pIt = guidMap.find(parent);
-		if(cIt != guidMap.end() && pIt != guidMap.end()) cIt->second->SetParent(pIt->second);
+		if(cIt != guidMap.end() && pIt != guidMap.end()) {
+			auto& childTransform = cIt->second->GetWorldTransform();
+			cIt->second->SetParent(pIt->second, childTransform.inheritScale);
+		}
 	}
 	return true;
 }

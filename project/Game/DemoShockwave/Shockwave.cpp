@@ -1,9 +1,6 @@
 #include "Shockwave.h"
-#include "Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h"
 #include "Engine/Objects/Collider/SphereCollider.h"
 #include <algorithm>
-
-REGISTER_SCENE_OBJECT(Shockwave)
 
 Shockwave::Shockwave() : Actor() {
 	param_.LoadParams();

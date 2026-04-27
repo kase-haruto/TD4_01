@@ -17,6 +17,7 @@ void ShockwaveManager::Initialize(int poolSize) {
 		auto sw = SceneAPI::Instantiate<Shockwave>("Torus.obj", "Shockwave");
 		sw->Initialize();
 		sw->Deactivate();
+		sw->SetTransient(true);
 		pool_.push_back(sw);
 	}
 }

@@ -83,7 +83,8 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 			auto parentSp = guidMap[newParentIt->second];
 			if (parentSp) {
 				// SetParent のみ（children_ は内部で処理される想定）
-				childSp->SetParent(parentSp);
+				auto& childTransform = childSp->GetWorldTransform();
+				childSp->SetParent(parentSp, childTransform.inheritScale);
 			}
 		}
 	}
