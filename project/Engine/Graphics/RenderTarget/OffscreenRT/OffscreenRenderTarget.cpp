@@ -94,6 +94,10 @@ void OffscreenRenderTarget::TransitionTo(ID3D12GraphicsCommandList* cmdList, D3D
 	resource_->Transition(cmdList, newState);
 }
 
+void OffscreenRenderTarget::TransitionDepthTo(ID3D12GraphicsCommandList* cmdList, D3D12_RESOURCE_STATES newState) {
+	depthResource_->Transition(cmdList, newState);
+}
+
 void OffscreenRenderTarget::Resize(uint32_t width, uint32_t height) {
 	auto		device = GraphicsGroup::GetInstance()->GetDevice();
 	DXGI_FORMAT format = resource_->Get()->GetDesc().Format;

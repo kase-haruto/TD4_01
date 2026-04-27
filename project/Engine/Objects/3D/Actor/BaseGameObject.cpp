@@ -148,6 +148,12 @@ void BaseGameObject::ShowGui() {
 			}
 			ImGui::TreePop();
 		}
+		if(ImGui::TreeNodeEx("Outline", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+			GuiCmd::CheckBox("Enable Outline", outlineSettings_.enabled);
+			GuiCmd::DragFloat("Outline Thickness", outlineSettings_.thickness, 0.001f, 0.0f, 1.0f);
+			ImGui::ColorEdit4("Outline Color", &outlineSettings_.color.x);
+			ImGui::TreePop();
+		}
 		GuiCmd::EndSection();
 	}
 
@@ -188,6 +194,9 @@ void BaseGameObject::ApplyConfig() {
 	if(collider_)
 		collider_->ApplyConfig(cfg.colliderConfig);
 	worldTransform_.ApplyConfig(cfg.transform);
+	outlineSettings_.enabled	 = cfg.outlineEnabled;
+	outlineSettings_.thickness = cfg.outlineThickness;
+	outlineSettings_.color	 = cfg.outlineColor;
 	id_		  = cfg.guid;
 	parentId_ = cfg.parentGuid;
 	name_	  = cfg.name;
@@ -205,6 +214,9 @@ void BaseGameObject::ExtractConfig() {
 	cfg.name	   = name_;
 	cfg.guid	   = id_;
 	cfg.parentGuid = parentId_;
+	cfg.outlineEnabled	 = outlineSettings_.enabled;
+	cfg.outlineThickness = outlineSettings_.thickness;
+	cfg.outlineColor	 = outlineSettings_.color;
 }
 
 void BaseGameObject::ApplyConfigFromJson(const nlohmann::json& j) {

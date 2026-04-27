@@ -1,6 +1,7 @@
 #pragma once
 
 // engine
+#include <Engine/Foundation/Math/Vector4.h>
 #include <Engine/Foundation/Utility/Guid/Guid.h>
 #include <Engine/Objects/3D/Geometory/AABB.h>
 #include <Engine/objects/Transform/Transform.h>
@@ -24,6 +25,12 @@ enum class ObjectType {
 };
 
 class IConfigurable; // 前方宣言
+
+struct OutlineSettings {
+	bool				   enabled	 = true;
+	float				   thickness = 0.035f;
+	CalyxEngine::Vector4 color	 = {0.02f, 0.02f, 0.025f, 1.0f};
+};
 
 /*-----------------------------------------------------------------------------------------
  * SceneObject
@@ -122,6 +129,8 @@ public:
 	bool											 IsPickable() const { return isEnablePicking_; }
 	bool											 IsTransient() const { return isTransient_; }
 	bool											 IsCastShadow() const { return isCastShadow_; }
+	bool											 IsOutlineEnabled() const { return outlineSettings_.enabled; }
+	const OutlineSettings&							 GetOutlineSettings() const { return outlineSettings_; }
 	uint32_t										 GetPickingID() const { return pickingID_; }
 
 	void		 SetGuid(const Guid& g) { id_ = g; }
@@ -129,6 +138,9 @@ public:
 	void		 SetEnablePicking(bool enable) { isEnablePicking_ = enable; }
 	void		 SetTransient(bool enable) { isTransient_ = enable; }
 	void		 SetCastShadow(bool enable) { isCastShadow_ = enable; }
+	void		 SetOutlineEnabled(bool enable) { outlineSettings_.enabled = enable; }
+	void		 SetOutlineThickness(float thickness) { outlineSettings_.thickness = thickness; }
+	void		 SetOutlineColor(const CalyxEngine::Vector4& color) { outlineSettings_.color = color; }
 	void		 SetParent(const std::shared_ptr<SceneObject>& newParentSp, bool inheritScale = true);
 	void		 SetEnableRaycast(bool enable) { isEnableRaycast_ = enable; }
 	void		 SetPickingID(uint32_t id) { pickingID_ = id; }
@@ -166,5 +178,6 @@ protected:
 	bool	 isEnablePicking_ = true;  // ピッキング有効
 	bool	 isTransient_	  = false; // 一時的（保存・階層除外）
 	bool 	isCastShadow_	  = true;  // 影を落とすか
+	OutlineSettings outlineSettings_{};
 	uint32_t pickingID_		  = 0;
 };

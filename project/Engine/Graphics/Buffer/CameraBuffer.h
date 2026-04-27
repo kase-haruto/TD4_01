@@ -36,8 +36,8 @@ public:
 	//===================================================================*/
 	void Initialize(ID3D12Device* device);
 	void Update(const CalyxEngine::Matrix4x4& view, const CalyxEngine::Matrix4x4& proj, const CalyxEngine::Vector3& worldPos, const CalyxEngine::Vector2& viewportSize);
-	void SetCommand(ID3D12GraphicsCommandList* cmdList, PipelineType pipelineType);
-	void SetCommand(ID3D12GraphicsCommandList* cmdList, uint32_t rootIndex);
+	void SetCommand(ID3D12GraphicsCommandList* cmdList, PipelineType pipelineType) const;
+	void SetCommand(ID3D12GraphicsCommandList* cmdList, uint32_t rootIndex) const;
 private:
 	//===================================================================*/
 	//                   private methods
