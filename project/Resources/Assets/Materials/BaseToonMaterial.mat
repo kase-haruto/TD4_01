@@ -1,0 +1,108 @@
+{
+  "fields": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "envirometCoefficient": 0.5,
+    "isReflect": false,
+    "lightingMode": 2,
+    "roughness": 0.5,
+    "shininess": 20.0
+  },
+  "graph": {
+    "links": [
+      {
+        "fromPinId": 11,
+        "id": 12,
+        "toPinId": 6
+      }
+    ],
+    "nextId": 13,
+    "nodes": [
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 1,
+        "inputs": [
+          {
+            "id": 2,
+            "kind": 0,
+            "name": "BaseColor",
+            "valueType": 2
+          },
+          {
+            "id": 3,
+            "kind": 0,
+            "name": "Shininess",
+            "valueType": 1
+          },
+          {
+            "id": 4,
+            "kind": 0,
+            "name": "Roughness",
+            "valueType": 1
+          },
+          {
+            "id": 5,
+            "kind": 0,
+            "name": "Reflect",
+            "valueType": 3
+          },
+          {
+            "id": 6,
+            "kind": 0,
+            "name": "Lighting Mode",
+            "valueType": 4
+          }
+        ],
+        "intValue": 0,
+        "outputs": [],
+        "position": [
+          965.0,
+          110.0
+        ],
+        "title": "Output",
+        "type": "Output"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 10,
+        "inputs": [],
+        "intValue": 2,
+        "outputs": [
+          {
+            "id": 11,
+            "kind": 1,
+            "name": "Mode",
+            "valueType": 4
+          }
+        ],
+        "position": [
+          326.0,
+          164.0
+        ],
+        "title": "Lighting Mode",
+        "type": "LightingMode"
+      }
+    ]
+  },
+  "guid": "4367fd92-8f1f-4b12-b601-94e996adf837",
+  "name": "BaseToonMaterial",
+  "type": "MaterialAsset"
+}

@@ -36,6 +36,8 @@ namespace CalyxEngine {
 	private:
 		bool CanCreateLink(const NodeGraph& graph, int32_t a, int32_t b, int32_t& from, int32_t& to) const;
 		void DrawPin(const NodePin& pin);
+		void DrawNodeHeader(const Node& node);
+		ImVec4 GetPinColor(NodeValueType type) const;
 
 	private:
 		std::string id_;

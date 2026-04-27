@@ -10,7 +10,7 @@
 
 namespace CalyxEngine {
 	enum class NodePinKind : int32_t { Input, Output };
-	enum class NodeValueType : int32_t { None, Float, Color, Bool };
+	enum class NodeValueType : int32_t { None, Float, Color, Bool, Int };
 
 	struct NodePin {
 		int32_t id = 0;
@@ -27,6 +27,7 @@ namespace CalyxEngine {
 		std::vector<NodePin> inputs;
 		std::vector<NodePin> outputs;
 		float floatValue = 0.0f;
+		int32_t intValue = 0;
 		Vector4 colorValue = {1, 1, 1, 1};
 		bool boolValue = false;
 	};
