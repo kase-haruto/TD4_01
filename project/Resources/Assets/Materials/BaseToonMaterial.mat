@@ -10,7 +10,7 @@
     "isReflect": false,
     "lightingMode": 2,
     "roughness": 0.5,
-    "shininess": 20.0
+    "shininess": 20.639999389648438
   },
   "graph": {
     "links": [
@@ -18,9 +18,19 @@
         "fromPinId": 11,
         "id": 12,
         "toPinId": 6
+      },
+      {
+        "fromPinId": 14,
+        "id": 15,
+        "toPinId": 3
+      },
+      {
+        "fromPinId": 17,
+        "id": 18,
+        "toPinId": 5
       }
     ],
-    "nextId": 13,
+    "nextId": 19,
     "nodes": [
       {
         "boolValue": false,
@@ -94,11 +104,65 @@
           }
         ],
         "position": [
-          326.0,
-          164.0
+          481.0,
+          407.0
         ],
         "title": "Lighting Mode",
         "type": "LightingMode"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 20.639999389648438,
+        "id": 13,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 14,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          481.0,
+          119.0
+        ],
+        "title": "Shininess",
+        "type": "Shininess"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 16,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 17,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 3
+          }
+        ],
+        "position": [
+          481.0,
+          263.0
+        ],
+        "title": "Reflect",
+        "type": "Reflect"
       }
     ]
   },

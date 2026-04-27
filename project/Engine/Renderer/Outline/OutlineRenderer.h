@@ -12,6 +12,7 @@
 class Camera3d;
 class IRenderTarget;
 class PipelineService;
+class SceneObject;
 
 class OutlineRenderer {
 public:
@@ -21,6 +22,13 @@ public:
 				PipelineService* psoService,
 				const Camera3d* camera,
 				const ModelRenderer& modelRenderer);
+	void RenderSelectionHighlight(ID3D12GraphicsCommandList* cmdList,
+								  ID3D12Device* device,
+								  IRenderTarget* rt,
+								  PipelineService* psoService,
+								  const Camera3d* camera,
+								  const ModelRenderer& modelRenderer,
+								  const SceneObject* selected);
 
 private:
 	struct CompositeConstants {
@@ -31,7 +39,8 @@ private:
 		float depthScale = 90.0f;
 		float normalScale = 1.8f;
 		float thickness = 2.0f;
-		float padding = 0.0f;
+		float insideMaskOnly = 0.0f;
+		CalyxEngine::Vector4 padding = {0.0f, 0.0f, 0.0f, 0.0f};
 	};
 
 	struct StaticBatch {
@@ -41,20 +50,23 @@ private:
 	};
 
 	void EnsureResources(ID3D12Device* device, const D3D12_VIEWPORT& viewport);
-	void RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
+	bool RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 							ID3D12Device* device,
 							IRenderTarget* rt,
 							PipelineService* psoService,
 							const Camera3d* camera,
-							const ModelRenderer& modelRenderer);
+							const ModelRenderer& modelRenderer,
+							const SceneObject* targetOwner = nullptr);
 	void Composite(ID3D12GraphicsCommandList* cmdList,
 				   IRenderTarget* rt,
 				   PipelineService* psoService);
 
 	DxGpuResource normalResource_;
 	DxGpuResource compositeResource_;
+	DxGpuResource selectionDepthResource_;
 	DescriptorHandle normalRtv_{};
 	DescriptorHandle compositeRtv_{};
+	DescriptorHandle selectionDepthDsv_{};
 	CompositeConstants compositeConstants_{};
 	uint32_t width_ = 0;
 	uint32_t height_ = 0;

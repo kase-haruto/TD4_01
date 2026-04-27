@@ -6,10 +6,11 @@
 struct Material {
     float4 color;
     int enableLighting;
+    float3 pad;
     float4x4 uvTransform;
     float shiniess;
 
-    bool isReflect;
+    int isReflect;
     float environmentCoefficient;
     float roughness;
 };
@@ -311,7 +312,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
     float3 ambient = albedo * 0.07f;
     litColor += ambient;
 
-    if(gMaterial.isReflect) {
+    if(gMaterial.isReflect != 0) {
         float3 viewDir    = normalize(input.worldPosition - cameraPosition);
         float3 reflectDir = reflect(viewDir, normal);
 

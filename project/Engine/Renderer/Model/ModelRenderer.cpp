@@ -266,6 +266,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							PipelineService*				psoService,
 							LightLibrary*					lightLibrary,
 							CalyxEngine::ShadowMapSystem* shadowMapSystem) {
+	(void)rt;
 
 	// Raytracing TLAS Build
 	if(raytracingSystem_) {
@@ -429,127 +430,6 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 		}
 	}
 
-#if defined(_DEBUG) || defined(DEVELOP)
-	// debugViewでのみ描画
-	if(rt->GetRenderTargetType() != RenderTargetType::DebugView) return;
-
-	//------------------------------------------------------------
-	// 選択オブジェクトのワイヤーフレーム（オレンジ）描画
-	//------------------------------------------------------------
-	if(auto* ctx = SceneContext::Current()) {
-		if(auto* selected = ctx->GetDebugSelectedObject()) {
-
-			// Static Models
-			for(auto& [model, insts] : staticModels_) {
-				if(!model->GetModelData() || !model->GetIsDrawEnable()) continue;
-
-				std::vector<WorldTransform>		selectedTf;
-				std::vector<GpuBillboardParams> selectedBb;
-				for(auto& inst : insts) {
-					if(inst.visible && inst.owner == selected) {
-						selectedTf.push_back(inst.tf);
-						GpuBillboardParams p{};
-						p.mode = static_cast<uint32_t>(inst.mode);
-						selectedBb.push_back(p);
-					}
-				}
-
-				if(!selectedTf.empty()) {
-					const auto ps = psoService->GetPipelineSet(PipelineTag::Object::WireframeObject3D, model->GetBlendMode());
-					psoService->SetCommand(ps, cmdList);
-
-					float thickness = 1.5f;
-					cmdList->SetGraphicsRoot32BitConstants(12, 1, &thickness, 0);
-
-					if(auto* cam = CameraManager::GetActive()) {
-						cam->SetCommand(cmdList, PipelineType::Object3D);
-					}
-					lightLibrary->SetCommand(cmdList, PipelineType::Object3D);
-
-					auto					 oldColor		 = model->GetColor();
-					auto					 oldLighting	 = model->GetLightingMode();
-					const CalyxEngine::Vector4 orangeWireframe = {1.0f, 0.5f, 0.0f, 1.0f};
-					model->SetColor(orangeWireframe);
-					model->SetLightingMode(LightingMode::UnlitColor);
-					model->TransferMaterial();
-
-					const UINT need = static_cast<UINT>(selectedTf.size());
-					model->EnsureBillboardCapacity(device, need);
-					model->UploadBillboardParams(selectedBb);
-					cmdList->SetGraphicsRootDescriptorTable(7, model->GetBillboardSrv());
-
-					model->EnsureInstanceCapacity(device, need);
-					model->UploadInstanceMatrices(selectedTf);
-					cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
-
-					model->BindMaterialCB(cmdList);
-					cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
-					cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
-
-					cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					model->BindVertexIndexBuffers(cmdList);
-
-					cmdList->DrawIndexedInstanced(static_cast<UINT>(model->GetModelData()->meshResource.Indices().size()), need, 0, 0, 0);
-
-					model->SetColor(oldColor);
-					model->SetLightingMode(oldLighting);
-					model->TransferMaterial();
-				}
-			}
-
-			// Skinned Models
-			for(auto& [model, insts] : skinnedModels_) {
-				if(!model->GetModelData() || !model->GetIsDrawEnable()) continue;
-
-				std::vector<WorldTransform> selectedTf;
-				for(auto& inst : insts) {
-					if(inst.visible && inst.owner == selected) {
-						selectedTf.push_back(inst.tf);
-					}
-				}
-
-				if(!selectedTf.empty()) {
-					const auto ps = psoService->GetPipelineSet(PipelineTag::Object::WireframeSkinnedObject3D, model->GetBlendMode());
-					psoService->SetCommand(ps, cmdList);
-
-					float thickness = 2.0f;
-					cmdList->SetGraphicsRoot32BitConstants(12, 1, &thickness, 0);
-
-					if(auto* cam = CameraManager::GetActive()) {
-						cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
-					}
-					lightLibrary->SetCommand(cmdList, PipelineType::SkinningObject3D);
-
-					auto					 oldColor		 = model->GetColor();
-					auto					 oldLighting	 = model->GetLightingMode();
-					const CalyxEngine::Vector4 orangeWireframe = {1.0f, 0.5f, 0.0f, 1.0f};
-					model->SetColor(orangeWireframe);
-					model->SetLightingMode(LightingMode::UnlitColor);
-					model->TransferMaterial();
-
-					for(const auto& tf : selectedTf) {
-						// Set transforms again and draw
-						model->UploadInstanceMatrices({tf});
-						cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
-						model->BindMaterialCB(cmdList);
-						cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
-						cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
-
-						cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-						model->BindVertexIndexBuffers(cmdList);
-						cmdList->DrawIndexedInstanced(static_cast<UINT>(model->GetModelData()->meshResource.Indices().size()), 1, 0, 0, 0);
-					}
-
-					model->SetColor(oldColor);
-					model->SetLightingMode(oldLighting);
-					model->TransferMaterial();
-				}
-			}
-		}
-	}
-#else
-	(void)rt;
-#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,7 @@ struct MaterialConfig final{
 	float shininess = 20.0f;					//< 光沢
 	float enviromentCoefficient = 0.5f;			//< 環境光の強さ
 	bool isReflect = false;						//< 反射
+	float roughness = 0.5f;						//< 反射の粗さ
 	int currentLightingMode_ = 0;				//< ライティングモード
 };
 
@@ -21,4 +22,5 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MaterialConfig,
 								   shininess,
 								   enviromentCoefficient,
 								   isReflect,
+								   roughness,
 								   currentLightingMode_)

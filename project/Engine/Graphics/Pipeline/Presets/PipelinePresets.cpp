@@ -257,7 +257,7 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineNormalObject3D() {
 	GraphicsPipelineDesc desc;
 	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
 	depthDesc.DepthEnable = TRUE;
-	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	depthDesc.StencilEnable = FALSE;
 
@@ -291,7 +291,7 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineNormalSkinnedObject3D() {
 	GraphicsPipelineDesc desc;
 	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
 	depthDesc.DepthEnable = TRUE;
-	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
 	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	depthDesc.StencilEnable = FALSE;
 
@@ -717,7 +717,7 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineComposite() {
 		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
 		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
 		.SRVTable(2, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
-		.Constants(0, 12, D3D12_SHADER_VISIBILITY_PIXEL)
+		.Constants(0, 16, D3D12_SHADER_VISIBILITY_PIXEL)
 		.SampleClampLinear(0);
 
 	return desc;
