@@ -24,6 +24,8 @@ public:
 
 	void OnCollisionEnter(Collider* other) override;
 
+	void TakeDamage(int32_t damage);
+
 	//--------- config ------------------------------------------------
 
 	//--------- accessor ------------------------------------------------
@@ -33,11 +35,12 @@ private:
 	void ApplyGravity(float dt);
 	void UpdatePopScale(float dt);
 	void HammerControl(float dt);
+	void DamageFlash(float dt);
 
 private:
 
 	struct PlayerParameter : public CalyxEngine::SerializableObject {
-		int	  playerHP_ = 10;
+		int	  playerHP = 10;
 		float moveSpeed = 2.0f;
 		float jumpForce = 15.0f;
 		float diveForce = -30.0f;
@@ -51,12 +54,14 @@ private:
 		float defaultShockScale = 1.0f;
 		float strongShockScale = 1.5f;
 
+		float damageFlashDuration = 1.0f;
+
 		CalyxEngine::Vector3 jumpScale = {0.8f, 1.3f, 0.8f};
 		CalyxEngine::Vector3 diveScale = {0.9f, 1.2f, 0.9f};
 		CalyxEngine::Vector3 landScale = {1.4f, 0.5f, 1.4f};
 
 		PlayerParameter() {
-			AddField("HP", moveSpeed).Category("Base Param");
+			AddField("HP", playerHP).Category("Base Param");
 			AddField("Move Speed", moveSpeed).Category("Move Param");
 			AddField("Jump Force", jumpForce).Category("Move Param");
 			AddField("Dive Force", diveForce).Category("Move Param");
@@ -66,6 +71,7 @@ private:
 			AddField("Dive Rotation Time", diveRotationTime).Category("Move Param");
 			AddField("Default ShockScale", defaultShockScale).Category("Shock Power");
 			AddField("Strong ShockScale", strongShockScale).Category("Shock Power");
+			AddField("Damage Flash Duration", damageFlashDuration).Category("Damage Param");
 			AddField("Jump Scale", jumpScale).Category("Pop Scale");
 			AddField("Dive Scale", diveScale).Category("Pop Scale");
 			AddField("Land Scale", landScale).Category("Pop Scale");
@@ -79,6 +85,10 @@ private:
 	PlayerParameter param_;
 	bool  isJumping_	 = false;
 	bool  isDiving_		 = false;
+
+	// ダメージ点滅用
+	float damageFlashTimer_ = 0.0f;
+	bool  isInvincible_	 = false;
 
 	// ハンマーリカバリー用
 	bool  isRecovering_	 = false;

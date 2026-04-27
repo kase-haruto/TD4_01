@@ -24,6 +24,7 @@ DemoPlayer::~DemoPlayer() = default;
 void DemoPlayer::Initialize() {
 	param_.LoadParams();
 	moveSpeed_					= param_.moveSpeed;
+	life_						= param_.playerHP;
 	worldTransform_.translation = {0.0f, 0.0f, 0.0f};
 	worldTransform_.scale		= {1.0f, 1.0f, 1.0f};
 	velocity_					= {0.0f, 0.0f, 0.0f};
@@ -31,6 +32,10 @@ void DemoPlayer::Initialize() {
 	isDiving_					= false;
 	isRecovering_				= false;
 	recoveryTimer_				= 0.0f;
+
+	damageFlashTimer_ = 0.0f;
+	isInvincible_	  = false;
+	SetDrawEnable(true);
 
 	baseRotation_				= CalyxEngine::Quaternion::MakeIdentity();
 	jumpRotation_				= 0.0f;
@@ -58,12 +63,29 @@ void DemoPlayer::Update(float dt) {
 		}
 	}
 
+	DamageFlash(dt);
+
 	moveSpeed_ = param_.moveSpeed;
 
 	Move(dt);
 	ApplyGravity(dt);
 	UpdatePopScale(dt);
 	HammerControl(dt);
+}
+
+void DemoPlayer::TakeDamage(int32_t damage) {
+	if(isInvincible_) {
+		return;
+	}
+
+	life_ -= damage;
+	if(life_ <= 0) {
+		life_	 = 0;
+		isAlive_ = false;
+	}
+
+	damageFlashTimer_ = param_.damageFlashDuration;
+	isInvincible_	  = true;
 }
 
 void DemoPlayer::DerivativeGui() {
@@ -83,9 +105,14 @@ void DemoPlayer::Move(float dt) {
 
 	if(CalyxFoundation::Input::PushKey(DIK_A)) {horizonVelocity.x -= 1.0f;}
 	if(CalyxFoundation::Input::PushKey(DIK_D)) {horizonVelocity.x += 1.0f;}
+#ifdef DEVELOP
 	if(CalyxFoundation::Input::PushKey(DIK_L)) {
 		worldTransform_.translation = {0.0f, worldTransform_.translation.y, 0.0f};
 	}
+	if(CalyxFoundation::Input::PushKey(DIK_K)) {
+		TakeDamage(1);
+	}
+#endif
 	// ずっと前へすすむ
 	horizonVelocity.z += 1.0f;
 
@@ -239,5 +266,27 @@ void DemoPlayer::HammerControl(float dt) {
 
 		CalyxEngine::Vector3 swingAxis = CalyxEngine::Quaternion::RotateVector({1.0f, 0.0f, .0f}, worldTransform_.rotation);
 		hammer_->SetSwingAngle(swingAxis, -hammerAngle);
+	}
+}
+
+void DemoPlayer::DamageFlash(float dt) {
+	// ダメージ点滅
+	if(damageFlashTimer_ > 0.0f) {
+		damageFlashTimer_ -= dt;
+		// 0.1秒おきに表示/非表示を切り替える
+		bool isVisible = (static_cast<int>(damageFlashTimer_ * 10) % 2 == 0);
+		SetDrawEnable(isVisible);
+		if(hammer_) {
+			hammer_->SetDrawEnable(isVisible);
+		}
+
+		if(damageFlashTimer_ <= 0.0f) {
+			damageFlashTimer_ = 0.0f;
+			isInvincible_	  = false;
+			SetDrawEnable(true);
+			if(hammer_) {
+				hammer_->SetDrawEnable(true);
+			}
+		}
 	}
 }
