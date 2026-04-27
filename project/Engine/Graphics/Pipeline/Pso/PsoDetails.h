@@ -26,6 +26,8 @@ namespace PipelineTag {
 		WireframeSkinnedObject3D,
 		OutlineObject3D,
 		OutlineSkinnedObject3D,
+		OutlineNormalObject3D,
+		OutlineNormalSkinnedObject3D,
 		ShadowStatic,
 		ShadowSkinned,
 		PickingObject3D,
@@ -47,6 +49,7 @@ namespace PipelineTag {
 		ChromaticAberration,
 		Vignette,
 		CRT,
+		OutlineComposite,
 
 		Count
 	};

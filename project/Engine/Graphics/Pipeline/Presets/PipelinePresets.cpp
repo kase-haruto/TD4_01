@@ -250,6 +250,74 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineSkinnedObject3D() {
 	return desc;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+//		screen-space outline normal prepass static object
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeOutlineNormalObject3D() {
+	GraphicsPipelineDesc desc;
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthDesc.StencilEnable = FALSE;
+
+	desc.VS(L"OutlineNormalObject3D.VS.hlsl")
+		.PS(L"OutlineNormal.PS.hlsl")
+		.Input(VertexInputLayout<VertexPosUvN>::Get())
+		.Blend(BlendMode::NONE)
+		.CullBack()
+		.DepthState(depthDesc)
+		.RTV(DXGI_FORMAT_R16G16B16A16_FLOAT)
+		.Samples(1);
+
+	desc.root_
+		.AllowIA()
+		.CBV(9, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX)
+		.SRVTable(9, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.Constants(2, 5, D3D12_SHADER_VISIBILITY_ALL)
+		.CBV(1, D3D12_SHADER_VISIBILITY_ALL)
+		.CBV(10, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(10, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX);
+
+	return desc;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		screen-space outline normal prepass skinned object
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeOutlineNormalSkinnedObject3D() {
+	GraphicsPipelineDesc desc;
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthDesc.StencilEnable = FALSE;
+
+	desc.VS(L"OutlineNormalSkinnedObject3D.VS.hlsl")
+		.PS(L"OutlineNormal.PS.hlsl")
+		.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+		.Blend(BlendMode::NONE)
+		.CullBack()
+		.DepthState(depthDesc)
+		.RTV(DXGI_FORMAT_R16G16B16A16_FLOAT)
+		.Samples(1);
+
+	desc.root_
+		.AllowIA()
+		.CBV(9, D3D12_SHADER_VISIBILITY_PIXEL)
+		.CBV(0, D3D12_SHADER_VISIBILITY_VERTEX)
+		.SRVTable(9, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.Constants(2, 5, D3D12_SHADER_VISIBILITY_ALL)
+		.CBV(1, D3D12_SHADER_VISIBILITY_ALL)
+		.CBV(10, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(10, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX);
+
+	return desc;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //		3d スキニング shadowMap用
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -626,5 +694,31 @@ GraphicsPipelineDesc PipelinePresets::MakeRadialBlur() {
 		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
 		.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL) // Blur parameters
 		.SampleClampLinear(0);
+	return desc;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		screen-space outline composite
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeOutlineComposite() {
+	GraphicsPipelineDesc desc;
+	desc.VS(L"CopyImage.VS.hlsl")
+		.PS(L"OutlineComposite.PS.hlsl")
+		.BlendNone()
+		.CullNone()
+		.DepthEnable(false)
+		.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+		.Samples(1);
+
+	desc.inputElems_.clear();
+
+	desc.root_
+		.AllowIA()
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(2, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.Constants(0, 12, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SampleClampLinear(0);
+
 	return desc;
 }
