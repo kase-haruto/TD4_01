@@ -14,13 +14,13 @@ namespace CalyxEngine {
 	class MaterialAsset : public DataAsset {
 	public:
 		MaterialAsset();
-		virtual ~MaterialAsset() = default;
+		virtual ~MaterialAsset()override = default;
 
 		std::string GetAssetTypeName() const override { return "MaterialAsset"; }
 
 		// --- Parameters ---
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		int32_t lightingMode = 2; // Default to Toon (as previously requested)
+		int32_t lightingMode = 0; // Default to Toon (as previously requested)
 		float   shininess = 20.0f;
 		bool    isReflect = false;
 		float   envirometCoefficient = 0.5f;

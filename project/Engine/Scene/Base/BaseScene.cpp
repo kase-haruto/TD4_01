@@ -135,6 +135,18 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 							 *modelRenderer_);
 
 #if defined(_DEBUG) || defined(DEVELOP)
+	if(rt->GetRenderTargetType() == RenderTargetType::DebugView) {
+		outlineRenderer_->RenderSelectionHighlight(cmd,
+												   GraphicsGroup::GetInstance()->GetDevice().Get(),
+												   rt,
+												   pso,
+												   cam,
+												   *modelRenderer_,
+												   sceneContext_->GetDebugSelectedObject());
+	}
+#endif
+
+#if defined(_DEBUG) || defined(DEVELOP)
 	// lightのデバッグ描画
 	auto dirLight = sceneContext_->FindFirst<DirectionalLight>();
 	if(dirLight)

@@ -432,7 +432,7 @@ void BaseModel::TransferMaterial() {
 		data.color = ma->color;
 		data.lightingMode = ma->lightingMode;
 		data.shininess = ma->shininess;
-		data.isReflect = ma->isReflect;
+		data.isReflect = ma->isReflect ? 1 : 0;
 		data.envirometCoefficient = ma->envirometCoefficient;
 		data.roughness = ma->roughness;
 	} else {
