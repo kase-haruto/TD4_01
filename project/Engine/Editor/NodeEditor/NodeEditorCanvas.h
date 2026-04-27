@@ -32,12 +32,16 @@ namespace CalyxEngine {
 		bool Draw(NodeGraph& graph, const DrawNodeBody& drawBody = {}, const DrawContextMenu& drawContextMenu = {});
 		bool ConsumeBackgroundContextRequest(Vector2& outCanvasPos);
 		bool ConsumeNodeContextRequest(int32_t& outNodeId);
+		Vector2 GetLastViewCenter() const { return lastViewCenter_; }
 
 	private:
 		bool CanCreateLink(const NodeGraph& graph, int32_t a, int32_t b, int32_t& from, int32_t& to) const;
-		void DrawPin(const NodePin& pin);
+		void DrawNodePins(const Node& node);
+		void DrawPin(const NodePin& pin, float rowWidth);
 		void DrawNodeHeader(const Node& node);
+		ImVec4 GetNodeHeaderColor(const Node& node) const;
 		ImVec4 GetPinColor(NodeValueType type) const;
+		float GetLinkThickness(NodeValueType type) const;
 
 	private:
 		std::string id_;
@@ -50,5 +54,6 @@ namespace CalyxEngine {
 		int32_t contextNodeId_ = 0;
 		ContextMenu activeContextMenu_{};
 		bool hasActiveContextMenu_ = false;
+		Vector2 lastViewCenter_{};
 	};
 }

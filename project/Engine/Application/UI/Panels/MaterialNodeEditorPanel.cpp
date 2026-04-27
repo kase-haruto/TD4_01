@@ -129,7 +129,10 @@ namespace CalyxEngine {
 		ImGui::SameLine();
 		if(ImGui::Button("+ Add Node", ImVec2(112.0f, 0.0f))) ImGui::OpenPopup("AddNodeToolbar");
 		if(ImGui::BeginPopup("AddNodeToolbar")) {
-			DrawAddNodeMenu(material, {60.0f, 100.0f});
+			Vector2 position = canvas_.GetLastViewCenter();
+			position.x -= 110.0f;
+			position.y -= 60.0f;
+			DrawAddNodeMenu(material, position);
 			ImGui::EndPopup();
 		}
 		ImGui::SameLine();
@@ -140,7 +143,7 @@ namespace CalyxEngine {
 
 	bool MaterialNodeEditorPanel::DrawAddNodeMenu(MaterialAsset& material, Vector2 position) {
 		bool changed = false;
-		if(ImGui::BeginMenu("Parameters")) {
+		if(ImGui::BeginMenu("Material Parameters")) {
 			if(ImGui::MenuItem("Color")) {
 				AddColorNode(material, position);
 				changed = true;
@@ -163,7 +166,7 @@ namespace CalyxEngine {
 			}
 			ImGui::EndMenu();
 		}
-		if(ImGui::BeginMenu("Math")) {
+		if(ImGui::BeginMenu("Operators")) {
 			if(ImGui::MenuItem("Multiply Color")) {
 				AddBinaryNode(material, "MultiplyColor", "Multiply Color", NodeValueType::Color, position);
 				changed = true;
@@ -204,9 +207,6 @@ namespace CalyxEngine {
 		}
 
 		ImGui::SetNextWindowPos(ImVec2(lightingModePopupPos_.x, lightingModePopupPos_.y), ImGuiCond_Appearing);
-		if(ImGuiViewport* viewport = ImGui::GetWindowViewport()) {
-			ImGui::SetNextWindowViewport(viewport->ID);
-		}
 		ImGui::SetNextWindowSizeConstraints(ImVec2(180.0f, 0.0f), ImVec2(240.0f, 260.0f));
 		if(ImGui::BeginPopup("LightingModeSelect")) {
 			Node* target = nullptr;
@@ -325,18 +325,18 @@ namespace CalyxEngine {
 		bool changed = false;
 		ImGui::PushID(node.id);
 		if(node.type == "Color") {
-			ImGui::SetNextItemWidth(170.0f);
+			ImGui::SetNextItemWidth(188.0f);
 			changed |= ImGui::ColorEdit4("Color", &node.colorValue.x);
 		} else if(node.type == "Shininess" || node.type == "Roughness") {
-			ImGui::SetNextItemWidth(160.0f);
+			ImGui::SetNextItemWidth(178.0f);
 			changed |= ImGui::DragFloat("Value", &node.floatValue, 0.01f, 0.0f, 256.0f);
 		} else if(node.type == "Reflect") {
 			changed |= ImGui::Checkbox("Value", &node.boolValue);
 		} else if(node.type == "LightingMode") {
 			node.intValue		= std::clamp(node.intValue, 0, kLightingModeCount - 1);
 			const char* current = kLightingModes[node.intValue];
-			ImGui::SetNextItemWidth(146.0f);
-			if(ImGui::Button(current, ImVec2(146.0f, 0.0f))) {
+			ImGui::SetNextItemWidth(178.0f);
+			if(ImGui::Button(current, ImVec2(178.0f, 0.0f))) {
 				lightingModePopupRequested_ = true;
 				lightingModePopupNodeId_	= node.id;
 				const ImVec2 itemMin		= ImGui::GetItemRectMin();
