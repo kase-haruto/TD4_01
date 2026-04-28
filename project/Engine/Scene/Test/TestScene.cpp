@@ -16,6 +16,7 @@
 #include <Engine/Scene/Serializer/SceneSerializer.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Foundation/Input/Input.h>
+#include <Engine/Foundation/Clock/ClockManager.h>
 // lib
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +63,11 @@ void TestScene::Update([[maybe_unused]]float dt){
 	// ポーズの切り替え
 	if (CalyxFoundation::Input::TriggerKey(DIK_0)) {
 		isPaused_ = !isPaused_;
-		sceneContext_->SetRuntime(!isPaused_);
+		if(isPaused_) {
+			ClockManager::GetInstance()->SetTimeScale(0.0f);
+		} else {
+			ClockManager::GetInstance()->SetTimeScale(1.0f);
+		}
 	}
 	if(CalyxFoundation::Input::TriggerKey(DIK_9)) {
 		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR));
@@ -72,7 +77,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 	}
 
 	if (isPaused_) {
-		
+
 		return;
 	}
 
