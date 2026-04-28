@@ -15,6 +15,7 @@
 #include <Engine/Lighting/LightLibrary.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
+#include <cstring>
 
 ModelRenderer::ModelRenderer() {
 	Microsoft::WRL::ComPtr<ID3D12Device5> device5;
@@ -225,12 +226,35 @@ void ModelRenderer::BuildStaticBatches() {
 		PipelineKey key{PipelineTag::Object::Object3d, model->GetBlendMode()};
 		auto&		batch = staticBatches_[key];
 
+		if(auto* item = FindCompatibleStaticBatch(batch, model)) {
+			item->transforms.insert(item->transforms.end(), visTf.begin(), visTf.end());
+			item->billboards.insert(item->billboards.end(), visBb.begin(), visBb.end());
+			continue;
+		}
+
 		StaticBatchItem item;
 		item.model = model;
 		item.transforms.swap(visTf);
 		item.billboards.swap(visBb);
 		batch.emplace_back(std::move(item));
 	}
+}
+
+ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model) {
+	if(!model || !model->GetModelData()) return nullptr;
+
+	for(auto& item : batch) {
+		BaseModel* base = item.model;
+		if(!base || !base->GetModelData()) continue;
+		if(base->GetModelData() != model->GetModelData()) continue;
+		if(base->GetTexSrv().ptr != model->GetTexSrv().ptr) continue;
+		if(base->GetEnvMapSrv().ptr != model->GetEnvMapSrv().ptr) continue;
+		if(std::memcmp(&base->GetMaterialForBatch(), &model->GetMaterialForBatch(), sizeof(Material)) != 0) continue;
+
+		return &item;
+	}
+
+	return nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
