@@ -179,6 +179,7 @@ namespace CalyxEngine {
 
 			// 空白クリックで選択解除 (テーブル内の空白エリア)
 			if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered()) {
+				
 				selected_.reset();
 				if(onSelect_) onSelect_(nullptr);
 			}

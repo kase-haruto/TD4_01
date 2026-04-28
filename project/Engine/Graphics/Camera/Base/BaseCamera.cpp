@@ -188,7 +188,7 @@ void BaseCamera::SetCommand(ID3D12GraphicsCommandList* command, PipelineType pip
 	cameraBuffer_.SetCommand(command, pipelineType);
 }
 
-void BaseCamera::SetRootCommand(ID3D12GraphicsCommandList* command, uint32_t rootIndex) {
+void BaseCamera::SetRootCommand(ID3D12GraphicsCommandList* command, uint32_t rootIndex) const {
 	cameraBuffer_.SetCommand(command, rootIndex);
 }
 

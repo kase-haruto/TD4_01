@@ -3,12 +3,14 @@
 #include "Engine/Assets/Manager/AssetManager.h"
 
 #include <Engine/Assets/Database/AssetDatabase.h>
+#include <Engine/Assets/DataAsset/MaterialAsset.h>
 
 #include <externals/imgui/ImGuiFileDialog.h>
 #include <externals/imgui/imgui.h>
 
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <system_error>
 #include <vector>
 
@@ -77,6 +79,9 @@ namespace CalyxEngine {
 				ImGui::EndMenu();
 			}
 			if(ImGui::BeginMenu("Assets")) {
+				if(ImGui::MenuItem("New Material")) {
+					CreateMaterialAssetInCurrentFolder();
+				}
 				if(ImGui::MenuItem("Rescan")) {
 					AssetDatabase::GetInstance()->Scan();
 					needsRebuildTree_ = true;
@@ -131,10 +136,41 @@ namespace CalyxEngine {
 	void AssetPanel::DrawLeftTree() {
 		EnsureFolderTreeBuilt();
 
+		DrawFavorites();
+		ImGui::Separator();
+
 		if(ImGui::TreeNodeEx("Assets", ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanFullWidth)) {
 			DrawDirNode(rootNode_.get());
 			ImGui::TreePop();
 		}
+	}
+
+	void AssetPanel::CreateMaterialAssetInCurrentFolder() {
+		std::filesystem::path folder = currentFolderAbs_.empty() ? assetsRootAbs_ : currentFolderAbs_;
+
+		std::filesystem::path path = folder / "New Material.mat";
+		for(int i = 1; std::filesystem::exists(path); ++i) {
+			path = folder / ("New Material " + std::to_string(i) + ".mat");
+		}
+
+		{
+			std::ofstream ofs(path);
+			if(!ofs) return;
+		}
+
+		auto* db = AssetDatabase::GetInstance();
+		const Guid guid = db->RegisterOrUpdate(path, AssetType::Material);
+		if(auto* dataAssets = AssetManager::GetInstance()->GetDataAssetManager()) {
+			auto asset = dataAssets->GetAsset<MaterialAsset>(guid);
+			if(asset) {
+				asset->SetName(path.stem().string());
+				dataAssets->SaveAsset(*asset, path);
+			}
+		}
+
+		db->Scan();
+		cacheValid_ = false;
+		needsRebuildTree_ = true;
 	}
 
 	/* ===================== 右ペイン ===================== */
@@ -368,6 +404,50 @@ namespace CalyxEngine {
 			}
 			ImGui::TreePop();
 		}
+	}
+
+	bool AssetPanel::DrawAssetDropTarget(AssetType expect, Guid* inoutGuid, float height) {
+		if(!inoutGuid) return false;
+
+		ImGui::PushID(inoutGuid);
+		ImVec2 dropSize(ImGui::GetContentRegionAvail().x, height);
+		ImGui::InvisibleButton("##AssetDropTarget", dropSize);
+
+		const bool hovered = ImGui::IsItemHovered();
+		const ImVec2 rmin = ImGui::GetItemRectMin();
+		const ImVec2 rmax = ImGui::GetItemRectMax();
+		ImGui::GetWindowDrawList()->AddRect(
+			rmin, rmax,
+			hovered ? IM_COL32(120, 180, 255, 220) : IM_COL32(90, 90, 90, 160),
+			8.0f, 0, 2.0f);
+
+		const char* label = "Drop Asset here";
+		switch(expect) {
+		case AssetType::Texture: label = "Drop Texture here"; break;
+		case AssetType::Material: label = "Drop Material here"; break;
+		case AssetType::Model: label = "Drop Model here"; break;
+		default: break;
+		}
+		ImGui::GetWindowDrawList()->AddText(
+			ImVec2(rmin.x + 8.0f, rmin.y + 8.0f),
+			IM_COL32(230, 230, 230, 255),
+			label);
+
+		bool changed = false;
+		if(ImGui::BeginDragDropTarget()) {
+			if(const ImGuiPayload* p = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
+				const AssetDragPayload payload =
+					*reinterpret_cast<const AssetDragPayload*>(p->Data);
+				if(payload.type == expect) {
+					*inoutGuid = payload.guid;
+					changed = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::PopID();
+		return changed;
 	}
 
 	void AssetPanel::DrawDirNode(DirNode* node) {

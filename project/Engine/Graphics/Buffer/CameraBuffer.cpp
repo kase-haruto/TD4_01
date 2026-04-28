@@ -33,7 +33,7 @@ void Camera3DBuffer::Update(const CalyxEngine::Matrix4x4& view, const CalyxEngin
 /////////////////////////////////////////////////////////////////////////////////////////
 //		コマンドを積む
 /////////////////////////////////////////////////////////////////////////////////////////
-void Camera3DBuffer::SetCommand(ID3D12GraphicsCommandList* cmdList, PipelineType pipelineType) {
+void Camera3DBuffer::SetCommand(ID3D12GraphicsCommandList* cmdList, PipelineType pipelineType) const {
 	uint32_t rootParameterIndex = 0;
 
 	if(pipelineType == PipelineType::Object3D || pipelineType == PipelineType::SkinningObject3D) {
@@ -45,6 +45,6 @@ void Camera3DBuffer::SetCommand(ID3D12GraphicsCommandList* cmdList, PipelineType
 	buffer_.SetCommand(cmdList, rootParameterIndex);
 }
 
-void Camera3DBuffer::SetCommand(ID3D12GraphicsCommandList* cmdList, uint32_t rootIndex) {
+void Camera3DBuffer::SetCommand(ID3D12GraphicsCommandList* cmdList, uint32_t rootIndex) const {
 	buffer_.SetCommand(cmdList, rootIndex);
 }

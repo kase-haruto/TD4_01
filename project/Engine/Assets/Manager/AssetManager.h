@@ -2,6 +2,7 @@
 
 #include <Engine/Assets/Model/ModelManager.h>
 #include <Engine/Assets/Texture/TextureManager.h>
+#include <Engine/Assets/DataAsset/DataAssetManager.h>
 
 namespace CalyxEngine {
 
@@ -29,6 +30,7 @@ namespace CalyxEngine {
 		// accessor ==========================//
 		ModelManager*   GetModelManager() const { return modelManager_.get(); }
 		TextureManager* GetTextureManager() const { return textureManager_.get(); }
+		DataAssetManager* GetDataAssetManager() const { return dataAssetManager_.get(); }
 
 	private:
 		//===================================================================*/
@@ -43,6 +45,7 @@ namespace CalyxEngine {
 		//===================================================================*/
 		std::unique_ptr<ModelManager>   modelManager_;
 		std::unique_ptr<TextureManager> textureManager_;
+		std::unique_ptr<DataAssetManager> dataAssetManager_;
 
 	};
 
