@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <vector>
-#define NOMINMAX
 
 #include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorEvent.h"
 #include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorObject.h"
@@ -32,9 +31,9 @@ private:
 	/// ギミックのエントリを表す構造体
 	/// </summary>
 	struct GimmickEntry {
-		std::shared_ptr<StageGimmickEventBase>	event;
-		std::shared_ptr<StageGimmickObjectBase> object;
-		std::string								name;
+		std::shared_ptr<StageGimmickEventBase>					event;
+		std::vector<std::shared_ptr<StageGimmickObjectBase>>	objects;
+		std::string												name;
 	};
 
 private:

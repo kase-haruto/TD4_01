@@ -8,7 +8,6 @@ REGISTER_SCENE_OBJECT(DroolRainEvent)
 
 DroolRainEvent::DroolRainEvent(const std::string& name) : StageGimmickEventBase(name) {}
 
-
 void DroolRainEvent::OnCollisionEnter(Collider* other) {
 
 	other;
@@ -22,15 +21,34 @@ void DroolRainEvent::OnCollisionExit(Collider* other) {
 	other;
 }
 
+void DroolRainEvent::SetTarget(const std::shared_ptr<DroolRainObject>& target) {
+	targetObjects_.push_back(target);
+}
+
 void DroolRainEvent::EventInitialize() {
 
-	// プレイヤーが入ったらよだれを生成する
-	const std::string objectName = "DroolRainObject";
-	for(size_t i = 0; i < droolCount_; ++i) {
-		if(droolCount_ <= droolObjects_.size()) { break; }
-		auto object = SceneAPI::Instantiate<DroolRainObject>("debugCube.obj", objectName);
-		object->SetParent(shared_from_this());
-		droolObjects_.push_back(object);
+	objectCount_ = 5;
+
+	std::string eventName = GetName();
+
+	const std::string eventPrefix  = "DroolRainEvent";
+	const std::string objectPrefix = "DroolRainObject(";
+
+	// イベント名が"DroolRainEvent"で始まっているか確認する
+	if(eventName.find(eventPrefix) != 0) {
+		return;
+	}
+	// 番号を抜き取る
+	std::string suffix = eventName.substr(eventPrefix.size());
+	// 対応するオブジェクト名を作る
+	std::string targetName = eventName + "/" + objectPrefix;
+	// シーンから対応するオブジェクトを探す
+	for(uint32_t i = 0; i < objectCount_; ++i) {
+		std::string indexedTargetName = targetName + std::to_string(i) + ")";
+		auto targetObject = SceneContext::Current()->FindObjectByName<DroolRainObject>(indexedTargetName);
+		if(targetObject) {
+			targetObjects_.push_back(targetObject);
+		}
 	}
 }
 

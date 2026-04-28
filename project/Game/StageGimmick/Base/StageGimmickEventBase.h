@@ -20,6 +20,8 @@ public:
 		return "StageGimmickEventBase";
 	}
 
+	uint32_t GetObjectCount() const { return objectCount_; }
+
 protected:
 	
 	// ギミックの初期化
@@ -30,4 +32,8 @@ protected:
 
 	// ギミックが作動しているか
 	bool isActive_ = true;
+
+	// ターゲットのギミックオブジェクトの数
+	uint32_t objectCount_ = 1;
+
 };

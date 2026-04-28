@@ -21,6 +21,9 @@ public:
 	void OnCollisionEnter(Collider* other) override;
 	void OnCollisionExit(Collider* other) override;
 
+	// ターゲットをセットする
+	void SetTarget(const std::shared_ptr<DroolRainObject>& target);
+
 protected:
 
 	// 初期化
@@ -32,10 +35,6 @@ protected:
 private:
 
 	// ターゲットのよだれ雨オブジェクト
-	std::vector<std::weak_ptr<DroolRainObject>> droolObjects_;
-
-	// 調整項目
-	uint32_t droolCount_ = 5;
-
+	std::vector<std::weak_ptr<DroolRainObject>> targetObjects_;
 
 };

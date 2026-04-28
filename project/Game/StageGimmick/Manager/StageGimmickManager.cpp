@@ -60,7 +60,6 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 	// 対応するオブジェクト名を作る
 	std::string targetName = eventPrefix + std::to_string(index) + ")";
 	// オブジェクトとイベントをシーンに生成
-	std::shared_ptr<StageGimmickObjectBase> object;
 	std::shared_ptr<StageGimmickEventBase>	event;
 	// シーンから対応するオブジェクトを探す
 	if(gimmickName == "BreakableFloor") {
@@ -76,27 +75,42 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 
 	// イベントが見つからなくなるまでループする
 	while(event) {
+		std::vector<std::shared_ptr<StageGimmickObjectBase>> objects;
+
 		if(gimmickName == "BreakableFloor") {
-			object = SceneContext::Current()->FindObjectByName<BreakableFloorObject>(
+			auto object = SceneContext::Current()->FindObjectByName<BreakableFloorObject>(
 				objectPrefix + std::to_string(index) + ")");
+			if(object) {
+				objects.push_back(object);
+			}
 		} else if(gimmickName == "GroundSpike") {
-			object = SceneContext::Current()->FindObjectByName<GroundSpikeObject>(
+			auto object = SceneContext::Current()->FindObjectByName<GroundSpikeObject>(
 				objectPrefix + std::to_string(index) + ")");
+			if(object) {
+				objects.push_back(object);
+			}
+		} else if(gimmickName == "DroolRain") {
+			for(uint32_t i = 0; i < event->GetObjectCount(); ++i) {
+				auto object = SceneContext::Current()->FindObjectByName<DroolRainObject>(
+					targetName + "/" + objectPrefix + std::to_string(i) + ")");
+				if(object) {
+					objects.push_back(object);
+				}
+			}
 		}
-		if(object) {
-			gimmicks_.push_back({event, object, gimmickName});
-		} else {
-		
-			gimmicks_.push_back({event, nullptr, gimmickName});
+
+		if(!objects.empty()) {
+			gimmicks_.push_back({event, objects, gimmickName});
 		}
 
 		++index;
 		targetName = eventPrefix + std::to_string(index) + ")";
+
 		if(gimmickName == "BreakableFloor") {
 			event = SceneContext::Current()->FindObjectByName<BreakableFloorEvent>(targetName);
 		} else if(gimmickName == "GroundSpike") {
 			event = SceneContext::Current()->FindObjectByName<GroundSpikeEvent>(targetName);
-		} else if(gimmickName == "DroolRain") {
+		}else if(gimmickName == "DroolRain") {
 			event = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
 		}
 	}
@@ -110,34 +124,48 @@ void StageGimmickManager::CreateGimmick(const std::string& gimmickName) {
 	const std::string eventName	 = gimmickName + "Event";
 
 	// オブジェクトとイベントをシーンに生成
-	std::shared_ptr<StageGimmickObjectBase> object;
+	std::vector<std::shared_ptr<StageGimmickObjectBase>> objects;
 	std::shared_ptr<StageGimmickEventBase> event;
 	if(gimmickName == "BreakableFloor") {
+
 		auto breakableObject = SceneAPI::Instantiate<BreakableFloorObject>("debugCube.obj", objectName);
-		auto breakableEvent = SceneAPI::Instantiate<BreakableFloorEvent>(eventName);
+		auto breakableEvent	 = SceneAPI::Instantiate<BreakableFloorEvent>(eventName);
 		breakableEvent->SetTarget(breakableObject);
-		object = breakableObject;
-		event  = breakableEvent;
+		breakableObject->SetParent(breakableEvent);
+		breakableEvent->Initialize();
+		breakableObject->Initialize();
+		objects.push_back(breakableObject);
+		event = breakableEvent;
+
 	} else if(gimmickName == "GroundSpike") {
+
 		auto spikeObject = SceneAPI::Instantiate<GroundSpikeObject>("debugCube.obj", objectName);
-		auto spikeEvent = SceneAPI::Instantiate<GroundSpikeEvent>(eventName);
+		auto spikeEvent	 = SceneAPI::Instantiate<GroundSpikeEvent>(eventName);
 		spikeEvent->SetTarget(spikeObject);
-		object = spikeObject;
-		event  = spikeEvent;
+		spikeObject->SetParent(spikeEvent);
+		spikeEvent->Initialize();
+		spikeObject->Initialize();
+		objects.push_back(spikeObject);
+		event = spikeEvent;
+
 	} else if(gimmickName == "DroolRain") {
 		auto droolEvent = SceneAPI::Instantiate<DroolRainEvent>(eventName);
-		event  = droolEvent;
-	}
-	if(object) {
-		object->SetParent(event);
-		object->Initialize();
-	}
-	if(event) {
-		event->Initialize();
+		droolEvent->Initialize();
+		event = droolEvent;
+		for(uint32_t i = 0; i < event->GetObjectCount(); ++i) {
+			std::string indexedObjectName = objectName + "(" + std::to_string(i) + ")";
+			if(event->GetName() == "DroolRainEvent") {
+				indexedObjectName = "DroolRainEvent(0)/" + indexedObjectName;
+			}
+			auto droolObject = SceneAPI::Instantiate<DroolRainObject>("debugCube.obj", indexedObjectName);
+			droolObject->SetParent(droolEvent);
+			droolObject->Initialize();
+			objects.push_back(droolObject);
+			droolEvent->SetTarget(droolObject);
+		}
 	}
 
-	// リストに追加
-	gimmicks_.push_back({event, object, gimmickName});
+	gimmicks_.push_back({event, objects, gimmickName});
 	ReindexGimmickNames(gimmickName);
 }
 
@@ -148,19 +176,22 @@ void StageGimmickManager::DeleteGimmick(size_t index) {
 	}
 
 	// シーンからオブジェクトとイベントを削除
-	auto event	= gimmicks_[index].event;
-	auto object = gimmicks_[index].object;
+	auto event   = gimmicks_[index].event;
+	auto objects = gimmicks_[index].objects;
 	const auto name = gimmicks_[index].name;
 
 	// シーンコンテキストが存在する場合に削除処理を行う
 	if(auto* ctx = SceneContext::Current()) {
-		if(event) ctx->RemoveObject(event);
-		if(object) ctx->RemoveObject(object);
+		if(event) { ctx->RemoveObject(event); }
+		for(auto& object : objects) {
+			if(object) {
+				ctx->RemoveObject(object);
+			}
+		}
 	}
 
 	// リストから削除
 	gimmicks_.erase(gimmicks_.begin() + index);
-
 	ReindexGimmickNames(name);
 }
 
@@ -174,10 +205,26 @@ void StageGimmickManager::ReindexGimmickNames(const std::string& gimmickName) {
 			continue;
 		}
 		if(gimmicks_[i].event) {
-			gimmicks_[i].event->SetName(gimmickName  + "Event(" + std::to_string(index) + ")", std::nullopt);
+			gimmicks_[i].event->SetName(
+				gimmickName + "Event(" + std::to_string(index) + ")",
+				std::nullopt);
 		}
-		if(gimmicks_[i].object) {
-			gimmicks_[i].object->SetName(gimmickName + "Object(" + std::to_string(index) + ")");
+		for(size_t objectIndex = 0; objectIndex < gimmicks_[i].objects.size(); ++objectIndex) {
+			auto& object = gimmicks_[i].objects[objectIndex];
+			const auto& eventName = gimmicks_[i].event->GetName();
+			if(!object) {
+				continue;
+			}
+			// 今は1ギミックにつきObjectが1つなので、従来通りの名前にする
+			if(gimmicks_[i].objects.size() == 1) {
+				object->SetName(
+					gimmickName + "Object(" + std::to_string(index) + ")");
+			}
+			// 将来的に1つのEventに複数Objectを持たせる場合
+			else {
+				object->SetName(
+					eventName + "/" + gimmickName + "Object(" + std::to_string(objectIndex) + ")");
+			}
 		}
 		++index;
 	}
