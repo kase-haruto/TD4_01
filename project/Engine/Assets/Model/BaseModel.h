@@ -71,7 +71,7 @@ public:
 	void EnsureInstanceCapacity(ID3D12Device* device, UINT needCount);
 	void UploadInstanceMatrices(const std::vector<WorldTransform>& tf);
 
-	void EnsureRaytracingBLAS(ID3D12Device5* device5, ID3D12GraphicsCommandList4* cmdList4);
+	virtual void EnsureRaytracingBLAS(ID3D12Device5* device5, ID3D12GraphicsCommandList4* cmdList4);
 
 	// レンダラーが使うハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInstanceSrv()const;  //< VS:t0 (gTransMat)

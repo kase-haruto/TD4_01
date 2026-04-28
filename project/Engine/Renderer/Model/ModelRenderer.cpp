@@ -268,6 +268,20 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							CalyxEngine::ShadowMapSystem* shadowMapSystem) {
 	(void)rt;
 
+	// Skinned meshes are converted to skinned vertex buffers once per frame.
+	{
+		bool computeSet = false;
+		for(auto& [model, insts] : skinnedModels_) {
+			if(!model || !model->GetModelData() || insts.empty()) continue;
+			if(!computeSet) {
+				const auto& ps = psoService->GetComputePipelineSet(PipelineTag::Compute::SkinningCompute);
+				ps.SetCompute(cmdList);
+				computeSet = true;
+			}
+			model->DispatchSkinning(psoService, cmdList);
+		}
+	}
+
 	// Raytracing TLAS Build
 	if(raytracingSystem_) {
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> cmd4;
@@ -338,7 +352,9 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 				psoService->SetCommand(ps, cmdList);
 
-				shadowMapSystem->BindForMainPass(cmdList);
+				if(shadowMapSystem) {
+					shadowMapSystem->BindForMainPass(cmdList);
+				}
 
 				if(raytracingSystem_) {
 					cmdList->SetGraphicsRootShaderResourceView(
@@ -403,7 +419,9 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 				psoService->SetCommand(ps, cmdList);
 
-				shadowMapSystem->BindForMainPass(cmdList);
+				if(shadowMapSystem) {
+					shadowMapSystem->BindForMainPass(cmdList);
+				}
 
 				if(raytracingSystem_) {
 					cmdList->SetGraphicsRootShaderResourceView(
@@ -425,7 +443,23 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 			}
 
 			for(auto& [model, visible] : batch) {
-				for(const auto& tf : visible) model->Draw(tf);
+				if(!model || visible.empty()) continue;
+
+				const UINT need = static_cast<UINT>(visible.size());
+				model->EnsureInstanceCapacity(device, need);
+				model->UploadInstanceMatrices(visible);
+				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
+
+				model->BindMaterialCB(cmdList);
+				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
+				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
+				model->SetCommandPalletSrv(7, cmdList);
+
+				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				model->BindVertexIndexBuffers(cmdList);
+
+				const UINT indexCount = static_cast<UINT>(model->GetModelData()->meshResource.Indices().size());
+				cmdList->DrawIndexedInstanced(indexCount, need, 0, 0, 0);
 			}
 		}
 	}

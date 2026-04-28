@@ -219,7 +219,15 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 		}
 
 		auto* model = static_cast<CalyxEngine::AnimationModel*>(inst.model);
-		model->Draw(*inst.transform);
+		inst.transform->SetCommand(cmdList, 1);
+		model->SetCommandPalletSrv(7, cmdList);
+		model->BindVertexIndexBuffers(cmdList);
+		cmdList->DrawIndexedInstanced(
+			static_cast<UINT>(model->GetModelData()->meshResource.Indices().size()),
+			1,
+			0,
+			0,
+			0);
 		drewAny = true;
 	}
 

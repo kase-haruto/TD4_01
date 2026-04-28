@@ -120,7 +120,7 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 	if(mode == BlendMode::NONE||mode == BlendMode::NORMAL) {
 		desc.VS(L"SkinningObject3d.VS.hlsl")
 			.PS(L"Object3d.PS.hlsl")
-			.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+			.Input(VertexInputLayout<VertexPosUvN>::Get())
 			.Blend(mode)
 			.CullBack()
 			.DepthEnable(true)
@@ -136,7 +136,7 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 
 		desc.VS(L"SkinningObject3d.VS.hlsl")
 			.PS(L"Object3d.PS.hlsl")
-			.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+			.Input(VertexInputLayout<VertexPosUvN>::Get())
 			.Blend(mode)
 			.CullBack()
 			.DepthState(depthDesc)
@@ -147,7 +147,7 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 	desc.root_
 		.AllowIA()
 		.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL)											 // Material
-		.CBV(0, D3D12_SHADER_VISIBILITY_VERTEX)											 // WVP
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX) // Instance transforms
 		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // Tex
 		.CBV(2, D3D12_SHADER_VISIBILITY_PIXEL)											 // DirLight
 		.CBV(1, D3D12_SHADER_VISIBILITY_ALL)											 // Camera
@@ -229,7 +229,7 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineSkinnedObject3D() {
 
 	desc.VS(L"OutlineSkinnedObject3D.VS.hlsl")
 		.PS(L"Outline.PS.hlsl")
-		.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+		.Input(VertexInputLayout<VertexPosUvN>::Get())
 		.Blend(BlendMode::NORMAL)
 		.CullFront()
 		.DepthState(depthDesc)
@@ -297,7 +297,7 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineNormalSkinnedObject3D() {
 
 	desc.VS(L"OutlineNormalSkinnedObject3D.VS.hlsl")
 		.PS(L"OutlineNormal.PS.hlsl")
-		.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+		.Input(VertexInputLayout<VertexPosUvN>::Get())
 		.Blend(BlendMode::NONE)
 		.CullBack()
 		.DepthState(depthDesc)
@@ -325,7 +325,7 @@ GraphicsPipelineDesc PipelinePresets::MakeShadowSkinned() {
 	GraphicsPipelineDesc desc;
 
 	desc.VS(L"ShadowSkinned.VS.hlsl")
-		.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+		.Input(VertexInputLayout<VertexPosUvN>::Get())
 		.CullBack()
 		.DepthEnable(true)
 		.DepthFunc(D3D12_COMPARISON_FUNC_LESS_EQUAL)
@@ -337,7 +337,7 @@ GraphicsPipelineDesc PipelinePresets::MakeShadowSkinned() {
 	desc.root_
 		.AllowIA()
 		.CBV(0, D3D12_SHADER_VISIBILITY_VERTEX)											  // ShadowCB
-		.CBV(1, D3D12_SHADER_VISIBILITY_VERTEX)											  // wvp
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX) // Instance transforms
 		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_VERTEX); // SkinningBuffer
 
 	return desc;
@@ -382,7 +382,7 @@ GraphicsPipelineDesc PipelinePresets::MakePickingSkinned() {
 	GraphicsPipelineDesc desc;
 	desc.VS(L"Picking.VS.hlsl")
 		.PS(L"ObjectPicking.PS.hlsl")
-		.Input(VertexInputLayout<VertexPosUvNSkinning>::Get())
+		.Input(VertexInputLayout<VertexPosUvN>::Get())
 		.Blend(BlendMode::NONE)
 		.CullBack()
 		.DepthEnable(true)
@@ -547,6 +547,20 @@ GraphicsPipelineDesc PipelinePresets::MakeGpuParticleUpdate() {
 		.UAVTable(0, 1)						 // u0 : RWStructuredBuffer<Particle>
 		.UAVTable(1, 1)						 // u1 : RWStructuredBuffer<uint> (freeListIndex)
 		.UAVTable(2, 1);					 // u2 : RWStructuredBuffer<uint> (freeList)
+
+	return desc;
+}
+
+GraphicsPipelineDesc PipelinePresets::MakeSkinningCompute() {
+	GraphicsPipelineDesc desc;
+	desc.CS(L"Skinning.CS.hlsl");
+
+	desc.root_
+		.Constants(0, 1, D3D12_SHADER_VISIBILITY_ALL) // b0: vertexCount
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_ALL) // t0: source vertices
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_ALL) // t1: influences
+		.SRVTable(2, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_ALL) // t2: matrix palette
+		.UAVTable(0, 1, D3D12_SHADER_VISIBILITY_ALL); // u0
 
 	return desc;
 }
