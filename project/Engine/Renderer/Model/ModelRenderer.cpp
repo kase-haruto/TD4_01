@@ -148,17 +148,17 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			}
 
 			// -------------------------
-			// ShadowPass：無条件で登録 (影を落とす場合のみ)
-			// -------------------------
-			if(!inst.owner || inst.owner->IsCastShadow()) {
-				staticVisibleForShadow_[model].push_back(inst.tf);
-				ExpandSceneBounds(inst.worldAABB);
-			}
-
-			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = camera->IsVisible(inst.worldAABB);
+
+			// -------------------------
+			// Shadow / Raytracing：メインカメラの可視分だけ登録
+			// -------------------------
+			if(inst.visible && (!inst.owner || inst.owner->IsCastShadow())) {
+				staticVisibleForShadow_[model].push_back(inst.tf);
+				ExpandSceneBounds(inst.worldAABB);
+			}
 		}
 	}
 
@@ -180,17 +180,17 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			}
 
 			// -------------------------
-			// ShadowPass：無条件で登録 (影を落とす場合のみ)
-			// -------------------------
-			if(!inst.owner || inst.owner->IsCastShadow()) {
-				skinnedVisibleForShadow_[model].push_back(inst.tf);
-				ExpandSceneBounds(inst.worldAABB);
-			}
-
-			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = camera->IsVisible(inst.worldAABB);
+
+			// -------------------------
+			// Shadow / Raytracing：メインカメラの可視分だけ登録
+			// -------------------------
+			if(inst.visible && (!inst.owner || inst.owner->IsCastShadow())) {
+				skinnedVisibleForShadow_[model].push_back(inst.tf);
+				ExpandSceneBounds(inst.worldAABB);
+			}
 		}
 	}
 

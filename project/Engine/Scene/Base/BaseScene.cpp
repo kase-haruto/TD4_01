@@ -73,12 +73,17 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 #endif
 	}
 
-	const Camera3d* cam = dynamic_cast<Camera3d*>(CameraManager::GetActive());
-	if(!cam) {
-		cam = CameraManager::GetMain3d();
+	const Camera3d* renderCam = dynamic_cast<Camera3d*>(CameraManager::GetActive());
+	if(!renderCam) {
+		renderCam = CameraManager::GetMain3d();
 	}
-	if(!cam) return;
-	modelRenderer_->PreCullAndBatch(cam);
+	if(!renderCam) return;
+
+	const Camera3d* cullCam = CameraManager::GetMain3d();
+	if(!cullCam) {
+		cullCam = renderCam;
+	}
+	modelRenderer_->PreCullAndBatch(cullCam);
 
 	// =========================================================
 	// MainPass
@@ -98,7 +103,7 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 							 GraphicsGroup::GetInstance()->GetDevice().Get(),
 							 rt,
 							 pso,
-							 cam,
+							 renderCam,
 							 *modelRenderer_);
 
 #if defined(_DEBUG) || defined(DEVELOP)
@@ -107,7 +112,7 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 												   GraphicsGroup::GetInstance()->GetDevice().Get(),
 												   rt,
 												   pso,
-												   cam,
+												   renderCam,
 												   *modelRenderer_,
 												   sceneContext_->GetDebugSelectedObject());
 	}
