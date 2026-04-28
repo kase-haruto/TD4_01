@@ -8,6 +8,7 @@
 #include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorObject.h"
 #include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeEvent.h"
 #include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeObject.h"
+#include "Game/StageGimmick/Gimmicks/DroolRain/DroolRainEvent.h"
 
 /// <summary>
 /// ステージギミックを管理するクラス

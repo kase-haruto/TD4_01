@@ -1,8 +1,7 @@
 #include "BreakableFloorEvent.h"
+
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Context/SceneContext.h>
-
-#include "Engine/Foundation/Input/Input.h"
 
 REGISTER_SCENE_OBJECT(BreakableFloorEvent)
 

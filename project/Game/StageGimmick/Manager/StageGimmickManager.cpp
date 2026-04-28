@@ -8,6 +8,7 @@ void StageGimmickManager::Initialize() {
 	// シーン内のギミックを再読み込みする
 	ReloadGimmicks("BreakableFloor");
 	ReloadGimmicks("GroundSpike");
+	ReloadGimmicks("DroolRain");
 }
 
 void StageGimmickManager::Update(float dt) {
@@ -20,6 +21,7 @@ void StageGimmickManager::ShowGui() {
 
 	GimmickShowGui("BreakableFloor");
 	GimmickShowGui("GroundSpike");
+	GimmickShowGui("DroolRain");
 	
 	ImGui::End();
 }
@@ -67,6 +69,9 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 	} else if(gimmickName == "GroundSpike") {
 		auto spikeEvent	 = SceneContext::Current()->FindObjectByName<GroundSpikeEvent>(targetName);
 		event  = spikeEvent;
+	} else if(gimmickName == "DroolRain") {
+		auto droolEvent = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
+		event  = droolEvent;
 	}
 
 	// イベントが見つからなくなるまでループする
@@ -80,13 +85,19 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 		}
 		if(object) {
 			gimmicks_.push_back({event, object, gimmickName});
+		} else {
+		
+			gimmicks_.push_back({event, nullptr, gimmickName});
 		}
+
 		++index;
 		targetName = eventPrefix + std::to_string(index) + ")";
 		if(gimmickName == "BreakableFloor") {
 			event = SceneContext::Current()->FindObjectByName<BreakableFloorEvent>(targetName);
 		} else if(gimmickName == "GroundSpike") {
 			event = SceneContext::Current()->FindObjectByName<GroundSpikeEvent>(targetName);
+		} else if(gimmickName == "DroolRain") {
+			event = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
 		}
 	}
 
@@ -113,12 +124,17 @@ void StageGimmickManager::CreateGimmick(const std::string& gimmickName) {
 		spikeEvent->SetTarget(spikeObject);
 		object = spikeObject;
 		event  = spikeEvent;
-	} else {
-		return;
+	} else if(gimmickName == "DroolRain") {
+		auto droolEvent = SceneAPI::Instantiate<DroolRainEvent>(eventName);
+		event  = droolEvent;
 	}
-	object->SetParent(event);
-	event->Initialize();
-	object->Initialize();
+	if(object) {
+		object->SetParent(event);
+		object->Initialize();
+	}
+	if(event) {
+		event->Initialize();
+	}
 
 	// リストに追加
 	gimmicks_.push_back({event, object, gimmickName});
