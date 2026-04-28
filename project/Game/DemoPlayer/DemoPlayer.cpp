@@ -2,6 +2,7 @@
 #include "Engine/Foundation/Input/Input.h"
 #include "Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h"
 #include "Engine/Scene/Utility/SceneUtility.h"
+#include "Engine/Objects/Collider/BoxCollider.h"
 #include <Game/DemoShockwave/ShockwaveManager.h>
 #include <algorithm>
 #include <cmath>
@@ -53,6 +54,9 @@ void DemoPlayer::Initialize() {
 		// 敵、イベントオブジェクト、ステージギミックを対象にする
 		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack | ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
 		collider_->SetOffset(param_.colliderOffset);
+		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
+			radius->SetSize(param_.colliderSize);
+		}
 	}
 
 	// 衝撃波マネージャーの初期化（プール作成）
