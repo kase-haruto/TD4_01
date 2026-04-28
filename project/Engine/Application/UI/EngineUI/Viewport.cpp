@@ -2,6 +2,9 @@
 #define NOMINMAX
 #endif
 #include "Viewport.h"
+#include <Engine/Assets/Database/AssetDatabase.h>
+#include <Engine/Assets/System/AssetDragPayload.h>
+#include <Engine/Assets/System/AssetType.h>
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
 #include <Engine/Editor/PickingPass.h>
 #include <Engine/Foundation/Input/Input.h>
@@ -14,6 +17,9 @@
 #include <Engine/Physics/Ray/RayDetail.h>
 #include <Engine/Physics/Ray/Raycastor.h>
 #include <Engine/Scene/Context/SceneContext.h>
+#include <Engine/Scene/Utility/SceneUtility.h>
+#include <Engine/System/Command/EditorCommand/LevelEditorCommand/CreateObjectCommand/CreateObjectCommand.h>
+#include <Engine/System/Command/Manager/CommandManager.h>
 #include <externals/imgui/ImGuizmo.h>
 #include <externals/imgui/imgui.h>
 
@@ -31,6 +37,49 @@ namespace {
             return nullptr;
         }
         return *(const PlaceToolPanel::PlaceItem* const*)payload->Data;
+    }
+
+    inline const AssetDragPayload* ReadAssetPayload(const ImGuiPayload* payload) {
+        if(!payload || !payload->Data || payload->DataSize != (int)sizeof(AssetDragPayload)) {
+            return nullptr;
+        }
+        return reinterpret_cast<const AssetDragPayload*>(payload->Data);
+    }
+
+    inline const AssetRecord* GetDraggedModelRecord(const ImGuiPayload* payload) {
+        const AssetDragPayload* assetPayload = ReadAssetPayload(payload);
+        if(!assetPayload || assetPayload->type != AssetType::Model) {
+            return nullptr;
+        }
+
+        const AssetRecord* record = AssetDatabase::GetInstance()->Get(assetPayload->guid);
+        if(!record || record->type != AssetType::Model) {
+            return nullptr;
+        }
+        return record;
+    }
+
+    inline std::shared_ptr<BaseGameObject> CreateModelObjectFromAsset(
+        const AssetRecord& record,
+        const CalyxEngine::Vector3& pos,
+        bool isGhost) {
+        const std::string modelName = record.sourcePath.filename().string();
+        const std::string objectName = record.sourcePath.stem().string();
+
+        auto obj = SceneAPI::Instantiate<BaseGameObject>(modelName, objectName);
+        obj->Initialize();
+        if(auto* collider = obj->GetCollider()) {
+            collider->SetCollisionEnabled(false);
+        }
+        obj->GetWorldTransform().translation = pos;
+
+        if(isGhost) {
+            obj->SetTransient(true);
+            obj->SetBlendMode(BlendMode::ALPHA);
+            obj->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
+        }
+
+        return obj;
     }
 }
 
@@ -151,6 +200,34 @@ void Viewport::Render(const ImTextureID& tex) {
                     if(ghost_) {
                         SceneContext::Current()->RemoveObject(ghost_);
                         ghost_ = nullptr;
+                        ghostKind_ = GhostKind::None;
+                        ghostAssetGuid_ = Guid::Empty();
+                    }
+                }
+            }
+            if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
+                const AssetRecord* record = GetDraggedModelRecord(payload);
+                if(record && hoverImageRect) {
+                    const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
+                    const AssetGUID guid = record->guid;
+
+                    auto factory = [guid, spawnPos]() {
+                        const AssetRecord* freshRecord = AssetDatabase::GetInstance()->Get(guid);
+                        if(!freshRecord) {
+                            return std::shared_ptr<BaseGameObject>{};
+                        }
+                        return CreateModelObjectFromAsset(*freshRecord, spawnPos, false);
+                    };
+
+                    CommandManager::GetInstance()->Execute(
+                        std::make_unique<CreateObjectCommand<BaseGameObject>>(
+                            SceneContext::Current(), factory, "Create Model Asset"));
+
+                    if(ghost_) {
+                        SceneContext::Current()->RemoveObject(ghost_);
+                        ghost_ = nullptr;
+                        ghostKind_ = GhostKind::None;
+                        ghostAssetGuid_ = Guid::Empty();
                     }
                 }
             }
@@ -165,29 +242,64 @@ void Viewport::Render(const ImTextureID& tex) {
 
         const ImGuiPayload* dragPayload = ImGui::GetDragDropPayload();
         const bool draggingPlace = (dragPayload && dragPayload->IsDataType("DND_PLACE_ITEM"));
+        const bool draggingModelAsset = (dragPayload && dragPayload->IsDataType("CALYX_ASSET") &&
+                                         GetDraggedModelRecord(dragPayload));
 
-        if(draggingPlace && hoverImageRect) {
+        if((draggingPlace || draggingModelAsset) && hoverImageRect) {
 
-            const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(dragPayload);
-            if(item && item->ghostFactory) {
+            const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
 
-                const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
+            if(draggingPlace) {
+                const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(dragPayload);
+                if(item && item->ghostFactory) {
 
-                if(!ghost_) {
-                    ghost_ = item->ghostFactory();
-                    if(auto go = std::dynamic_pointer_cast<BaseGameObject>(ghost_)) {
-                        go->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
+                    if(ghost_ && ghostKind_ != GhostKind::PlaceItem) {
+                        SceneContext::Current()->RemoveObject(ghost_);
+                        ghost_ = nullptr;
+                        ghostKind_ = GhostKind::None;
+                        ghostAssetGuid_ = Guid::Empty();
+                    }
+
+                    if(!ghost_) {
+                        ghost_ = item->ghostFactory();
+                        ghostKind_ = GhostKind::PlaceItem;
+                        ghostAssetGuid_ = Guid::Empty();
+                        if(auto go = std::dynamic_pointer_cast<BaseGameObject>(ghost_)) {
+                            go->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
+                        }
+                    }
+
+                    if(ghost_) {
+                        ghost_->GetWorldTransform().translation = spawnPos;
                     }
                 }
+            } else if(draggingModelAsset) {
+                const AssetRecord* record = GetDraggedModelRecord(dragPayload);
+                if(record) {
+                    if(ghost_ && (ghostKind_ != GhostKind::ModelAsset || ghostAssetGuid_ != record->guid)) {
+                        SceneContext::Current()->RemoveObject(ghost_);
+                        ghost_ = nullptr;
+                        ghostKind_ = GhostKind::None;
+                        ghostAssetGuid_ = Guid::Empty();
+                    }
 
-                if(ghost_) {
-                    ghost_->GetWorldTransform().translation = spawnPos;
+                    if(!ghost_) {
+                        ghost_ = CreateModelObjectFromAsset(*record, spawnPos, true);
+                        ghostKind_ = GhostKind::ModelAsset;
+                        ghostAssetGuid_ = record->guid;
+                    }
+
+                    if(ghost_) {
+                        ghost_->GetWorldTransform().translation = spawnPos;
+                    }
                 }
             }
         } else {
             if(ghost_) {
                 SceneContext::Current()->RemoveObject(ghost_);
                 ghost_ = nullptr;
+                ghostKind_ = GhostKind::None;
+                ghostAssetGuid_ = Guid::Empty();
             }
         }
     }

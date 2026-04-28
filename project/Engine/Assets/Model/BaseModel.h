@@ -98,6 +98,7 @@ protected:
 	std::string textureName_ = "textures/white1x1.dds"; // デフォルトのテクスチャ名
 	ModelData* modelData_;
 	Guid materialGuid_;
+	std::optional<CalyxEngine::Vector4> colorOverride_;
 public:
 	BlendMode blendMode_ = BlendMode::NORMAL;
 	Transform2D  uvTransform{ {1.0f, 1.0f},

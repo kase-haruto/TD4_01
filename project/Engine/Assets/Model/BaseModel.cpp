@@ -441,6 +441,9 @@ void BaseModel::TransferMaterial() {
 		data.lightingMode = 0;
 		data.shininess = 20.0f;
 	}
+	if(colorOverride_) {
+		data.color = *colorOverride_;
+	}
 
 	// UV transform を適用
 	CalyxEngine::Matrix4x4 uvTransformMatrix = CalyxEngine::MakeScaleMatrix(CalyxEngine::Vector3(uvTransform.scale.x, uvTransform.scale.y, 1.0f));
@@ -452,6 +455,7 @@ void BaseModel::TransferMaterial() {
 }
 
 const CalyxEngine::Vector4& BaseModel::GetColor() const {
+	if(colorOverride_) return *colorOverride_;
 	auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
 	if (ma) return ma->color;
 	static CalyxEngine::Vector4 fallback = {1, 1, 1, 1};
@@ -459,8 +463,8 @@ const CalyxEngine::Vector4& BaseModel::GetColor() const {
 }
 
 void BaseModel::SetColor(const CalyxEngine::Vector4& color) {
-	auto ma = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
-	if (ma) ma->color = color;
+	colorOverride_ = color;
+	TransferMaterial();
 }
 
 void BaseModel::SetLightingMode(LightingMode mode) {
