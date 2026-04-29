@@ -77,6 +77,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInstanceSrv()const;  //< VS:t0 (gTransMat)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv()const;       //< PS:t0 (gTexture)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetEnvMapSrv()const;    //< PS:t1 (gEnvironmentMap)
+	const Material& GetMaterialForBatch() const { return currentMaterial_; }
 
 	virtual void BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList)const;
 	void BindMaterialCB(ID3D12GraphicsCommandList* cmdList)const;
@@ -91,6 +92,7 @@ protected:
 	//			protected methods
 	//===================================================================*/
 	DxConstantBuffer<Material> materialBuffer_;
+	Material currentMaterial_{};
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle_{};
 
