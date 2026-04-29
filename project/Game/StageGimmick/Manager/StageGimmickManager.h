@@ -3,11 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorEvent.h"
-#include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorObject.h"
-#include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeEvent.h"
-#include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeObject.h"
-#include "Game/StageGimmick/Gimmicks/DroolRain/DroolRainEvent.h"
+#include "Game/StageGimmick/Base/StageGimmickEventBase.h"
+#include "Game/StageGimmick/Base/StageGimmickObjectBase.h"
 
 /// <summary>
 /// ステージギミックを管理するクラス

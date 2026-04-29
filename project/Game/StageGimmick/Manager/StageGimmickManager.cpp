@@ -3,12 +3,18 @@
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <externals/imgui/imgui.h>
 
+#include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorEvent.h"
+#include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeEvent.h"
+#include "Game/StageGimmick/Gimmicks/DroolRain/DroolRainEvent.h"
+#include "Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.h"
+
 void StageGimmickManager::Initialize() {
 
 	// シーン内のギミックを再読み込みする
 	ReloadGimmicks("BreakableFloor");
 	ReloadGimmicks("GroundSpike");
 	ReloadGimmicks("DroolRain");
+	ReloadGimmicks("Projectile");
 }
 
 void StageGimmickManager::Update(float dt) {
@@ -22,6 +28,7 @@ void StageGimmickManager::ShowGui() {
 	GimmickShowGui("BreakableFloor");
 	GimmickShowGui("GroundSpike");
 	GimmickShowGui("DroolRain");
+	GimmickShowGui("Projectile");
 	
 	ImGui::End();
 }
@@ -71,6 +78,9 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 	} else if(gimmickName == "DroolRain") {
 		auto droolEvent = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
 		event  = droolEvent;
+	} else if(gimmickName == "Projectile") {
+		auto projectileEvent = SceneContext::Current()->FindObjectByName<ProjectileFireEvent>(targetName);
+		event  = projectileEvent;
 	}
 
 	// イベントが見つからなくなるまでループする
@@ -97,6 +107,12 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 					objects.push_back(object);
 				}
 			}
+		} else if(gimmickName == "Projectile") {
+			auto object = SceneContext::Current()->FindObjectByName<ProjectileObject>(
+				objectPrefix + std::to_string(index) + ")");
+			if(object) {
+				objects.push_back(object);
+			}
 		}
 
 		if(!objects.empty()) {
@@ -112,6 +128,8 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 			event = SceneContext::Current()->FindObjectByName<GroundSpikeEvent>(targetName);
 		}else if(gimmickName == "DroolRain") {
 			event = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
+		}else if(gimmickName == "Projectile") {
+			event = SceneContext::Current()->FindObjectByName<ProjectileFireEvent>(targetName);
 		}
 	}
 
@@ -163,6 +181,16 @@ void StageGimmickManager::CreateGimmick(const std::string& gimmickName) {
 			objects.push_back(droolObject);
 			droolEvent->SetTarget(droolObject);
 		}
+	} else if(gimmickName == "Projectile") {
+
+		auto projectileObject = SceneAPI::Instantiate<ProjectileObject>("debugCube.obj", objectName);
+		auto projectileEvent = SceneAPI::Instantiate<ProjectileFireEvent>(eventName);
+		projectileEvent->SetTarget(projectileObject);
+		projectileObject->SetParent(projectileEvent);
+		projectileEvent->Initialize();
+		projectileObject->Initialize();
+		objects.push_back(projectileObject);
+		event = projectileEvent;
 	}
 
 	gimmicks_.push_back({event, objects, gimmickName});
