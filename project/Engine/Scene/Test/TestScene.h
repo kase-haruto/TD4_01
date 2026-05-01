@@ -48,5 +48,9 @@ private:
 
 	bool isPaused_ = false;
 	std::unique_ptr<Sprite> pauseBg_ = nullptr;
-};
+	std::unique_ptr<Sprite> resumeBtn_ = nullptr;
+	std::unique_ptr<Sprite> toSelectBtn_ = nullptr;
+	std::unique_ptr<Sprite> toTitleBtn_ = nullptr;
 
+	int selectedIndex_ = 0;
+};
