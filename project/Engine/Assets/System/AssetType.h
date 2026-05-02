@@ -13,4 +13,5 @@ enum class AssetType
 	Shader,
 	Material,
 	Audio,
+	Prefab,
 };
