@@ -440,7 +440,7 @@ void BaseModel::TransferMaterial() {
 	auto am = CalyxEngine::AssetManager::GetInstance();
 	auto ma = am->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
 
-	Material data;
+	Material data{};
 	if (ma) {
 		data.color = ma->color;
 		data.lightingMode = ma->lightingMode;
@@ -464,6 +464,7 @@ void BaseModel::TransferMaterial() {
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 	data.uvTransform = uvTransformMatrix;
 
+	currentMaterial_ = data;
 	materialBuffer_.TransferData(data);
 }
 
