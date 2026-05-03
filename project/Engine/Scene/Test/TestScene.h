@@ -40,6 +40,7 @@ private:
 	/* graphics =====================================================*/
 	std::unique_ptr<FogEffect>fog_ = nullptr;
 
+
 	/* objects ====================================================*/
 	std::shared_ptr<BaseGameObject> modelField_;
 	std::unique_ptr<Sprite> testSprite_;
