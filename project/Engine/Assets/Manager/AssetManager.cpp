@@ -19,6 +19,8 @@ void CalyxEngine::AssetManager::Initialize(ImGuiManager* imgui) {
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(imgui);
 	textureManager_->StartUpLoad();
+
+	dataAssetManager_ = std::make_unique<DataAssetManager>();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -26,4 +28,6 @@ void CalyxEngine::AssetManager::Initialize(ImGuiManager* imgui) {
 /////////////////////////////////////////////////////////////////////////////////////////
 void CalyxEngine::AssetManager::Finalize() {
 	modelManager_.reset();
+	textureManager_.reset();
+	dataAssetManager_.reset();
 }

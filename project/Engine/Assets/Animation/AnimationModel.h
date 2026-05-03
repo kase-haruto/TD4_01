@@ -1,7 +1,10 @@
 #pragma once
 #include "../Model/BaseModel.h"
 #include "AnimationStruct.h"
+#include <Engine/Graphics/Descriptor/DescriptorAllocator.h>
 #include <externals/imgui/imgui.h>
+
+class PipelineService;
 
 namespace CalyxEngine {
 
@@ -28,6 +31,8 @@ namespace CalyxEngine {
 
 		// モデル読み込み時処理
 		void OnModelLoaded() override;
+		void EnsureRaytracingBLAS(ID3D12Device5* device5, ID3D12GraphicsCommandList4* cmdList4) override;
+		void DispatchSkinning(PipelineService* psoService, ID3D12GraphicsCommandList* cmdList);
 
 		// アニメーションの登録 (ゲーム側は enum を int16_t にキャストして渡す想定)
 		void RegisterAnimation(int16_t animID,const std::string& animName,const std::optional<std::string>& fileName = std::nullopt);
@@ -61,6 +66,7 @@ namespace CalyxEngine {
 		std::vector<std::string>            GetAnimationNodeNames() const;
 		std::optional<CalyxEngine::Matrix4x4> GetJointMatrix(const std::string& name) const;
 		D3D12_GPU_DESCRIPTOR_HANDLE         GetJointMatrixSrv() const;
+		bool                                HasSkinnedVertexBuffer() const;
 		void                                SetAnimationSpeed(float speed) { animationSpeed_ = speed; }
 
 	private:
@@ -76,6 +82,7 @@ namespace CalyxEngine {
 
 		/// アニメーションをバインド
 		void BuildFastChannels(Animation& anim);
+		void EnsureGpuSkinningResources(ID3D12Device* device);
 
 
 
@@ -97,6 +104,13 @@ namespace CalyxEngine {
 		ImVec4                   jointHighlightCol_ = {1.0f,0.2f,0.2f,1.0f};
 		SkinCluster              skinCluster_;
 		mutable D3D12_VERTEX_BUFFER_VIEW vbvs_[2];
+		DxStructuredBuffer<VertexPosUvN> skinnedVertexBuffer_;
+		D3D12_VERTEX_BUFFER_VIEW skinnedVertexBufferView_{};
+		DescriptorHandle sourceVertexSrv_{};
+		DescriptorHandle influenceSrv_{};
+		D3D12_RESOURCE_STATES skinnedVertexState_ = D3D12_RESOURCE_STATE_COMMON;
+		bool gpuSkinningResourcesCreated_ = false;
+		bool skinnedVertexReady_ = false;
 
 	public:
 		float animationSpeed_ = 1.0f;  //< アニメーションの再生速度

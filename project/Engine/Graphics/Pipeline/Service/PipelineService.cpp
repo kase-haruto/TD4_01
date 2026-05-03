@@ -82,6 +82,12 @@ void PipelineService::RegisterAllPipelines() {
 	}
 
 	//========================= Shadow ===================================
+	regObjNoBlend(PipelineTag::Object::OutlineObject3D, PipelinePresets::MakeOutlineObject3D);
+	regObjNoBlend(PipelineTag::Object::OutlineSkinnedObject3D, PipelinePresets::MakeOutlineSkinnedObject3D);
+	regObjNoBlend(PipelineTag::Object::OutlineNormalObject3D, PipelinePresets::MakeOutlineNormalObject3D);
+	regObjNoBlend(PipelineTag::Object::OutlineNormalSkinnedObject3D, PipelinePresets::MakeOutlineNormalSkinnedObject3D);
+
+	//========================= Shadow ===================================
 	regObjNoBlend(PipelineTag::Object::ShadowStatic, PipelinePresets::MakeShadowStatic);
 	regObjNoBlend(PipelineTag::Object::ShadowSkinned, PipelinePresets::MakeShadowSkinned);
 
@@ -99,6 +105,7 @@ void PipelineService::RegisterAllPipelines() {
 	regCS(PipelineTag::Compute::ParticleInitializeCompute, PipelinePresets::MakeGpuParticleCS);
 	regCS(PipelineTag::Compute::ParticleEmitCompute, PipelinePresets::MakeGpuParticleEmit);
 	regCS(PipelineTag::Compute::ParticleUpdateCompute, PipelinePresets::MakeGpuParticleUpdate);
+	regCS(PipelineTag::Compute::SkinningCompute, PipelinePresets::MakeSkinningCompute);
 
 	//=================== PostProcess Pipelines ==========================
 	regPP(PipelineTag::PostProcess::GrayScale, PipelinePresets::MakeGrayScale);
@@ -106,6 +113,7 @@ void PipelineService::RegisterAllPipelines() {
 	regPP(PipelineTag::PostProcess::Vignette, PipelinePresets::MakeVignette);
 	regPP(PipelineTag::PostProcess::ChromaticAberration, PipelinePresets::MakeChromaticAberration);
 	regPP(PipelineTag::PostProcess::CRT, PipelinePresets::MakeCRT);
+	regPP(PipelineTag::PostProcess::OutlineComposite, PipelinePresets::MakeOutlineComposite);
 	regPP(PipelineTag::PostProcess::CopyImage, PipelinePresets::MakeCopyImage);
 
 }

@@ -101,32 +101,33 @@ namespace CalyxEngine {
 			tlasCapacity_ = instanceCount;
 
 			// バッファの作成
-			tlas_ = CreateDefaultBuffer(
+			Microsoft::WRL::ComPtr<ID3D12Resource> newTlas = CreateDefaultBuffer(
 				device_,
 				prebuild.ResultDataMaxSizeInBytes,
 				D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
 				D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
 			// バッファの作成
-			scratch_ = CreateDefaultBuffer(
+			Microsoft::WRL::ComPtr<ID3D12Resource> newScratch = CreateDefaultBuffer(
 				device_,
 				prebuild.ScratchDataSizeInBytes,
 				D3D12_RESOURCE_STATE_COMMON,
 				D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
-			// No transitions needed for TLAS (Created as RTAS)
-			// Need transition for Scratch: COMMON -> UAV
+			D3D12_RESOURCE_BARRIER barrier = {};
 
-			D3D12_RESOURCE_BARRIER barriers[1] = {};
+			barrier.Type				   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Transition.pResource   = newScratch.Get();
+			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+			barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-			// Scratch: COMMON -> UAV
-			barriers[0].Type				   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barriers[0].Transition.pResource   = scratch_.Get();
-			barriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
-			barriers[0].Transition.StateAfter  = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-			barriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			cmd->ResourceBarrier(1, &barrier);
 
-			cmd->ResourceBarrier(1, barriers);
+			RetireResource(tlas_);
+			RetireResource(scratch_);
+			tlas_	 = newTlas;
+			scratch_ = newScratch;
 
 			// SRVの設定
 			D3D12_SHADER_RESOURCE_VIEW_DESC srv{};
@@ -165,5 +166,12 @@ namespace CalyxEngine {
 	D3D12_GPU_DESCRIPTOR_HANDLE RaytracingSystem::GetTLASSrv() const { return tlasSrv_.gpu; }
 
 	ID3D12Resource* RaytracingSystem::GetTLAS() const { return tlas_.Get(); }
+
+	void RaytracingSystem::RetireResource(Microsoft::WRL::ComPtr<ID3D12Resource>& resource) {
+		if(!resource) return;
+
+		retiredResources_.push_back(resource);
+		resource.Reset();
+	}
 
 } // namespace CalyxEngine

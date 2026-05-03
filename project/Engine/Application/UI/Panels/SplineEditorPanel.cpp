@@ -208,7 +208,7 @@ namespace CalyxEngine {
 		return true;
 	}
 
-	// -------------------- ギズモ更新＋3Dプレビュー描画 --------------------
+	// -------------------- ：更新＋3Dプレビュー描画 --------------------
 	void SplineEditorPanel::HandleGizmoUpdateAndDraw3D() {
 		if(data_.points.empty()) return;
 		auto* drawer = PrimitiveDrawer::GetInstance();

@@ -1,0 +1,172 @@
+{
+  "fields": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "envirometCoefficient": 0.5,
+    "isReflect": false,
+    "lightingMode": 2,
+    "roughness": 0.5,
+    "shininess": 20.639999389648438
+  },
+  "graph": {
+    "links": [
+      {
+        "fromPinId": 11,
+        "id": 12,
+        "toPinId": 6
+      },
+      {
+        "fromPinId": 14,
+        "id": 15,
+        "toPinId": 3
+      },
+      {
+        "fromPinId": 17,
+        "id": 18,
+        "toPinId": 5
+      }
+    ],
+    "nextId": 19,
+    "nodes": [
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 1,
+        "inputs": [
+          {
+            "id": 2,
+            "kind": 0,
+            "name": "BaseColor",
+            "valueType": 2
+          },
+          {
+            "id": 3,
+            "kind": 0,
+            "name": "Shininess",
+            "valueType": 1
+          },
+          {
+            "id": 4,
+            "kind": 0,
+            "name": "Roughness",
+            "valueType": 1
+          },
+          {
+            "id": 5,
+            "kind": 0,
+            "name": "Reflect",
+            "valueType": 3
+          },
+          {
+            "id": 6,
+            "kind": 0,
+            "name": "Lighting Mode",
+            "valueType": 4
+          }
+        ],
+        "intValue": 0,
+        "outputs": [],
+        "position": [
+          965.0,
+          110.0
+        ],
+        "title": "Output",
+        "type": "Output"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 10,
+        "inputs": [],
+        "intValue": 2,
+        "outputs": [
+          {
+            "id": 11,
+            "kind": 1,
+            "name": "Mode",
+            "valueType": 4
+          }
+        ],
+        "position": [
+          481.0,
+          407.0
+        ],
+        "title": "Lighting Mode",
+        "type": "LightingMode"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 20.639999389648438,
+        "id": 13,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 14,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          481.0,
+          119.0
+        ],
+        "title": "Shininess",
+        "type": "Shininess"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 16,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 17,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 3
+          }
+        ],
+        "position": [
+          481.0,
+          263.0
+        ],
+        "title": "Reflect",
+        "type": "Reflect"
+      }
+    ]
+  },
+  "guid": "4367fd92-8f1f-4b12-b601-94e996adf837",
+  "name": "BaseToonMaterial",
+  "type": "MaterialAsset"
+}

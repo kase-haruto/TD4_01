@@ -208,10 +208,6 @@ namespace CalyxEngine {
 			auto vp = debugRT->GetViewport();
 			pickingPass_->Resize(static_cast<int32_t>(vp.Width), static_cast<int32_t>(vp.Height));
 			if(auto* renderer = slots_[currentIdx_].scene->GetModelRenderer()) {
-				// ピッキングの前にデバッグカメラ視点でカリング結果を更新する
-				if(auto* debugCam = CameraManager::GetDebug()) {
-					renderer->PreCullAndBatch(debugCam);
-				}
 				pickingPass_->Render(cmd, renderer, pso);
 			}
 			debugRT->SetRenderTarget(cmd);

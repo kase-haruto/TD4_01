@@ -50,6 +50,7 @@ namespace CalyxEngine {
 		void DrawToolbar();
 		void DrawLeftTree();
 		void DrawRightView();
+		void CreateMaterialAssetInCurrentFolder();
 
 		void DrawFavorites();
 		void DrawDirNode(DirNode* node);

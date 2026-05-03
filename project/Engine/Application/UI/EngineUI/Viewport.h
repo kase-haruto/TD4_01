@@ -9,6 +9,7 @@
 // engine
 #include <Engine/Application/UI/EngineUI/IEngineUI.h>
 #include <Engine/Application/UI/EngineUI/IOnViewportTool.h>
+#include <Engine/Foundation/Utility/Guid/Guid.h>
 
 // c++
 #include <memory>
@@ -65,6 +66,12 @@ namespace CalyxEngine {
 								const ImVec2&	 viewportSize);
 
 	private:
+		enum class GhostKind {
+			None,
+			PlaceItem,
+			ModelAsset,
+		};
+
 		std::vector<IOnViewportTool*> tools_;
 		ViewportType				  type_ = ViewportType::VIEWPORT_NONE; //< ビューポートの種類
 		std::string					  windowName_;						   //< ビューポートのウィンドウ名
@@ -79,6 +86,8 @@ namespace CalyxEngine {
 		bool			   wasTriggered_ = false;
 
 		std::shared_ptr<SceneObject> ghost_		  = nullptr;
+		GhostKind					 ghostKind_	  = GhostKind::None;
+		Guid						 ghostAssetGuid_ = Guid::Empty();
 		PickingPass*				 pickingPass_ = nullptr;
 	};
 

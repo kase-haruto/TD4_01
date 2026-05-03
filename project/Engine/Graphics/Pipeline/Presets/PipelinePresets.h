@@ -13,6 +13,10 @@ namespace PipelinePresets {
 
 	GraphicsPipelineDesc MakeWireframeObject3D(BlendMode mode);
 	GraphicsPipelineDesc MakeWireframeSkinnedObject3D(BlendMode mode);
+	GraphicsPipelineDesc MakeOutlineObject3D();
+	GraphicsPipelineDesc MakeOutlineSkinnedObject3D();
+	GraphicsPipelineDesc MakeOutlineNormalObject3D();
+	GraphicsPipelineDesc MakeOutlineNormalSkinnedObject3D();
 	// shadow
 	GraphicsPipelineDesc MakeShadowStatic();
 	GraphicsPipelineDesc MakeShadowSkinned();
@@ -31,6 +35,7 @@ namespace PipelinePresets {
 	GraphicsPipelineDesc MakeGpuParticleCS();
 	GraphicsPipelineDesc MakeGpuParticleEmit();
 	GraphicsPipelineDesc MakeGpuParticleUpdate();
+	GraphicsPipelineDesc MakeSkinningCompute();
 
 	// postprocess
 	GraphicsPipelineDesc MakeCopyImage();
@@ -40,4 +45,5 @@ namespace PipelinePresets {
 	GraphicsPipelineDesc MakeChromaticAberration();
 	GraphicsPipelineDesc MakeVignette();
 	GraphicsPipelineDesc MakeCRT();
+	GraphicsPipelineDesc MakeOutlineComposite();
 }

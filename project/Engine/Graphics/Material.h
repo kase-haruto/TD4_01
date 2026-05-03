@@ -24,7 +24,7 @@ struct Material {
 	float     pad[3];
 	CalyxEngine::Matrix4x4 uvTransform;
 	float     shininess;
-	bool      isReflect             = false;
+	int32_t   isReflect             = 0;
 	float     envirometCoefficient = 0.5f;
 	float     roughness             = 0.5f; // 反射率
 

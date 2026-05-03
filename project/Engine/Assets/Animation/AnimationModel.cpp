@@ -8,6 +8,7 @@
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
+#include <Engine/Graphics/Pipeline/Service/PipelineService.h>
 #include <Engine/Lighting/LightData.h>
 #include <Engine/Renderer/Mesh/VertexData.h>
 
@@ -20,6 +21,7 @@
 
 #include <Engine/Foundation/Utility/Func/CxUtils.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
+#include <d3dx12.h>
 #include <filesystem>
 
 namespace CalyxEngine {
@@ -352,6 +354,115 @@ namespace CalyxEngine {
 		}
 	}
 
+	void AnimationModel::EnsureGpuSkinningResources(ID3D12Device* device) {
+		if(gpuSkinningResourcesCreated_) return;
+		if(!device || !modelData_) return;
+
+		const UINT vertexCount = static_cast<UINT>(modelData_->meshResource.Vertices().size());
+		if(vertexCount == 0) return;
+
+		if(sourceVertexSrv_.cpu.ptr == 0) {
+			sourceVertexSrv_ = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
+		}
+		D3D12_SHADER_RESOURCE_VIEW_DESC vertexSrv{};
+		vertexSrv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		vertexSrv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		vertexSrv.Format = DXGI_FORMAT_UNKNOWN;
+		vertexSrv.Buffer.FirstElement = 0;
+		vertexSrv.Buffer.NumElements = vertexCount;
+		vertexSrv.Buffer.StructureByteStride = sizeof(VertexPosUvN);
+		vertexSrv.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		device->CreateShaderResourceView(
+			modelData_->meshResource.VertexBuffer().GetResource().Get(),
+			&vertexSrv,
+			sourceVertexSrv_.cpu);
+
+		if(influenceSrv_.cpu.ptr == 0) {
+			influenceSrv_ = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
+		}
+		D3D12_SHADER_RESOURCE_VIEW_DESC influenceSrv{};
+		influenceSrv.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		influenceSrv.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		influenceSrv.Format = DXGI_FORMAT_UNKNOWN;
+		influenceSrv.Buffer.FirstElement = 0;
+		influenceSrv.Buffer.NumElements = vertexCount;
+		influenceSrv.Buffer.StructureByteStride = sizeof(VertexInfluence);
+		influenceSrv.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		device->CreateShaderResourceView(
+			skinCluster_.influenceResource.Get(),
+			&influenceSrv,
+			influenceSrv_.cpu);
+
+		skinnedVertexBuffer_.InitializeAsRW(device, vertexCount);
+		skinnedVertexBuffer_.CreateUav(device);
+		skinnedVertexState_ = D3D12_RESOURCE_STATE_COMMON;
+
+		skinnedVertexBufferView_.BufferLocation = skinnedVertexBuffer_.GetResource()->GetGPUVirtualAddress();
+		skinnedVertexBufferView_.SizeInBytes = sizeof(VertexPosUvN) * vertexCount;
+		skinnedVertexBufferView_.StrideInBytes = sizeof(VertexPosUvN);
+
+		gpuSkinningResourcesCreated_ = true;
+	}
+
+	void AnimationModel::DispatchSkinning(PipelineService* psoService, ID3D12GraphicsCommandList* cmdList) {
+		if(!modelData_ || !psoService || !cmdList) return;
+		ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
+		EnsureGpuSkinningResources(device);
+		if(!gpuSkinningResourcesCreated_) return;
+
+		auto* resource = skinnedVertexBuffer_.GetResource().Get();
+		if(skinnedVertexState_ != D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+			auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+				resource,
+				skinnedVertexState_,
+				D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+			cmdList->ResourceBarrier(1, &barrier);
+			skinnedVertexState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+		}
+
+		const auto& ps = psoService->GetComputePipelineSet(PipelineTag::Compute::SkinningCompute);
+		ps.SetCompute(cmdList);
+
+		const UINT vertexCount = static_cast<UINT>(modelData_->meshResource.Vertices().size());
+		cmdList->SetComputeRoot32BitConstant(0, vertexCount, 0);
+		cmdList->SetComputeRootDescriptorTable(1, sourceVertexSrv_.gpu);
+		cmdList->SetComputeRootDescriptorTable(2, influenceSrv_.gpu);
+		cmdList->SetComputeRootDescriptorTable(3, skinCluster_.paletteSrvHandle.second);
+		cmdList->SetComputeRootDescriptorTable(4, skinnedVertexBuffer_.GetGpuUavHandle());
+		cmdList->Dispatch((vertexCount + 127u) / 128u, 1, 1);
+
+		D3D12_RESOURCE_BARRIER barriers[2]{};
+		barriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+		barriers[0].UAV.pResource = resource;
+		barriers[1] = CD3DX12_RESOURCE_BARRIER::Transition(
+			resource,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		cmdList->ResourceBarrier(2, barriers);
+
+		skinnedVertexState_ =
+			D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE |
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		skinnedVertexReady_ = true;
+	}
+
+	void AnimationModel::EnsureRaytracingBLAS(ID3D12Device5* device5, ID3D12GraphicsCommandList4* cmdList4) {
+		if(!modelData_) return;
+		if(!device5 || !cmdList4) return;
+		if(!skinnedVertexReady_ || !skinnedVertexBuffer_.IsValid()) return;
+
+		rayMesh_.BuildBLAS(
+			device5,
+			cmdList4,
+			skinnedVertexBuffer_.GetResource()->GetGPUVirtualAddress(),
+			static_cast<UINT>(modelData_->meshResource.Vertices().size()),
+			sizeof(VertexPosUvN),
+			modelData_->meshResource.IndexBuffer().GetResource()->GetGPUVirtualAddress(),
+			static_cast<UINT>(modelData_->meshResource.Indices().size()));
+		blasBuilt_ = true;
+	}
+
 	void AnimationModel::RegisterAnimation(
 		int16_t							  animID,
 		const std::string&				  animName,
@@ -425,12 +536,14 @@ namespace CalyxEngine {
 	void AnimationModel::BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList) const {
 		if(!modelData_) return;
 
-		// 頂点バッファ/インデックスバッファをセット
-		vbvs_[0] = modelData_->meshResource.VertexBuffer().GetVertexBufferView(); // vertexDataのvbv
-		vbvs_[1] = skinCluster_.influenceBufferView;							  // influenceDataのvbv
-
 		modelData_->meshResource.IndexBuffer().SetCommand(cmdList);
-		cmdList->IASetVertexBuffers(0, 2, vbvs_);
+		if(skinnedVertexReady_) {
+			cmdList->IASetVertexBuffers(0, 1, &skinnedVertexBufferView_);
+			return;
+		}
+
+		vbvs_[0] = modelData_->meshResource.VertexBuffer().GetVertexBufferView();
+		cmdList->IASetVertexBuffers(0, 1, vbvs_);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -441,15 +554,28 @@ namespace CalyxEngine {
 		if(!modelData_) {
 			return;
 		}
+		if(!handle_) {
+			return;
+		}
 
 		ID3D12GraphicsCommandList* cmdList = GraphicsGroup::GetInstance()->GetCommandList().Get();
+		ID3D12Device*			   device  = GraphicsGroup::GetInstance()->GetDevice().Get();
 
+		std::vector<WorldTransform> singleTransform{transform};
+		EnsureInstanceCapacity(device, 1);
+		UploadInstanceMatrices(singleTransform);
+
+		materialBuffer_.SetCommand(cmdList, 0);
+		cmdList->SetGraphicsRootDescriptorTable(1, GetInstanceSrv());
+		cmdList->SetGraphicsRootDescriptorTable(2, handle_.value());
+		cmdList->SetGraphicsRootDescriptorTable(6, GetEnvMapSrv());
 		SetCommandPalletSrv(7, cmdList);
 
 		// 頂点バッファ/インデックスバッファをセット
 		BindVertexIndexBuffers(cmdList);
 
-		BaseModel::Draw(transform);
+		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		cmdList->DrawIndexedInstanced(UINT(modelData_->meshResource.Indices().size()), 1, 0, 0, 0);
 
 		if(isDrawSkeleton_) {
 			CalyxEngine::Vector4 col = {jointHighlightCol_.x, jointHighlightCol_.y,
@@ -509,20 +635,11 @@ namespace CalyxEngine {
 
 	void AnimationModel::CreateMaterialBuffer() {
 		ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
-		// materialData_ に初期値をセットする
-		materialData_.color		   = CalyxEngine::Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-		materialData_.shininess	   = 20.0f;
-		materialData_.lightingMode = LightingMode::HalfLambert;
-		materialData_.uvTransform  = CalyxEngine::Matrix4x4::MakeIdentity();
-
-		// materialData_ の内容で GPU に転送
 		materialBuffer_.Initialize(device);
 	}
 
 	void AnimationModel::MaterialBufferMap() {
-		// materialData_ の内容で GPU に転送
-		// マテリアルのデータを転送
-		materialBuffer_.TransferData(materialData_);
+		TransferMaterial();
 	}
 
 	//-----------------------------------------------------------------------------
@@ -550,5 +667,7 @@ namespace CalyxEngine {
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE AnimationModel::GetJointMatrixSrv() const { return skinCluster_.paletteSrvHandle.second; }
+
+	bool AnimationModel::HasSkinnedVertexBuffer() const { return skinnedVertexReady_; }
 
 } // namespace CalyxEngine

@@ -54,13 +54,13 @@ public:
 	BlendMode GetBlendMode() const { return blendMode_; }
 	void SetBlendMode(BlendMode mode) { blendMode_ = mode; }
 	ModelData* GetModelData()const;
-	const CalyxEngine::Vector4& GetColor() const { return materialData_.color; }
-	void SetColor(const CalyxEngine::Vector4& color) { materialData_.color = color; }
+	const CalyxEngine::Vector4& GetColor() const;
+	void SetColor(const CalyxEngine::Vector4& color);
 	void SetIsDrawEnable(bool drawEnable) { isDrawEnable_ = drawEnable; }
 	bool GetIsDrawEnable()const { return isDrawEnable_; }
 	void SetTex(const std::string& name);
-	void SetLightingMode(LightingMode mode) { materialData_.lightingMode = mode; }
-	LightingMode GetLightingMode() const { return static_cast<LightingMode>(materialData_.lightingMode); }
+	void SetLightingMode(LightingMode mode);
+	LightingMode GetLightingMode() const;
 	void TransferMaterial();
 
 	// 参照用（TLAS インスタンス登録で使う）
@@ -71,12 +71,13 @@ public:
 	void EnsureInstanceCapacity(ID3D12Device* device, UINT needCount);
 	void UploadInstanceMatrices(const std::vector<WorldTransform>& tf);
 
-	void EnsureRaytracingBLAS(ID3D12Device5* device5, ID3D12GraphicsCommandList4* cmdList4);
+	virtual void EnsureRaytracingBLAS(ID3D12Device5* device5, ID3D12GraphicsCommandList4* cmdList4);
 
 	// レンダラーが使うハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInstanceSrv()const;  //< VS:t0 (gTransMat)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv()const;       //< PS:t0 (gTexture)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetEnvMapSrv()const;    //< PS:t1 (gEnvironmentMap)
+	const Material& GetMaterialForBatch() const { return currentMaterial_; }
 
 	virtual void BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList)const;
 	void BindMaterialCB(ID3D12GraphicsCommandList* cmdList)const;
@@ -91,13 +92,15 @@ protected:
 	//			protected methods
 	//===================================================================*/
 	DxConstantBuffer<Material> materialBuffer_;
+	Material currentMaterial_{};
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle_{};
 
 	std::string fileName_;
 	std::string textureName_ = "textures/white1x1.dds"; // デフォルトのテクスチャ名
 	ModelData* modelData_;
-	Material materialData_;
+	Guid materialGuid_;
+	std::optional<CalyxEngine::Vector4> colorOverride_;
 public:
 	BlendMode blendMode_ = BlendMode::NORMAL;
 	Transform2D  uvTransform{ {1.0f, 1.0f},

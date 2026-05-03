@@ -15,6 +15,7 @@
 #include <Engine/Lighting/LightLibrary.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
+#include <cstring>
 
 ModelRenderer::ModelRenderer() {
 	Microsoft::WRL::ComPtr<ID3D12Device5> device5;
@@ -147,17 +148,17 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			}
 
 			// -------------------------
-			// ShadowPass：無条件で登録 (影を落とす場合のみ)
-			// -------------------------
-			if(!inst.owner || inst.owner->IsCastShadow()) {
-				staticVisibleForShadow_[model].push_back(inst.tf);
-				ExpandSceneBounds(inst.worldAABB);
-			}
-
-			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = camera->IsVisible(inst.worldAABB);
+
+			// -------------------------
+			// Shadow / Raytracing：メインカメラの可視分だけ登録
+			// -------------------------
+			if(inst.visible && (!inst.owner || inst.owner->IsCastShadow())) {
+				staticVisibleForShadow_[model].push_back(inst.tf);
+				ExpandSceneBounds(inst.worldAABB);
+			}
 		}
 	}
 
@@ -179,17 +180,17 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			}
 
 			// -------------------------
-			// ShadowPass：無条件で登録 (影を落とす場合のみ)
-			// -------------------------
-			if(!inst.owner || inst.owner->IsCastShadow()) {
-				skinnedVisibleForShadow_[model].push_back(inst.tf);
-				ExpandSceneBounds(inst.worldAABB);
-			}
-
-			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = camera->IsVisible(inst.worldAABB);
+
+			// -------------------------
+			// Shadow / Raytracing：メインカメラの可視分だけ登録
+			// -------------------------
+			if(inst.visible && (!inst.owner || inst.owner->IsCastShadow())) {
+				skinnedVisibleForShadow_[model].push_back(inst.tf);
+				ExpandSceneBounds(inst.worldAABB);
+			}
 		}
 	}
 
@@ -225,12 +226,35 @@ void ModelRenderer::BuildStaticBatches() {
 		PipelineKey key{PipelineTag::Object::Object3d, model->GetBlendMode()};
 		auto&		batch = staticBatches_[key];
 
+		if(auto* item = FindCompatibleStaticBatch(batch, model)) {
+			item->transforms.insert(item->transforms.end(), visTf.begin(), visTf.end());
+			item->billboards.insert(item->billboards.end(), visBb.begin(), visBb.end());
+			continue;
+		}
+
 		StaticBatchItem item;
 		item.model = model;
 		item.transforms.swap(visTf);
 		item.billboards.swap(visBb);
 		batch.emplace_back(std::move(item));
 	}
+}
+
+ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model) {
+	if(!model || !model->GetModelData()) return nullptr;
+
+	for(auto& item : batch) {
+		BaseModel* base = item.model;
+		if(!base || !base->GetModelData()) continue;
+		if(base->GetModelData() != model->GetModelData()) continue;
+		if(base->GetTexSrv().ptr != model->GetTexSrv().ptr) continue;
+		if(base->GetEnvMapSrv().ptr != model->GetEnvMapSrv().ptr) continue;
+		if(std::memcmp(&base->GetMaterialForBatch(), &model->GetMaterialForBatch(), sizeof(Material)) != 0) continue;
+
+		return &item;
+	}
+
+	return nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -266,6 +290,21 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							PipelineService*				psoService,
 							LightLibrary*					lightLibrary,
 							CalyxEngine::ShadowMapSystem* shadowMapSystem) {
+	(void)rt;
+
+	// Skinned meshes are converted to skinned vertex buffers once per frame.
+	{
+		bool computeSet = false;
+		for(auto& [model, insts] : skinnedModels_) {
+			if(!model || !model->GetModelData() || insts.empty()) continue;
+			if(!computeSet) {
+				const auto& ps = psoService->GetComputePipelineSet(PipelineTag::Compute::SkinningCompute);
+				ps.SetCompute(cmdList);
+				computeSet = true;
+			}
+			model->DispatchSkinning(psoService, cmdList);
+		}
+	}
 
 	// Raytracing TLAS Build
 	if(raytracingSystem_) {
@@ -337,7 +376,9 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 				psoService->SetCommand(ps, cmdList);
 
-				shadowMapSystem->BindForMainPass(cmdList);
+				if(shadowMapSystem) {
+					shadowMapSystem->BindForMainPass(cmdList);
+				}
 
 				if(raytracingSystem_) {
 					cmdList->SetGraphicsRootShaderResourceView(
@@ -402,7 +443,9 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 				psoService->SetCommand(ps, cmdList);
 
-				shadowMapSystem->BindForMainPass(cmdList);
+				if(shadowMapSystem) {
+					shadowMapSystem->BindForMainPass(cmdList);
+				}
 
 				if(raytracingSystem_) {
 					cmdList->SetGraphicsRootShaderResourceView(
@@ -424,132 +467,27 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 			}
 
 			for(auto& [model, visible] : batch) {
-				for(const auto& tf : visible) model->Draw(tf);
+				if(!model || visible.empty()) continue;
+
+				const UINT need = static_cast<UINT>(visible.size());
+				model->EnsureInstanceCapacity(device, need);
+				model->UploadInstanceMatrices(visible);
+				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
+
+				model->BindMaterialCB(cmdList);
+				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
+				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
+				model->SetCommandPalletSrv(7, cmdList);
+
+				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				model->BindVertexIndexBuffers(cmdList);
+
+				const UINT indexCount = static_cast<UINT>(model->GetModelData()->meshResource.Indices().size());
+				cmdList->DrawIndexedInstanced(indexCount, need, 0, 0, 0);
 			}
 		}
 	}
 
-#if defined(_DEBUG) || defined(DEVELOP)
-	// debugViewでのみ描画
-	if(rt->GetRenderTargetType() != RenderTargetType::DebugView) return;
-
-	//------------------------------------------------------------
-	// 選択オブジェクトのワイヤーフレーム（オレンジ）描画
-	//------------------------------------------------------------
-	if(auto* ctx = SceneContext::Current()) {
-		if(auto* selected = ctx->GetDebugSelectedObject()) {
-
-			// Static Models
-			for(auto& [model, insts] : staticModels_) {
-				if(!model->GetModelData() || !model->GetIsDrawEnable()) continue;
-
-				std::vector<WorldTransform>		selectedTf;
-				std::vector<GpuBillboardParams> selectedBb;
-				for(auto& inst : insts) {
-					if(inst.visible && inst.owner == selected) {
-						selectedTf.push_back(inst.tf);
-						GpuBillboardParams p{};
-						p.mode = static_cast<uint32_t>(inst.mode);
-						selectedBb.push_back(p);
-					}
-				}
-
-				if(!selectedTf.empty()) {
-					const auto ps = psoService->GetPipelineSet(PipelineTag::Object::WireframeObject3D, model->GetBlendMode());
-					psoService->SetCommand(ps, cmdList);
-
-					float thickness = 1.5f;
-					cmdList->SetGraphicsRoot32BitConstants(12, 1, &thickness, 0);
-
-					if(auto* cam = CameraManager::GetActive()) {
-						cam->SetCommand(cmdList, PipelineType::Object3D);
-					}
-					lightLibrary->SetCommand(cmdList, PipelineType::Object3D);
-
-					auto					 oldColor		 = model->GetColor();
-					auto					 oldLighting	 = model->GetLightingMode();
-					const CalyxEngine::Vector4 orangeWireframe = {1.0f, 0.5f, 0.0f, 1.0f};
-					model->SetColor(orangeWireframe);
-					model->SetLightingMode(LightingMode::UnlitColor);
-					model->TransferMaterial();
-
-					const UINT need = static_cast<UINT>(selectedTf.size());
-					model->EnsureBillboardCapacity(device, need);
-					model->UploadBillboardParams(selectedBb);
-					cmdList->SetGraphicsRootDescriptorTable(7, model->GetBillboardSrv());
-
-					model->EnsureInstanceCapacity(device, need);
-					model->UploadInstanceMatrices(selectedTf);
-					cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
-
-					model->BindMaterialCB(cmdList);
-					cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
-					cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
-
-					cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					model->BindVertexIndexBuffers(cmdList);
-
-					cmdList->DrawIndexedInstanced(static_cast<UINT>(model->GetModelData()->meshResource.Indices().size()), need, 0, 0, 0);
-
-					model->SetColor(oldColor);
-					model->SetLightingMode(oldLighting);
-					model->TransferMaterial();
-				}
-			}
-
-			// Skinned Models
-			for(auto& [model, insts] : skinnedModels_) {
-				if(!model->GetModelData() || !model->GetIsDrawEnable()) continue;
-
-				std::vector<WorldTransform> selectedTf;
-				for(auto& inst : insts) {
-					if(inst.visible && inst.owner == selected) {
-						selectedTf.push_back(inst.tf);
-					}
-				}
-
-				if(!selectedTf.empty()) {
-					const auto ps = psoService->GetPipelineSet(PipelineTag::Object::WireframeSkinnedObject3D, model->GetBlendMode());
-					psoService->SetCommand(ps, cmdList);
-
-					float thickness = 2.0f;
-					cmdList->SetGraphicsRoot32BitConstants(12, 1, &thickness, 0);
-
-					if(auto* cam = CameraManager::GetActive()) {
-						cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
-					}
-					lightLibrary->SetCommand(cmdList, PipelineType::SkinningObject3D);
-
-					auto					 oldColor		 = model->GetColor();
-					auto					 oldLighting	 = model->GetLightingMode();
-					const CalyxEngine::Vector4 orangeWireframe = {1.0f, 0.5f, 0.0f, 1.0f};
-					model->SetColor(orangeWireframe);
-					model->SetLightingMode(LightingMode::UnlitColor);
-					model->TransferMaterial();
-
-					for(const auto& tf : selectedTf) {
-						// Set transforms again and draw
-						model->UploadInstanceMatrices({tf});
-						cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
-						model->BindMaterialCB(cmdList);
-						cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
-						cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
-
-						cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-						model->BindVertexIndexBuffers(cmdList);
-						cmdList->DrawIndexedInstanced(static_cast<UINT>(model->GetModelData()->meshResource.Indices().size()), 1, 0, 0, 0);
-					}
-
-					model->SetColor(oldColor);
-					model->SetLightingMode(oldLighting);
-					model->TransferMaterial();
-				}
-			}
-		}
-	}
-#else
-	(void)rt;
-#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -566,7 +504,8 @@ void ModelRenderer::CollectVisibleStatic(std::vector<RenderInstance>& out) const
 			out.push_back(RenderInstance{
 				model,
 				&inst.tf,
-				inst.owner});
+				inst.owner,
+				inst.mode});
 		}
 	}
 }
@@ -585,7 +524,8 @@ void ModelRenderer::CollectVisibleSkinned(std::vector<RenderInstance>& out) cons
 			out.push_back(RenderInstance{
 				model,
 				&inst.tf,
-				inst.owner});
+				inst.owner,
+				BillboardMode::None});
 		}
 	}
 }

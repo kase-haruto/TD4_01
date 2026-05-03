@@ -12,6 +12,7 @@
 
 #include <d3d12.h>
 #include <map>
+#include <cstddef>
 #include <unordered_map>
 #include <vector>
 
@@ -39,6 +40,7 @@ public:
 		BaseModel*			  model;
 		const WorldTransform* transform;
 		SceneObject*		  owner;
+		BillboardMode		  billboardMode = BillboardMode::None;
 	};
 
 private:
@@ -186,6 +188,7 @@ private:
 	 * \brief スタティックモデルのバッチ構築
 	 */
 	void BuildStaticBatches();
+	StaticBatchItem* FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model);
 	/**
 	 * \brief スキンメッシュモデルのバッチ構築
 	 */

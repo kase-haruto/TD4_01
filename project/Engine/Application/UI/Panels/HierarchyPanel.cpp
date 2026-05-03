@@ -5,6 +5,9 @@
 
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
+#include <Engine/Assets/Database/AssetDatabase.h>
+#include <Engine/Assets/System/AssetDragPayload.h>
+#include <Engine/Assets/System/AssetType.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Objects/3D/Actor/Library/SceneObjectLibrary.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
@@ -23,6 +26,7 @@
 #include <externals/imgui/ImGuiFileDialog.h>
 
 #include <algorithm>
+#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -54,6 +58,26 @@ namespace CalyxEngine {
 			int pb = TypePriority(b->GetObjectType());
 			if(pa != pb) return pa < pb;
 			return a->GetName() < b->GetName();
+		}
+
+		inline const AssetDragPayload* ReadAssetPayload(const ImGuiPayload* payload) {
+			if(!payload || !payload->Data || payload->DataSize != (int)sizeof(AssetDragPayload)) {
+				return nullptr;
+			}
+			return reinterpret_cast<const AssetDragPayload*>(payload->Data);
+		}
+
+		inline const AssetRecord* GetDraggedPrefabRecord(const ImGuiPayload* payload) {
+			const AssetDragPayload* assetPayload = ReadAssetPayload(payload);
+			if(!assetPayload || assetPayload->type != AssetType::Prefab) {
+				return nullptr;
+			}
+
+			const AssetRecord* record = AssetDatabase::GetInstance()->Get(assetPayload->guid);
+			if(!record || record->type != AssetType::Prefab) {
+				return nullptr;
+			}
+			return record;
 		}
 
 	} // namespace
@@ -179,6 +203,7 @@ namespace CalyxEngine {
 
 			// 空白クリックで選択解除 (テーブル内の空白エリア)
 			if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered()) {
+				
 				selected_.reset();
 				if(onSelect_) onSelect_(nullptr);
 			}
@@ -186,6 +211,19 @@ namespace CalyxEngine {
 			// 右クリック空白メニュー (テーブル内の空白エリア)
 			if(ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
 				ImGui::OpenPopup("BlankContextMenu");
+			}
+
+			if(ImGui::BeginDragDropTarget()) {
+				if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
+					if(const AssetRecord* record = GetDraggedPrefabRecord(payload)) {
+						auto objects = PrefabSerializer::Load(record->sourcePath.string());
+						for(auto& sp : objects) {
+							if(onCreate_) onCreate_(sp);
+						}
+						RefreshCache();
+					}
+				}
+				ImGui::EndDragDropTarget();
 			}
 
 			if(ImGui::BeginPopup("BlankContextMenu")) {
@@ -231,8 +269,11 @@ namespace CalyxEngine {
 		// Save
 		if(ImGuiFileDialog::Instance()->Display("SavePrefabDlg")) {
 			if(ImGuiFileDialog::Instance()->IsOk() && prefabSaveTarget_) {
-				PrefabSerializer::Save({prefabSaveTarget_},
-									   ImGuiFileDialog::Instance()->GetFilePathName());
+				const std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+				if(PrefabSerializer::Save({prefabSaveTarget_}, path)) {
+					AssetDatabase::GetInstance()->RegisterOrUpdate(path, AssetType::Prefab);
+					AssetDatabase::GetInstance()->Scan();
+				}
 			}
 			ImGuiFileDialog::Instance()->Close();
 			prefabSaveTarget_ = nullptr;
@@ -244,9 +285,9 @@ namespace CalyxEngine {
 				auto vec = PrefabSerializer::Load(
 					ImGuiFileDialog::Instance()->GetFilePathName());
 
-				for(auto& up : vec) {
+				for(auto& sp : vec) {
 					if(lib_ && onCreate_) {
-						onCreate_(std::shared_ptr<SceneObject>(std::move(up)));
+						onCreate_(sp);
 					}
 				}
 			}
@@ -401,6 +442,31 @@ namespace CalyxEngine {
 							drag->SetParent(objSP);
 							RefreshCache();
 						}
+					}
+				}
+				if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
+					if(const AssetRecord* record = GetDraggedPrefabRecord(payload)) {
+						auto objects = PrefabSerializer::Load(record->sourcePath.string());
+
+						std::unordered_set<SceneObject*> loaded;
+						loaded.reserve(objects.size());
+						for(auto& sp : objects) {
+							if(sp) loaded.insert(sp.get());
+						}
+
+						auto parent = obj->shared_from_this();
+						for(auto& sp : objects) {
+							if(!sp) continue;
+							auto existingParent = sp->GetParent();
+							if(!existingParent || !loaded.contains(existingParent.get())) {
+								sp->SetParent(parent);
+							}
+						}
+
+						for(auto& sp : objects) {
+							if(onCreate_) onCreate_(sp);
+						}
+						RefreshCache();
 					}
 				}
 				ImGui::EndDragDropTarget();
