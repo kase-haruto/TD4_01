@@ -13,6 +13,8 @@
 // scene
 #include "Engine/Scene/Test/TestScene.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
+#include "Game/Scene/Clear/ClearScene.h"
+#include "Game/Scene/Gameover/GameoverScene.h"
 
 
 #include <Engine/Editor/PickingPass.h>
@@ -34,6 +36,12 @@ namespace CalyxEngine {
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::TEST),
 				 std::make_unique<TestScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::CLEAR),
+				 std::make_unique<ClearScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::GAMEOVER),
+				 std::make_unique<GameoverScene>());
 
 		SetCurrent(idToIndex_.at(
 			GameSceneUtil::ToSceneId(SceneType::TEST)));

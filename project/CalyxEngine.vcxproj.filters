@@ -2446,6 +2446,11 @@
     <ClCompile Include="Engine\Assets\File\IAssetChangeHandler.cpp" />
     <ClCompile Include="Engine\Assets\Manager\AssetManager.cpp" />
     <ClCompile Include="Game\DemoPlayer\DemoPlayer.cpp" />
+    <ClCompile Include="Game\DemoHammer\DemoHammer.cpp" />
+    <ClCompile Include="Game\DemoShockwave\ShockwaveManager.cpp" />
+    <ClCompile Include="Game\DemoShockwave\Shockwave.cpp" />
+    <ClCompile Include="Game\Scene\Clear\ClearScene.cpp" />
+    <ClCompile Include="Game\Scene\Gameover\GameoverScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Application\System\Environment.h" />
@@ -2471,11 +2476,57 @@
     <ClInclude Include="Engine\Assets\File\IAssetChangeHandler.h" />
     <ClInclude Include="Engine\Assets\Manager\AssetManager.h" />
     <ClInclude Include="Game\DemoPlayer\DemoPlayer.h" />
+    <ClInclude Include="Game\DemoHammer\DemoHammer.h" />
+    <ClInclude Include="Game\DemoShockwave\ShockwaveManager.h" />
+    <ClInclude Include="Game\DemoShockwave\Shockwave.h" />
+    <ClInclude Include="Game\Scene\Clear\ClearScene.h" />
+    <ClInclude Include="Game\Scene\Gameover\GameoverScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\ObjectPicking.PS.hlsl" />
     <FxCompile Include="Resources\shaders\Wireframe.GS.hlsl" />
     <FxCompile Include="Resources\shaders\Wireframe.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object2d.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object2d.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object3d.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Core\Object3d.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Enviroment\Skybox.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Enviroment\Skybox.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Effect.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Effect.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Fragment.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Graphics\Lighting\Fragment.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\EmitParticle.CS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\GpuParticle.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\InitializeParticle.CS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\Particle.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\Particle.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Particles\UpdateParticle.CS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\ChromaticAberration\ChromaticAberration.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Copy\CopyImage.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Copy\CopyImage.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\CRT\CRT.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Grayscale\Grayscale.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\RadialBlur\RadialBlur.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\PostProcess\Vignette\Vignette.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Skinning\ShadowSkinned.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Skinning\ShadowStatic.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Skinning\SkinningObject3d.VS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Debug\Wireframe.GS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Debug\Wireframe.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Picking\ObjectPicking.PS.hlsl" />
+    <FxCompile Include="Resources\shaders\Utility\Picking\Picking.VS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shaders\Core\Object2d.hlsli" />
+    <None Include="Resources\shaders\Core\Object3d.hlsli" />
+    <None Include="Resources\shaders\Enviroment\Skybox.hlsli" />
+    <None Include="Resources\shaders\Graphics\Lighting\Effect.hlsli" />
+    <None Include="Resources\shaders\Graphics\Lighting\Fragment.hlsli" />
+    <None Include="Resources\shaders\Particles\GpuParticle.hlsli" />
+    <None Include="Resources\shaders\Particles\Particle.hlsli" />
+    <None Include="Resources\shaders\PostProcess\Copy\CopyImage.hlsli" />
+    <None Include="Resources\shaders\Skinning\SkinningObject3d.hlsli" />
     <FxCompile Include="Resources\shaders\Core\Object2d.PS.hlsl" />
     <FxCompile Include="Resources\shaders\Core\Object2d.VS.hlsl" />
     <FxCompile Include="Resources\shaders\Core\Object3d.PS.hlsl" />

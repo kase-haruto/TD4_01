@@ -2,6 +2,9 @@
 #define NOMINMAX
 #endif
 #include "Viewport.h"
+#include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
+#include <Engine/Application/Effects/FxSystem.h>
+#include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
 #include <Engine/Assets/System/AssetType.h>
@@ -24,6 +27,7 @@
 #include <externals/imgui/imgui.h>
 
 #include <cmath>
+#include <unordered_set>
 
 namespace CalyxEngine {
 
@@ -59,6 +63,19 @@ namespace {
         return record;
     }
 
+    inline const AssetRecord* GetDraggedPrefabRecord(const ImGuiPayload* payload) {
+        const AssetDragPayload* assetPayload = ReadAssetPayload(payload);
+        if(!assetPayload || assetPayload->type != AssetType::Prefab) {
+            return nullptr;
+        }
+
+        const AssetRecord* record = AssetDatabase::GetInstance()->Get(assetPayload->guid);
+        if(!record || record->type != AssetType::Prefab) {
+            return nullptr;
+        }
+        return record;
+    }
+
     inline std::shared_ptr<BaseGameObject> CreateModelObjectFromAsset(
         const AssetRecord& record,
         const CalyxEngine::Vector3& pos,
@@ -80,6 +97,37 @@ namespace {
         }
 
         return obj;
+    }
+
+    void AddPrefabObjectsToCurrentScene(
+        const std::vector<std::shared_ptr<SceneObject>>& objects,
+        const CalyxEngine::Vector3& spawnOffset) {
+        SceneContext* ctx = SceneContext::Current();
+        if(!ctx) return;
+
+        std::unordered_set<SceneObject*> loaded;
+        loaded.reserve(objects.size());
+        for(const auto& sp : objects) {
+            if(sp) loaded.insert(sp.get());
+        }
+
+        for(const auto& sp : objects) {
+            if(!sp) continue;
+
+            auto parent = sp->GetParent();
+            if(!parent || !loaded.contains(parent.get())) {
+                sp->GetWorldTransform().translation =
+                    sp->GetWorldTransform().translation + spawnOffset;
+            }
+
+            ctx->AddObject(sp);
+
+            if(auto fxObj = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(sp)) {
+                if(auto* fxSys = ctx->GetFxSystem()) {
+                    fxSys->AddEmitter(fxObj->GetEmitter(), fxObj->GetGuid());
+                }
+            }
+        }
     }
 }
 
@@ -230,6 +278,20 @@ void Viewport::Render(const ImTextureID& tex) {
                         ghostAssetGuid_ = Guid::Empty();
                     }
                 }
+
+                const AssetRecord* prefabRecord = GetDraggedPrefabRecord(payload);
+                if(prefabRecord && hoverImageRect) {
+                    const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
+                    auto objects = PrefabSerializer::Load(prefabRecord->sourcePath.string());
+                    AddPrefabObjectsToCurrentScene(objects, spawnPos);
+
+                    if(ghost_) {
+                        SceneContext::Current()->RemoveObject(ghost_);
+                        ghost_ = nullptr;
+                        ghostKind_ = GhostKind::None;
+                        ghostAssetGuid_ = Guid::Empty();
+                    }
+                }
             }
             ImGui::EndDragDropTarget();
         }
@@ -244,8 +306,10 @@ void Viewport::Render(const ImTextureID& tex) {
         const bool draggingPlace = (dragPayload && dragPayload->IsDataType("DND_PLACE_ITEM"));
         const bool draggingModelAsset = (dragPayload && dragPayload->IsDataType("CALYX_ASSET") &&
                                          GetDraggedModelRecord(dragPayload));
+        const bool draggingPrefabAsset = (dragPayload && dragPayload->IsDataType("CALYX_ASSET") &&
+                                          GetDraggedPrefabRecord(dragPayload));
 
-        if((draggingPlace || draggingModelAsset) && hoverImageRect) {
+        if((draggingPlace || draggingModelAsset || draggingPrefabAsset) && hoverImageRect) {
 
             const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
 
@@ -292,6 +356,13 @@ void Viewport::Render(const ImTextureID& tex) {
                     if(ghost_) {
                         ghost_->GetWorldTransform().translation = spawnPos;
                     }
+                }
+            } else if(draggingPrefabAsset) {
+                if(ghost_) {
+                    SceneContext::Current()->RemoveObject(ghost_);
+                    ghost_ = nullptr;
+                    ghostKind_ = GhostKind::None;
+                    ghostAssetGuid_ = Guid::Empty();
                 }
             }
         } else {
