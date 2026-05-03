@@ -5,6 +5,7 @@
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/System/Command/EditorCommand/LevelEditorCommand/CreateObjectCommand/CreateObjectCommand.h>
@@ -21,6 +22,38 @@
 #include <externals/imgui/imgui.h>
 
 namespace CalyxEngine {
+	namespace {
+		D3D12_GPU_DESCRIPTOR_HANDLE LoadPlaceIcon(const std::string& iconPath) {
+			if(iconPath.empty()) {
+				return {};
+			}
+			return AssetManager::GetInstance()->GetTextureManager()->LoadTexture(iconPath);
+		}
+
+		std::shared_ptr<SceneObject> CreateRegisteredObjectForScene(const std::string&		   typeName,
+																	 const std::string&		   displayName,
+																	 ObjectType				   objectType,
+																	 const CalyxEngine::Vector3& pos,
+																	 bool					   transient) {
+			auto* ctx = SceneContext::Current();
+			if(!ctx) {
+				return nullptr;
+			}
+
+			auto obj = SceneObjectRegistry::Get().Create(typeName);
+			if(!obj) {
+				return nullptr;
+			}
+
+			obj->SetName(displayName.empty() ? typeName : displayName, objectType);
+			obj->SetTransient(transient);
+			ctx->AddObject(obj);
+			obj->Initialize();
+			obj->GetWorldTransform().translation = pos;
+			return obj;
+		}
+	} // namespace
+
 	// ============================================================================
 	//  ctor
 	// ============================================================================
@@ -125,6 +158,39 @@ namespace CalyxEngine {
 										 obj->SetTransient(true);
 										 return obj;
 									 }});
+		}
+
+		// ------------------------------ Event -----------------------------------
+		{
+			auto& eventItems = categoryItems_[PlaceItemCategory::Event];
+			for(const SceneObjectClassDesc* desc : SceneObjectRegistry::Get().ListPlaceableTypes()) {
+				if(!desc || desc->objectType != ObjectType::Event) {
+					continue;
+				}
+
+				const std::string typeName	 = desc->typeName;
+				const std::string displayName = desc->displayName.empty() ? desc->typeName : desc->displayName;
+				const std::string iconPath	 = desc->iconPath;
+				const ObjectType  objectType	 = desc->objectType;
+
+				eventItems.push_back({PlaceItemCategory::Event,
+									  displayName,
+									  LoadPlaceIcon(iconPath),
+									  {64, 64},
+									  [typeName, displayName, objectType](const CalyxEngine::Vector3& pos) {
+										  auto factory = [typeName, displayName, objectType, pos]() {
+											  return CreateRegisteredObjectForScene(
+												  typeName, displayName, objectType, pos, false);
+										  };
+										  CommandManager::GetInstance()->Execute(
+											  std::make_unique<CreateObjectCommand<SceneObject>>(
+												  SceneContext::Current(), factory, "Create Registered Object"));
+									  },
+									  [typeName, displayName, objectType]() {
+										  return CreateRegisteredObjectForScene(
+											  typeName, displayName, objectType, CalyxEngine::Vector3::Zero(), true);
+									  }});
+			}
 		}
 	}
 		

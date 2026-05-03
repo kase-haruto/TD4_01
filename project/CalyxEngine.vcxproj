@@ -89,6 +89,9 @@
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command>powershell -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)Tools\Reflection\generate_reflection.ps1"</Command>
+    </PreBuildEvent>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
@@ -118,6 +121,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Command>powershell -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)Tools\Reflection\generate_reflection.ps1"</Command>
+    </PreBuildEvent>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -150,6 +156,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Develop|x64'">
+    <PreBuildEvent>
+      <Command>powershell -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)Tools\Reflection\generate_reflection.ps1"</Command>
+    </PreBuildEvent>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -181,6 +190,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Develop_LivePP|x64'">
+    <PreBuildEvent>
+      <Command>powershell -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)Tools\Reflection\generate_reflection.ps1"</Command>
+    </PreBuildEvent>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -458,6 +470,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Application\Effects\Particle\Module\Uv\TextureSheetAnimModule.cpp" />
     <ClCompile Include="Engine\Renderer\Sprite\SpriteRenderer.cpp" />
     <ClCompile Include="Data\Engine\Prefab\Serializer\PrefabSerializer.cpp" />
+    <ClCompile Include="Engine\Foundation\Reflection\CalyxObjectRegistry.generated.cpp" />
     <ClCompile Include="Engine\Renderer\Model\ModelRenderer.cpp" />
     <ClCompile Include="Engine\Renderer\Outline\OutlineRenderer.cpp" />
     <ClCompile Include="Engine\Objects\3D\Actor\Registry\SceneObjectRegistry.cpp" />
@@ -771,6 +784,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Application\Effects\Particle\Module\Uv\TextureSheetAnimModule.h" />
     <ClInclude Include="Engine\Renderer\Sprite\SpriteRenderer.h" />
     <ClInclude Include="Data\Engine\Prefab\Serializer\PrefabSerializer.h" />
+    <ClInclude Include="Engine\Foundation\Reflection\CalyxObjectRegistry.generated.h" />
+    <ClInclude Include="Engine\Foundation\Reflection\CalyxReflection.h" />
     <ClInclude Include="Engine\Renderer\Model\ModelRenderer.h" />
     <ClInclude Include="Engine\Renderer\Outline\OutlineRenderer.h" />
     <ClInclude Include="Engine\Objects\3D\Actor\Registry\SceneObjectRegistry.h" />
