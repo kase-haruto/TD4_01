@@ -13,9 +13,6 @@ struct Material {
     int isReflect;
     float environmentCoefficient;
     float roughness;
-    float4 textureBlendWeights;
-    int textureBlendMode;
-    float3 texturePad;
 };
 
 struct DirectionalLight {
@@ -62,9 +59,6 @@ TextureCube<float4> gEnvironmentMap : register(t1);
 Texture2D<float>    gShadowMap      : register(t2); // unused
 RaytracingAccelerationStructure gRtScene : register(t3);
 Texture2D<float4>   gTexture        : register(t0);
-Texture2D<float4>   gTexture1       : register(t4);
-Texture2D<float4>   gTexture2       : register(t5);
-Texture2D<float4>   gTexture3       : register(t6);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                            samplers
@@ -88,38 +82,6 @@ float3 ApplyToneMappingAndGamma(float3 color, float exposure) {
 
 #include "StandardLighting.hlsli"
 #include "ToonLighting.hlsli"
-
-float4 SampleMaterialTexture(float2 uv) {
-    float4 weights = max(gMaterial.textureBlendWeights, 0.0f);
-
-    float4 baseColor = gTexture.Sample(gSampler, uv);
-
-    if (gMaterial.textureBlendMode == 1) {
-        float4 c1 = gTexture1.Sample(gSampler, uv);
-        float4 c2 = gTexture2.Sample(gSampler, uv);
-        float4 c3 = gTexture3.Sample(gSampler, uv);
-
-        float3 rgb = baseColor.rgb;
-        rgb = lerp(rgb, rgb * c1.rgb, saturate(weights.y));
-        rgb = lerp(rgb, rgb * c2.rgb, saturate(weights.z));
-        rgb = lerp(rgb, rgb * c3.rgb, saturate(weights.w));
-
-        float alpha = baseColor.a;
-        alpha = lerp(alpha, alpha * c1.a, saturate(weights.y));
-        alpha = lerp(alpha, alpha * c2.a, saturate(weights.z));
-        alpha = lerp(alpha, alpha * c3.a, saturate(weights.w));
-        return float4(rgb, alpha);
-    }
-
-    float weightSum = max(weights.x + weights.y + weights.z + weights.w, 0.0001f);
-    weights /= weightSum;
-
-    float4 color = baseColor * weights.x;
-    color += gTexture1.Sample(gSampler, uv) * weights.y;
-    color += gTexture2.Sample(gSampler, uv) * weights.z;
-    color += gTexture3.Sample(gSampler, uv) * weights.w;
-    return color;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                    小物: ハッシュ / 回転
@@ -302,7 +264,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
     PixelShaderOutput output;
 
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 textureColor  = SampleMaterialTexture(transformedUV.xy);
+    float4 textureColor  = gTexture.Sample(gSampler, transformedUV.xy);
 
     float3 albedo = gMaterial.color.rgb * textureColor.rgb;
     float  alpha  = gMaterial.color.a   * textureColor.a;

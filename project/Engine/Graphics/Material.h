@@ -27,9 +27,6 @@ struct Material {
 	int32_t   isReflect             = 0;
 	float     envirometCoefficient = 0.5f;
 	float     roughness             = 0.5f; // 反射率
-	CalyxEngine::Vector4 textureBlendWeights = {1.0f, 0.0f, 0.0f, 0.0f};
-	int32_t   textureBlendMode = 0; // 0: weighted blend, 1: multiply
-	float     texturePad[3] = {};
 
 	//config
 	void           ApplyConfig(const MaterialConfig& config);
