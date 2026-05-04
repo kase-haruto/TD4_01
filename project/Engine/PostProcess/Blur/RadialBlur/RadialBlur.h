@@ -30,6 +30,10 @@ public:
 	void ShowImGui() override;
 	void ResetParameters() override;
 	void Tick(float /*dt*/) override {} // 今回は未使用
+	nlohmann::json SaveParameters() const override;
+	void LoadParameters(const nlohmann::json& params) override;
+	bool GetFloatParameter(const std::string& name, float& out) const override;
+	bool SetFloatParameter(const std::string& name, float value) override;
 
 	// ---------------- Runtime API（Tween用にgetter/setter揃える） ----------------
 	float   GetWidth() const           { return blurParam_.width; }

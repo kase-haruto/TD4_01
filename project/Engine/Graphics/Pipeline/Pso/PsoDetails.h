@@ -50,6 +50,7 @@ namespace PipelineTag {
 		Vignette,
 		CRT,
 		OutlineComposite,
+		Blend,
 
 		Count
 	};

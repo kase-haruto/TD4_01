@@ -1,0 +1,217 @@
+{
+  "graph": {
+    "links": [
+      {
+        "fromPinId": 2,
+        "id": 12,
+        "toPinId": 10
+      },
+      {
+        "fromPinId": 11,
+        "id": 13,
+        "toPinId": 4
+      }
+    ],
+    "nextId": 14,
+    "nodes": [
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 1,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 2,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          20.0,
+          120.0
+        ],
+        "properties": {},
+        "title": "Scene Color",
+        "type": "Input"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 3,
+        "inputs": [
+          {
+            "id": 4,
+            "kind": 0,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "intValue": 0,
+        "outputs": [],
+        "position": [
+          720.0,
+          120.0
+        ],
+        "properties": {},
+        "title": "Output",
+        "type": "Output"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 5,
+        "inputs": [
+          {
+            "id": 6,
+            "kind": 0,
+            "name": "A",
+            "valueType": 2
+          },
+          {
+            "id": 7,
+            "kind": 0,
+            "name": "B",
+            "valueType": 2
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 8,
+            "kind": 1,
+            "name": "Out",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          318.0,
+          -142.0
+        ],
+        "properties": {
+          "applyMode": "Always",
+          "autoDisable": true,
+          "duration": 0.25,
+          "easeIndex": 8,
+          "enabled": true,
+          "floatAnimations": [],
+          "parameters": {
+            "mode": 0,
+            "opacity": 1.0
+          }
+        },
+        "title": "Blend",
+        "type": "Blend"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 9,
+        "inputs": [
+          {
+            "id": 10,
+            "kind": 0,
+            "name": "In",
+            "valueType": 2
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 11,
+            "kind": 1,
+            "name": "Out",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          358.0,
+          114.0
+        ],
+        "properties": {
+          "applyMode": "Always",
+          "autoDisable": true,
+          "duration": 0.25,
+          "easeIndex": 8,
+          "enabled": true,
+          "floatAnimations": [],
+          "parameters": {
+            "screenSize": [
+              1280.0,
+              720.0
+            ]
+          }
+        },
+        "title": "CRTEffect",
+        "type": "CRTEffect"
+      }
+    ]
+  },
+  "name": "Default",
+  "nodes": [
+    {
+      "applyMode": "Always",
+      "autoDisable": true,
+      "duration": 0.25,
+      "ease": "",
+      "easeIndex": 8,
+      "enabled": true,
+      "floatAnimations": [],
+      "id": 5,
+      "parameters": {
+        "mode": 0,
+        "opacity": 1.0
+      },
+      "title": "Blend",
+      "type": "Blend"
+    },
+    {
+      "applyMode": "Always",
+      "autoDisable": true,
+      "duration": 0.25,
+      "ease": "",
+      "easeIndex": 8,
+      "enabled": true,
+      "floatAnimations": [],
+      "id": 9,
+      "parameters": {
+        "screenSize": [
+          1280.0,
+          720.0
+        ]
+      },
+      "title": "CRTEffect",
+      "type": "CRTEffect"
+    }
+  ],
+  "outline": {
+    "enabled": true
+  },
+  "type": "PostEffectPreset",
+  "version": 1
+}

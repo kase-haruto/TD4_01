@@ -21,6 +21,7 @@
 #include <optional>
 #include <algorithm>
 #include <cmath>
+#include <externals/nlohmann/json.hpp>
 
 class PipelineService;
 class IPostEffectPass;
@@ -47,6 +48,14 @@ public:
 	bool MoveUp(const std::string& name);
 	bool MoveDown(const std::string& name);
 	void SetOrder(const std::vector<std::string>& orderedNames);
+
+	bool SavePreset(const std::string& filePath, const std::string& presetName = "PostEffectPreset") const;
+	bool LoadPreset(const std::string& filePath);
+	void PlayTriggeredEffects();
+	void PlayTriggeredEffect(const std::string& name);
+
+	void SetOutlineEnabled(bool enabled) { outlineEnabled_ = enabled; }
+	bool IsOutlineEnabled() const { return outlineEnabled_; }
 
 	// ---------- 実行/更新 ----------
 	void Update(float dt);
@@ -105,6 +114,10 @@ private:
 
 	PostProcessCollection collection_;
 	PostEffectGraph graph_{&collection_};
+	nlohmann::json loadedPreset_;
+	bool hasLoadedGraph_ = false;
+	bool outlineEnabled_ = true;
 
 	const std::string kCopyImageName = "CopyImage";
+	const std::string kBlendName = "Blend";
 };

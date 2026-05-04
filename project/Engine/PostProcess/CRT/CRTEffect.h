@@ -19,6 +19,8 @@ public:
 			   D3D12_GPU_DESCRIPTOR_HANDLE inputSRV,
 			   IRenderTarget* outputRT) override;
 	const std::string GetName() const override { return "CRTEffect"; }
+	nlohmann::json SaveParameters() const override;
+	void LoadParameters(const nlohmann::json& params) override;
 
 	void SetScreenSize(const CalyxEngine::Vector2& size) {
 		param_.screenSize = size;

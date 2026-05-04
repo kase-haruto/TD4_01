@@ -26,6 +26,7 @@
 
 #include <Engine/Foundation/Utility/FileSystem/FileScanner.h>
 #include <algorithm>
+#include <filesystem>
 
 using namespace EngineEdit;
 
@@ -59,6 +60,7 @@ namespace CalyxEngine {
 		splineEditor_		= std::make_unique<SplineEditorPanel>();
 		assetPanel_			= std::make_unique<AssetPanel>();
 		materialNodeEditorPanel_ = std::make_unique<MaterialNodeEditorPanel>();
+		postEffectNodeEditorPanel_ = std::make_unique<PostEffectNodeEditorPanel>();
 		livePPPanel_		= std::make_unique<LivePPPanel>();
 		sceneSwitchOverlay_ = std::make_unique<SceneSwitchOverlay>();
 
@@ -185,7 +187,10 @@ namespace CalyxEngine {
 		editorPanels_.push_back(splineEditor_.get());
 		editorPanels_.push_back(assetPanel_.get());
 		editorPanels_.push_back(materialNodeEditorPanel_.get());
+		editorPanels_.push_back(postEffectNodeEditorPanel_.get());
 		editorPanels_.push_back(livePPPanel_.get());
+
+		ApplyEditToolMode(editToolMode_, true);
 
 		// Editors メニュー（MenuCategory::Tools）に各パネルのトグルを追加
 		for(auto* p : editorPanels_) {
@@ -271,6 +276,10 @@ namespace CalyxEngine {
 	//=============================================================================
 	void LevelEditor::Update() {
 #if defined(_DEBUG) || defined(DEVELOP)
+		if(layoutSwitcher_) {
+			layoutSwitcher_->ApplyPending();
+		}
+
 		SceneContext* ctx = SceneContext::Current();
 
 		const ImGuiIO& io			= ImGui::GetIO();
@@ -388,10 +397,155 @@ namespace CalyxEngine {
 		if(menu_) {
 			menu_->Render();
 		}
-		// レイアウトスイッチャーメニューの描画
 		if(layoutSwitcher_ && ImGui::BeginMainMenuBar()) {
-			layoutSwitcher_->DrawMenu();
+			DrawEditModeCombo();
 			ImGui::EndMainMenuBar();
+		}
+	}
+
+	void LevelEditor::DrawEditModeCombo() {
+		ImGui::Separator();
+		ImGui::TextUnformatted("EditMode");
+		ImGui::SetNextItemWidth(140.0f);
+		if(ImGui::BeginCombo("##EditToolMode", GetEditToolModeName(editToolMode_))) {
+			if(layoutSwitcher_ && ImGui::BeginMenu("Object")) {
+				for(const auto& preset : layoutSwitcher_->GetPresets()) {
+					const bool selected = editToolMode_ == EngineEdit::EditToolMode::Object &&
+										  preset.path == layoutSwitcher_->GetCurrentPath();
+					if(ImGui::MenuItem(preset.name.c_str(), nullptr, selected)) {
+						ApplyEditToolMode(EngineEdit::EditToolMode::Object, false);
+						layoutSwitcher_->Apply(preset.path);
+					}
+				}
+				ImGui::EndMenu();
+			} else if(!layoutSwitcher_) {
+				const bool selected = editToolMode_ == EngineEdit::EditToolMode::Object;
+				if(ImGui::Selectable(GetEditToolModeName(EngineEdit::EditToolMode::Object), selected)) {
+					ApplyEditToolMode(EngineEdit::EditToolMode::Object, false);
+				}
+			}
+
+			const EngineEdit::EditToolMode modes[] = {
+				EngineEdit::EditToolMode::PostEffect,
+				EngineEdit::EditToolMode::Material,
+				EngineEdit::EditToolMode::Animation,
+			};
+
+			for(const auto mode : modes) {
+				const bool selected = (mode == editToolMode_);
+				if(ImGui::Selectable(GetEditToolModeName(mode), selected)) {
+					ApplyEditToolMode(mode, true);
+				}
+				if(selected) ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+	}
+
+	const char* LevelEditor::GetEditToolModeName(EngineEdit::EditToolMode mode) const {
+		switch(mode) {
+		case EngineEdit::EditToolMode::Object:
+			return "Object";
+		case EngineEdit::EditToolMode::PostEffect:
+			return "PostEffect";
+		case EngineEdit::EditToolMode::Material:
+			return "Material";
+		case EngineEdit::EditToolMode::Animation:
+			return "Animation";
+		default:
+			return "Object";
+		}
+	}
+
+	std::string LevelEditor::GetEditToolModeLayoutPath(EngineEdit::EditToolMode mode) const {
+		const std::string layoutDir = "Resources/Assets/Configs/Editor/Layout/";
+
+		switch(mode) {
+		case EngineEdit::EditToolMode::Object:
+			return layoutDir + "ObjectEdit.ini";
+		case EngineEdit::EditToolMode::PostEffect:
+			return layoutDir + "PostEfectEdit.ini";
+		case EngineEdit::EditToolMode::Material:
+			return layoutDir + "MaterialEdit.ini";
+		case EngineEdit::EditToolMode::Animation:
+			return layoutDir + "AnimationEdit.ini";
+		default:
+			return layoutDir + "ObjectEdit.ini";
+		}
+	}
+
+	std::string LevelEditor::GetEditToolModeLoadLayoutPath(EngineEdit::EditToolMode mode) const {
+		const std::string modeLayoutPath = GetEditToolModeLayoutPath(mode);
+		if(std::filesystem::exists(modeLayoutPath)) {
+			return modeLayoutPath;
+		}
+
+		if(mode == EngineEdit::EditToolMode::Object) {
+			return "Resources/Assets/Configs/Editor/Layout/gameEngineDefault.ini";
+		}
+
+		return modeLayoutPath;
+	}
+
+	void LevelEditor::ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout) {
+		editToolMode_ = mode;
+
+		auto setShow = [](IEngineUI* panel, bool show) {
+			if(panel) {
+				panel->SetShow(show);
+			}
+		};
+
+		if(mainViewport_) mainViewport_->SetShow(true);
+		if(debugViewport_) debugViewport_->SetShow(true);
+
+		switch(mode) {
+		case EngineEdit::EditToolMode::Object:
+			setShow(hierarchy_.get(), true);
+			setShow(editor_.get(), true);
+			setShow(inspector_.get(), true);
+			setShow(placeToolPanel_.get(), true);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			break;
+		case EngineEdit::EditToolMode::PostEffect:
+			setShow(hierarchy_.get(), false);
+			setShow(editor_.get(), false);
+			setShow(inspector_.get(), false);
+			setShow(placeToolPanel_.get(), false);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), true);
+			break;
+		case EngineEdit::EditToolMode::Material:
+			setShow(hierarchy_.get(), false);
+			setShow(editor_.get(), false);
+			setShow(inspector_.get(), true);
+			setShow(placeToolPanel_.get(), false);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), true);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			break;
+		case EngineEdit::EditToolMode::Animation:
+			setShow(hierarchy_.get(), true);
+			setShow(editor_.get(), false);
+			setShow(inspector_.get(), true);
+			setShow(placeToolPanel_.get(), false);
+			setShow(splineEditor_.get(), true);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			break;
+		default:
+			break;
+		}
+
+		if(applyLayout && layoutSwitcher_) {
+			layoutSwitcher_->Apply(GetEditToolModeLoadLayoutPath(mode));
 		}
 	}
 

@@ -13,6 +13,7 @@
 #include <Engine/Application/UI/Panels/LivePPPanel.h>
 #include <Engine/Application/UI/Panels/MaterialNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
+#include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Editor/ImGuiLayoutSwitcher.h>
 #include <Engine/Editor/SceneObjectEditor.h>
@@ -20,12 +21,20 @@
 
 // c++
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace EngineEdit {
 	enum class EditorMode {
 		Edit,
 		Game
+	};
+
+	enum class EditToolMode {
+		Object,
+		PostEffect,
+		Material,
+		Animation
 	};
 } // namespace EngineEdit
 
@@ -103,6 +112,11 @@ namespace CalyxEngine {
 		void EnterGameMode();
 		void ExitGameMode();
 		void ToggleMode();
+		void DrawEditModeCombo();
+		void ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout);
+		const char* GetEditToolModeName(EngineEdit::EditToolMode mode) const;
+		std::string GetEditToolModeLayoutPath(EngineEdit::EditToolMode mode) const;
+		std::string GetEditToolModeLoadLayoutPath(EngineEdit::EditToolMode mode) const;
 
 		void TogglePanel(IEngineUI* p) {
 			if(p) p->SetShow(!p->IsShow());
@@ -118,6 +132,7 @@ namespace CalyxEngine {
 		std::unique_ptr<SplineEditorPanel>	 splineEditor_;
 		std::unique_ptr<AssetPanel>			 assetPanel_;
 		std::unique_ptr<MaterialNodeEditorPanel> materialNodeEditorPanel_;
+		std::unique_ptr<PostEffectNodeEditorPanel> postEffectNodeEditorPanel_;
 		std::unique_ptr<LivePPPanel>		 livePPPanel_;
 		std::unique_ptr<SceneSwitchOverlay>	 sceneSwitchOverlay_;
 		std::unique_ptr<ImGuiLayoutSwitcher> layoutSwitcher_;
@@ -127,6 +142,7 @@ namespace CalyxEngine {
 		// メニュー
 		std::unique_ptr<EditorMenu> menu_; //< エディターメニュー
 		EngineEdit::EditorMode		mode_ = EngineEdit::EditorMode::Edit;
+		EngineEdit::EditToolMode	editToolMode_ = EngineEdit::EditToolMode::Object;
 
 		// ビューポート
 		std::unique_ptr<Viewport>			mainViewport_;		 //< メインビューポート
