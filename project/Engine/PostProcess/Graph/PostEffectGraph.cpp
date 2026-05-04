@@ -5,6 +5,7 @@
 #include <Engine/Graphics/Device/DxCore.h>
 #include <cassert>
 #include <algorithm>
+#include <vector>
 
 void PostEffectGraph::SetPassesFromList(const std::vector<PostEffectSlot>& slots){
 	passes_.clear();
@@ -172,19 +173,44 @@ D3D12_GPU_DESCRIPTOR_HANDLE PostEffectGraph::ExecuteGraphNode(ID3D12GraphicsComm
 	}
 
 	if(node.type == "Blend"){
-		D3D12_GPU_DESCRIPTOR_HANDLE inputA = sceneSRV;
-		D3D12_GPU_DESCRIPTOR_HANDLE inputB = sceneSRV;
-		if(!node.inputPins.empty()){
-			inputA = ExecuteGraphNode(cmd, FindInputSourceNode(node.inputPins[0]), sceneSRV, dxCore, cache, visiting, tempIndex);
+		if(node.inputPins.empty()){
+			cache[nodeId] = sceneSRV;
+			visiting[nodeId] = false;
+			return sceneSRV;
 		}
-		if(node.inputPins.size() >= 2){
-			inputB = ExecuteGraphNode(cmd, FindInputSourceNode(node.inputPins[1]), sceneSRV, dxCore, cache, visiting, tempIndex);
+
+		std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> inputs;
+		inputs.reserve(node.inputPins.size());
+		for(const int32_t inputPin : node.inputPins){
+			const int32_t sourceNode = FindInputSourceNode(inputPin);
+			if(sourceNode == 0) continue;
+			inputs.push_back(ExecuteGraphNode(cmd, sourceNode, sceneSRV, dxCore, cache, visiting, tempIndex));
 		}
+
+		if(inputs.empty()){
+			cache[nodeId] = sceneSRV;
+			visiting[nodeId] = false;
+			return sceneSRV;
+		}
+
 		if(auto* blend = dynamic_cast<BlendEffect*>(node.pass)){
-			output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			blend->Apply(cmd, inputA, inputB, output);
+			if(inputs.size() == 1){
+				output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
+				node.pass->Apply(cmd, inputs.front(), output);
+			}else{
+				D3D12_GPU_DESCRIPTOR_HANDLE current = inputs.front();
+				for(size_t i = 1; i < inputs.size(); ++i){
+					IRenderTarget* blendOutput = (i + 1 == inputs.size()) ? output : AcquireTempTarget(dxCore, tempIndex);
+					if(!blendOutput) break;
+					blendOutput->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
+					blend->Apply(cmd, current, inputs[i], blendOutput);
+					blendOutput->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+					current = blendOutput->GetSRV();
+				}
+			}
 		}else{
-			node.pass->Apply(cmd, inputA, output);
+			output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			node.pass->Apply(cmd, inputs.front(), output);
 		}
 	}else{
 		D3D12_GPU_DESCRIPTOR_HANDLE inputSRV = sceneSRV;

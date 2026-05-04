@@ -35,7 +35,7 @@ namespace CalyxEngine {
 			if(type == "ChromaticAberration") return {{"intensity", 0.0f}};
 			if(type == "Vignette") return {{"strength", 1.0f}, {"radius", 0.0f}};
 			if(type == "CRTEffect") return {{"screenSize", {1280.0f, 720.0f}}};
-			if(type == "Blend") return {{"opacity", 1.0f}, {"mode", 0}};
+			if(type == "Blend") return {{"opacity", 0.5f}, {"mode", 0}};
 			return nlohmann::json::object();
 		}
 
@@ -187,7 +187,7 @@ namespace CalyxEngine {
 		} else if(node.type == "Vignette") {
 			ImGui::TextDisabled("strength %.2f", params.value("strength", 1.0f));
 		} else if(node.type == "Blend") {
-			ImGui::TextDisabled("opacity %.2f", params.value("opacity", 1.0f));
+			ImGui::TextDisabled("opacity %.2f", params.value("opacity", 0.5f));
 		}
 
 		ImGui::TextDisabled("Select node to edit");
@@ -311,18 +311,22 @@ namespace CalyxEngine {
 			}
 			HelpTooltip("Area before the vignette starts. Larger values keep more of the center unaffected.");
 		} else if(node.type == "Blend") {
-			float opacity = params.value("opacity", 1.0f);
+			float opacity = params.value("opacity", 0.5f);
 			int blendMode = params.value("mode", 0);
 			if(ImGui::DragFloat("Opacity", &opacity, 0.01f, 0.0f, 1.0f)) {
 				params["opacity"] = opacity;
 				changed = true;
 			}
-			HelpTooltip("Blend amount between input A and input B.");
+			HelpTooltip("Blend amount. In Lerp mode, 0 shows the previous input and 1 shows the next input.");
 			if(ImGui::Combo("Mode", &blendMode, "Lerp\0Add\0Multiply\0Max\0")) {
 				params["mode"] = blendMode;
 				changed = true;
 			}
 			HelpTooltip("How input A and input B are combined.");
+			if(blendMode == 0 && opacity >= 0.999f) {
+				ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.30f, 1.0f), "Lerp opacity 1.0 shows only the later input.");
+			}
+			changed |= DrawBlendInputControls(node);
 		}
 
 		if(isTriggered) {
@@ -375,6 +379,48 @@ namespace CalyxEngine {
 		return changed;
 	}
 
+	bool PostEffectNodeEditorPanel::DrawBlendInputControls(Node& node) {
+		if(node.type != "Blend") return false;
+
+		bool changed = false;
+		ImGui::SeparatorText("Inputs");
+		ImGui::TextDisabled("%d color inputs", static_cast<int>(node.inputs.size()));
+		HelpTooltip("Blend combines all connected inputs in order from top to bottom.");
+
+		if(ImGui::Button("+ Input", ImVec2(92.0f, 0.0f))) {
+			const int32_t index = static_cast<int32_t>(node.inputs.size());
+			const char label = static_cast<char>('A' + (std::min)(index, 25));
+			node.inputs.push_back({graph_.AllocateId(), std::string(1, label), NodePinKind::Input, NodeValueType::Color});
+			node.properties["inputCount"] = static_cast<int>(node.inputs.size());
+			changed = true;
+		}
+		ImGui::SameLine();
+		const bool canRemove = node.inputs.size() > 2;
+		if(!canRemove) ImGui::BeginDisabled();
+		if(ImGui::Button("- Input", ImVec2(92.0f, 0.0f))) {
+			const int32_t removedPinId = node.inputs.back().id;
+			node.inputs.pop_back();
+			std::erase_if(graph_.links, [removedPinId](const NodeLink& link) {
+				return link.toPinId == removedPinId || link.fromPinId == removedPinId;
+			});
+			node.properties["inputCount"] = static_cast<int>(node.inputs.size());
+			changed = true;
+		}
+		if(!canRemove) ImGui::EndDisabled();
+		HelpTooltip("Blend keeps at least two inputs. Removing an input also removes its links.");
+
+		for(int32_t i = 0; i < static_cast<int32_t>(node.inputs.size()); ++i) {
+			const char label = static_cast<char>('A' + (std::min)(i, 25));
+			const std::string expectedName = std::string(1, label);
+			if(node.inputs[i].name != expectedName) {
+				node.inputs[i].name = expectedName;
+				changed = true;
+			}
+		}
+
+		return changed;
+	}
+
 	void PostEffectNodeEditorPanel::AddInputNode(Vector2 position) {
 		Node node;
 		node.id = graph_.AllocateId();
@@ -417,6 +463,9 @@ namespace CalyxEngine {
 			{"parameters", DefaultParameters(type)},
 			{"floatAnimations", nlohmann::json::array()}
 		};
+		if(type == "Blend") {
+			node.properties["inputCount"] = static_cast<int>(node.inputs.size());
+		}
 		graph_.nodes.push_back(std::move(node));
 	}
 
