@@ -63,3 +63,51 @@ void RadialBlurEffect::ResetParameters() {
     blurParam_.center = { 0.5f, 0.5f };
     blurParam_.width  = 0.0f;
 }
+
+nlohmann::json RadialBlurEffect::SaveParameters() const {
+    return nlohmann::json{
+        {"center", {blurParam_.center.x, blurParam_.center.y}},
+        {"width", blurParam_.width}
+    };
+}
+
+void RadialBlurEffect::LoadParameters(const nlohmann::json& params) {
+    if(auto it = params.find("center"); it != params.end() && it->is_array() && it->size() == 2) {
+        SetCenter({it->at(0).get<float>(), it->at(1).get<float>()});
+    }
+    if(params.contains("width") && params["width"].is_number()) {
+        SetWidth(params["width"].get<float>());
+    }
+}
+
+bool RadialBlurEffect::GetFloatParameter(const std::string& name, float& out) const {
+    if(name == "width") {
+        out = blurParam_.width;
+        return true;
+    }
+    if(name == "center.x") {
+        out = blurParam_.center.x;
+        return true;
+    }
+    if(name == "center.y") {
+        out = blurParam_.center.y;
+        return true;
+    }
+    return false;
+}
+
+bool RadialBlurEffect::SetFloatParameter(const std::string& name, float value) {
+    if(name == "width") {
+        SetWidth(value);
+        return true;
+    }
+    if(name == "center.x") {
+        SetCenter({value, blurParam_.center.y});
+        return true;
+    }
+    if(name == "center.y") {
+        SetCenter({blurParam_.center.x, value});
+        return true;
+    }
+    return false;
+}

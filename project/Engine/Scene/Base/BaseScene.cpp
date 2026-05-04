@@ -11,6 +11,7 @@
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/PostProcess/Manager/PostEffectManager.h>
 #include <Engine/Objects/Event/BaseEventObject.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 
@@ -98,16 +99,20 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 	// Particles
 	sceneContext_->GetFxSystem()->Render(pso, cmd);
 
+	const bool outlineEnabled = PostEffectManager::Get()->IsOutlineEnabled();
+
 	// OutlinePass
-	outlineRenderer_->Render(cmd,
-							 GraphicsGroup::GetInstance()->GetDevice().Get(),
-							 rt,
-							 pso,
-							 renderCam,
-							 *modelRenderer_);
+	if(outlineEnabled) {
+		outlineRenderer_->Render(cmd,
+								 GraphicsGroup::GetInstance()->GetDevice().Get(),
+								 rt,
+								 pso,
+								 renderCam,
+								 *modelRenderer_);
+	}
 
 #if defined(_DEBUG) || defined(DEVELOP)
-	if(rt->GetRenderTargetType() == RenderTargetType::DebugView) {
+	if(outlineEnabled && rt->GetRenderTargetType() == RenderTargetType::DebugView) {
 		outlineRenderer_->RenderSelectionHighlight(cmd,
 												   GraphicsGroup::GetInstance()->GetDevice().Get(),
 												   rt,

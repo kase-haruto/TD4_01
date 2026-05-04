@@ -33,6 +33,7 @@ namespace CalyxEngine {
 		bool ConsumeBackgroundContextRequest(Vector2& outCanvasPos);
 		bool ConsumeNodeContextRequest(int32_t& outNodeId);
 		Vector2 GetLastViewCenter() const { return lastViewCenter_; }
+		int32_t GetSelectedNodeId() const { return selectedNodeId_; }
 
 	private:
 		bool CanCreateLink(const NodeGraph& graph, int32_t a, int32_t b, int32_t& from, int32_t& to) const;
@@ -55,5 +56,6 @@ namespace CalyxEngine {
 		ContextMenu activeContextMenu_{};
 		bool hasActiveContextMenu_ = false;
 		Vector2 lastViewCenter_{};
+		int32_t selectedNodeId_ = 0;
 	};
 }

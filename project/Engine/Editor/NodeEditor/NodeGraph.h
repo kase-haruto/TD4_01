@@ -30,6 +30,7 @@ namespace CalyxEngine {
 		int32_t intValue = 0;
 		Vector4 colorValue = {1, 1, 1, 1};
 		bool boolValue = false;
+		nlohmann::json properties = nlohmann::json::object();
 	};
 
 	struct NodeLink {

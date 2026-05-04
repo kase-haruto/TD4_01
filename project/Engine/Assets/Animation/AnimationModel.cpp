@@ -567,8 +567,11 @@ namespace CalyxEngine {
 
 		materialBuffer_.SetCommand(cmdList, 0);
 		cmdList->SetGraphicsRootDescriptorTable(1, GetInstanceSrv());
-		cmdList->SetGraphicsRootDescriptorTable(2, handle_.value());
+		cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(0));
 		cmdList->SetGraphicsRootDescriptorTable(6, GetEnvMapSrv());
+		cmdList->SetGraphicsRootDescriptorTable(12, GetTexSrv(1));
+		cmdList->SetGraphicsRootDescriptorTable(13, GetTexSrv(2));
+		cmdList->SetGraphicsRootDescriptorTable(14, GetTexSrv(3));
 		SetCommandPalletSrv(7, cmdList);
 
 		// 頂点バッファ/インデックスバッファをセット

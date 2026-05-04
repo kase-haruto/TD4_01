@@ -251,6 +251,9 @@ namespace CalyxEngine {
 			ed::Link(ed::LinkId(link.id), ed::PinId(link.fromPinId), ed::PinId(link.toPinId), GetPinColor(type), GetLinkThickness(type));
 		}
 
+		ed::NodeId selectedNodes[1];
+		selectedNodeId_ = ed::GetSelectedNodes(selectedNodes, 1) > 0 ? static_cast<int32_t>(selectedNodes[0].Get()) : 0;
+
 		if(ed::BeginCreate()) {
 			ed::PinId a, b;
 			if(ed::QueryNewLink(&a, &b, ImVec4(0.70f, 0.76f, 0.84f, 1.0f), kStyle.validPreviewThickness)) {

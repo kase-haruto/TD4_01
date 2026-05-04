@@ -1,11 +1,11 @@
 # Calyx Reflection / Object Collection
 
-This folder contains the build-time collection step for editor-placeable scene objects.
-It is designed to give the engine a small Unreal-style workflow without relying on C++ runtime reflection.
+このフォルダには、エディタに配置できる `SceneObject` 系クラスをビルド時に自動収集する仕組みが入っています。
+C++ の実行時リフレクションではなく、ヘッダに書いたマーカーをビルド前スクリプトが読み取り、C++ の登録コードを生成する方式です。
 
-## Goal
+## 目的
 
-Add a marker before a class declaration, then let the editor discover it automatically:
+クラス定義の直前に `CALYX_OBJECT(...)` を書くだけで、エディタの配置パネルに自動で表示されるようにします。
 
 ```cpp
 #include <Engine/Foundation/Reflection/CalyxReflection.h>
@@ -17,118 +17,164 @@ public:
 };
 ```
 
-After the next build, the object is registered into `SceneObjectRegistry` and appears in the editor placement panel.
+次回ビルド時にこのクラスが `SceneObjectRegistry` に登録され、エディタの Events カテゴリから配置できるようになります。
 
-## Build Flow
+## 全体の流れ
 
-1. MSBuild runs `Tools/Reflection/generate_reflection.ps1` as a pre-build event.
-2. The script scans header files under `Engine/**/*.h` and `Game/**/*.h`.
-3. It finds `CALYX_OBJECT(...)` markers followed by `class ClassName :`.
-4. It writes generated registration code to:
+1. MSBuild の PreBuildEvent で `Tools/Reflection/generate_reflection.ps1` が実行されます。
+2. スクリプトが `Engine/**/*.h` と `Game/**/*.h` を走査します。
+3. `CALYX_OBJECT(...)` の直後にある `class ClassName :` を検出します。
+4. 検出結果から以下の生成ファイルを書き出します。
    - `Engine/Foundation/Reflection/CalyxObjectRegistry.generated.h`
    - `Engine/Foundation/Reflection/CalyxObjectRegistry.generated.cpp`
-5. `main.cpp` calls `CalyxEngine::RegisterGeneratedSceneObjects()` during startup.
-6. `PlaceToolPanel` asks `SceneObjectRegistry` for placeable objects and builds the Events list from that registry data.
+5. `main.cpp` で `CalyxEngine::RegisterGeneratedSceneObjects()` が呼ばれます。
+6. 生成された登録コードが `SceneObjectRegistry` にクラス情報を登録します。
+7. `PlaceToolPanel` が `SceneObjectRegistry` から配置可能オブジェクト一覧を取得し、Events に表示します。
 
-## Important Files
+## 主要ファイル
 
 - `Engine/Foundation/Reflection/CalyxReflection.h`
-  Defines marker macros. These compile to nothing and exist for the generator.
+  - `CALYX_OBJECT` などのマクロ定義です。
+  - C++ 上では空マクロで、generator 用の目印として使います。
 
 - `Tools/Reflection/generate_reflection.ps1`
-  The active generator used by MSBuild. It is PowerShell-based so it works in the Visual Studio build environment.
+  - MSBuild から実行される実際の generator です。
+  - Visual Studio 環境だけで動かせるように PowerShell で書いています。
 
 - `Tools/Reflection/generate_reflection.py`
-  Python version of the generator. It is not wired into MSBuild because Python may not be installed.
+  - Python 版 generator です。
+  - 現在は MSBuild には接続していません。
 
 - `Engine/Foundation/Reflection/CalyxObjectRegistry.generated.cpp`
-  Generated registration output. Do not edit by hand.
+  - 自動生成される登録コードです。
+  - 手で編集しないでください。
 
 - `Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.*`
-  Runtime registry used by scene loading and editor placement.
+  - シーンロードとエディタ配置の両方で使う実行時 Registry です。
 
 - `Engine/Application/UI/Panels/PlaceToolPanel.cpp`
-  Reads placeable registry entries and creates editor placement items.
+  - Registry から配置可能オブジェクトを取得し、配置パネルに表示します。
 
 ## CALYX_OBJECT
 
-`CALYX_OBJECT` is the currently active marker.
+現在実際に使われているマーカーです。
 
-Supported fields:
+最小例:
+
+```cpp
+CALYX_OBJECT(Category = Event, DisplayName = "Camera Event")
+```
+
+指定できる項目:
 
 ```cpp
 CALYX_OBJECT(
 	Category = Event,
-	DisplayName = "Camera Event"
+	DisplayName = "Camera Event",
+	Icon = "UI/Tool/event.png",
+	Placeable = true
 )
 ```
 
 - `Category`
-  Maps to `ObjectType`. Currently `Event` is used by the placement panel.
+  - `ObjectType` に対応します。
+  - 現在の配置パネルでは主に `Event` を使います。
 
 - `DisplayName`
-  The name shown in the editor.
+  - エディタに表示される名前です。
+  - 未指定の場合は `TypeName` が使われます。
 
 - `Icon`
-  Asset path passed to `TextureManager::LoadTexture`. It is relative to `Resources/Assets`.
-  Default: `UI/Tool/event.png`.
+  - `TextureManager::LoadTexture` に渡すアイコンパスです。
+  - `Resources/Assets` からの相対パスで指定します。
+  - デフォルトは `UI/Tool/event.png` です。
 
 - `Placeable`
-  If `true`, the class is exposed to the placement panel.
-  Default: `true`.
+  - `true` の場合、エディタの配置パネルに表示されます。
+  - デフォルトは `true` です。
 
-If `TypeName` is omitted, the C++ class name is used as the serialized type name.
-If `DisplayName` is omitted, `TypeName` is used.
+- `TypeName`
+  - 保存データや Registry で使う型名です。
+  - 未指定の場合は C++ のクラス名が使われます。
+
+通常の Event では、まずはこの形で十分です。
+
+```cpp
+CALYX_OBJECT(Category = Event, DisplayName = "Tutorial Event")
+```
+
+非表示にしたい場合だけ `Placeable = false` を指定します。
+
+```cpp
+CALYX_OBJECT(Category = Event, DisplayName = "Internal Event", Placeable = false)
+```
+
+専用アイコンを使いたい場合だけ `Icon` を指定します。
+
+```cpp
+CALYX_OBJECT(Category = Event, DisplayName = "Boss Event", Icon = "UI/Tool/bossEvent.png")
+```
 
 ## CALYX_GENERATED_BODY
 
-`CALYX_GENERATED_BODY()` is an optional placeholder marker.
+`CALYX_GENERATED_BODY()` は現在は任意のプレースホルダーです。
 
-Current role:
+現在の役割:
 
-- It compiles to nothing.
-- It documents that the class participates in the generated reflection/object collection system.
+- C++ 上では何もしません。
+- generator もまだ読み取っていません。
+- 「このクラスは生成系に参加する」という目印として残せる程度です。
 
-Planned role:
+将来的な役割:
 
-- This is where generated per-class glue can be attached later if needed.
-- Examples: static class descriptor access, property table binding, editor metadata hooks, version migration hooks.
+- クラスごとの生成コード差し込み場所にする可能性があります。
+- 例: static な型情報取得、プロパティテーブル接続、エディタ用メタデータ hook、バージョン移行 hook など。
 
-Keeping it in the class now makes future expansion less disruptive.
+現段階では必須ではありません。
+
+```cpp
+class CameraEventObject : public BaseEventObject {
+public:
+	CameraEventObject();
+};
+```
+
+このように書いて問題ありません。
 
 ## CALYX_PROPERTY
 
-`CALYX_PROPERTY(...)` is also a placeholder marker right now.
+`CALYX_PROPERTY(...)` も現在はプレースホルダーです。
 
-Current role:
+現在の役割:
 
-- It compiles to nothing.
-- The generator does not yet collect properties.
+- C++ 上では何もしません。
+- generator はまだプロパティを収集していません。
 
-Planned role:
+将来的な役割:
 
-- Mark fields for automatic inspector display.
-- Add metadata such as display name, range, category, serialization behavior, and editor-only flags.
+- フィールドを Inspector に自動表示するためのマーカーにする予定です。
+- 表示名、範囲、カテゴリ、保存対象、エディタ専用フラグなどを指定できるようにする想定です。
 
-Example target syntax:
+将来的な構文例:
 
 ```cpp
 CALYX_PROPERTY(Edit, DisplayName = "Trigger Radius", Min = 0.0f)
 float triggerRadius_ = 1.0f;
 ```
 
-The current implementation intentionally stops at object collection. Property reflection should be added as a second step so it can be designed around the existing `IConfigurable` and JSON serialization flow.
+現在の実装は、意図的に「オブジェクト自動収集」までに留めています。
+プロパティ自動収集は、既存の `IConfigurable` と JSON 保存/読み込みの流れに合わせて次の段階で設計するのが安全です。
 
-## Adding A New Placeable Event
+## 新しい配置可能 Event の追加手順
 
-1. Create the event class as usual.
-2. Include `CalyxReflection.h` in the header.
-3. Add `CALYX_OBJECT(...)` immediately before the class declaration.
-4. Build the project.
-5. The generated registry file is updated by the pre-build step.
-6. The event appears under the Events category in the placement panel.
+1. 通常通り Event クラスを作成します。
+2. ヘッダで `Engine/Foundation/Reflection/CalyxReflection.h` を include します。
+3. クラス定義の直前に `CALYX_OBJECT(...)` を書きます。
+4. プロジェクトをビルドします。
+5. PreBuildEvent により生成ファイルが更新されます。
+6. エディタの Events カテゴリに表示されます。
 
-## Minimal Event Example
+例:
 
 ```cpp
 #include <Engine/Foundation/Reflection/CalyxReflection.h>
@@ -142,11 +188,13 @@ public:
 };
 ```
 
-This uses the default event icon and is placeable by default.
+この例では、デフォルトアイコン `UI/Tool/event.png` が使われ、配置可能状態で登録されます。
 
-## Current Limitations
+## 現在の制限
 
-- The generator is regex-based. Keep `CALYX_OBJECT(...)` directly before the class declaration.
-- The class must be in a header under `Engine` or `Game`.
-- The class must have a default constructor compatible with `std::make_shared<ClassName>()`.
-- Only object collection is implemented. Property collection is reserved for the next stage.
+- generator は正規表現ベースです。
+- `CALYX_OBJECT(...)` はクラス定義の直前に置いてください。
+- 対象クラスは `Engine` または `Game` 配下の `.h` に書いてください。
+- 対象クラスは `std::make_shared<ClassName>()` で作れるデフォルトコンストラクタを持つ必要があります。
+- 現在実装済みなのはオブジェクト自動収集のみです。
+- プロパティ自動収集は未実装です。

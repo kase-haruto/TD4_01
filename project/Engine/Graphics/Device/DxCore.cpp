@@ -85,6 +85,13 @@ namespace CalyxEngine {
 		postBuffer2->Initialize(device.Get(), width, height, format_, DescriptorAllocator::Allocate(DescriptorUsage::Rtv), DescriptorAllocator::Allocate(DescriptorUsage::Dsv));
 		postBuffer2->SetRenderTargetType(RenderTargetType::PostEffectBuffer2);
 		renderTargetCollection_->Add("PostEffectBuffer2", std::move(postBuffer2));
+
+		for(int i = 0; i < 8; ++i) {
+			auto nodeBuffer = std::make_unique<OffscreenRenderTarget>();
+			nodeBuffer->Initialize(device.Get(), width, height, format_, DescriptorAllocator::Allocate(DescriptorUsage::Rtv), DescriptorAllocator::Allocate(DescriptorUsage::Dsv));
+			nodeBuffer->SetRenderTargetType(RenderTargetType::PostEffectBuffer1);
+			renderTargetCollection_->Add("PostEffectNodeBuffer" + std::to_string(i), std::move(nodeBuffer));
+		}
 	}
 
 	void DxCore::PreDraw() {

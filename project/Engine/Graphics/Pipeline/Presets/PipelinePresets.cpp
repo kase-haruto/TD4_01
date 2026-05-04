@@ -52,6 +52,9 @@ GraphicsPipelineDesc PipelinePresets::MakeObject3D(BlendMode mode) {
 		.SRVTable(2, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [9] ShadowMap t2
 		.SRV(3, D3D12_SHADER_VISIBILITY_PIXEL)											 // [10] TLAS t3
 		.CBV(5, D3D12_SHADER_VISIBILITY_PIXEL)											 // shadow 11
+		.SRVTable(4, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [12] Tex1
+		.SRVTable(5, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [13] Tex2
+		.SRVTable(6, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [14] Tex3
 
 		.SamplerWrapLinear(0);
 
@@ -158,6 +161,9 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 		.SRVTable(2, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [9] ShadowMap t2
 		.SRV(3, D3D12_SHADER_VISIBILITY_PIXEL)											 // [10] TLAS t3
 		.CBV(5, D3D12_SHADER_VISIBILITY_PIXEL)											 // shadow 11
+		.SRVTable(4, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [12] Tex1
+		.SRVTable(5, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [13] Tex2
+		.SRVTable(6, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [14] Tex3
 
 		.SamplerWrapLinear(0);
 
@@ -734,5 +740,29 @@ GraphicsPipelineDesc PipelinePresets::MakeOutlineComposite() {
 		.Constants(0, 16, D3D12_SHADER_VISIBILITY_PIXEL)
 		.SampleClampLinear(0);
 
+	return desc;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		Blend
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeBlend() {
+	GraphicsPipelineDesc desc;
+	desc.VS(L"CopyImage.VS.hlsl")
+		.PS(L"Blend.PS.hlsl")
+		.BlendNone()
+		.CullNone()
+		.DepthEnable(false)
+		.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+		.Samples(1);
+
+	desc.inputElems_.clear();
+
+	desc.root_
+		.AllowIA()
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SampleClampLinear(0);
 	return desc;
 }
