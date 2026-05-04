@@ -12,7 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-
+#include <filesystem>
 
 
 ModelManager::ModelManager() {
@@ -255,6 +255,7 @@ ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const st
 
 	// パスを組み立て
 	std::string filePath = directoryPath + "/" + modelNameLower + "/" + fileNameWithExt;
+	std::filesystem::path modelDirectory = std::filesystem::path(filePath).parent_path();
 
 	const aiScene* scene = importer.ReadFile(
 		filePath.c_str(),
@@ -269,6 +270,7 @@ ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const st
 	}
 
 	ModelData modelData;
+	LoadMaterials(scene, modelDirectory, modelData);
 
 	// メッシュデータを格納
 	for(unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
@@ -294,8 +296,6 @@ ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const st
 				jointWeightData.vertexWeights.push_back({bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId});
 			}
 		}
-
-		LoadMaterial(scene, mesh, modelData);
 	}
 
 	// アニメーション(サンプル)
@@ -373,6 +373,7 @@ void ModelManager::CreateGpuResources(const std::string&, ModelData& model) {
 //----------------------------------------------------------------------------
 void ModelManager::LoadMesh(const aiMesh* mesh, ModelData& modelData) {
 	uint32_t baseVertex = static_cast<uint32_t>(modelData.meshResource.Vertices().size());
+	uint32_t indexStart = static_cast<uint32_t>(modelData.meshResource.Indices().size());
 
 	// 初期AABBを極端な値に
 	CalyxEngine::Vector3 minPos = {FLT_MAX, FLT_MAX, FLT_MAX};
@@ -403,6 +404,14 @@ void ModelManager::LoadMesh(const aiMesh* mesh, ModelData& modelData) {
 		modelData.meshResource.data.indices.push_back(baseVertex + face.mIndices[1]);
 	}
 
+	const uint32_t indexCount = static_cast<uint32_t>(modelData.meshResource.Indices().size()) - indexStart;
+	if(indexCount > 0) {
+		modelData.meshResource.SubMeshes().push_back({
+			indexStart,
+			indexCount,
+			mesh->mMaterialIndex});
+	}
+
 	// ローカルAABBを格納
 	if(modelData.localAABB.min_ == CalyxEngine::Vector3{} && modelData.localAABB.max_ == CalyxEngine::Vector3{}) {
 		modelData.localAABB.Initialize(minPos, maxPos);
@@ -417,25 +426,60 @@ void ModelManager::LoadMesh(const aiMesh* mesh, ModelData& modelData) {
 //----------------------------------------------------------------------------
 // マテリアル読み込み
 //----------------------------------------------------------------------------
-void ModelManager::LoadMaterial(const aiScene* scene, const aiMesh* mesh, ModelData& modelData) {
-	if(!scene->HasMaterials()) {
-		modelData.meshResource.data.material.textureFilePath = "white1x1.dds";
-		return;
-	}
-	const aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-	if(!material) {
-		modelData.meshResource.data.material.textureFilePath = "white1x1.dds";
+void ModelManager::LoadMaterials(const aiScene* scene, const std::filesystem::path& modelDirectory, ModelData& modelData) {
+	modelData.meshResource.Materials().clear();
+
+	auto resolveTexturePath = [&](const aiString& texPath) -> std::string {
+		std::error_code ec;
+		std::filesystem::path assetRoot = std::filesystem::weakly_canonical("Resources/Assets", ec);
+		if(ec) {
+			assetRoot = std::filesystem::path("Resources/Assets");
+			ec.clear();
+		}
+		std::filesystem::path path(texPath.C_Str());
+		if(path.is_absolute()) {
+			auto rel = std::filesystem::relative(path, assetRoot, ec);
+			if(!ec) return rel.generic_string();
+			return path.generic_string();
+		}
+
+		std::filesystem::path full = std::filesystem::weakly_canonical(modelDirectory / path, ec);
+		if(ec) {
+			full = modelDirectory / path;
+		}
+
+		auto rel = std::filesystem::relative(full, assetRoot, ec);
+		if(!ec) return rel.generic_string();
+
+		return full.generic_string();
+	};
+
+	const unsigned int materialCount = scene && scene->HasMaterials() ? scene->mNumMaterials : 0;
+	if(materialCount == 0) {
+		MaterialData fallback{};
+		fallback.textureFilePath = "textures/white1x1.dds";
+		modelData.meshResource.Materials().push_back(fallback);
+		modelData.meshResource.Material() = fallback;
 		return;
 	}
 
-	aiString texPath;
-	if(material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
-		modelData.meshResource.data.material.textureFilePath = texPath.C_Str();
-	} else {
-		modelData.meshResource.Material().textureFilePath = "white1x1.dds";
+	for(unsigned int materialIndex = 0; materialIndex < materialCount; ++materialIndex) {
+		MaterialData materialData{};
+		materialData.textureFilePath = "textures/white1x1.dds";
+
+		const aiMaterial* material = scene->mMaterials[materialIndex];
+		if(material) {
+			aiString texPath;
+			if(material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+				materialData.textureFilePath = resolveTexturePath(texPath);
+			}
+			LoadUVTransform(material, materialData);
+		}
+
+		modelData.meshResource.Materials().push_back(materialData);
 	}
 
-	LoadUVTransform(material, modelData.meshResource.Material());
+	modelData.meshResource.Material() = modelData.meshResource.Materials().front();
 }
 
 //----------------------------------------------------------------------------

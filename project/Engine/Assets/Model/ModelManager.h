@@ -11,6 +11,7 @@
 
 /* STL */
 #include <condition_variable>
+#include <filesystem>
 #include <functional>
 #include <future>
 #include <memory>
@@ -99,7 +100,7 @@ private:
 	void LoadMesh(const aiMesh* mesh, ModelData& modelData);
 
 	/// マテリアル読み込み
-	void LoadMaterial(const aiScene* scene, const aiMesh* mesh, ModelData& modelData);
+	void LoadMaterials(const aiScene* scene, const std::filesystem::path& modelDirectory, ModelData& modelData);
 
 	/// UV変換情報読み込み
 	void LoadUVTransform(const aiMaterial* material, MaterialData& outMaterial);
