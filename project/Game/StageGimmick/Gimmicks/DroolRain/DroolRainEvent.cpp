@@ -41,6 +41,7 @@ void DroolRainEvent::SetTarget(const std::shared_ptr<DroolRainObject>& target) {
 void DroolRainEvent::EventInitialize() {
 
 	objectCount_ = 5;
+	targetObjects_.resize(objectCount_);
 
 	std::string eventName = GetName();
 
@@ -55,17 +56,31 @@ void DroolRainEvent::EventInitialize() {
 	std::string suffix = eventName.substr(eventPrefix.size());
 	// 対応するオブジェクト名を作る
 	std::string targetName = eventName + "/" + objectPrefix;
-	// シーンから対応するオブジェクトを探す
+
+	// シーンから対応するオブジェクトを生成する
 	for(uint32_t i = 0; i < objectCount_; ++i) {
 		std::string indexedTargetName = targetName + std::to_string(i) + ")";
-		auto targetObject = SceneContext::Current()->FindObjectByName<DroolRainObject>(indexedTargetName);
+		auto object = SceneContext::Current()->FindObjectByName<DroolRainObject>(indexedTargetName);
+		if(object) {
+			targetObjects_[i] = object;
+			continue;
+		}
+		auto targetObject = SceneAPI::Instantiate<DroolRainObject>("debugCube.obj", indexedTargetName);
 		if(targetObject) {
-			targetObjects_.push_back(targetObject);
+			targetObject->SetParent(shared_from_this());
+			targetObject->Initialize();
+			targetObject->GetWorldTransform().translation.y -= 0.5f;
+			targetObject->GetWorldTransform().inheritScale = false;
+			targetObjects_[i] = (targetObject);
 		}
 	}
 }
 
 void DroolRainEvent::EventUpdate(float dt) {
+
+	if(targetObjects_.empty()) {
+		EventInitialize();
+	}
 
 	dt;
 }

@@ -2,10 +2,12 @@
 
 #include "Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Engine/Foundation/Reflection/CalyxReflection.h"
 
 /// <summary>
 /// 地面から生えてくる歯のイベントクラス
 /// </summary>
+CALYX_OBJECT(Category = Event, DisplayName = "GroundSpikeEvent")
 class GroundSpikeEvent : public StageGimmickEventBase 
 {
 public:

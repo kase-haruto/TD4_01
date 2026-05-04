@@ -8,10 +8,25 @@
 #include <memory>
 #include <utility>
 
+#include <Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorEvent.h>
 #include <Engine/Objects/Event/Camera/CameraEventObject.h>
+#include <Game/StageGimmick/Gimmicks/DroolRain/DroolRainEvent.h>
+#include <Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeEvent.h>
+#include <Game/StageGimmick/Gimmicks/Projectile/ProjectileFireEvent.h>
 
 namespace CalyxEngine {
 	void RegisterGeneratedSceneObjects() {
+		{
+			SceneObjectClassDesc desc;
+			desc.typeName = "BreakableFloorEvent";
+			desc.displayName = "BreakableFloorEvent";
+			desc.objectType = ObjectType::Event;
+			desc.iconPath = "UI/Tool/event.png";
+			desc.placeable = true;
+			desc.ctor = std::make_unique<SceneCtor<BreakableFloorEvent>>();
+			SceneObjectRegistry::Get().Register(std::move(desc));
+		}
+
 		{
 			SceneObjectClassDesc desc;
 			desc.typeName = "CameraEventObject";
@@ -20,6 +35,39 @@ namespace CalyxEngine {
 			desc.iconPath = "UI/Tool/event.png";
 			desc.placeable = true;
 			desc.ctor = std::make_unique<SceneCtor<CameraEventObject>>();
+			SceneObjectRegistry::Get().Register(std::move(desc));
+		}
+
+		{
+			SceneObjectClassDesc desc;
+			desc.typeName = "DroolRainEvent";
+			desc.displayName = "DroolRainEvent";
+			desc.objectType = ObjectType::Event;
+			desc.iconPath = "UI/Tool/event.png";
+			desc.placeable = true;
+			desc.ctor = std::make_unique<SceneCtor<DroolRainEvent>>();
+			SceneObjectRegistry::Get().Register(std::move(desc));
+		}
+
+		{
+			SceneObjectClassDesc desc;
+			desc.typeName = "GroundSpikeEvent";
+			desc.displayName = "GroundSpikeEvent";
+			desc.objectType = ObjectType::Event;
+			desc.iconPath = "UI/Tool/event.png";
+			desc.placeable = true;
+			desc.ctor = std::make_unique<SceneCtor<GroundSpikeEvent>>();
+			SceneObjectRegistry::Get().Register(std::move(desc));
+		}
+
+		{
+			SceneObjectClassDesc desc;
+			desc.typeName = "ProjectileFireEvent";
+			desc.displayName = "ProjectileFireEvent";
+			desc.objectType = ObjectType::Event;
+			desc.iconPath = "UI/Tool/event.png";
+			desc.placeable = true;
+			desc.ctor = std::make_unique<SceneCtor<ProjectileFireEvent>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
 	}
