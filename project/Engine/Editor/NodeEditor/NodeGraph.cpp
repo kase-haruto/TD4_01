@@ -45,7 +45,7 @@ namespace CalyxEngine {
 		p.valueType = static_cast<NodeValueType>(j.value("valueType", 0));
 	}
 	void to_json(nlohmann::json& j, const Node& n) {
-		j = {{"id", n.id}, {"type", n.type}, {"title", n.title}, {"position", {n.position.x, n.position.y}}, {"inputs", n.inputs}, {"outputs", n.outputs}, {"floatValue", n.floatValue}, {"intValue", n.intValue}, {"colorValue", {n.colorValue.x, n.colorValue.y, n.colorValue.z, n.colorValue.w}}, {"boolValue", n.boolValue}};
+		j = {{"id", n.id}, {"type", n.type}, {"title", n.title}, {"position", {n.position.x, n.position.y}}, {"inputs", n.inputs}, {"outputs", n.outputs}, {"floatValue", n.floatValue}, {"intValue", n.intValue}, {"colorValue", {n.colorValue.x, n.colorValue.y, n.colorValue.z, n.colorValue.w}}, {"boolValue", n.boolValue}, {"properties", n.properties}};
 	}
 	void from_json(const nlohmann::json& j, Node& n) {
 		n.id = j.value("id", 0);
@@ -58,6 +58,7 @@ namespace CalyxEngine {
 		n.intValue = j.value("intValue", 0);
 		if(auto it = j.find("colorValue"); it != j.end() && it->is_array() && it->size() == 4) n.colorValue = {it->at(0).get<float>(), it->at(1).get<float>(), it->at(2).get<float>(), it->at(3).get<float>()};
 		n.boolValue = j.value("boolValue", false);
+		if(auto it = j.find("properties"); it != j.end() && it->is_object()) n.properties = *it;
 	}
 	void to_json(nlohmann::json& j, const NodeLink& l) { j = {{"id", l.id}, {"fromPinId", l.fromPinId}, {"toPinId", l.toPinId}}; }
 	void from_json(const nlohmann::json& j, NodeLink& l) {

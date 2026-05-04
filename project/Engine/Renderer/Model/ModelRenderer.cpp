@@ -247,7 +247,14 @@ ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticB
 		BaseModel* base = item.model;
 		if(!base || !base->GetModelData()) continue;
 		if(base->GetModelData() != model->GetModelData()) continue;
-		if(base->GetTexSrv().ptr != model->GetTexSrv().ptr) continue;
+		bool sameTextures = true;
+		for(size_t slot = 0; slot < BaseModel::kMaxTextureSlots; ++slot) {
+			if(base->GetTexSrv(slot).ptr != model->GetTexSrv(slot).ptr) {
+				sameTextures = false;
+				break;
+			}
+		}
+		if(!sameTextures) continue;
 		if(base->GetEnvMapSrv().ptr != model->GetEnvMapSrv().ptr) continue;
 		if(std::memcmp(&base->GetMaterialForBatch(), &model->GetMaterialForBatch(), sizeof(Material)) != 0) continue;
 
@@ -417,8 +424,11 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
 
 				model->BindMaterialCB(cmdList);
-				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
+				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(0));
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
+				cmdList->SetGraphicsRootDescriptorTable(12, model->GetTexSrv(1));
+				cmdList->SetGraphicsRootDescriptorTable(13, model->GetTexSrv(2));
+				cmdList->SetGraphicsRootDescriptorTable(14, model->GetTexSrv(3));
 
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				model->BindVertexIndexBuffers(cmdList);
@@ -475,8 +485,11 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
 
 				model->BindMaterialCB(cmdList);
-				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
+				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(0));
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
+				cmdList->SetGraphicsRootDescriptorTable(12, model->GetTexSrv(1));
+				cmdList->SetGraphicsRootDescriptorTable(13, model->GetTexSrv(2));
+				cmdList->SetGraphicsRootDescriptorTable(14, model->GetTexSrv(3));
 				model->SetCommandPalletSrv(7, cmdList);
 
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

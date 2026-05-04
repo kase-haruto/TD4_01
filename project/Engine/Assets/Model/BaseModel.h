@@ -21,6 +21,7 @@
 
 /* c++ */
 #include <d3d12.h>
+#include <array>
 #include <string>
 #include <optional>
 
@@ -31,6 +32,8 @@
  *---------------------------------------------------------------------------------------*/
 class BaseModel {
 public:
+	static constexpr size_t kMaxTextureSlots = BaseModelConfig::kMaxTextureSlots;
+
 	//===================================================================*/
 	//			public methods
 	//===================================================================*/
@@ -49,6 +52,7 @@ public:
 	BaseModelConfig ExtractConfig() const;
 	void ShowImGui(BaseModelConfig& config);
 	bool LoadTextureByGuid(const Guid& g);
+	bool LoadTextureSlotByGuid(size_t slot, const Guid& g);
 
 	//--------- accessor -----------------------------------------------------
 	BlendMode GetBlendMode() const { return blendMode_; }
@@ -76,6 +80,7 @@ public:
 	// レンダラーが使うハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInstanceSrv()const;  //< VS:t0 (gTransMat)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv()const;       //< PS:t0 (gTexture)
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv(size_t slot)const;
 	D3D12_GPU_DESCRIPTOR_HANDLE GetEnvMapSrv()const;    //< PS:t1 (gEnvironmentMap)
 	const Material& GetMaterialForBatch() const { return currentMaterial_; }
 
@@ -95,6 +100,7 @@ protected:
 	Material currentMaterial_{};
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle_{};
+	std::array<std::optional<D3D12_GPU_DESCRIPTOR_HANDLE>, kMaxTextureSlots> textureSlotHandles_{};
 
 	std::string fileName_;
 	std::string textureName_ = "textures/white1x1.dds"; // デフォルトのテクスチャ名
@@ -115,6 +121,7 @@ protected:
 
 protected:
 	Guid textureGuid_;
+	std::array<Guid, kMaxTextureSlots> textureGuids_{};
 	static const std::string directoryPath_;
 	bool isDrawEnable_ = true;
 
