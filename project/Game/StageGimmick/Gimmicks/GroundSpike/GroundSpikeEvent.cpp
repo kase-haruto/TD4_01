@@ -1,5 +1,6 @@
 #include "GroundSpikeEvent.h"
 
+#include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
@@ -44,10 +45,24 @@ void GroundSpikeEvent::EventInitialize() {
 	// 対応するオブジェクト名を作る
 	std::string targetName = objectPrefix + suffix;
 	// シーンから対応するオブジェクトを探す
-	targetObject_ =
-		SceneContext::Current()->FindObjectByName<GroundSpikeObject>(targetName);
+	auto object = SceneContext::Current()->FindObjectByName<GroundSpikeObject>(targetName);
+	if(object) {
+		targetObject_ = object;
+		return;
+	}
+	// シーンから対応するオブジェクトが無ければ生成する
+	targetObject_ = SceneAPI::Instantiate<GroundSpikeObject>("debugCube.obj", targetName);
+	targetObject_.lock()->SetParent(shared_from_this());
+	targetObject_.lock()->Initialize();
+	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;
+	targetObject_.lock()->GetWorldTransform().inheritScale = false;
 }
 
 void GroundSpikeEvent::EventUpdate(float dt) {
+
+	if(!targetObject_.lock()) {
+		EventInitialize();
+	}
+
 	dt;
 }

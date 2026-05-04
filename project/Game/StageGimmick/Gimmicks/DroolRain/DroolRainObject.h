@@ -32,6 +32,8 @@ protected:
 
 private:
 
+	float offsetY_ = 0.0f;
+
 	// 雨が降っているか
 	bool isRaining_ = false;
 };

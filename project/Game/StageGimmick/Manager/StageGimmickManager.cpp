@@ -10,11 +10,6 @@
 
 void StageGimmickManager::Initialize() {
 
-	// シーン内のギミックを再読み込みする
-	ReloadGimmicks("BreakableFloor");
-	ReloadGimmicks("GroundSpike");
-	ReloadGimmicks("DroolRain");
-	ReloadGimmicks("Projectile");
 }
 
 void StageGimmickManager::Update(float dt) {
@@ -23,14 +18,6 @@ void StageGimmickManager::Update(float dt) {
 
 void StageGimmickManager::ShowGui() {
 
-	ImGui::Begin("StageGimmickManager");
-
-	GimmickShowGui("BreakableFloor");
-	GimmickShowGui("GroundSpike");
-	GimmickShowGui("DroolRain");
-	GimmickShowGui("Projectile");
-	
-	ImGui::End();
 }
 
 void StageGimmickManager::GimmickShowGui(const std::string& gimmickName) {

@@ -1,5 +1,6 @@
 #include "ProjectileFireEvent.h"
 
+#include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
@@ -33,9 +34,9 @@ void ProjectileFireEvent::EventInitialize() {
 
 	std::string eventName = GetName();
 
-	const std::string eventPrefix  = "ProjectileEvent";
+	const std::string eventPrefix  = "ProjectileFireEvent";
 	const std::string objectPrefix = "ProjectileObject";
-	// イベント名が"ProjectileEvent"で始まっているか確認する
+	// イベント名が"ProjectileFireEvent"で始まっているか確認する
 	if(eventName.find(eventPrefix) != 0) {
 		return;
 	}
@@ -44,11 +45,24 @@ void ProjectileFireEvent::EventInitialize() {
 	// 対応するオブジェクト名を作る
 	std::string targetName = objectPrefix + suffix;
 	// シーンから対応するオブジェクトを探す
-	targetObject_ =
-		SceneContext::Current()->FindObjectByName<ProjectileObject>(targetName);
+	auto object = SceneContext::Current()->FindObjectByName<ProjectileObject>(targetName);
+	if(object) {
+		targetObject_ = object;
+		return;
+	}
+	// シーンから対応するオブジェクトが無ければ生成する
+	targetObject_ = SceneAPI::Instantiate<ProjectileObject>("debugCube.obj", targetName);
+	targetObject_.lock()->SetParent(shared_from_this());
+	targetObject_.lock()->Initialize();
+	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;
+	targetObject_.lock()->GetWorldTransform().inheritScale = false;
 }
 
 void ProjectileFireEvent::EventUpdate(float dt) {
+
+	if(!targetObject_.lock()) {
+		EventInitialize();
+	}
 
 	dt;
 }

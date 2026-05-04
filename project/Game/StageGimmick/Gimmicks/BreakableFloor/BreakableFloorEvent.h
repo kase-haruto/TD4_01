@@ -2,10 +2,12 @@
 
 #include "Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Engine/Foundation/Reflection/CalyxReflection.h"
 
 /// <summary>
 /// 壊れる床のイベントクラス
 /// </summary>
+CALYX_OBJECT(Category = Event, DisplayName = "BreakableFloorEvent")
 class BreakableFloorEvent : public StageGimmickEventBase
 {
 public:
