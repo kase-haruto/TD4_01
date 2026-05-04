@@ -4,7 +4,12 @@
 
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
 #include "Game\StageGimmick\Gimmicks\DroolRain\DroolRainObject.h"
+#include "Engine/Foundation/Reflection/CalyxReflection.h"
 
+/// <summary>
+/// よだれ雨のイベントクラス
+/// </summary>
+CALYX_OBJECT(Category = Event, DisplayName = "DroolRainEvent")
 class DroolRainEvent : public StageGimmickEventBase
 {
 public:

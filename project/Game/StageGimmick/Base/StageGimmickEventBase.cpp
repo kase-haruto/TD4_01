@@ -6,7 +6,6 @@ void StageGimmickEventBase::Initialize() {
 
 	// イベントオブジェの初期化
 	BaseEventObject::Initialize();
-	EventInitialize();
 }
 
 void StageGimmickEventBase::AlwaysUpdate(float dt) {

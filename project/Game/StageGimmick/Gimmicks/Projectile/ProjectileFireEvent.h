@@ -2,10 +2,12 @@
 
 #include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Engine/Foundation/Reflection/CalyxReflection.h"
 
 /// <summary>
 /// 飛んでくる弾のイベントクラス
 /// </summary>
+CALYX_OBJECT(Category = Event, DisplayName = "ProjectileFireEvent")
 class ProjectileFireEvent : public StageGimmickEventBase 
 {
 public:
