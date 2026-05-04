@@ -145,19 +145,32 @@ void BaseModel::ShowImGuiInterface() {
 
 void BaseModel::Draw(const WorldTransform& transform) {
 	if(!isDrawEnable_) return;
+	if(!modelData_) return;
+	if(!handle_) return;
 
 	ID3D12GraphicsCommandList* cmdList = GraphicsGroup::GetInstance()->GetCommandList().Get();
+	ID3D12Device*			   device  = GraphicsGroup::GetInstance()->GetDevice().Get();
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// マテリアル & 行列バッファをセット
+	std::vector<WorldTransform> singleTransform{transform};
+	EnsureInstanceCapacity(device, 1);
+	UploadInstanceMatrices(singleTransform);
+
+	GpuBillboardParams billboard{};
+	std::vector<GpuBillboardParams> singleBillboard{billboard};
+	EnsureBillboardCapacity(device, 1);
+	UploadBillboardParams(singleBillboard);
+
+	// マテリアル & インスタンス行列バッファをセット
 	materialBuffer_.SetCommand(cmdList, 0);
-	transform.SetCommand(cmdList, 1);
+	cmdList->SetGraphicsRootDescriptorTable(1, GetInstanceSrv());
 
 	cmdList->SetGraphicsRootDescriptorTable(2, handle_.value());
 
 	// 環境マップ
 	D3D12_GPU_DESCRIPTOR_HANDLE envMapHandle = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle();
 	cmdList->SetGraphicsRootDescriptorTable(6, envMapHandle);
+	cmdList->SetGraphicsRootDescriptorTable(7, GetBillboardSrv());
 
 	// 描画
 	cmdList->DrawIndexedInstanced(UINT(modelData_->meshResource.Indices().size()), 1, 0, 0, 0);
@@ -427,7 +440,7 @@ void BaseModel::TransferMaterial() {
 	auto am = CalyxEngine::AssetManager::GetInstance();
 	auto ma = am->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
 
-	Material data;
+	Material data{};
 	if (ma) {
 		data.color = ma->color;
 		data.lightingMode = ma->lightingMode;
@@ -451,6 +464,7 @@ void BaseModel::TransferMaterial() {
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 	data.uvTransform = uvTransformMatrix;
 
+	currentMaterial_ = data;
 	materialBuffer_.TransferData(data);
 }
 

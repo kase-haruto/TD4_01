@@ -42,12 +42,20 @@ private:
 	/* graphics =====================================================*/
 	std::unique_ptr<FogEffect>fog_ = nullptr;
 
+
 	/* objects ====================================================*/
 	std::shared_ptr<BaseGameObject> modelField_;
 	std::unique_ptr<Sprite> testSprite_;
 	std::shared_ptr<CalyxHuman> animationHuman_;
-	std::shared_ptr<DemoPlayer> player_;
+	std::shared_ptr<DemoPlayer>		player_;
 
+	bool isPaused_ = false;
+	std::unique_ptr<Sprite> pauseBg_ = nullptr;
+	std::unique_ptr<Sprite> resumeBtn_ = nullptr;
+	std::unique_ptr<Sprite> toSelectBtn_ = nullptr;
+	std::unique_ptr<Sprite> toTitleBtn_ = nullptr;
+
+	int selectedIndex_ = 0;
+	
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 };
-

@@ -21,7 +21,7 @@ namespace CalyxEngine {
 	void ShadowMapSystem::Render(
 		ID3D12GraphicsCommandList* cmdList,
 		PipelineService*           psoService,
-		ID3D12Device* /*device*/,
+		ID3D12Device*              device,
 		const std::unordered_map<BaseModel*,std::vector<WorldTransform>>&                   staticVisible,
 		const std::unordered_map<CalyxEngine::AnimationModel*,std::vector<WorldTransform>>& skinnedVisible) {
 		psoService->ResetState();
@@ -39,6 +39,9 @@ namespace CalyxEngine {
 				if(!model || !model->GetModelData()) { continue; }
 				if(tfs.empty()) { continue; }
 
+				const UINT instanceCount = static_cast<UINT>(tfs.size());
+				model->EnsureInstanceCapacity(device, instanceCount);
+				model->UploadInstanceMatrices(tfs);
 				cmdList->SetGraphicsRootDescriptorTable(1,model->GetInstanceSrv());
 
 				model->BindVertexIndexBuffers(cmdList);
@@ -46,7 +49,7 @@ namespace CalyxEngine {
 
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				cmdList->DrawIndexedInstanced(indexCount,(UINT)tfs.size(),0,0,0);
+				cmdList->DrawIndexedInstanced(indexCount,instanceCount,0,0,0);
 			}
 		}
 
@@ -59,8 +62,12 @@ namespace CalyxEngine {
 
 			for(const auto& [model, tfs] : skinnedVisible) {
 				if(!model || !model->GetModelData()) continue;
+				if(tfs.empty()) continue;
 
-				cmdList->SetGraphicsRootDescriptorTable(2,model->GetJointMatrixSrv());
+				const UINT instanceCount = static_cast<UINT>(tfs.size());
+				model->EnsureInstanceCapacity(device, instanceCount);
+				model->UploadInstanceMatrices(tfs);
+				cmdList->SetGraphicsRootDescriptorTable(1,model->GetInstanceSrv());
 
 				// skin pallet
 				model->SetCommandPalletSrv(2,cmdList);
@@ -68,12 +75,8 @@ namespace CalyxEngine {
 				model->BindVertexIndexBuffers(cmdList);
 				const UINT indexCount = (UINT)model->GetModelData()->meshResource.Indices().size();
 
-				for(const auto& tf : tfs) {
-					(void)tf;
-					tf.SetCommand(cmdList,1);
-					cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-					cmdList->DrawIndexedInstanced(indexCount,1,0,0,0);
-				}
+				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				cmdList->DrawIndexedInstanced(indexCount,instanceCount,0,0,0);
 			}
 		}
 

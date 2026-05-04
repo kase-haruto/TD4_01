@@ -25,6 +25,8 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 			j["guid"] = obj->GetGuid();
 			if (auto parent = obj->GetParent()){
 				j["parentGuid"] = parent->GetGuid();
+			} else {
+				j["parentGuid"] = Guid::Empty();
 			}
 			jArray.push_back(std::move(j));
 		}
@@ -61,6 +63,7 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 		Guid oldGuid = j.value("guid", Guid{});
 		Guid newGuid = Guid::New();
 		sp->SetGuid(newGuid);
+		sp->Initialize();
 
 		oldToNewGuid[oldGuid] = newGuid;
 		oldToObject[oldGuid] = sp;
@@ -83,7 +86,8 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 			auto parentSp = guidMap[newParentIt->second];
 			if (parentSp) {
 				// SetParent のみ（children_ は内部で処理される想定）
-				childSp->SetParent(parentSp);
+				auto& childTransform = childSp->GetWorldTransform();
+				childSp->SetParent(parentSp, childTransform.inheritScale);
 			}
 		}
 	}

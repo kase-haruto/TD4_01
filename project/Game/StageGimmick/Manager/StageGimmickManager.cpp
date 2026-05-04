@@ -82,7 +82,9 @@ void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
 		auto projectileEvent = SceneContext::Current()->FindObjectByName<ProjectileFireEvent>(targetName);
 		event  = projectileEvent;
 	}
-	event->Initialize();
+	if(event) {
+		event->Initialize();
+	}
 
 	// イベントが見つからなくなるまでループする
 	while(event) {

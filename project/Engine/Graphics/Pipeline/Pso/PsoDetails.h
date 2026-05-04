@@ -58,6 +58,7 @@ namespace PipelineTag {
 		ParticleInitializeCompute = 0,
 		ParticleEmitCompute,
 		ParticleUpdateCompute,
+		SkinningCompute,
 		kComputeCount
 	};
 } // namespace PipelineTag

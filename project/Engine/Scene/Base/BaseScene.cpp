@@ -18,10 +18,6 @@ BaseScene::BaseScene() {
 	spriteRenderer_	 = std::make_unique<SpriteRenderer>();
 	modelRenderer_	 = std::make_unique<ModelRenderer>();
 	outlineRenderer_ = std::make_unique<OutlineRenderer>();
-	shadowMapSystem_ = std::make_unique<CalyxEngine::ShadowMapSystem>();
-	shadowMapSystem_->Initialize(
-		GraphicsGroup::GetInstance()->GetDevice().Get(),
-		4096);
 }
 
 void BaseScene::Initialize() {}
@@ -77,51 +73,27 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 #endif
 	}
 
-	const Camera3d* cam = dynamic_cast<Camera3d*>(CameraManager::GetActive());
-	if(!cam) {
-		cam = CameraManager::GetMain3d();
+	const Camera3d* renderCam = dynamic_cast<Camera3d*>(CameraManager::GetActive());
+	if(!renderCam) {
+		renderCam = CameraManager::GetMain3d();
 	}
-	if(!cam) return;
-	modelRenderer_->PreCullAndBatch(cam);
+	if(!renderCam) return;
 
-	// =========================================================
-	//  ShadowPass
-	// =========================================================
-	{
-		auto* dirLight = sceneContext_->GetLightLibrary()->GetDirectionalLight();
-		if(dirLight) {
-			// シーン全体のAABBからシャドウマップの範囲を決定
-			shadowMapSystem_->UpdateShadowBounds(*cam, 500.0f, 10.0f);
-			dirLight->UpdateLightVP(shadowMapSystem_->GetShadowBounds().GetBounds());
-			shadowMapSystem_->SetLightVP(dirLight->GetLightVP());
-		}
-
-		// ShadowMap を作る
-		shadowMapSystem_->Render(
-			cmd,
-			pso,
-			GraphicsGroup::GetInstance()->GetDevice().Get(),
-			modelRenderer_->GetStaticVisible(),
-			modelRenderer_->GetSkinnedVisible());
+	const Camera3d* cullCam = CameraManager::GetMain3d();
+	if(!cullCam) {
+		cullCam = renderCam;
 	}
-
-	// =========================================================
-	// MainPass の前に、描画先(OM)を必ず復帰させる
-	// =========================================================
-	{
-		// RTV + DSV + Viewport を復帰
-		rt->SetRenderTarget(cmd);
-	}
+	modelRenderer_->PreCullAndBatch(cullCam);
 
 	// =========================================================
 	// MainPass
 	// =========================================================
-	// ===== ShadowMap を MainPass にバインド =====
+	rt->SetRenderTarget(cmd);
 	modelRenderer_->DrawAll(cmd,
 							GraphicsGroup::GetInstance()->GetDevice().Get(),
 							rt,
 							pso,
-							sceneContext_->GetLightLibrary(), shadowMapSystem_.get());
+							sceneContext_->GetLightLibrary(), nullptr);
 
 	// Particles
 	sceneContext_->GetFxSystem()->Render(pso, cmd);
@@ -131,7 +103,7 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 							 GraphicsGroup::GetInstance()->GetDevice().Get(),
 							 rt,
 							 pso,
-							 cam,
+							 renderCam,
 							 *modelRenderer_);
 
 #if defined(_DEBUG) || defined(DEVELOP)
@@ -140,7 +112,7 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 												   GraphicsGroup::GetInstance()->GetDevice().Get(),
 												   rt,
 												   pso,
-												   cam,
+												   renderCam,
 												   *modelRenderer_,
 												   sceneContext_->GetDebugSelectedObject());
 	}

@@ -13,6 +13,8 @@
 // scene
 #include "Engine/Scene/Test/TestScene.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
+#include "Game/Scene/Clear/ClearScene.h"
+#include "Game/Scene/Gameover/GameoverScene.h"
 
 
 #include <Engine/Editor/PickingPass.h>
@@ -34,6 +36,12 @@ namespace CalyxEngine {
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::TEST),
 				 std::make_unique<TestScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::CLEAR),
+				 std::make_unique<ClearScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::GAMEOVER),
+				 std::make_unique<GameoverScene>());
 
 		SetCurrent(idToIndex_.at(
 			GameSceneUtil::ToSceneId(SceneType::TEST)));
@@ -200,10 +208,6 @@ namespace CalyxEngine {
 			auto vp = debugRT->GetViewport();
 			pickingPass_->Resize(static_cast<int32_t>(vp.Width), static_cast<int32_t>(vp.Height));
 			if(auto* renderer = slots_[currentIdx_].scene->GetModelRenderer()) {
-				// ピッキングの前にデバッグカメラ視点でカリング結果を更新する
-				if(auto* debugCam = CameraManager::GetDebug()) {
-					renderer->PreCullAndBatch(debugCam);
-				}
 				pickingPass_->Render(cmd, renderer, pso);
 			}
 			debugRT->SetRenderTarget(cmd);
