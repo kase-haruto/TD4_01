@@ -10,15 +10,28 @@ DroolRainEvent::DroolRainEvent(const std::string& name) : StageGimmickEventBase(
 
 void DroolRainEvent::OnCollisionEnter(Collider* other) {
 
-	other;
-
 	// プレイヤー以外の衝突は無視する
 	if(other->GetType() != ColliderType::Type_Player) return;
+
+	// プレイヤーがイベント内に入ったら降らせる
+	for(auto& target : targetObjects_) {
+		if(auto lockedTarget = target.lock()) {
+			lockedTarget->SetIsRaining(true);
+		}
+	}
 }
 
 void DroolRainEvent::OnCollisionExit(Collider* other) {
 
-	other;
+	// プレイヤー以外の衝突は無視する
+	if(other->GetType() != ColliderType::Type_Player) return;
+
+	// プレイヤーがイベント内から出たら降らせるのをやめる
+	for(auto& target : targetObjects_) {
+		if(auto lockedTarget = target.lock()) {
+			lockedTarget->SetIsRaining(false);
+		}
+	}
 }
 
 void DroolRainEvent::SetTarget(const std::shared_ptr<DroolRainObject>& target) {

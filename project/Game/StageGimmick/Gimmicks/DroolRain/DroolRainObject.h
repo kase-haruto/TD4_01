@@ -18,6 +18,10 @@ public:
 		return "DroolRainObject";
 	}
 
+	void SetIsRaining(bool isRaining) {
+		isRaining_ = isRaining;
+	}
+
 protected:
 
 	// 初期化
@@ -28,4 +32,6 @@ protected:
 
 private:
 
+	// 雨が降っているか
+	bool isRaining_ = false;
 };

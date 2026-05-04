@@ -13,9 +13,26 @@ ProjectileObject::ProjectileObject(
 	: StageGimmickObjectBase(modelName, objectName) {
 }
 
+void ProjectileObject::OnCollisionEnter(Collider* other) {
+
+	// プレイヤー以外の衝突は無視する
+	if(other->GetType() != ColliderType::Type_Player) {
+		return;
+	}
+	// コライダーとモデルを無効化
+	isFlying_ = false;
+	if(collider_) {
+		collider_->SetCollisionEnabled(false);
+	}
+	if(model_) {
+		BaseGameObject::SetDrawEnable(false);
+	}
+}
+
 void ProjectileObject::ObjectInitialize() {
 
 	BaseGameObject::InitializeCollider(ColliderKind::Box);
+	isFlying_ = false;
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {

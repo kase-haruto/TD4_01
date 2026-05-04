@@ -21,6 +21,8 @@ public:
 	void SetIsFlying(bool isFlying) { isFlying_ = isFlying; }
 	void SetIsHoming(bool isHoming) { isHoming_ = isHoming; }
 
+	void OnCollisionEnter(Collider* other) override;
+
 protected:
 
 	// 初期化

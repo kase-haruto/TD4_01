@@ -18,6 +18,10 @@ void DroolRainObject::ObjectInitialize() {
 
 void DroolRainObject::ObjectUpdate(float dt) {
 
+	if(!isRaining_) {
+		return;
+	}
+
 	float y = worldTransform_.translation.y;
 	y -= 2.0f * dt;
 	worldTransform_.translation.y = y;

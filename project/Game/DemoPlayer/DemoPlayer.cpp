@@ -39,7 +39,7 @@ void DemoPlayer::Initialize() {
 
 	InitializeCollider(BaseGameObject::ColliderKind::Sphere);
 	collider_->SetType(ColliderType::Type_Player);
-	collider_->SetTargetType(ColliderType::Type_EventObject);
+	collider_->SetTargetType(ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
 }
 
 void DemoPlayer::Update(float dt) {
