@@ -275,14 +275,20 @@ void DemoPlayer::HammerControl(float dt) {
 				isRecovering_ = false;
 			}
 			// リカバリー中サイズ
-			hammer_->GetWorldTransform().scale = hammerInitialScale_;
+			CalyxEngine::Vector3 scaleMultiplier = CalyxEngine::Vector3::Lerp(param_.hammerSwingScale, {1.0f, 1.0f, 1.0f}, progress);
+
+			hammer_->GetWorldTransform().scale.x = hammerInitialScale_.x * scaleMultiplier.x;
+			hammer_->GetWorldTransform().scale.y = hammerInitialScale_.y * scaleMultiplier.y;
+			hammer_->GetWorldTransform().scale.z = hammerInitialScale_.z * scaleMultiplier.z;
 
 		} else if(isJumping_) {
 			if(isDiving_) {
 				// 急降下中は90度
 				hammerAngle = pi * 0.5f;
 				// 急降下中サイズ
-				hammer_->GetWorldTransform().scale = hammerInitialScale_;
+				hammer_->GetWorldTransform().scale.x = hammerInitialScale_.x * param_.hammerSwingScale.x;
+				hammer_->GetWorldTransform().scale.y = hammerInitialScale_.y * param_.hammerSwingScale.y;
+				hammer_->GetWorldTransform().scale.z = hammerInitialScale_.z * param_.hammerSwingScale.z;
 			} else {
 				// スイング中
 				if(jumpRotation_ <= pi / 6.0f) {

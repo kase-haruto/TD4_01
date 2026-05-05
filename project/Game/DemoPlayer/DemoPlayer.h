@@ -63,7 +63,7 @@ private:
 		CalyxEngine::Vector3 diveScale = {0.9f, 1.2f, 0.9f};
 		CalyxEngine::Vector3 landScale = {1.4f, 0.5f, 1.4f};
 
-		CalyxEngine::Vector3 hammerSwingScale = {2.0f, 2.0f, 2.0f};
+		CalyxEngine::Vector3 hammerSwingScale = {2.5f, 1.5f, 2.5f};
 
 		PlayerParameter() {
 			AddField("HP", playerHP).Category("Base Param");
