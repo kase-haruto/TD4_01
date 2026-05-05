@@ -6,7 +6,9 @@ public:
 	Stage() = default;
 	~Stage() = default;
 
-	void Update();
+	void Initialize(float hp,float limitTime);
+
+	void Update(float dt);
 
 	void TakeDamage(float damage);
 
