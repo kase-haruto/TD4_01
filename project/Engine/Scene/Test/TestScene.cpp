@@ -47,6 +47,9 @@ void TestScene::Initialize(){
 
 	LoadAssets();
 
+	stage_ = std::make_unique<Stage>();
+	stage_->Initialize(20.0f, 60.0f);
+
 	stageGimmickManager_ = std::make_unique<StageGimmickManager>();
 	stageGimmickManager_->Initialize();
 
@@ -135,6 +138,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 		return;
 	}
 
+	stage_->Update(dt);
 
 	stageGimmickManager_->ShowGui();
 	stageGimmickManager_->Update(dt);
@@ -148,6 +152,8 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	//========================================================//
 	//	spriteの登録
 	//========================================================//
+	stage_->Draw(spriteRenderer_.get());
+
 	if (isPaused_) {
 		spriteRenderer_->Register(pauseBg_.get());
 		spriteRenderer_->Register(resumeBtn_.get());
