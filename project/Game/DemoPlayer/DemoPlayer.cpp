@@ -47,6 +47,9 @@ void DemoPlayer::Initialize() {
 	targetScale_   = {1.0f, 1.0f, 1.0f};
 	scaleVelocity_ = {0.0f, 0.0f, 0.0f};
 
+	hammerTargetScale_	 = {1.0f, 1.0f, 1.0f};
+	hammerScaleVelocity_ = {0.0f, 0.0f, 0.0f};
+
 	InitializeCollider(ColliderKind::Box);
 	if(collider_) {
 		collider_->SetType(ColliderType::Type_Player);
@@ -71,6 +74,9 @@ void DemoPlayer::Update(float dt) {
 			if(auto h = std::dynamic_pointer_cast<DemoHammer>(child)) {
 				hammer_ = h;
 				firstSetting_ = false;
+				// 本来のサイズを保持
+				hammerInitialScale_ = hammer_->GetWorldTransform().scale;
+				hammerTargetScale_	= hammerInitialScale_;
 				break;
 			}
 		}
@@ -168,6 +174,14 @@ void DemoPlayer::Move(float dt) {
 			worldTransform_.scale = param_.jumpScale;
 			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
 
+			// ハンマーのサイズ（降り始めに最大化）
+			if(hammer_) {
+				hammer_->GetWorldTransform().scale.x = hammerInitialScale_.x * param_.hammerSwingScale.x;
+				hammer_->GetWorldTransform().scale.y = hammerInitialScale_.y * param_.hammerSwingScale.y;
+				hammer_->GetWorldTransform().scale.z = hammerInitialScale_.z * param_.hammerSwingScale.z;
+				hammerScaleVelocity_				 = {0.0f, 0.0f, 0.0f};
+			}
+
 			// 衝撃波を発生（ハンマー振り下ろし）
 			ShockwaveManager::GetInstance()->Emit(worldTransform_.translation, param_.defaultShockScale);
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
@@ -260,11 +274,17 @@ void DemoPlayer::HammerControl(float dt) {
 			if(progress >= 1.0f) {
 				isRecovering_ = false;
 			}
+			// リカバリー中サイズ
+			hammer_->GetWorldTransform().scale = hammerInitialScale_;
+
 		} else if(isJumping_) {
 			if(isDiving_) {
 				// 急降下中は90度
 				hammerAngle = pi * 0.5f;
+				// 急降下中サイズ
+				hammer_->GetWorldTransform().scale = hammerInitialScale_;
 			} else {
+				// スイング中
 				if(jumpRotation_ <= pi / 6.0f) {
 					float t		= jumpRotation_ / (pi / 6.0f);
 					hammerAngle = std::lerp(0.0f, pi * 0.5f, t);
@@ -273,8 +293,20 @@ void DemoPlayer::HammerControl(float dt) {
 				} else {
 					float t		= (jumpRotation_ - pi) / pi;
 					hammerAngle = std::lerp(pi * 0.5f, 0.0f, t);
+
+					// ジャンプの回転（pi〜2*pi）に合わせてサイズを戻す
+					// 0~piの時に最大（param_.hammerSwingScale）、2*piの時に元（1.0）
+					float				 scaleT			 = std::clamp((jumpRotation_ - pi) / (pi), 0.0f, 1.0f);
+					CalyxEngine::Vector3 scaleMultiplier = CalyxEngine::Vector3::Lerp(param_.hammerSwingScale, {1.0f, 1.0f, 1.0f}, scaleT);
+
+					hammer_->GetWorldTransform().scale.x = hammerInitialScale_.x * scaleMultiplier.x;
+					hammer_->GetWorldTransform().scale.y = hammerInitialScale_.y * scaleMultiplier.y;
+					hammer_->GetWorldTransform().scale.z = hammerInitialScale_.z * scaleMultiplier.z;
 				}
 			}
+		} else {
+			// 地面にいる時は初期サイズ
+			hammer_->GetWorldTransform().scale = hammerInitialScale_;
 		}
 
 		CalyxEngine::Vector3 swingAxis = CalyxEngine::Quaternion::RotateVector({1.0f, 0.0f, .0f}, worldTransform_.rotation);
