@@ -180,6 +180,20 @@ namespace CalyxEngine {
 	static inline void toLowerInplace(std::string& s) {
 		std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return (char)std::tolower(c); });
 	}
+
+	static bool HasExtension(const std::filesystem::path& path, const char* expectedExt) {
+		std::string ext = path.extension().string();
+		toLowerInplace(ext);
+		return ext == expectedExt;
+	}
+
+	static bool IsPngPreviewSidecar(const AssetRecord& rec) {
+		if(rec.type != AssetType::Texture || !HasExtension(rec.sourcePath, ".png")) return false;
+
+		std::filesystem::path ddsPath = rec.sourcePath;
+		ddsPath.replace_extension(".dds");
+		return std::filesystem::exists(ddsPath);
+	}
 	
 	void AssetPanel::DrawRightView() {
 		auto&		db	  = *AssetDatabase::GetInstance();
@@ -219,15 +233,9 @@ namespace CalyxEngine {
 			// 事前に現在フォルダ lower を1回だけ作る（IsInFolderの高速版）
 			std::string curFolderLower = NormalizeLower(currentFolderAbs_);
 
-			auto isLikelyNon2D = [](const std::filesystem::path& p) {
-				std::string ext = p.extension().string();
-				for(auto& c : ext) c = (char)std::tolower((unsigned char)c);
-				return (ext == ".dds");
-			};
-			(void)isLikelyNon2D; // 必要なら draw 側で再利用
-
 			for(auto* rec : items) {
 				if(!rec) continue;
+				if(IsPngPreviewSidecar(*rec)) continue;
 
 				// スコープ
 				if(scope_ == Scope::SelectedFolder) {
@@ -284,12 +292,6 @@ namespace CalyxEngine {
 		}
 
 		// --- ファイル（クリッピングあり）---
-		auto isLikelyNon2D = [](const std::filesystem::path& p) {
-			std::string ext = p.extension().string();
-			for(auto& c : ext) c = (char)std::tolower((unsigned char)c);
-			return (ext == ".dds");
-		};
-
 		if(!gridMode_) {
 			// List：1行=1アイテム → ListClipper で可視分のみ描画
 			ImGuiListClipper clip;
@@ -303,7 +305,7 @@ namespace CalyxEngine {
 					ImGui::BeginGroup();
 
 					ImTextureID thumb =
-						((rec->type == AssetType::Texture) && !isLikelyNon2D(rec->sourcePath) && rec->previewTex)
+						((rec->type == AssetType::Texture) && rec->previewTex)
 							? rec->previewTex
 							: (iconGeneric_ ? iconGeneric_ : nullptr);
 
@@ -351,9 +353,9 @@ namespace CalyxEngine {
 				ImGui::BeginGroup();
 
 				ImVec2		sz(thumbSize_, thumbSize_);
-				const bool	non2D = (rec->type == AssetType::Texture) && isLikelyNon2D(rec->sourcePath);
-				ImTextureID thumb = (!non2D && rec->previewTex) ? rec->previewTex
-																: (iconGeneric_ ? iconGeneric_ : nullptr);
+				ImTextureID thumb = ((rec->type == AssetType::Texture) && rec->previewTex)
+										 ? rec->previewTex
+										 : (iconGeneric_ ? iconGeneric_ : nullptr);
 
 				if(thumb)
 					ImGui::ImageButton("##thumb", thumb, sz);
