@@ -10,7 +10,7 @@
 
 namespace CalyxEngine {
 	enum class NodePinKind : int32_t { Input, Output };
-	enum class NodeValueType : int32_t { None, Float, Color, Bool, Int, Material };
+	enum class NodeValueType : int32_t { None, Float, Color, Bool, Int, Material, Texture2D };
 
 	struct NodePin {
 		int32_t id = 0;

@@ -69,6 +69,13 @@ namespace CalyxEngine {
 				drawList->AddPolyline(pts, 4, ToU32(outline), ImDrawFlags_Closed, 1.2f);
 				break;
 			}
+			case NodeValueType::Texture2D: {
+				const ImVec2 min(center.x - r - 1.0f, center.y - r - 1.0f);
+				const ImVec2 max(center.x + r + 1.0f, center.y + r + 1.0f);
+				drawList->AddRectFilled(min, max, ToU32(fill), 2.0f);
+				drawList->AddRect(min, max, ToU32(outline), 2.0f, 0, 1.4f);
+				break;
+			}
 			default:
 				drawList->AddCircleFilled(center, r, ToU32(fill), 18);
 				drawList->AddCircle(center, r + 1.5f, ToU32(outline), 18, 1.8f);
@@ -158,7 +165,8 @@ namespace CalyxEngine {
 	ImVec4 NodeEditorCanvas::GetNodeHeaderColor(const Node& node) const {
 		if(node.type == "Output") return ImVec4(0.16f, 0.31f, 0.47f, 1.0f);
 		if(node.type == "ToonMaster" || node.type == "LitMaster" || node.type == "UnlitMaster") return ImVec4(0.30f, 0.24f, 0.40f, 1.0f);
-		if(node.type == "Color" || node.type == "MultiplyColor") return ImVec4(0.38f, 0.30f, 0.13f, 1.0f);
+		if(node.type == "Color" || node.type == "MultiplyColor" || node.type == "LerpColor" || node.type == "TextureSample") return ImVec4(0.38f, 0.30f, 0.13f, 1.0f);
+		if(node.type == "ObjectTexture") return ImVec4(0.20f, 0.32f, 0.36f, 1.0f);
 		if(node.type == "LightingMode") return ImVec4(0.17f, 0.34f, 0.52f, 1.0f);
 		if(node.type == "Reflect") return ImVec4(0.20f, 0.38f, 0.35f, 1.0f);
 		if(node.type == "Shininess" || node.type == "Roughness" || node.type == "MultiplyFloat") return ImVec4(0.18f, 0.28f, 0.46f, 1.0f);
@@ -177,6 +185,8 @@ namespace CalyxEngine {
 			return ImVec4(0.34f, 0.86f, 0.42f, 1.0f);
 		case NodeValueType::Material:
 			return ImVec4(0.84f, 0.46f, 1.0f, 1.0f);
+		case NodeValueType::Texture2D:
+			return ImVec4(0.22f, 0.76f, 0.82f, 1.0f);
 		default:
 			return ImVec4(0.82f, 0.86f, 0.90f, 1.0f);
 		}

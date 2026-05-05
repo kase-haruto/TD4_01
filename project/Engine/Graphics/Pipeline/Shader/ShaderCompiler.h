@@ -2,7 +2,9 @@
 #include <cassert>
 #include <dxgi1_6.h>
 #include <d3d12.h>
+#include <d3d12shader.h>
 #include <dxcapi.h>
+#include <Engine/Graphics/MaterialGraph/ShaderReflectionInfo.h>
 #include <string>
 #include <wrl.h>
 #include <unordered_map>
@@ -27,12 +29,21 @@ public://メンバ関数
 		const std::wstring& filePath,
 		const wchar_t* profile);
 
+	 Microsoft::WRL::ComPtr<IDxcBlob> CompileSource(
+		const std::wstring& sourceName,
+		const std::string& source,
+		const wchar_t* profile);
+
 	 /// <summary>
 	 /// ファイル名またはサブディレクトリを含む相対パスからシェーダーをコンパイル
 	 /// 例: "Fragment.VS.hlsl" や "Skybox/Skybox.VS.hlsl"
 	 /// </summary>
 	 Microsoft::WRL::ComPtr<IDxcBlob> CompileShaderByName(
 		const std::wstring& shaderName,
+		const wchar_t* profile);
+
+	 CalyxEngine::ShaderReflectionInfo ReflectShader(
+		const std::wstring& filePath,
 		const wchar_t* profile);
 
 	void Compile(const std::wstring& filePath,

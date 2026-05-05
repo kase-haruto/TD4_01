@@ -4,11 +4,17 @@
 #include <Engine\Assets\Database\AssetDatabase.h>
 #include <Engine\Assets\Manager\AssetManager.h>
 #include <Engine\Graphics\MaterialGraph\MaterialGraphCompiler.h>
+#include <Engine\Graphics\MaterialGraph\ShaderGraphCodeGenerator.h>
+#include <Engine\Graphics\MaterialGraph\ShaderGraphSchema.h>
+#include <Engine\Graphics\MaterialGraph\ShaderGraphValidator.h>
+#include <Engine\Graphics\Pipeline\Shader\ShaderCompiler.h>
 #include <externals\imgui\imgui.h>
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 namespace CalyxEngine {
@@ -74,6 +80,28 @@ namespace CalyxEngine {
 			return std::any_of(material.graph.links.begin(), material.graph.links.end(), [pin](const NodeLink& link) {
 				return link.toPinId == pin->id;
 			});
+		}
+
+		const ShaderGraphNodeSchema* FindSchemaNode(const ShaderGraphSchema& schema, const std::string& type) {
+			for(const auto& node : schema.nodes) {
+				if(node.type == type) return &node;
+			}
+			return nullptr;
+		}
+
+		void EnsureSchemaPins(MaterialAsset& material, Node& node, const ShaderGraphNodeSchema& schemaNode) {
+			for(const auto& pinSchema : schemaNode.pins) {
+				auto& pins = pinSchema.role == ShaderGraphPinRole::Input ? node.inputs : node.outputs;
+				const auto exists = std::any_of(pins.begin(), pins.end(), [&pinSchema](const NodePin& pin) {
+					return pin.name == pinSchema.name;
+				});
+				if(exists) continue;
+				pins.push_back({
+					material.graph.AllocateId(),
+					pinSchema.name,
+					pinSchema.role == ShaderGraphPinRole::Input ? NodePinKind::Input : NodePinKind::Output,
+					pinSchema.valueType});
+			}
 		}
 
 		float GetFloatProperty(const Node& node, const char* key, float fallback) {
@@ -241,8 +269,63 @@ namespace CalyxEngine {
 		}
 		ImGui::SameLine();
 		if(ImGui::Button("Save", ImVec2(76.0f, 0.0f))) Save(material);
+		ImGui::SameLine();
+		if(ImGui::Button("Copy HLSL", ImVec2(96.0f, 0.0f))) {
+			const GeneratedShaderGraphCode generated = ShaderGraphCodeGenerator::GenerateObject3DMaterialFunction(material);
+			ImGui::SetClipboardText(generated.hlsl.c_str());
+			graphStatusMessage_ = "Copied generated material HLSL to clipboard.";
+			graphStatusIsError_ = false;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Compile HLSL", ImVec2(112.0f, 0.0f))) {
+			const GeneratedShaderGraphCode generated = ShaderGraphCodeGenerator::GeneratePreviewPixelShaderSource(material);
+			ShaderCompiler compiler;
+			compiler.InitializeDXC();
+			compiler.CompileSource(L"GeneratedMaterialPreview.PS.hlsl", generated.hlsl, L"ps_6_5");
+			graphStatusMessage_ = "Generated preview pixel shader compiled successfully.";
+			graphStatusIsError_ = false;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Build Runtime", ImVec2(116.0f, 0.0f))) {
+			MaterialGraphRuntimeShader shader = runtimeShaderCache_.GetOrCompileObject3DPixelShader(material);
+			std::ostringstream oss;
+			oss << "Runtime material shader " << (shader.cacheHit ? "cache hit" : "compiled")
+				<< ". Hash: " << shader.hash
+				<< ", cache entries: " << runtimeShaderCache_.Size() << ".";
+			graphStatusMessage_ = oss.str();
+			graphStatusIsError_ = shader.pixelShader == nullptr;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Validate Shader", ImVec2(124.0f, 0.0f))) {
+			ShaderCompiler compiler;
+			compiler.InitializeDXC();
+			const ShaderReflectionInfo reflection = compiler.ReflectShader(L"Resources/shaders/Core/Object3d.PS.hlsl", L"ps_6_5");
+			const ShaderGraphValidationResult validation = ShaderGraphValidator::ValidateObject3DMaterialShader(reflection);
+			if(validation.ok) {
+				std::ostringstream oss;
+				oss << "Object3D shader contract is valid. Resources: " << reflection.resources.size()
+					<< ", cbuffers: " << reflection.cbuffers.size() << ".";
+				graphStatusMessage_ = oss.str();
+				graphStatusIsError_ = false;
+			} else {
+				std::ostringstream oss;
+				oss << "Object3D shader contract validation failed:";
+				for(const std::string& message : validation.messages) {
+					oss << "\n- " << message;
+				}
+				graphStatusMessage_ = oss.str();
+				graphStatusIsError_ = true;
+			}
+		}
 		ImGui::PopStyleVar();
 		ImGui::Separator();
+		if(!graphStatusMessage_.empty()) {
+			const ImVec4 color = graphStatusIsError_ ? ImVec4(1.0f, 0.35f, 0.25f, 1.0f) : ImVec4(0.45f, 0.85f, 0.55f, 1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, color);
+			ImGui::TextWrapped("%s", graphStatusMessage_.c_str());
+			ImGui::PopStyleColor();
+			ImGui::Separator();
+		}
 	}
 
 	bool MaterialNodeEditorPanel::DrawAddNodeMenu(MaterialAsset& material, Vector2 position) {
@@ -308,13 +391,48 @@ namespace CalyxEngine {
 			}
 			ImGui::EndMenu();
 		}
+		if(ImGui::BeginMenu("Textures")) {
+			if(ImGui::MenuItem("Object Texture")) {
+				AddObjectTextureNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Texture Sample")) {
+				AddTextureSampleNode(material, position);
+				changed = true;
+			}
+			ImGui::EndMenu();
+		}
 		if(ImGui::BeginMenu("Operators")) {
+			if(ImGui::MenuItem("Add Float")) {
+				AddBinaryNode(material, "AddFloat", "Add Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Subtract Float")) {
+				AddBinaryNode(material, "SubtractFloat", "Subtract Float", NodeValueType::Float, position);
+				changed = true;
+			}
 			if(ImGui::MenuItem("Multiply Color")) {
 				AddBinaryNode(material, "MultiplyColor", "Multiply Color", NodeValueType::Color, position);
 				changed = true;
 			}
 			if(ImGui::MenuItem("Multiply Float")) {
 				AddBinaryNode(material, "MultiplyFloat", "Multiply Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Divide Float")) {
+				AddBinaryNode(material, "DivideFloat", "Divide Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Power Float")) {
+				AddBinaryNode(material, "PowerFloat", "Power Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Min Float")) {
+				AddBinaryNode(material, "MinFloat", "Min Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Max Float")) {
+				AddBinaryNode(material, "MaxFloat", "Max Float", NodeValueType::Float, position);
 				changed = true;
 			}
 			if(ImGui::MenuItem("Lerp Color")) {
@@ -342,6 +460,11 @@ namespace CalyxEngine {
 		}
 		if(ImGui::MenuItem("Toon Lighting##quick")) {
 			AddToonMasterNode(material, position);
+			changed = true;
+		}
+		if(ImGui::MenuItem("Texture Sample##quick")) {
+			AddObjectTextureNode(material, {position.x - 240.0f, position.y});
+			AddTextureSampleNode(material, position);
 			changed = true;
 		}
 		return changed;
@@ -662,14 +785,30 @@ namespace CalyxEngine {
 			} else {
 				ImGui::TextDisabled("%s", kLightingModes[LightingModeFromNodeType(node.type, 0)]);
 			}
+		} else if(node.type == "AddFloat") {
+			ImGui::TextDisabled("A + B");
+		} else if(node.type == "SubtractFloat") {
+			ImGui::TextDisabled("A - B");
 		} else if(node.type == "MultiplyColor" || node.type == "MultiplyFloat") {
 			ImGui::TextDisabled("A * B");
+		} else if(node.type == "DivideFloat") {
+			ImGui::TextDisabled("A / B");
+		} else if(node.type == "PowerFloat") {
+			ImGui::TextDisabled("pow(A, B)");
+		} else if(node.type == "MinFloat") {
+			ImGui::TextDisabled("min(A, B)");
+		} else if(node.type == "MaxFloat") {
+			ImGui::TextDisabled("max(A, B)");
 		} else if(node.type == "LerpColor" || node.type == "LerpFloat") {
 			ImGui::TextDisabled("lerp(A, B, T)");
 		} else if(node.type == "SaturateFloat") {
 			ImGui::TextDisabled("saturate(Value)");
 		} else if(node.type == "OneMinusFloat") {
 			ImGui::TextDisabled("1 - Value");
+		} else if(node.type == "ObjectTexture") {
+			ImGui::TextDisabled("Object gTexture");
+		} else if(node.type == "TextureSample") {
+			ImGui::TextDisabled("Sample Texture2D");
 		} else if(node.type == "Output") {
 			ImGui::TextUnformatted("Material Output");
 		}
@@ -787,6 +926,27 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddObjectTextureNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "ObjectTexture";
+		node.title	  = "Object Texture";
+		node.position = position;
+		node.outputs.push_back({material.graph.AllocateId(), "Texture", NodePinKind::Output, NodeValueType::Texture2D});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddTextureSampleNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "TextureSample";
+		node.title	  = "Texture Sample";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Texture", NodePinKind::Input, NodeValueType::Texture2D});
+		node.outputs.push_back({material.graph.AllocateId(), "Color", NodePinKind::Output, NodeValueType::Color});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position) {
 		Node node;
 		node.id		  = material.graph.AllocateId();
@@ -824,25 +984,12 @@ namespace CalyxEngine {
 	}
 
 	void MaterialNodeEditorPanel::EnsureOutputNode(MaterialAsset& material) {
+		const ShaderGraphSchema schema = ShaderGraphSchemas::Object3DMaterial();
+
 		for(auto& node : material.graph.nodes) {
-			if(node.type != "ToonMaster") continue;
-			auto ensureMasterInput = [&material, &node](const char* name, NodeValueType type) {
-				const auto exists = std::any_of(node.inputs.begin(), node.inputs.end(), [name](const NodePin& pin) {
-					return pin.name == name;
-				});
-				if(!exists) node.inputs.push_back({material.graph.AllocateId(), name, NodePinKind::Input, type});
-			};
-			ensureMasterInput("Base Color", NodeValueType::Color);
-			ensureMasterInput("Highlight", NodeValueType::Color);
-			ensureMasterInput("1st Shade", NodeValueType::Color);
-			ensureMasterInput("2nd Shade", NodeValueType::Color);
-			ensureMasterInput("Base Step", NodeValueType::Float);
-			ensureMasterInput("Base Feather", NodeValueType::Float);
-			ensureMasterInput("Shade Step", NodeValueType::Float);
-			ensureMasterInput("Shade Feather", NodeValueType::Float);
-			ensureMasterInput("Spec Threshold", NodeValueType::Float);
-			ensureMasterInput("Spec Softness", NodeValueType::Float);
-			ensureMasterInput("Spec Intensity", NodeValueType::Float);
+			if(const ShaderGraphNodeSchema* schemaNode = FindSchemaNode(schema, node.type)) {
+				EnsureSchemaPins(material, node, *schemaNode);
+			}
 		}
 
 		for(auto& node : material.graph.nodes) {
@@ -903,6 +1050,7 @@ namespace CalyxEngine {
 			const NodePin* fromPin	= material.graph.FindPin(link.fromPinId, &fromNode);
 			if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Color) return fallback;
 			if(fromNode->type == "Color") return fromNode->colorValue;
+			if(fromNode->type == "TextureSample") return {1, 1, 1, 1};
 			if(fromNode->type == "MultiplyColor") {
 				return EvaluateColor(material, fromNode->inputs[0].id, {1, 1, 1, 1}) *
 					   EvaluateColor(material, fromNode->inputs[1].id, {1, 1, 1, 1});
@@ -917,10 +1065,49 @@ namespace CalyxEngine {
 			const Node*	   fromNode = nullptr;
 			const NodePin* fromPin	= material.graph.FindPin(link.fromPinId, &fromNode);
 			if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Float) return fallback;
-			if(fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+			if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+			if(fromNode->type == "AddFloat") {
+				return EvaluateFloat(material, fromNode->inputs[0].id, 0.0f) +
+					   EvaluateFloat(material, fromNode->inputs[1].id, 0.0f);
+			}
+			if(fromNode->type == "SubtractFloat") {
+				return EvaluateFloat(material, fromNode->inputs[0].id, 0.0f) -
+					   EvaluateFloat(material, fromNode->inputs[1].id, 0.0f);
+			}
 			if(fromNode->type == "MultiplyFloat") {
 				return EvaluateFloat(material, fromNode->inputs[0].id, 1.0f) *
 					   EvaluateFloat(material, fromNode->inputs[1].id, 1.0f);
+			}
+			if(fromNode->type == "DivideFloat") {
+				const float b = EvaluateFloat(material, fromNode->inputs[1].id, 1.0f);
+				return EvaluateFloat(material, fromNode->inputs[0].id, fallback) / (std::abs(b) < 0.0001f ? 0.0001f : b);
+			}
+			if(fromNode->type == "PowerFloat") {
+				return std::pow(
+					std::max(EvaluateFloat(material, fromNode->inputs[0].id, 1.0f), 0.0f),
+					EvaluateFloat(material, fromNode->inputs[1].id, 1.0f));
+			}
+			if(fromNode->type == "MinFloat") {
+				return std::min(
+					EvaluateFloat(material, fromNode->inputs[0].id, fallback),
+					EvaluateFloat(material, fromNode->inputs[1].id, fallback));
+			}
+			if(fromNode->type == "MaxFloat") {
+				return std::max(
+					EvaluateFloat(material, fromNode->inputs[0].id, fallback),
+					EvaluateFloat(material, fromNode->inputs[1].id, fallback));
+			}
+			if(fromNode->type == "LerpFloat") {
+				const float a = EvaluateFloat(material, fromNode->inputs[0].id, fallback);
+				const float b = EvaluateFloat(material, fromNode->inputs[1].id, fallback);
+				const float t = std::clamp(EvaluateFloat(material, fromNode->inputs[2].id, 0.0f), 0.0f, 1.0f);
+				return a + (b - a) * t;
+			}
+			if(fromNode->type == "SaturateFloat") {
+				return std::clamp(EvaluateFloat(material, fromNode->inputs[0].id, fallback), 0.0f, 1.0f);
+			}
+			if(fromNode->type == "OneMinusFloat") {
+				return 1.0f - EvaluateFloat(material, fromNode->inputs[0].id, fallback);
 			}
 		}
 		return fallback;

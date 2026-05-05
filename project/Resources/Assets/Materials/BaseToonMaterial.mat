@@ -53,9 +53,19 @@
         "fromPinId": 38,
         "id": 42,
         "toPinId": 25
+      },
+      {
+        "fromPinId": 47,
+        "id": 51,
+        "toPinId": 49
+      },
+      {
+        "fromPinId": 50,
+        "id": 52,
+        "toPinId": 27
       }
     ],
-    "nextId": 46,
+    "nextId": 53,
     "nodes": [
       {
         "boolValue": false,
@@ -78,8 +88,8 @@
         "intValue": 0,
         "outputs": [],
         "position": [
-          1575.0,
-          416.0
+          2099.0,
+          437.0
         ],
         "properties": {},
         "title": "Output",
@@ -173,8 +183,8 @@
           }
         ],
         "position": [
-          1071.0,
-          104.0
+          1739.0,
+          93.0
         ],
         "properties": {
           "baseColor": [
@@ -211,6 +221,69 @@
         },
         "title": "Toon Master",
         "type": "ToonMaster"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 46,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 47,
+            "kind": 1,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "position": [
+          1205.0,
+          438.0
+        ],
+        "properties": {},
+        "title": "Object Texture",
+        "type": "ObjectTexture"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 48,
+        "inputs": [
+          {
+            "id": 49,
+            "kind": 0,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 50,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          1491.0,
+          437.0
+        ],
+        "properties": {},
+        "title": "Texture Sample",
+        "type": "TextureSample"
       }
     ]
   },

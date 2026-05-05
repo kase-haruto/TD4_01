@@ -9,6 +9,8 @@
 
 // std
 #include <array>
+#include <memory>
+#include <unordered_map>
 
 /* ========================================================================
 /*		パイプライン配膳サービス
@@ -80,6 +82,10 @@ public:
 	ID3D12RootSignature* GetRootSig(const GraphicsPipelineDesc& desc) { return library_->GetRoot(desc); }
 
 	PipelineSet		   GetPipelineSet(PipelineTag::Object tag, BlendMode blend = BlendMode::NORMAL) const;
+	PipelineSet		   GetGeneratedMaterialObjectPipelineSet(
+		BlendMode blend,
+		Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,
+		std::size_t shaderHash);
 	PipelineSet		   GetPipelineSet(PipelineTag::PostProcess tag) const;
 	const PipelineSet& GetComputePipelineSet(PipelineTag::Compute tag) const {
 		return csCache_[static_cast<size_t>(tag)];
@@ -94,6 +100,21 @@ public:
 	}
 
 private:
+	struct GeneratedMaterialPipelineKey {
+		BlendMode blend = BlendMode::NORMAL;
+		std::size_t shaderHash = 0;
+
+		bool operator==(const GeneratedMaterialPipelineKey& rhs) const {
+			return blend == rhs.blend && shaderHash == rhs.shaderHash;
+		}
+	};
+
+	struct GeneratedMaterialPipelineKeyHasher {
+		std::size_t operator()(const GeneratedMaterialPipelineKey& key) const {
+			return std::hash<int>()(static_cast<int>(key.blend)) ^ (key.shaderHash << 1);
+		}
+	};
+
 	//===================================================================*/
 	//		private variables
 	//===================================================================*/
@@ -105,6 +126,7 @@ private:
 	mutable ID3D12RootSignature* lastRootSignature_ = nullptr;
 
 	std::unordered_map<PipelineKey, PipelineSet, PipelineKeyHasher>					  objCache_;
+	std::unordered_map<GeneratedMaterialPipelineKey, std::unique_ptr<PipelineStateObject>, GeneratedMaterialPipelineKeyHasher> generatedMaterialPipelines_;
 	std::array<PipelineSet, static_cast<size_t>(PipelineTag::PostProcess::Count)>	  ppCache_{};
 	std::array<PipelineSet, static_cast<size_t>(PipelineTag::Compute::kComputeCount)> csCache_{};
 };
