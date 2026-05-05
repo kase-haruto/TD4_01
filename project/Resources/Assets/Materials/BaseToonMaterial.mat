@@ -17,28 +17,32 @@
       1.0,
       1.0
     ],
+    "toonBaseFeather": 0.17800000309944153,
+    "toonBaseStep": 0.7580000162124634,
     "toonEdgeSoftness": 0.19900000095367432,
     "toonHighlightColor": [
-      1.149999976158142,
-      1.100000023841858,
-      1.0,
+      1.0800000429153442,
+      1.059999942779541,
+      1.0199999809265137,
       1.0
     ],
     "toonMidShadowColor": [
-      0.3921568691730499,
-      0.42352941632270813,
-      0.529411792755127,
+      0.4156862795352936,
+      0.4000000059604645,
+      0.6549019813537598,
       1.0
     ],
+    "toonShadeFeather": 0.07199999690055847,
+    "toonShadeStep": 0.33399999141693115,
     "toonShadowColor": [
-      0.15294118225574493,
-      0.16862745583057404,
-      0.22745098173618317,
+      0.2078431397676468,
+      0.21568627655506134,
+      0.3686274588108063,
       1.0
     ],
-    "toonSpecularIntensity": 0.1340000033378601,
-    "toonSpecularSoftness": 0.05400000140070915,
-    "toonSpecularThreshold": 0.8539999723434448,
+    "toonSpecularIntensity": 0.6710000038146973,
+    "toonSpecularSoftness": 0.03500000014901161,
+    "toonSpecularThreshold": 0.9850000143051147,
     "toonThreshold1": 0.6169999837875366,
     "toonThreshold2": 0.18400000035762787,
     "toonThreshold3": 0.8199999928474426
@@ -46,27 +50,12 @@
   "graph": {
     "links": [
       {
-        "fromPinId": 14,
-        "id": 15,
-        "toPinId": 3
-      },
-      {
-        "fromPinId": 17,
-        "id": 18,
-        "toPinId": 5
-      },
-      {
-        "fromPinId": 20,
-        "id": 21,
-        "toPinId": 2
-      },
-      {
-        "fromPinId": 23,
-        "id": 24,
-        "toPinId": 6
+        "fromPinId": 38,
+        "id": 42,
+        "toPinId": 25
       }
     ],
-    "nextId": 25,
+    "nextId": 46,
     "nodes": [
       {
         "boolValue": false,
@@ -80,41 +69,17 @@
         "id": 1,
         "inputs": [
           {
-            "id": 2,
+            "id": 25,
             "kind": 0,
-            "name": "BaseColor",
-            "valueType": 2
-          },
-          {
-            "id": 3,
-            "kind": 0,
-            "name": "Shininess",
-            "valueType": 1
-          },
-          {
-            "id": 4,
-            "kind": 0,
-            "name": "Roughness",
-            "valueType": 1
-          },
-          {
-            "id": 5,
-            "kind": 0,
-            "name": "Reflect",
-            "valueType": 3
-          },
-          {
-            "id": 6,
-            "kind": 0,
-            "name": "Lighting Mode",
-            "valueType": 4
+            "name": "Surface",
+            "valueType": 5
           }
         ],
         "intValue": 0,
         "outputs": [],
         "position": [
-          965.0,
-          110.0
+          1575.0,
+          416.0
         ],
         "properties": {},
         "title": "Output",
@@ -128,141 +93,124 @@
           1.0,
           1.0
         ],
-        "floatValue": 20.639999389648438,
-        "id": 13,
-        "inputs": [],
-        "intValue": 0,
-        "outputs": [
+        "floatValue": 0.0,
+        "id": 26,
+        "inputs": [
           {
-            "id": 14,
-            "kind": 1,
-            "name": "Value",
+            "id": 27,
+            "kind": 0,
+            "name": "Base Color",
+            "valueType": 2
+          },
+          {
+            "id": 28,
+            "kind": 0,
+            "name": "Highlight",
+            "valueType": 2
+          },
+          {
+            "id": 29,
+            "kind": 0,
+            "name": "1st Shade",
+            "valueType": 2
+          },
+          {
+            "id": 30,
+            "kind": 0,
+            "name": "2nd Shade",
+            "valueType": 2
+          },
+          {
+            "id": 31,
+            "kind": 0,
+            "name": "Base Step",
+            "valueType": 1
+          },
+          {
+            "id": 32,
+            "kind": 0,
+            "name": "Base Feather",
+            "valueType": 1
+          },
+          {
+            "id": 33,
+            "kind": 0,
+            "name": "Shade Step",
+            "valueType": 1
+          },
+          {
+            "id": 34,
+            "kind": 0,
+            "name": "Shade Feather",
+            "valueType": 1
+          },
+          {
+            "id": 35,
+            "kind": 0,
+            "name": "Spec Threshold",
+            "valueType": 1
+          },
+          {
+            "id": 36,
+            "kind": 0,
+            "name": "Spec Softness",
+            "valueType": 1
+          },
+          {
+            "id": 37,
+            "kind": 0,
+            "name": "Spec Intensity",
             "valueType": 1
           }
         ],
-        "position": [
-          481.0,
-          119.0
-        ],
-        "properties": {},
-        "title": "Shininess",
-        "type": "Shininess"
-      },
-      {
-        "boolValue": false,
-        "colorValue": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "floatValue": 0.0,
-        "id": 16,
-        "inputs": [],
         "intValue": 0,
         "outputs": [
           {
-            "id": 17,
+            "id": 38,
             "kind": 1,
-            "name": "Value",
-            "valueType": 3
+            "name": "Surface",
+            "valueType": 5
           }
         ],
         "position": [
-          481.0,
-          263.0
-        ],
-        "properties": {},
-        "title": "Reflect",
-        "type": "Reflect"
-      },
-      {
-        "boolValue": false,
-        "colorValue": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "floatValue": 0.0,
-        "id": 19,
-        "inputs": [],
-        "intValue": 0,
-        "outputs": [
-          {
-            "id": 20,
-            "kind": 1,
-            "name": "Color",
-            "valueType": 2
-          }
-        ],
-        "position": [
-          498.0,
-          -41.0
-        ],
-        "properties": {},
-        "title": "Color",
-        "type": "Color"
-      },
-      {
-        "boolValue": false,
-        "colorValue": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "floatValue": 0.0,
-        "id": 22,
-        "inputs": [],
-        "intValue": 2,
-        "outputs": [
-          {
-            "id": 23,
-            "kind": 1,
-            "name": "Lighting",
-            "valueType": 4
-          }
-        ],
-        "position": [
-          409.0,
-          429.0
+          1071.0,
+          104.0
         ],
         "properties": {
-          "toonBaseColor": [
+          "baseColor": [
             1.0,
             1.0,
             1.0,
             1.0
           ],
-          "toonEdgeSoftness": 0.19900000095367432,
-          "toonHighlightColor": [
-            1.149999976158142,
-            1.100000023841858,
-            1.0,
+          "baseFeather": 0.17800000309944153,
+          "baseStep": 0.7580000162124634,
+          "firstShadeColor": [
+            0.4156862795352936,
+            0.4000000059604645,
+            0.6549019813537598,
             1.0
           ],
-          "toonMidShadowColor": [
-            0.3921568691730499,
-            0.42352941632270813,
-            0.529411792755127,
+          "highlightColor": [
+            1.0800000429153442,
+            1.059999942779541,
+            1.0199999809265137,
             1.0
           ],
-          "toonShadowColor": [
-            0.15294118225574493,
-            0.16862745583057404,
-            0.22745098173618317,
+          "secondShadeColor": [
+            0.2078431397676468,
+            0.21568627655506134,
+            0.3686274588108063,
             1.0
           ],
-          "toonSpecularIntensity": 0.1340000033378601,
-          "toonSpecularSoftness": 0.05400000140070915,
-          "toonSpecularThreshold": 0.8539999723434448,
-          "toonThreshold1": 0.6169999837875366,
-          "toonThreshold2": 0.18400000035762787,
-          "toonThreshold3": 0.8199999928474426
+          "shadeFeather": 0.07199999690055847,
+          "shadeStep": 0.33399999141693115,
+          "specularIntensity": 0.6710000038146973,
+          "specularSoftness": 0.03500000014901161,
+          "specularThreshold": 0.9850000143051147
         },
-        "title": "Toon Lighting",
-        "type": "ToonLighting"
+        "title": "Toon Master",
+        "type": "ToonMaster"
       }
     ]
   },

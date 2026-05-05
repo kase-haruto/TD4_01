@@ -3,6 +3,7 @@
 #include <Engine\Assets\DataAsset\MaterialAsset.h>
 #include <Engine\Assets\Database\AssetDatabase.h>
 #include <Engine\Assets\Manager\AssetManager.h>
+#include <Engine\Graphics\MaterialGraph\MaterialGraphCompiler.h>
 #include <externals\imgui\imgui.h>
 
 #include <algorithm>
@@ -34,6 +35,15 @@ namespace CalyxEngine {
 				   name == "Toon Spec Intensity";
 		}
 
+		bool IsLegacyOutputPin(const std::string& name) {
+			return name == "BaseColor" ||
+				   name == "Shininess" ||
+				   name == "Roughness" ||
+				   name == "Reflect" ||
+				   name == "Lighting Mode" ||
+				   IsObsoleteToonOutputPin(name);
+		}
+
 		bool IsLightingNode(const std::string& type) {
 			return type == "HalfLambertLighting" ||
 				   type == "LambertLighting" ||
@@ -49,6 +59,21 @@ namespace CalyxEngine {
 			if(type == "NoLighting") return 3;
 			if(type == "UnlitColorLighting") return 4;
 			return fallback;
+		}
+
+		const NodePin* FindInputPin(const Node& node, const char* name) {
+			for(const auto& pin : node.inputs) {
+				if(pin.name == name) return &pin;
+			}
+			return nullptr;
+		}
+
+		bool IsInputLinked(const MaterialAsset& material, const Node& node, const char* name) {
+			const NodePin* pin = FindInputPin(node, name);
+			if(!pin) return false;
+			return std::any_of(material.graph.links.begin(), material.graph.links.end(), [pin](const NodeLink& link) {
+				return link.toPinId == pin->id;
+			});
 		}
 
 		float GetFloatProperty(const Node& node, const char* key, float fallback) {
@@ -83,6 +108,20 @@ namespace CalyxEngine {
 			SetFloatProperty(node, "toonSpecularSoftness", 0.02f);
 			SetFloatProperty(node, "toonSpecularIntensity", 0.35f);
 		}
+
+		void SetDefaultToonMasterProperties(Node& node) {
+			SetColorProperty(node, "baseColor", {1, 1, 1, 1});
+			SetColorProperty(node, "highlightColor", {1.08f, 1.06f, 1.02f, 1.0f});
+			SetColorProperty(node, "firstShadeColor", {0.72f, 0.76f, 0.86f, 1.0f});
+			SetColorProperty(node, "secondShadeColor", {0.42f, 0.46f, 0.58f, 1.0f});
+			SetFloatProperty(node, "baseStep", 0.25f);
+			SetFloatProperty(node, "baseFeather", 0.03f);
+			SetFloatProperty(node, "shadeStep", -0.15f);
+			SetFloatProperty(node, "shadeFeather", 0.03f);
+			SetFloatProperty(node, "specularThreshold", 0.96f);
+			SetFloatProperty(node, "specularSoftness", 0.02f);
+			SetFloatProperty(node, "specularIntensity", 0.35f);
+		}
 	} // namespace
 
 	MaterialNodeEditorPanel::MaterialNodeEditorPanel()
@@ -116,7 +155,7 @@ namespace CalyxEngine {
 				DrawToolbar(*material);
 				if(canvas_.Draw(
 					   material->graph,
-					   [this](Node& node) { return DrawNodeBody(node); },
+					   [this, material](Node& node) { return DrawNodeBody(*material, node); },
 					   [this, material](const NodeEditorCanvas::ContextMenu& menu) { return DrawContextMenu(*material, menu); })) {
 					Evaluate(*material);
 				}
@@ -213,6 +252,10 @@ namespace CalyxEngine {
 				AddColorNode(material, position);
 				changed = true;
 			}
+			if(ImGui::MenuItem("Float")) {
+				AddFloatNode(material, "Float", "Float", position);
+				changed = true;
+			}
 			if(ImGui::MenuItem("Shininess")) {
 				AddFloatNode(material, "Shininess", "Shininess", position);
 				changed = true;
@@ -250,6 +293,21 @@ namespace CalyxEngine {
 			}
 			ImGui::EndMenu();
 		}
+		if(ImGui::BeginMenu("Master")) {
+			if(ImGui::MenuItem("Toon Master")) {
+				AddToonMasterNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lit Master")) {
+				AddLitMasterNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Unlit Master")) {
+				AddUnlitMasterNode(material, position);
+				changed = true;
+			}
+			ImGui::EndMenu();
+		}
 		if(ImGui::BeginMenu("Operators")) {
 			if(ImGui::MenuItem("Multiply Color")) {
 				AddBinaryNode(material, "MultiplyColor", "Multiply Color", NodeValueType::Color, position);
@@ -257,6 +315,22 @@ namespace CalyxEngine {
 			}
 			if(ImGui::MenuItem("Multiply Float")) {
 				AddBinaryNode(material, "MultiplyFloat", "Multiply Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lerp Color")) {
+				AddLerpNode(material, "LerpColor", "Lerp Color", NodeValueType::Color, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lerp Float")) {
+				AddLerpNode(material, "LerpFloat", "Lerp Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Saturate Float")) {
+				AddUnaryFloatNode(material, "SaturateFloat", "Saturate Float", position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("One Minus Float")) {
+				AddUnaryFloatNode(material, "OneMinusFloat", "One Minus Float", position);
 				changed = true;
 			}
 			ImGui::EndMenu();
@@ -267,7 +341,7 @@ namespace CalyxEngine {
 			changed = true;
 		}
 		if(ImGui::MenuItem("Toon Lighting##quick")) {
-			AddLightingNode(material, "ToonLighting", "Toon Lighting", 2, position);
+			AddToonMasterNode(material, position);
 			changed = true;
 		}
 		return changed;
@@ -405,15 +479,17 @@ namespace CalyxEngine {
 		ImGui::CloseCurrentPopup();
 	}
 
-	bool MaterialNodeEditorPanel::DrawNodeBody(Node& node) {
+	bool MaterialNodeEditorPanel::DrawNodeBody(MaterialAsset& material, Node& node) {
 		bool changed = false;
 		ImGui::PushID(node.id);
 		if(node.type == "Color") {
 			ImGui::SetNextItemWidth(188.0f);
 			changed |= ImGui::ColorEdit4("Color", &node.colorValue.x);
-		} else if(node.type == "Shininess" || node.type == "Roughness") {
+		} else if(node.type == "Float" || node.type == "Shininess" || node.type == "Roughness") {
 			ImGui::SetNextItemWidth(178.0f);
-			changed |= ImGui::DragFloat("Value", &node.floatValue, 0.01f, 0.0f, 256.0f);
+			const float minValue = node.type == "Float" ? -1000.0f : 0.0f;
+			const float maxValue = node.type == "Float" ? 1000.0f : 256.0f;
+			changed |= ImGui::DragFloat("Value", &node.floatValue, 0.01f, minValue, maxValue);
 		} else if(node.type == "Reflect") {
 			changed |= ImGui::Checkbox("Value", &node.boolValue);
 		} else if(node.type == "LightingMode") {
@@ -447,6 +523,68 @@ namespace CalyxEngine {
 				lightingModePopupPos_.x = popupPos.x;
 				lightingModePopupPos_.y = popupPos.y;
 			}
+		} else if(node.type == "ToonMaster") {
+			if(ImGui::Button("Reset Toon Master", ImVec2(188.0f, 0.0f))) {
+				SetDefaultToonMasterProperties(node);
+				changed = true;
+			}
+
+			Vector4 base = GetColorProperty(node, "baseColor", {1, 1, 1, 1});
+			Vector4 highlight = GetColorProperty(node, "highlightColor", {1.08f, 1.06f, 1.02f, 1.0f});
+			Vector4 firstShade = GetColorProperty(node, "firstShadeColor", {0.72f, 0.76f, 0.86f, 1.0f});
+			Vector4 secondShade = GetColorProperty(node, "secondShadeColor", {0.42f, 0.46f, 0.58f, 1.0f});
+			float baseStep = GetFloatProperty(node, "baseStep", 0.25f);
+			float baseFeather = GetFloatProperty(node, "baseFeather", 0.03f);
+			float shadeStep = GetFloatProperty(node, "shadeStep", -0.15f);
+			float shadeFeather = GetFloatProperty(node, "shadeFeather", 0.03f);
+			float specThreshold = GetFloatProperty(node, "specularThreshold", 0.96f);
+			float specSoftness = GetFloatProperty(node, "specularSoftness", 0.02f);
+			float specIntensity = GetFloatProperty(node, "specularIntensity", 0.35f);
+
+			auto drawColorFallback = [&](const char* pinName, const char* label, const char* property, Vector4& value) {
+				const bool linked = IsInputLinked(material, node, pinName);
+				ImGui::BeginDisabled(linked);
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4(label, &value.x)) {
+					SetColorProperty(node, property, value);
+					changed = true;
+				}
+				ImGui::EndDisabled();
+				if(linked) {
+					ImGui::SameLine();
+					ImGui::TextDisabled("Linked");
+				}
+			};
+			auto drawFloatFallback = [&](const char* pinName, const char* label, const char* property, float& value, float minValue, float maxValue) {
+				const bool linked = IsInputLinked(material, node, pinName);
+				ImGui::BeginDisabled(linked);
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat(label, &value, minValue, maxValue)) {
+					SetFloatProperty(node, property, value);
+					changed = true;
+				}
+				ImGui::EndDisabled();
+				if(linked) {
+					ImGui::SameLine();
+					ImGui::TextDisabled("Linked");
+				}
+			};
+
+			drawColorFallback("Base Color", "Base", "baseColor", base);
+			drawColorFallback("Highlight", "Highlight", "highlightColor", highlight);
+			drawColorFallback("1st Shade", "1st Shade", "firstShadeColor", firstShade);
+			drawColorFallback("2nd Shade", "2nd Shade", "secondShadeColor", secondShade);
+			drawFloatFallback("Base Step", "Base Step", "baseStep", baseStep, -1.0f, 1.0f);
+			drawFloatFallback("Base Feather", "Base Feather", "baseFeather", baseFeather, 0.0f, 0.25f);
+			drawFloatFallback("Shade Step", "Shade Step", "shadeStep", shadeStep, -1.0f, 1.0f);
+			drawFloatFallback("Shade Feather", "Shade Feather", "shadeFeather", shadeFeather, 0.0f, 0.25f);
+			drawFloatFallback("Spec Threshold", "Spec Threshold", "specularThreshold", specThreshold, 0.0f, 1.0f);
+			drawFloatFallback("Spec Softness", "Spec Softness", "specularSoftness", specSoftness, 0.0f, 0.25f);
+			drawFloatFallback("Spec Intensity", "Spec Intensity", "specularIntensity", specIntensity, 0.0f, 4.0f);
+		} else if(node.type == "LitMaster") {
+			ImGui::TextDisabled("Standard Lit Surface");
+		} else if(node.type == "UnlitMaster") {
+			ImGui::TextDisabled("Unlit Surface");
 		} else if(IsLightingNode(node.type)) {
 			if(node.type == "ToonLighting") {
 				if(ImGui::Button("Reset Toon Defaults", ImVec2(188.0f, 0.0f))) {
@@ -526,6 +664,12 @@ namespace CalyxEngine {
 			}
 		} else if(node.type == "MultiplyColor" || node.type == "MultiplyFloat") {
 			ImGui::TextDisabled("A * B");
+		} else if(node.type == "LerpColor" || node.type == "LerpFloat") {
+			ImGui::TextDisabled("lerp(A, B, T)");
+		} else if(node.type == "SaturateFloat") {
+			ImGui::TextDisabled("saturate(Value)");
+		} else if(node.type == "OneMinusFloat") {
+			ImGui::TextDisabled("1 - Value");
 		} else if(node.type == "Output") {
 			ImGui::TextUnformatted("Material Output");
 		}
@@ -550,7 +694,8 @@ namespace CalyxEngine {
 		node.type		= type;
 		node.title		= title;
 		node.position	= position;
-		node.floatValue = node.type == "Roughness" ? material.roughness : material.shininess;
+		if(node.type == "Float") node.floatValue = 0.0f;
+		else node.floatValue = node.type == "Roughness" ? material.roughness : material.shininess;
 		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float});
 		material.graph.nodes.push_back(std::move(node));
 	}
@@ -592,6 +737,56 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddToonMasterNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "ToonMaster";
+		node.title	  = "Toon Master";
+		node.position = position;
+		SetDefaultToonMasterProperties(node);
+		node.inputs.push_back({material.graph.AllocateId(), "Base Color", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Highlight", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "1st Shade", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "2nd Shade", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Base Step", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Base Feather", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Shade Step", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Shade Feather", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Spec Threshold", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Spec Softness", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Spec Intensity", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddLitMasterNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "LitMaster";
+		node.title	  = "Lit Master";
+		node.position = position;
+		node.properties["lightingMode"] = 0.0f;
+		node.properties["shininess"] = material.shininess;
+		node.properties["roughness"] = material.roughness;
+		node.inputs.push_back({material.graph.AllocateId(), "Base Color", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Shininess", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Roughness", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Reflect", NodePinKind::Input, NodeValueType::Bool});
+		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddUnlitMasterNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "UnlitMaster";
+		node.title	  = "Unlit Master";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Base Color", NodePinKind::Input, NodeValueType::Color});
+		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position) {
 		Node node;
 		node.id		  = material.graph.AllocateId();
@@ -604,19 +799,80 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddLerpNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = type;
+		node.title	  = title;
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "A", NodePinKind::Input, valueType});
+		node.inputs.push_back({material.graph.AllocateId(), "B", NodePinKind::Input, valueType});
+		node.inputs.push_back({material.graph.AllocateId(), "T", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Result", NodePinKind::Output, valueType});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddUnaryFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = type;
+		node.title	  = title;
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Result", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::EnsureOutputNode(MaterialAsset& material) {
 		for(auto& node : material.graph.nodes) {
+			if(node.type != "ToonMaster") continue;
+			auto ensureMasterInput = [&material, &node](const char* name, NodeValueType type) {
+				const auto exists = std::any_of(node.inputs.begin(), node.inputs.end(), [name](const NodePin& pin) {
+					return pin.name == name;
+				});
+				if(!exists) node.inputs.push_back({material.graph.AllocateId(), name, NodePinKind::Input, type});
+			};
+			ensureMasterInput("Base Color", NodeValueType::Color);
+			ensureMasterInput("Highlight", NodeValueType::Color);
+			ensureMasterInput("1st Shade", NodeValueType::Color);
+			ensureMasterInput("2nd Shade", NodeValueType::Color);
+			ensureMasterInput("Base Step", NodeValueType::Float);
+			ensureMasterInput("Base Feather", NodeValueType::Float);
+			ensureMasterInput("Shade Step", NodeValueType::Float);
+			ensureMasterInput("Shade Feather", NodeValueType::Float);
+			ensureMasterInput("Spec Threshold", NodeValueType::Float);
+			ensureMasterInput("Spec Softness", NodeValueType::Float);
+			ensureMasterInput("Spec Intensity", NodeValueType::Float);
+		}
+
+		for(auto& node : material.graph.nodes) {
 			if(node.type != "Output") continue;
-			std::vector<int32_t> removedPinIds;
-			for(const auto& pin : node.inputs) {
-				if(IsObsoleteToonOutputPin(pin.name)) {
-					removedPinIds.push_back(pin.id);
+			auto ensureInput = [&material, &node](const char* name, NodeValueType type) {
+				const auto exists = std::any_of(node.inputs.begin(), node.inputs.end(), [name](const NodePin& pin) {
+					return pin.name == name;
+				});
+				if(!exists) node.inputs.push_back({material.graph.AllocateId(), name, NodePinKind::Input, type});
+			};
+			ensureInput("Surface", NodeValueType::Material);
+
+			const auto surfaceIt = std::find_if(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
+				return pin.name == "Surface";
+			});
+			const bool hasSurfaceLink = surfaceIt != node.inputs.end() &&
+				std::any_of(material.graph.links.begin(), material.graph.links.end(), [&surfaceIt](const NodeLink& link) {
+					return link.toPinId == surfaceIt->id;
+				});
+
+			if(hasSurfaceLink) {
+				std::vector<int32_t> removedPinIds;
+				for(const auto& pin : node.inputs) {
+					if(IsLegacyOutputPin(pin.name)) {
+						removedPinIds.push_back(pin.id);
+					}
 				}
-			}
-			if(!removedPinIds.empty()) {
 				node.inputs.erase(
 					std::remove_if(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
-						return IsObsoleteToonOutputPin(pin.name);
+						return IsLegacyOutputPin(pin.name);
 					}),
 					node.inputs.end());
 				material.graph.links.erase(
@@ -625,13 +881,9 @@ namespace CalyxEngine {
 							   std::find(removedPinIds.begin(), removedPinIds.end(), link.fromPinId) != removedPinIds.end();
 					}),
 					material.graph.links.end());
+				return;
 			}
-			auto ensureInput = [&material, &node](const char* name, NodeValueType type) {
-				const auto exists = std::any_of(node.inputs.begin(), node.inputs.end(), [name](const NodePin& pin) {
-					return pin.name == name;
-				});
-				if(!exists) node.inputs.push_back({material.graph.AllocateId(), name, NodePinKind::Input, type});
-			};
+
 			ensureInput("Lighting Mode", NodeValueType::Int);
 			return;
 		}
@@ -640,11 +892,7 @@ namespace CalyxEngine {
 		node.type	  = "Output";
 		node.title	  = "Output";
 		node.position = {420.0f, 120.0f};
-		node.inputs.push_back({material.graph.AllocateId(), "BaseColor", NodePinKind::Input, NodeValueType::Color});
-		node.inputs.push_back({material.graph.AllocateId(), "Shininess", NodePinKind::Input, NodeValueType::Float});
-		node.inputs.push_back({material.graph.AllocateId(), "Roughness", NodePinKind::Input, NodeValueType::Float});
-		node.inputs.push_back({material.graph.AllocateId(), "Reflect", NodePinKind::Input, NodeValueType::Bool});
-		node.inputs.push_back({material.graph.AllocateId(), "Lighting Mode", NodePinKind::Input, NodeValueType::Int});
+		node.inputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Input, NodeValueType::Material});
 		material.graph.nodes.push_back(std::move(node));
 	}
 
@@ -719,34 +967,17 @@ namespace CalyxEngine {
 		material.toonThreshold2 = GetFloatProperty(node, "toonThreshold2", material.toonThreshold2);
 		material.toonThreshold3 = GetFloatProperty(node, "toonThreshold3", material.toonThreshold3);
 		material.toonEdgeSoftness = GetFloatProperty(node, "toonEdgeSoftness", material.toonEdgeSoftness);
+		material.toonShadeStep = material.toonThreshold1;
+		material.toonShadeFeather = material.toonEdgeSoftness;
+		material.toonBaseStep = material.toonThreshold2;
+		material.toonBaseFeather = material.toonEdgeSoftness;
 		material.toonSpecularThreshold = GetFloatProperty(node, "toonSpecularThreshold", material.toonSpecularThreshold);
 		material.toonSpecularSoftness = GetFloatProperty(node, "toonSpecularSoftness", material.toonSpecularSoftness);
 		material.toonSpecularIntensity = GetFloatProperty(node, "toonSpecularIntensity", material.toonSpecularIntensity);
 	}
 
 	void MaterialNodeEditorPanel::Evaluate(MaterialAsset& material) {
-		for(const auto& node : material.graph.nodes) {
-			if(node.type != "Output") continue;
-			for(const auto& pin : node.inputs) {
-				if(pin.name == "BaseColor") material.color = EvaluateColor(material, pin.id, material.color);
-				if(pin.name == "Shininess") material.shininess = EvaluateFloat(material, pin.id, material.shininess);
-				if(pin.name == "Roughness") material.roughness = EvaluateFloat(material, pin.id, material.roughness);
-				if(pin.name == "Reflect") material.isReflect = EvaluateBool(material, pin.id, material.isReflect);
-				if(pin.name == "Lighting Mode") {
-					material.lightingMode = EvaluateInt(material, pin.id, material.lightingMode);
-					for(const auto& link : material.graph.links) {
-						if(link.toPinId != pin.id) continue;
-						const Node* fromNode = nullptr;
-						material.graph.FindPin(link.fromPinId, &fromNode);
-						if(fromNode) {
-							ApplyToonLightingNode(material, *fromNode);
-						}
-						break;
-					}
-				}
-			}
-			return;
-		}
+		MaterialGraphCompiler::Compile(material);
 	}
 
 	void MaterialNodeEditorPanel::Save(MaterialAsset& material) {

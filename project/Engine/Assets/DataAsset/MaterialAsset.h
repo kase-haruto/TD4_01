@@ -20,7 +20,7 @@ namespace CalyxEngine {
 
 		// --- Parameters ---
 		Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		int32_t lightingMode = 0; // Default to Toon (as previously requested)
+		int32_t lightingMode = 0;
 		float   shininess = 20.0f;
 		bool    isReflect = false;
 		float   envirometCoefficient = 0.5f;
@@ -29,6 +29,10 @@ namespace CalyxEngine {
 		Vector4 toonBaseColor = {1.0f, 1.0f, 1.0f, 1.0f};
 		Vector4 toonMidShadowColor = {0.72f, 0.76f, 0.86f, 1.0f};
 		Vector4 toonShadowColor = {0.42f, 0.46f, 0.58f, 1.0f};
+		float   toonBaseStep = 0.25f;
+		float   toonBaseFeather = 0.03f;
+		float   toonShadeStep = -0.15f;
+		float   toonShadeFeather = 0.03f;
 		float   toonThreshold1 = -0.15f;
 		float   toonThreshold2 = 0.25f;
 		float   toonThreshold3 = 0.82f;

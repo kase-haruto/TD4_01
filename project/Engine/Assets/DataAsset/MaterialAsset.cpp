@@ -19,6 +19,10 @@ namespace CalyxEngine {
 		AddField("toonBaseColor", toonBaseColor);
 		AddField("toonMidShadowColor", toonMidShadowColor);
 		AddField("toonShadowColor", toonShadowColor);
+		AddField("toonBaseStep", toonBaseStep);
+		AddField("toonBaseFeather", toonBaseFeather);
+		AddField("toonShadeStep", toonShadeStep);
+		AddField("toonShadeFeather", toonShadeFeather);
 		AddField("toonThreshold1", toonThreshold1);
 		AddField("toonThreshold2", toonThreshold2);
 		AddField("toonThreshold3", toonThreshold3);

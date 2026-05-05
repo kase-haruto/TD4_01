@@ -486,10 +486,10 @@ void BaseModel::TransferMaterial() {
 		data.toonBaseColor = ma->toonBaseColor;
 		data.toonMidShadowColor = ma->toonMidShadowColor;
 		data.toonShadowColor = ma->toonShadowColor;
-		data.toonThreshold1 = ma->toonThreshold1;
-		data.toonThreshold2 = ma->toonThreshold2;
-		data.toonThreshold3 = ma->toonThreshold3;
-		data.toonEdgeSoftness = ma->toonEdgeSoftness;
+		data.toonBaseStep = ma->toonBaseStep;
+		data.toonBaseFeather = ma->toonBaseFeather;
+		data.toonShadeStep = ma->toonShadeStep;
+		data.toonShadeFeather = ma->toonShadeFeather;
 		data.toonSpecularThreshold = ma->toonSpecularThreshold;
 		data.toonSpecularSoftness = ma->toonSpecularSoftness;
 		data.toonSpecularIntensity = ma->toonSpecularIntensity;

@@ -4,20 +4,15 @@ float ToonBand(float value, float threshold, float softness) {
 }
 
 float3 EvaluateToonRamp(float ndotl, float3 albedo) {
-    float t1 = min(gMaterial.toonThreshold1, min(gMaterial.toonThreshold2, gMaterial.toonThreshold3));
-    float t3 = max(gMaterial.toonThreshold1, max(gMaterial.toonThreshold2, gMaterial.toonThreshold3));
-    float t2 = gMaterial.toonThreshold1 + gMaterial.toonThreshold2 + gMaterial.toonThreshold3 - t1 - t3;
-    float softness = gMaterial.toonEdgeSoftness;
+    float shadeStep = min(gMaterial.toonShadeStep, gMaterial.toonBaseStep);
+    float baseStep = max(gMaterial.toonShadeStep, gMaterial.toonBaseStep);
 
     float3 shadow = albedo * gMaterial.toonShadowColor.rgb;
     float3 midShadow = albedo * gMaterial.toonMidShadowColor.rgb;
     float3 base = albedo * gMaterial.toonBaseColor.rgb;
-    float3 highlight = albedo * gMaterial.toonHighlightColor.rgb;
 
-    float3 ramp = lerp(shadow, midShadow, ToonBand(ndotl, t1, softness));
-    ramp = lerp(ramp, base, ToonBand(ndotl, t2, softness));
-    ramp = lerp(ramp, highlight, ToonBand(ndotl, t3, softness));
-    return ramp;
+    float3 shadeRamp = lerp(shadow, midShadow, ToonBand(ndotl, shadeStep, gMaterial.toonShadeFeather));
+    return lerp(shadeRamp, base, ToonBand(ndotl, baseStep, gMaterial.toonBaseFeather));
 }
 
 float EvaluateToonSpecular(float ndoth) {
@@ -44,7 +39,7 @@ void ComputeToonDirectionalLight(
     float NdotH = saturate(dot(normal, H));
     
     float toonSpecular = EvaluateToonSpecular(NdotH);
-    specular = gDirectionalLight.color.rgb * toonSpecular * gDirectionalLight.intensity;
+    specular = gDirectionalLight.color.rgb * gMaterial.toonHighlightColor.rgb * toonSpecular * gDirectionalLight.intensity;
 }
 
 void ComputeToonPointLight(
@@ -72,5 +67,5 @@ void ComputeToonPointLight(
     float  NdotH   = saturate(dot(normal, halfVec));
     float toonSpecular = EvaluateToonSpecular(NdotH);
 
-    specular = gPointLight.color.rgb * toonSpecular * gPointLight.intensity * attenuation;
+    specular = gPointLight.color.rgb * gMaterial.toonHighlightColor.rgb * toonSpecular * gPointLight.intensity * attenuation;
 }

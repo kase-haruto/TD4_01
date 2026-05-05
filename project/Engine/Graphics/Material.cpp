@@ -5,6 +5,8 @@
 
 #include <externals/imgui/imgui.h>
 
+#include <algorithm>
+
 void Material::ApplyConfig(const MaterialConfig& config) {
 	color                 = config.color;
 	lightingMode          = config.enableLighting;
@@ -16,10 +18,10 @@ void Material::ApplyConfig(const MaterialConfig& config) {
     toonBaseColor         = config.toonBaseColor;
     toonMidShadowColor    = config.toonMidShadowColor;
     toonShadowColor       = config.toonShadowColor;
-    toonThreshold1        = config.toonThreshold1;
-    toonThreshold2        = config.toonThreshold2;
-    toonThreshold3        = config.toonThreshold3;
-    toonEdgeSoftness      = config.toonEdgeSoftness;
+    toonBaseStep          = config.toonBaseStep;
+    toonBaseFeather       = config.toonBaseFeather;
+    toonShadeStep         = config.toonShadeStep;
+    toonShadeFeather      = config.toonShadeFeather;
     toonSpecularThreshold = config.toonSpecularThreshold;
     toonSpecularSoftness  = config.toonSpecularSoftness;
     toonSpecularIntensity = config.toonSpecularIntensity;
@@ -38,10 +40,14 @@ MaterialConfig Material::ExtractConfig() const {
     config.toonBaseColor         = toonBaseColor;
     config.toonMidShadowColor    = toonMidShadowColor;
     config.toonShadowColor       = toonShadowColor;
-    config.toonThreshold1        = toonThreshold1;
-    config.toonThreshold2        = toonThreshold2;
-    config.toonThreshold3        = toonThreshold3;
-    config.toonEdgeSoftness      = toonEdgeSoftness;
+    config.toonBaseStep          = toonBaseStep;
+    config.toonBaseFeather       = toonBaseFeather;
+    config.toonShadeStep         = toonShadeStep;
+    config.toonShadeFeather      = toonShadeFeather;
+    config.toonThreshold1        = toonShadeStep;
+    config.toonThreshold2        = toonBaseStep;
+    config.toonThreshold3        = 0.82f;
+    config.toonEdgeSoftness      = std::max(toonShadeFeather, toonBaseFeather);
     config.toonSpecularThreshold = toonSpecularThreshold;
     config.toonSpecularSoftness  = toonSpecularSoftness;
     config.toonSpecularIntensity = toonSpecularIntensity;
@@ -89,10 +95,10 @@ void Material::ShowImGui() {
         GuiCmd::ColorEdit4("base ramp", toonBaseColor);
         GuiCmd::ColorEdit4("mid shadow", toonMidShadowColor);
         GuiCmd::ColorEdit4("shadow", toonShadowColor);
-        GuiCmd::SliderFloat("threshold 1", toonThreshold1, -1.0f, 1.0f);
-        GuiCmd::SliderFloat("threshold 2", toonThreshold2, -1.0f, 1.0f);
-        GuiCmd::SliderFloat("threshold 3", toonThreshold3, -1.0f, 1.0f);
-        GuiCmd::SliderFloat("edge softness", toonEdgeSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("base step", toonBaseStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("base feather", toonBaseFeather, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("shade step", toonShadeStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("shade feather", toonShadeFeather, 0.0f, 0.25f);
         GuiCmd::SliderFloat("specular threshold", toonSpecularThreshold, 0.0f, 1.0f);
         GuiCmd::SliderFloat("specular softness", toonSpecularSoftness, 0.0f, 0.25f);
         GuiCmd::SliderFloat("specular intensity", toonSpecularIntensity, 0.0f, 4.0f);
@@ -124,10 +130,10 @@ void Material::ShowImGui(MaterialConfig& config) {
         GuiCmd::ColorEdit4("base ramp", config.toonBaseColor);
         GuiCmd::ColorEdit4("mid shadow", config.toonMidShadowColor);
         GuiCmd::ColorEdit4("shadow", config.toonShadowColor);
-        GuiCmd::SliderFloat("threshold 1", config.toonThreshold1, -1.0f, 1.0f);
-        GuiCmd::SliderFloat("threshold 2", config.toonThreshold2, -1.0f, 1.0f);
-        GuiCmd::SliderFloat("threshold 3", config.toonThreshold3, -1.0f, 1.0f);
-        GuiCmd::SliderFloat("edge softness", config.toonEdgeSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("base step", config.toonBaseStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("base feather", config.toonBaseFeather, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("shade step", config.toonShadeStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("shade feather", config.toonShadeFeather, 0.0f, 0.25f);
         GuiCmd::SliderFloat("specular threshold", config.toonSpecularThreshold, 0.0f, 1.0f);
         GuiCmd::SliderFloat("specular softness", config.toonSpecularSoftness, 0.0f, 0.25f);
         GuiCmd::SliderFloat("specular intensity", config.toonSpecularIntensity, 0.0f, 4.0f);

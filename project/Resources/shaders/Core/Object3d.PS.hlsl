@@ -17,10 +17,10 @@ struct Material {
     float4 toonBaseColor;
     float4 toonMidShadowColor;
     float4 toonShadowColor;
-    float toonThreshold1;
-    float toonThreshold2;
-    float toonThreshold3;
-    float toonEdgeSoftness;
+    float toonBaseStep;
+    float toonBaseFeather;
+    float toonShadeStep;
+    float toonShadeFeather;
     float toonSpecularThreshold;
     float toonSpecularSoftness;
     float toonSpecularIntensity;
