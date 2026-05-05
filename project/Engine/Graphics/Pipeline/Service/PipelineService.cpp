@@ -158,6 +158,47 @@ PipelineSet PipelineService::GetPipelineSet(PipelineTag::Object tag, BlendMode b
 	return {};
 }
 
+PipelineSet PipelineService::GetGeneratedMaterialObjectPipelineSet(
+	BlendMode blend,
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,
+	std::size_t shaderHash) {
+	GeneratedMaterialPipelineKey key{PipelineTag::Object::Object3d, blend, shaderHash};
+	auto it = generatedMaterialPipelines_.find(key);
+	if(it != generatedMaterialPipelines_.end()) {
+		return {
+			it->second->GetPipelineState().Get(),
+			it->second->GetRootSignature().Get()};
+	}
+
+	GraphicsPipelineDesc desc = PipelinePresets::MakeObject3D(blend);
+	auto pipeline = factory_->CreateWithPixelShaderBlob(desc, pixelShader);
+	PipelineSet set{
+		pipeline->GetPipelineState().Get(),
+		pipeline->GetRootSignature().Get()};
+	generatedMaterialPipelines_[key] = std::move(pipeline);
+	return set;
+}
+
+PipelineSet PipelineService::GetGeneratedMaterialSkinnedPipelineSet(
+	BlendMode blend,
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,
+	std::size_t shaderHash) {
+	GeneratedMaterialPipelineKey key{PipelineTag::Object::SkinningObject3D, blend, shaderHash};
+	auto it = generatedMaterialPipelines_.find(key);
+	if(it != generatedMaterialPipelines_.end()) {
+		return {
+			it->second->GetPipelineState().Get(),
+			it->second->GetRootSignature().Get()};
+	}
+
+	GraphicsPipelineDesc desc = PipelinePresets::MakeSkinningObject3D(blend);
+	auto pipeline = factory_->CreateWithPixelShaderBlob(desc, pixelShader);
+	PipelineSet set{
+		pipeline->GetPipelineState().Get(),
+		pipeline->GetRootSignature().Get()};
+	generatedMaterialPipelines_[key] = std::move(pipeline);
+	return set;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //		pso取得(ポストプロセス

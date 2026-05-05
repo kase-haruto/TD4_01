@@ -27,16 +27,16 @@
       1.0
     ],
     "toonMidShadowColor": [
-      0.4156862795352936,
-      0.4000000059604645,
+      0.25882354378700256,
+      0.2980392277240753,
       0.6549019813537598,
       1.0
     ],
     "toonShadeFeather": 0.07199999690055847,
     "toonShadeStep": 0.33399999141693115,
     "toonShadowColor": [
-      0.2078431397676468,
-      0.21568627655506134,
+      0.11372549086809158,
+      0.1568627506494522,
       0.3686274588108063,
       1.0
     ],
@@ -53,9 +53,19 @@
         "fromPinId": 38,
         "id": 42,
         "toPinId": 25
+      },
+      {
+        "fromPinId": 47,
+        "id": 51,
+        "toPinId": 49
+      },
+      {
+        "fromPinId": 50,
+        "id": 52,
+        "toPinId": 27
       }
     ],
-    "nextId": 46,
+    "nextId": 54,
     "nodes": [
       {
         "boolValue": false,
@@ -78,8 +88,8 @@
         "intValue": 0,
         "outputs": [],
         "position": [
-          1575.0,
-          416.0
+          2099.0,
+          437.0
         ],
         "properties": {},
         "title": "Output",
@@ -173,8 +183,8 @@
           }
         ],
         "position": [
-          1071.0,
-          104.0
+          1739.0,
+          93.0
         ],
         "properties": {
           "baseColor": [
@@ -186,8 +196,8 @@
           "baseFeather": 0.17800000309944153,
           "baseStep": 0.7580000162124634,
           "firstShadeColor": [
-            0.4156862795352936,
-            0.4000000059604645,
+            0.25882354378700256,
+            0.2980392277240753,
             0.6549019813537598,
             1.0
           ],
@@ -198,8 +208,8 @@
             1.0
           ],
           "secondShadeColor": [
-            0.2078431397676468,
-            0.21568627655506134,
+            0.11372549086809158,
+            0.1568627506494522,
             0.3686274588108063,
             1.0
           ],
@@ -211,6 +221,75 @@
         },
         "title": "Toon Master",
         "type": "ToonMaster"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 46,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 47,
+            "kind": 1,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "position": [
+          1205.0,
+          438.0
+        ],
+        "properties": {},
+        "title": "Object Texture",
+        "type": "ObjectTexture"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 48,
+        "inputs": [
+          {
+            "id": 49,
+            "kind": 0,
+            "name": "Texture",
+            "valueType": 6
+          },
+          {
+            "id": 53,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 50,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          1491.0,
+          437.0
+        ],
+        "properties": {},
+        "title": "Texture Sample",
+        "type": "TextureSample"
       }
     ]
   },

@@ -249,6 +249,8 @@ ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticB
 		if(base->GetModelData() != model->GetModelData()) continue;
 		if(base->GetTexSrv().ptr != model->GetTexSrv().ptr) continue;
 		if(base->GetEnvMapSrv().ptr != model->GetEnvMapSrv().ptr) continue;
+		if(base->UsesRuntimeMaterialGraph() != model->UsesRuntimeMaterialGraph()) continue;
+		if(base->UsesRuntimeMaterialGraph() && base->GetMaterialGuid() != model->GetMaterialGuid()) continue;
 		if(std::memcmp(&base->GetMaterialForBatch(), &model->GetMaterialForBatch(), sizeof(Material)) != 0) continue;
 
 		return &item;
@@ -368,6 +370,27 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 	{
 		PipelineKey lastKey{};
 		bool		hasLast = false;
+		bool		usingGeneratedPipeline = false;
+		auto bindObject3DPassResources = [&]() -> bool {
+			if(shadowMapSystem) {
+				shadowMapSystem->BindForMainPass(cmdList);
+			}
+
+			if(raytracingSystem_) {
+				cmdList->SetGraphicsRootShaderResourceView(
+					10, // Space0, t3
+					raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
+			}
+
+			if(auto* cam = CameraManager::GetActive()) {
+				cam->SetCommand(cmdList, PipelineType::Object3D);
+			} else {
+				return false;
+			}
+
+			lightLibrary->SetCommand(cmdList, PipelineType::Object3D);
+			return true;
+		};
 
 		for(auto& [key, batch] : staticBatches_) {
 			if(batch.empty()) continue;
@@ -376,33 +399,39 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 				psoService->SetCommand(ps, cmdList);
 
-				if(shadowMapSystem) {
-					shadowMapSystem->BindForMainPass(cmdList);
-				}
-
-				if(raytracingSystem_) {
-					cmdList->SetGraphicsRootShaderResourceView(
-						10, // Space0, t3
-						raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
-				}
-
-				if(auto* cam = CameraManager::GetActive()) {
-					cam->SetCommand(cmdList, PipelineType::Object3D);
-				} else {
-					// 判定漏れ防止
-					continue;
-				}
-
-				lightLibrary->SetCommand(cmdList, PipelineType::Object3D);
+				if(!bindObject3DPassResources()) continue;
 
 				lastKey = key;
 				hasLast = true;
+				usingGeneratedPipeline = false;
 			}
 
 			for(auto& item : batch) {
 				BaseModel* model   = item.model;
 				auto&	   visible = item.transforms;
 				if(!model || visible.empty()) continue;
+
+				if(model->UsesRuntimeMaterialGraph()) {
+					if(auto material = model->GetMaterialAsset()) {
+						CalyxEngine::MaterialGraphRuntimeShader shader = runtimeMaterialShaderCache_.GetOrCompileObject3DPixelShader(*material);
+						if(shader.pixelShader) {
+							const auto generatedSet = psoService->GetGeneratedMaterialObjectPipelineSet(model->GetBlendMode(), shader.pixelShader, shader.hash);
+							psoService->SetCommand(generatedSet, cmdList);
+							if(!bindObject3DPassResources()) continue;
+							usingGeneratedPipeline = true;
+						} else if(usingGeneratedPipeline) {
+							const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
+							psoService->SetCommand(ps, cmdList);
+							if(!bindObject3DPassResources()) continue;
+							usingGeneratedPipeline = false;
+						}
+					}
+				} else if(usingGeneratedPipeline) {
+					const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
+					psoService->SetCommand(ps, cmdList);
+					if(!bindObject3DPassResources()) continue;
+					usingGeneratedPipeline = false;
+				}
 
 				const UINT need = static_cast<UINT>(item.billboards.size());
 				if(need == 0) continue;
@@ -416,6 +445,9 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				model->UploadInstanceMatrices(visible);
 				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
 
+				if(model->UsesRuntimeMaterialGraph()) {
+					model->TransferMaterial();
+				}
 				model->BindMaterialCB(cmdList);
 				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
@@ -444,6 +476,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 	{
 		PipelineKey lastKey{};
 		bool		hasLast = false;
+		bool		usingGeneratedPipeline = false;
 
 		for(auto& [key, batch] : skinnedBatches_) {
 			if(batch.empty()) continue;
@@ -473,16 +506,81 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 
 				lastKey = key;
 				hasLast = true;
+				usingGeneratedPipeline = false;
 			}
 
 			for(auto& [model, visible] : batch) {
 				if(!model || visible.empty()) continue;
+
+				if(model->UsesRuntimeMaterialGraph()) {
+					if(auto material = model->GetMaterialAsset()) {
+						CalyxEngine::MaterialGraphRuntimeShader shader = runtimeMaterialShaderCache_.GetOrCompileObject3DPixelShader(*material);
+						if(shader.pixelShader) {
+							const auto generatedSet = psoService->GetGeneratedMaterialSkinnedPipelineSet(model->GetBlendMode(), shader.pixelShader, shader.hash);
+							psoService->SetCommand(generatedSet, cmdList);
+							if(shadowMapSystem) {
+								shadowMapSystem->BindForMainPass(cmdList);
+							}
+							if(raytracingSystem_) {
+								cmdList->SetGraphicsRootShaderResourceView(
+									10, // Space0, t3
+									raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
+							}
+							if(auto* cam = CameraManager::GetActive()) {
+								cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
+							} else {
+								continue;
+							}
+							lightLibrary->SetCommand(cmdList, PipelineType::SkinningObject3D);
+							usingGeneratedPipeline = true;
+						} else if(usingGeneratedPipeline) {
+							const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
+							psoService->SetCommand(ps, cmdList);
+							if(shadowMapSystem) {
+								shadowMapSystem->BindForMainPass(cmdList);
+							}
+							if(raytracingSystem_) {
+								cmdList->SetGraphicsRootShaderResourceView(
+									10, // Space0, t3
+									raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
+							}
+							if(auto* cam = CameraManager::GetActive()) {
+								cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
+							} else {
+								continue;
+							}
+							lightLibrary->SetCommand(cmdList, PipelineType::SkinningObject3D);
+							usingGeneratedPipeline = false;
+						}
+					}
+				} else if(usingGeneratedPipeline) {
+					const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
+					psoService->SetCommand(ps, cmdList);
+					if(shadowMapSystem) {
+						shadowMapSystem->BindForMainPass(cmdList);
+					}
+					if(raytracingSystem_) {
+						cmdList->SetGraphicsRootShaderResourceView(
+							10, // Space0, t3
+							raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
+					}
+					if(auto* cam = CameraManager::GetActive()) {
+						cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
+					} else {
+						continue;
+					}
+					lightLibrary->SetCommand(cmdList, PipelineType::SkinningObject3D);
+					usingGeneratedPipeline = false;
+				}
 
 				const UINT need = static_cast<UINT>(visible.size());
 				model->EnsureInstanceCapacity(device, need);
 				model->UploadInstanceMatrices(visible);
 				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
 
+				if(model->UsesRuntimeMaterialGraph()) {
+					model->TransferMaterial();
+				}
 				model->BindMaterialCB(cmdList);
 				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());

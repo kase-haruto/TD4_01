@@ -23,6 +23,11 @@
 #include <d3d12.h>
 #include <string>
 #include <optional>
+#include <memory>
+
+namespace CalyxEngine {
+	class MaterialAsset;
+}
 
 /*-----------------------------------------------------------------------------------------
  * BaseModel
@@ -79,6 +84,9 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv(size_t materialIndex)const;
 	D3D12_GPU_DESCRIPTOR_HANDLE GetEnvMapSrv()const;    //< PS:t1 (gEnvironmentMap)
 	const Material& GetMaterialForBatch() const { return currentMaterial_; }
+	std::shared_ptr<CalyxEngine::MaterialAsset> GetMaterialAsset() const;
+	const Guid& GetMaterialGuid() const { return materialGuid_; }
+	bool UsesRuntimeMaterialGraph() const;
 
 	virtual void BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList)const;
 	void BindMaterialCB(ID3D12GraphicsCommandList* cmdList)const;

@@ -11,6 +11,7 @@
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Assets/DataAsset/MaterialAsset.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
+#include <Engine/Foundation/Clock/ClockManager.h>
 
 
 // lib
@@ -441,6 +442,26 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t materialIndex) const {
 }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetEnvMapSrv() const { return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle(); }
 
+std::shared_ptr<CalyxEngine::MaterialAsset> BaseModel::GetMaterialAsset() const {
+	return CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+}
+
+bool BaseModel::UsesRuntimeMaterialGraph() const {
+	auto material = GetMaterialAsset();
+	if(!material) return false;
+
+	for(const auto& node : material->graph.nodes) {
+		if(node.type != "Output") continue;
+		for(const auto& pin : node.inputs) {
+			if(pin.name != "Surface") continue;
+			return std::any_of(material->graph.links.begin(), material->graph.links.end(), [&pin](const auto& graphLink) {
+				return graphLink.toPinId == pin.id;
+			});
+		}
+	}
+	return false;
+}
+
 void BaseModel::BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList) const {
 	modelData_->meshResource.SetCommand(cmdList);
 }
@@ -508,6 +529,7 @@ void BaseModel::TransferMaterial() {
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeRotateZMatrix(uvTransform.rotate));
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 	data.uvTransform = uvTransformMatrix;
+	data.pad3 = ClockManager::GetInstance()->GetTotalTime();
 
 	currentMaterial_ = data;
 	materialBuffer_.TransferData(data);
