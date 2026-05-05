@@ -12,6 +12,17 @@ void Material::ApplyConfig(const MaterialConfig& config) {
 	envirometCoefficient = config.enviromentCoefficient;
 	isReflect             = config.isReflect ? 1 : 0;
 	roughness             = config.roughness;
+    toonHighlightColor    = config.toonHighlightColor;
+    toonBaseColor         = config.toonBaseColor;
+    toonMidShadowColor    = config.toonMidShadowColor;
+    toonShadowColor       = config.toonShadowColor;
+    toonThreshold1        = config.toonThreshold1;
+    toonThreshold2        = config.toonThreshold2;
+    toonThreshold3        = config.toonThreshold3;
+    toonEdgeSoftness      = config.toonEdgeSoftness;
+    toonSpecularThreshold = config.toonSpecularThreshold;
+    toonSpecularSoftness  = config.toonSpecularSoftness;
+    toonSpecularIntensity = config.toonSpecularIntensity;
 
 }
 
@@ -23,6 +34,17 @@ MaterialConfig Material::ExtractConfig() const {
 	config.enviromentCoefficient = envirometCoefficient;
 	config.isReflect             = isReflect != 0;
 	config.roughness             = roughness;
+    config.toonHighlightColor    = toonHighlightColor;
+    config.toonBaseColor         = toonBaseColor;
+    config.toonMidShadowColor    = toonMidShadowColor;
+    config.toonShadowColor       = toonShadowColor;
+    config.toonThreshold1        = toonThreshold1;
+    config.toonThreshold2        = toonThreshold2;
+    config.toonThreshold3        = toonThreshold3;
+    config.toonEdgeSoftness      = toonEdgeSoftness;
+    config.toonSpecularThreshold = toonSpecularThreshold;
+    config.toonSpecularSoftness  = toonSpecularSoftness;
+    config.toonSpecularIntensity = toonSpecularIntensity;
 	return config;
 }
 
@@ -61,6 +83,21 @@ void Material::ShowImGui() {
     ImGui::SeparatorText("Color");
     GuiCmd::ColorEdit4("color", color);
 
+    if (lightingMode == 2) {
+        ImGui::SeparatorText("Toon");
+        GuiCmd::ColorEdit4("highlight", toonHighlightColor);
+        GuiCmd::ColorEdit4("base ramp", toonBaseColor);
+        GuiCmd::ColorEdit4("mid shadow", toonMidShadowColor);
+        GuiCmd::ColorEdit4("shadow", toonShadowColor);
+        GuiCmd::SliderFloat("threshold 1", toonThreshold1, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("threshold 2", toonThreshold2, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("threshold 3", toonThreshold3, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("edge softness", toonEdgeSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular threshold", toonSpecularThreshold, 0.0f, 1.0f);
+        GuiCmd::SliderFloat("specular softness", toonSpecularSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular intensity", toonSpecularIntensity, 0.0f, 4.0f);
+    }
+
     ImGui::SeparatorText("EnviromentCoefficient");
     // 環境マップ
     bool reflect = isReflect != 0;
@@ -79,6 +116,21 @@ void Material::ShowImGui(MaterialConfig& config) {
     // color
     if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
         GuiCmd::ColorEdit4("color", config.color);
+        ImGui::TreePop();
+    }
+
+    if (config.enableLighting == 2 && ImGui::TreeNodeEx("Toon", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+        GuiCmd::ColorEdit4("highlight", config.toonHighlightColor);
+        GuiCmd::ColorEdit4("base ramp", config.toonBaseColor);
+        GuiCmd::ColorEdit4("mid shadow", config.toonMidShadowColor);
+        GuiCmd::ColorEdit4("shadow", config.toonShadowColor);
+        GuiCmd::SliderFloat("threshold 1", config.toonThreshold1, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("threshold 2", config.toonThreshold2, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("threshold 3", config.toonThreshold3, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("edge softness", config.toonEdgeSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular threshold", config.toonSpecularThreshold, 0.0f, 1.0f);
+        GuiCmd::SliderFloat("specular softness", config.toonSpecularSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular intensity", config.toonSpecularIntensity, 0.0f, 4.0f);
         ImGui::TreePop();
     }
 

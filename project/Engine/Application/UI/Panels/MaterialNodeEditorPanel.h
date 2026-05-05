@@ -30,12 +30,14 @@ namespace CalyxEngine {
 		void AddFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position);
 		void AddBoolNode(MaterialAsset& material, const char* type, const char* title, Vector2 position);
 		void AddLightingModeNode(MaterialAsset& material, Vector2 position);
+		void AddLightingNode(MaterialAsset& material, const char* type, const char* title, int32_t mode, Vector2 position);
 		void AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position);
 		void EnsureOutputNode(MaterialAsset& material);
 		Vector4 EvaluateColor(const MaterialAsset& material, int32_t inputPinId, const Vector4& fallback) const;
 		float EvaluateFloat(const MaterialAsset& material, int32_t inputPinId, float fallback) const;
 		bool EvaluateBool(const MaterialAsset& material, int32_t inputPinId, bool fallback) const;
 		int32_t EvaluateInt(const MaterialAsset& material, int32_t inputPinId, int32_t fallback) const;
+		void ApplyToonLightingNode(MaterialAsset& material, const Node& node) const;
 		void Evaluate(MaterialAsset& material);
 		void Save(MaterialAsset& material);
 

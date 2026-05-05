@@ -10,15 +10,41 @@
     "isReflect": false,
     "lightingMode": 2,
     "roughness": 0.5,
-    "shininess": 20.639999389648438
+    "shininess": 20.639999389648438,
+    "toonBaseColor": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "toonEdgeSoftness": 0.19900000095367432,
+    "toonHighlightColor": [
+      1.149999976158142,
+      1.100000023841858,
+      1.0,
+      1.0
+    ],
+    "toonMidShadowColor": [
+      0.3921568691730499,
+      0.42352941632270813,
+      0.529411792755127,
+      1.0
+    ],
+    "toonShadowColor": [
+      0.15294118225574493,
+      0.16862745583057404,
+      0.22745098173618317,
+      1.0
+    ],
+    "toonSpecularIntensity": 0.1340000033378601,
+    "toonSpecularSoftness": 0.05400000140070915,
+    "toonSpecularThreshold": 0.8539999723434448,
+    "toonThreshold1": 0.6169999837875366,
+    "toonThreshold2": 0.18400000035762787,
+    "toonThreshold3": 0.8199999928474426
   },
   "graph": {
     "links": [
-      {
-        "fromPinId": 11,
-        "id": 12,
-        "toPinId": 6
-      },
       {
         "fromPinId": 14,
         "id": 15,
@@ -33,9 +59,14 @@
         "fromPinId": 20,
         "id": 21,
         "toPinId": 2
+      },
+      {
+        "fromPinId": 23,
+        "id": 24,
+        "toPinId": 6
       }
     ],
-    "nextId": 22,
+    "nextId": 25,
     "nodes": [
       {
         "boolValue": false,
@@ -88,34 +119,6 @@
         "properties": {},
         "title": "Output",
         "type": "Output"
-      },
-      {
-        "boolValue": false,
-        "colorValue": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "floatValue": 0.0,
-        "id": 10,
-        "inputs": [],
-        "intValue": 2,
-        "outputs": [
-          {
-            "id": 11,
-            "kind": 1,
-            "name": "Mode",
-            "valueType": 4
-          }
-        ],
-        "position": [
-          481.0,
-          407.0
-        ],
-        "properties": {},
-        "title": "Lighting Mode",
-        "type": "LightingMode"
       },
       {
         "boolValue": false,
@@ -200,6 +203,66 @@
         "properties": {},
         "title": "Color",
         "type": "Color"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 22,
+        "inputs": [],
+        "intValue": 2,
+        "outputs": [
+          {
+            "id": 23,
+            "kind": 1,
+            "name": "Lighting",
+            "valueType": 4
+          }
+        ],
+        "position": [
+          409.0,
+          429.0
+        ],
+        "properties": {
+          "toonBaseColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "toonEdgeSoftness": 0.19900000095367432,
+          "toonHighlightColor": [
+            1.149999976158142,
+            1.100000023841858,
+            1.0,
+            1.0
+          ],
+          "toonMidShadowColor": [
+            0.3921568691730499,
+            0.42352941632270813,
+            0.529411792755127,
+            1.0
+          ],
+          "toonShadowColor": [
+            0.15294118225574493,
+            0.16862745583057404,
+            0.22745098173618317,
+            1.0
+          ],
+          "toonSpecularIntensity": 0.1340000033378601,
+          "toonSpecularSoftness": 0.05400000140070915,
+          "toonSpecularThreshold": 0.8539999723434448,
+          "toonThreshold1": 0.6169999837875366,
+          "toonThreshold2": 0.18400000035762787,
+          "toonThreshold3": 0.8199999928474426
+        },
+        "title": "Toon Lighting",
+        "type": "ToonLighting"
       }
     ]
   },

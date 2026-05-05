@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 
 namespace CalyxEngine {
 	namespace {
@@ -18,6 +19,70 @@ namespace CalyxEngine {
 			"No Lighting",
 			"Unlit Color"};
 		constexpr int32_t kLightingModeCount = static_cast<int32_t>(std::size(kLightingModes));
+
+		bool IsObsoleteToonOutputPin(const std::string& name) {
+			return name == "Toon Highlight" ||
+				   name == "Toon Base" ||
+				   name == "Toon Mid Shadow" ||
+				   name == "Toon Shadow" ||
+				   name == "Toon Threshold 1" ||
+				   name == "Toon Threshold 2" ||
+				   name == "Toon Threshold 3" ||
+				   name == "Toon Edge Softness" ||
+				   name == "Toon Spec Threshold" ||
+				   name == "Toon Spec Softness" ||
+				   name == "Toon Spec Intensity";
+		}
+
+		bool IsLightingNode(const std::string& type) {
+			return type == "HalfLambertLighting" ||
+				   type == "LambertLighting" ||
+				   type == "ToonLighting" ||
+				   type == "NoLighting" ||
+				   type == "UnlitColorLighting";
+		}
+
+		int32_t LightingModeFromNodeType(const std::string& type, int32_t fallback) {
+			if(type == "HalfLambertLighting") return 0;
+			if(type == "LambertLighting") return 1;
+			if(type == "ToonLighting") return 2;
+			if(type == "NoLighting") return 3;
+			if(type == "UnlitColorLighting") return 4;
+			return fallback;
+		}
+
+		float GetFloatProperty(const Node& node, const char* key, float fallback) {
+			if(!node.properties.contains(key)) return fallback;
+			return node.properties.value(key, fallback);
+		}
+
+		void SetFloatProperty(Node& node, const char* key, float value) {
+			node.properties[key] = value;
+		}
+
+		Vector4 GetColorProperty(const Node& node, const char* key, const Vector4& fallback) {
+			auto it = node.properties.find(key);
+			if(it == node.properties.end() || !it->is_array() || it->size() != 4) return fallback;
+			return {it->at(0).get<float>(), it->at(1).get<float>(), it->at(2).get<float>(), it->at(3).get<float>()};
+		}
+
+		void SetColorProperty(Node& node, const char* key, const Vector4& value) {
+			node.properties[key] = {value.x, value.y, value.z, value.w};
+		}
+
+		void SetDefaultToonProperties(Node& node) {
+			SetColorProperty(node, "toonHighlightColor", {1.15f, 1.10f, 1.00f, 1.0f});
+			SetColorProperty(node, "toonBaseColor", {1.0f, 1.0f, 1.0f, 1.0f});
+			SetColorProperty(node, "toonMidShadowColor", {0.72f, 0.76f, 0.86f, 1.0f});
+			SetColorProperty(node, "toonShadowColor", {0.42f, 0.46f, 0.58f, 1.0f});
+			SetFloatProperty(node, "toonThreshold1", -0.15f);
+			SetFloatProperty(node, "toonThreshold2", 0.25f);
+			SetFloatProperty(node, "toonThreshold3", 0.82f);
+			SetFloatProperty(node, "toonEdgeSoftness", 0.03f);
+			SetFloatProperty(node, "toonSpecularThreshold", 0.96f);
+			SetFloatProperty(node, "toonSpecularSoftness", 0.02f);
+			SetFloatProperty(node, "toonSpecularIntensity", 0.35f);
+		}
 	} // namespace
 
 	MaterialNodeEditorPanel::MaterialNodeEditorPanel()
@@ -160,8 +225,27 @@ namespace CalyxEngine {
 				AddBoolNode(material, "Reflect", "Reflect", position);
 				changed = true;
 			}
-			if(ImGui::MenuItem("Lighting Mode")) {
-				AddLightingModeNode(material, position);
+			ImGui::EndMenu();
+		}
+		if(ImGui::BeginMenu("Lighting")) {
+			if(ImGui::MenuItem("Half-Lambert")) {
+				AddLightingNode(material, "HalfLambertLighting", "Half-Lambert", 0, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lambert")) {
+				AddLightingNode(material, "LambertLighting", "Lambert", 1, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Toon Lighting")) {
+				AddLightingNode(material, "ToonLighting", "Toon Lighting", 2, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("No Lighting")) {
+				AddLightingNode(material, "NoLighting", "No Lighting", 3, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Unlit Color")) {
+				AddLightingNode(material, "UnlitColorLighting", "Unlit Color", 4, position);
 				changed = true;
 			}
 			ImGui::EndMenu();
@@ -182,8 +266,8 @@ namespace CalyxEngine {
 			AddColorNode(material, position);
 			changed = true;
 		}
-		if(ImGui::MenuItem("Lighting Mode##quick")) {
-			AddLightingModeNode(material, position);
+		if(ImGui::MenuItem("Toon Lighting##quick")) {
+			AddLightingNode(material, "ToonLighting", "Toon Lighting", 2, position);
 			changed = true;
 		}
 		return changed;
@@ -363,6 +447,83 @@ namespace CalyxEngine {
 				lightingModePopupPos_.x = popupPos.x;
 				lightingModePopupPos_.y = popupPos.y;
 			}
+		} else if(IsLightingNode(node.type)) {
+			if(node.type == "ToonLighting") {
+				if(ImGui::Button("Reset Toon Defaults", ImVec2(188.0f, 0.0f))) {
+					SetDefaultToonProperties(node);
+					changed = true;
+				}
+
+				Vector4 highlight = GetColorProperty(node, "toonHighlightColor", {1.15f, 1.10f, 1.00f, 1.0f});
+				Vector4 base = GetColorProperty(node, "toonBaseColor", {1.0f, 1.0f, 1.0f, 1.0f});
+				Vector4 midShadow = GetColorProperty(node, "toonMidShadowColor", {0.72f, 0.76f, 0.86f, 1.0f});
+				Vector4 shadow = GetColorProperty(node, "toonShadowColor", {0.42f, 0.46f, 0.58f, 1.0f});
+				float threshold1 = GetFloatProperty(node, "toonThreshold1", -0.15f);
+				float threshold2 = GetFloatProperty(node, "toonThreshold2", 0.25f);
+				float threshold3 = GetFloatProperty(node, "toonThreshold3", 0.82f);
+				float edgeSoftness = GetFloatProperty(node, "toonEdgeSoftness", 0.03f);
+				float specThreshold = GetFloatProperty(node, "toonSpecularThreshold", 0.96f);
+				float specSoftness = GetFloatProperty(node, "toonSpecularSoftness", 0.02f);
+				float specIntensity = GetFloatProperty(node, "toonSpecularIntensity", 0.35f);
+
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Highlight", &highlight.x)) {
+					SetColorProperty(node, "toonHighlightColor", highlight);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Base", &base.x)) {
+					SetColorProperty(node, "toonBaseColor", base);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Mid Shadow", &midShadow.x)) {
+					SetColorProperty(node, "toonMidShadowColor", midShadow);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Shadow", &shadow.x)) {
+					SetColorProperty(node, "toonShadowColor", shadow);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Threshold 1", &threshold1, -1.0f, 1.0f)) {
+					SetFloatProperty(node, "toonThreshold1", threshold1);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Threshold 2", &threshold2, -1.0f, 1.0f)) {
+					SetFloatProperty(node, "toonThreshold2", threshold2);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Threshold 3", &threshold3, -1.0f, 1.0f)) {
+					SetFloatProperty(node, "toonThreshold3", threshold3);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Edge Softness", &edgeSoftness, 0.0f, 0.25f)) {
+					SetFloatProperty(node, "toonEdgeSoftness", edgeSoftness);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Spec Threshold", &specThreshold, 0.0f, 1.0f)) {
+					SetFloatProperty(node, "toonSpecularThreshold", specThreshold);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Spec Softness", &specSoftness, 0.0f, 0.25f)) {
+					SetFloatProperty(node, "toonSpecularSoftness", specSoftness);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Spec Intensity", &specIntensity, 0.0f, 4.0f)) {
+					SetFloatProperty(node, "toonSpecularIntensity", specIntensity);
+					changed = true;
+				}
+			} else {
+				ImGui::TextDisabled("%s", kLightingModes[LightingModeFromNodeType(node.type, 0)]);
+			}
 		} else if(node.type == "MultiplyColor" || node.type == "MultiplyFloat") {
 			ImGui::TextDisabled("A * B");
 		} else if(node.type == "Output") {
@@ -417,6 +578,20 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddLightingNode(MaterialAsset& material, const char* type, const char* title, int32_t mode, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = type;
+		node.title	  = title;
+		node.position = position;
+		node.intValue = mode;
+		node.outputs.push_back({material.graph.AllocateId(), "Lighting", NodePinKind::Output, NodeValueType::Int});
+		if(node.type == "ToonLighting") {
+			SetDefaultToonProperties(node);
+		}
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position) {
 		Node node;
 		node.id		  = material.graph.AllocateId();
@@ -432,12 +607,32 @@ namespace CalyxEngine {
 	void MaterialNodeEditorPanel::EnsureOutputNode(MaterialAsset& material) {
 		for(auto& node : material.graph.nodes) {
 			if(node.type != "Output") continue;
-			const auto hasLightingMode = std::any_of(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
-				return pin.name == "Lighting Mode";
-			});
-			if(!hasLightingMode) {
-				node.inputs.push_back({material.graph.AllocateId(), "Lighting Mode", NodePinKind::Input, NodeValueType::Int});
+			std::vector<int32_t> removedPinIds;
+			for(const auto& pin : node.inputs) {
+				if(IsObsoleteToonOutputPin(pin.name)) {
+					removedPinIds.push_back(pin.id);
+				}
 			}
+			if(!removedPinIds.empty()) {
+				node.inputs.erase(
+					std::remove_if(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
+						return IsObsoleteToonOutputPin(pin.name);
+					}),
+					node.inputs.end());
+				material.graph.links.erase(
+					std::remove_if(material.graph.links.begin(), material.graph.links.end(), [&removedPinIds](const NodeLink& link) {
+						return std::find(removedPinIds.begin(), removedPinIds.end(), link.toPinId) != removedPinIds.end() ||
+							   std::find(removedPinIds.begin(), removedPinIds.end(), link.fromPinId) != removedPinIds.end();
+					}),
+					material.graph.links.end());
+			}
+			auto ensureInput = [&material, &node](const char* name, NodeValueType type) {
+				const auto exists = std::any_of(node.inputs.begin(), node.inputs.end(), [name](const NodePin& pin) {
+					return pin.name == name;
+				});
+				if(!exists) node.inputs.push_back({material.graph.AllocateId(), name, NodePinKind::Input, type});
+			};
+			ensureInput("Lighting Mode", NodeValueType::Int);
 			return;
 		}
 		Node node;
@@ -507,8 +702,26 @@ namespace CalyxEngine {
 				}
 				return base;
 			}
+			if(IsLightingNode(fromNode->type)) {
+				return LightingModeFromNodeType(fromNode->type, fallback);
+			}
 		}
 		return fallback;
+	}
+
+	void MaterialNodeEditorPanel::ApplyToonLightingNode(MaterialAsset& material, const Node& node) const {
+		if(node.type != "ToonLighting") return;
+		material.toonHighlightColor = GetColorProperty(node, "toonHighlightColor", material.toonHighlightColor);
+		material.toonBaseColor = GetColorProperty(node, "toonBaseColor", material.toonBaseColor);
+		material.toonMidShadowColor = GetColorProperty(node, "toonMidShadowColor", material.toonMidShadowColor);
+		material.toonShadowColor = GetColorProperty(node, "toonShadowColor", material.toonShadowColor);
+		material.toonThreshold1 = GetFloatProperty(node, "toonThreshold1", material.toonThreshold1);
+		material.toonThreshold2 = GetFloatProperty(node, "toonThreshold2", material.toonThreshold2);
+		material.toonThreshold3 = GetFloatProperty(node, "toonThreshold3", material.toonThreshold3);
+		material.toonEdgeSoftness = GetFloatProperty(node, "toonEdgeSoftness", material.toonEdgeSoftness);
+		material.toonSpecularThreshold = GetFloatProperty(node, "toonSpecularThreshold", material.toonSpecularThreshold);
+		material.toonSpecularSoftness = GetFloatProperty(node, "toonSpecularSoftness", material.toonSpecularSoftness);
+		material.toonSpecularIntensity = GetFloatProperty(node, "toonSpecularIntensity", material.toonSpecularIntensity);
 	}
 
 	void MaterialNodeEditorPanel::Evaluate(MaterialAsset& material) {
@@ -519,7 +732,18 @@ namespace CalyxEngine {
 				if(pin.name == "Shininess") material.shininess = EvaluateFloat(material, pin.id, material.shininess);
 				if(pin.name == "Roughness") material.roughness = EvaluateFloat(material, pin.id, material.roughness);
 				if(pin.name == "Reflect") material.isReflect = EvaluateBool(material, pin.id, material.isReflect);
-				if(pin.name == "Lighting Mode") material.lightingMode = EvaluateInt(material, pin.id, material.lightingMode);
+				if(pin.name == "Lighting Mode") {
+					material.lightingMode = EvaluateInt(material, pin.id, material.lightingMode);
+					for(const auto& link : material.graph.links) {
+						if(link.toPinId != pin.id) continue;
+						const Node* fromNode = nullptr;
+						material.graph.FindPin(link.fromPinId, &fromNode);
+						if(fromNode) {
+							ApplyToonLightingNode(material, *fromNode);
+						}
+						break;
+					}
+				}
 			}
 			return;
 		}

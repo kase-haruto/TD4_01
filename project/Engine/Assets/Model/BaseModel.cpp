@@ -482,6 +482,17 @@ void BaseModel::TransferMaterial() {
 		data.isReflect = ma->isReflect ? 1 : 0;
 		data.envirometCoefficient = ma->envirometCoefficient;
 		data.roughness = ma->roughness;
+		data.toonHighlightColor = ma->toonHighlightColor;
+		data.toonBaseColor = ma->toonBaseColor;
+		data.toonMidShadowColor = ma->toonMidShadowColor;
+		data.toonShadowColor = ma->toonShadowColor;
+		data.toonThreshold1 = ma->toonThreshold1;
+		data.toonThreshold2 = ma->toonThreshold2;
+		data.toonThreshold3 = ma->toonThreshold3;
+		data.toonEdgeSoftness = ma->toonEdgeSoftness;
+		data.toonSpecularThreshold = ma->toonSpecularThreshold;
+		data.toonSpecularSoftness = ma->toonSpecularSoftness;
+		data.toonSpecularIntensity = ma->toonSpecularIntensity;
 	} else {
 		// Default fallback
 		data.color = {1, 1, 1, 1};
