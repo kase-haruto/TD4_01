@@ -3,11 +3,19 @@
 #include <Engine\Assets\DataAsset\MaterialAsset.h>
 #include <Engine\Assets\Database\AssetDatabase.h>
 #include <Engine\Assets\Manager\AssetManager.h>
+#include <Engine\Graphics\MaterialGraph\MaterialGraphCompiler.h>
+#include <Engine\Graphics\MaterialGraph\ShaderGraphCodeGenerator.h>
+#include <Engine\Graphics\MaterialGraph\ShaderGraphSchema.h>
+#include <Engine\Graphics\MaterialGraph\ShaderGraphValidator.h>
+#include <Engine\Graphics\Pipeline\Shader\ShaderCompiler.h>
 #include <externals\imgui\imgui.h>
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
+#include <vector>
 
 namespace CalyxEngine {
 	namespace {
@@ -18,6 +26,130 @@ namespace CalyxEngine {
 			"No Lighting",
 			"Unlit Color"};
 		constexpr int32_t kLightingModeCount = static_cast<int32_t>(std::size(kLightingModes));
+
+		bool IsObsoleteToonOutputPin(const std::string& name) {
+			return name == "Toon Highlight" ||
+				   name == "Toon Base" ||
+				   name == "Toon Mid Shadow" ||
+				   name == "Toon Shadow" ||
+				   name == "Toon Threshold 1" ||
+				   name == "Toon Threshold 2" ||
+				   name == "Toon Threshold 3" ||
+				   name == "Toon Edge Softness" ||
+				   name == "Toon Spec Threshold" ||
+				   name == "Toon Spec Softness" ||
+				   name == "Toon Spec Intensity";
+		}
+
+		bool IsLegacyOutputPin(const std::string& name) {
+			return name == "BaseColor" ||
+				   name == "Shininess" ||
+				   name == "Roughness" ||
+				   name == "Reflect" ||
+				   name == "Lighting Mode" ||
+				   IsObsoleteToonOutputPin(name);
+		}
+
+		bool IsLightingNode(const std::string& type) {
+			return type == "HalfLambertLighting" ||
+				   type == "LambertLighting" ||
+				   type == "ToonLighting" ||
+				   type == "NoLighting" ||
+				   type == "UnlitColorLighting";
+		}
+
+		int32_t LightingModeFromNodeType(const std::string& type, int32_t fallback) {
+			if(type == "HalfLambertLighting") return 0;
+			if(type == "LambertLighting") return 1;
+			if(type == "ToonLighting") return 2;
+			if(type == "NoLighting") return 3;
+			if(type == "UnlitColorLighting") return 4;
+			return fallback;
+		}
+
+		const NodePin* FindInputPin(const Node& node, const char* name) {
+			for(const auto& pin : node.inputs) {
+				if(pin.name == name) return &pin;
+			}
+			return nullptr;
+		}
+
+		bool IsInputLinked(const MaterialAsset& material, const Node& node, const char* name) {
+			const NodePin* pin = FindInputPin(node, name);
+			if(!pin) return false;
+			return std::any_of(material.graph.links.begin(), material.graph.links.end(), [pin](const NodeLink& link) {
+				return link.toPinId == pin->id;
+			});
+		}
+
+		const ShaderGraphNodeSchema* FindSchemaNode(const ShaderGraphSchema& schema, const std::string& type) {
+			for(const auto& node : schema.nodes) {
+				if(node.type == type) return &node;
+			}
+			return nullptr;
+		}
+
+		void EnsureSchemaPins(MaterialAsset& material, Node& node, const ShaderGraphNodeSchema& schemaNode) {
+			for(const auto& pinSchema : schemaNode.pins) {
+				auto& pins = pinSchema.role == ShaderGraphPinRole::Input ? node.inputs : node.outputs;
+				const auto exists = std::any_of(pins.begin(), pins.end(), [&pinSchema](const NodePin& pin) {
+					return pin.name == pinSchema.name;
+				});
+				if(exists) continue;
+				pins.push_back({
+					material.graph.AllocateId(),
+					pinSchema.name,
+					pinSchema.role == ShaderGraphPinRole::Input ? NodePinKind::Input : NodePinKind::Output,
+					pinSchema.valueType});
+			}
+		}
+
+		float GetFloatProperty(const Node& node, const char* key, float fallback) {
+			if(!node.properties.contains(key)) return fallback;
+			return node.properties.value(key, fallback);
+		}
+
+		void SetFloatProperty(Node& node, const char* key, float value) {
+			node.properties[key] = value;
+		}
+
+		Vector4 GetColorProperty(const Node& node, const char* key, const Vector4& fallback) {
+			auto it = node.properties.find(key);
+			if(it == node.properties.end() || !it->is_array() || it->size() != 4) return fallback;
+			return {it->at(0).get<float>(), it->at(1).get<float>(), it->at(2).get<float>(), it->at(3).get<float>()};
+		}
+
+		void SetColorProperty(Node& node, const char* key, const Vector4& value) {
+			node.properties[key] = {value.x, value.y, value.z, value.w};
+		}
+
+		void SetDefaultToonProperties(Node& node) {
+			SetColorProperty(node, "toonHighlightColor", {1.15f, 1.10f, 1.00f, 1.0f});
+			SetColorProperty(node, "toonBaseColor", {1.0f, 1.0f, 1.0f, 1.0f});
+			SetColorProperty(node, "toonMidShadowColor", {0.72f, 0.76f, 0.86f, 1.0f});
+			SetColorProperty(node, "toonShadowColor", {0.42f, 0.46f, 0.58f, 1.0f});
+			SetFloatProperty(node, "toonThreshold1", -0.15f);
+			SetFloatProperty(node, "toonThreshold2", 0.25f);
+			SetFloatProperty(node, "toonThreshold3", 0.82f);
+			SetFloatProperty(node, "toonEdgeSoftness", 0.03f);
+			SetFloatProperty(node, "toonSpecularThreshold", 0.96f);
+			SetFloatProperty(node, "toonSpecularSoftness", 0.02f);
+			SetFloatProperty(node, "toonSpecularIntensity", 0.35f);
+		}
+
+		void SetDefaultToonMasterProperties(Node& node) {
+			SetColorProperty(node, "baseColor", {1, 1, 1, 1});
+			SetColorProperty(node, "highlightColor", {1.08f, 1.06f, 1.02f, 1.0f});
+			SetColorProperty(node, "firstShadeColor", {0.72f, 0.76f, 0.86f, 1.0f});
+			SetColorProperty(node, "secondShadeColor", {0.42f, 0.46f, 0.58f, 1.0f});
+			SetFloatProperty(node, "baseStep", 0.25f);
+			SetFloatProperty(node, "baseFeather", 0.03f);
+			SetFloatProperty(node, "shadeStep", -0.15f);
+			SetFloatProperty(node, "shadeFeather", 0.03f);
+			SetFloatProperty(node, "specularThreshold", 0.96f);
+			SetFloatProperty(node, "specularSoftness", 0.02f);
+			SetFloatProperty(node, "specularIntensity", 0.35f);
+		}
 	} // namespace
 
 	MaterialNodeEditorPanel::MaterialNodeEditorPanel()
@@ -51,7 +183,7 @@ namespace CalyxEngine {
 				DrawToolbar(*material);
 				if(canvas_.Draw(
 					   material->graph,
-					   [this](Node& node) { return DrawNodeBody(node); },
+					   [this, material](Node& node) { return DrawNodeBody(*material, node); },
 					   [this, material](const NodeEditorCanvas::ContextMenu& menu) { return DrawContextMenu(*material, menu); })) {
 					Evaluate(*material);
 				}
@@ -137,8 +269,92 @@ namespace CalyxEngine {
 		}
 		ImGui::SameLine();
 		if(ImGui::Button("Save", ImVec2(76.0f, 0.0f))) Save(material);
+		ImGui::SameLine();
+		if(ImGui::Button("Copy HLSL", ImVec2(96.0f, 0.0f))) {
+			const GeneratedShaderGraphCode generated = ShaderGraphCodeGenerator::GenerateObject3DMaterialFunction(material);
+			ImGui::SetClipboardText(generated.hlsl.c_str());
+			graphStatusMessage_ = "Copied generated material HLSL to clipboard.";
+			graphStatusIsError_ = false;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Compile HLSL", ImVec2(112.0f, 0.0f))) {
+			MaterialGraphRuntimeShader shader = runtimeShaderCache_.GetOrCompilePreviewPixelShader(material);
+			if(shader.compileSucceeded) {
+				std::ostringstream oss;
+				oss << "Generated preview pixel shader " << (shader.cacheHit ? "cache hit" : "compiled")
+					<< ". Hash: " << shader.hash << ".";
+				if(!shader.compileMessage.empty()) oss << "\n" << shader.compileMessage;
+				graphStatusMessage_ = oss.str();
+				graphStatusIsError_ = false;
+			} else {
+				std::ostringstream oss;
+				oss << "Generated preview pixel shader compile failed.";
+				if(shader.fallbackUsed) oss << " Using last successful preview shader.";
+				if(!shader.compileMessage.empty()) oss << "\n" << shader.compileMessage;
+				graphStatusMessage_ = oss.str();
+				graphStatusIsError_ = true;
+			}
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Build Runtime", ImVec2(116.0f, 0.0f))) {
+			MaterialGraphRuntimeShader shader = runtimeShaderCache_.GetOrCompileObject3DPixelShader(material);
+			std::ostringstream oss;
+			if(shader.compileSucceeded) {
+				oss << "Runtime material shader " << (shader.cacheHit ? "cache hit" : "compiled")
+					<< ". Hash: " << shader.hash
+					<< ", cache entries: " << runtimeShaderCache_.Size() << ".";
+				if(!shader.compileMessage.empty()) oss << "\n" << shader.compileMessage;
+			} else {
+				oss << "Runtime material shader compile failed.";
+				if(shader.fallbackUsed) oss << " Using last successful runtime shader.";
+				else oss << " No fallback shader is available.";
+				if(!shader.compileMessage.empty()) oss << "\n" << shader.compileMessage;
+			}
+			graphStatusMessage_ = oss.str();
+			graphStatusIsError_ = !shader.compileSucceeded;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Validate Graph", ImVec2(124.0f, 0.0f))) {
+			const ShaderGraphValidationResult validation = ShaderGraphValidator::ValidateMaterialGraph(material.graph);
+			std::ostringstream oss;
+			oss << (validation.ok ? "Material graph validation passed." : "Material graph validation failed:");
+			for(const std::string& message : validation.messages) {
+				oss << "\n- " << message;
+			}
+			graphStatusMessage_ = oss.str();
+			graphStatusIsError_ = !validation.ok;
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Validate Shader", ImVec2(124.0f, 0.0f))) {
+			ShaderCompiler compiler;
+			compiler.InitializeDXC();
+			const ShaderReflectionInfo reflection = compiler.ReflectShader(L"Resources/shaders/Core/Object3d.PS.hlsl", L"ps_6_5");
+			const ShaderGraphValidationResult validation = ShaderGraphValidator::ValidateObject3DMaterialShader(reflection);
+			if(validation.ok) {
+				std::ostringstream oss;
+				oss << "Object3D shader contract is valid. Resources: " << reflection.resources.size()
+					<< ", cbuffers: " << reflection.cbuffers.size() << ".";
+				graphStatusMessage_ = oss.str();
+				graphStatusIsError_ = false;
+			} else {
+				std::ostringstream oss;
+				oss << "Object3D shader contract validation failed:";
+				for(const std::string& message : validation.messages) {
+					oss << "\n- " << message;
+				}
+				graphStatusMessage_ = oss.str();
+				graphStatusIsError_ = true;
+			}
+		}
 		ImGui::PopStyleVar();
 		ImGui::Separator();
+		if(!graphStatusMessage_.empty()) {
+			const ImVec4 color = graphStatusIsError_ ? ImVec4(1.0f, 0.35f, 0.25f, 1.0f) : ImVec4(0.45f, 0.85f, 0.55f, 1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, color);
+			ImGui::TextWrapped("%s", graphStatusMessage_.c_str());
+			ImGui::PopStyleColor();
+			ImGui::Separator();
+		}
 	}
 
 	bool MaterialNodeEditorPanel::DrawAddNodeMenu(MaterialAsset& material, Vector2 position) {
@@ -146,6 +362,14 @@ namespace CalyxEngine {
 		if(ImGui::BeginMenu("Material Parameters")) {
 			if(ImGui::MenuItem("Color")) {
 				AddColorNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Float")) {
+				AddFloatNode(material, "Float", "Float", position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Float2")) {
+				AddFloat2Node(material, position);
 				changed = true;
 			}
 			if(ImGui::MenuItem("Shininess")) {
@@ -160,19 +384,135 @@ namespace CalyxEngine {
 				AddBoolNode(material, "Reflect", "Reflect", position);
 				changed = true;
 			}
-			if(ImGui::MenuItem("Lighting Mode")) {
-				AddLightingModeNode(material, position);
+			ImGui::EndMenu();
+		}
+		if(ImGui::BeginMenu("Lighting")) {
+			if(ImGui::MenuItem("Half-Lambert")) {
+				AddLightingNode(material, "HalfLambertLighting", "Half-Lambert", 0, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lambert")) {
+				AddLightingNode(material, "LambertLighting", "Lambert", 1, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Toon Lighting")) {
+				AddLightingNode(material, "ToonLighting", "Toon Lighting", 2, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("No Lighting")) {
+				AddLightingNode(material, "NoLighting", "No Lighting", 3, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Unlit Color")) {
+				AddLightingNode(material, "UnlitColorLighting", "Unlit Color", 4, position);
 				changed = true;
 			}
 			ImGui::EndMenu();
 		}
+		if(ImGui::BeginMenu("Master")) {
+			if(ImGui::MenuItem("Toon Master")) {
+				AddToonMasterNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lit Master")) {
+				AddLitMasterNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Unlit Master")) {
+				AddUnlitMasterNode(material, position);
+				changed = true;
+			}
+			ImGui::EndMenu();
+		}
+		if(ImGui::BeginMenu("Textures")) {
+			if(ImGui::MenuItem("Object Texture")) {
+				AddObjectTextureNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Texture Sample")) {
+				AddTextureSampleNode(material, position);
+				changed = true;
+			}
+			ImGui::EndMenu();
+		}
+		if(ImGui::BeginMenu("Inputs")) {
+			if(ImGui::MenuItem("UV")) { AddShaderInputFloat2Node(material, "UV", "UV", position); changed = true; }
+			if(ImGui::MenuItem("UV X")) { AddShaderInputFloatNode(material, "UVX", "UV X", position); changed = true; }
+			if(ImGui::MenuItem("UV Y")) { AddShaderInputFloatNode(material, "UVY", "UV Y", position); changed = true; }
+			if(ImGui::MenuItem("Time")) { AddShaderInputFloatNode(material, "Time", "Time", position); changed = true; }
+			ImGui::Separator();
+			if(ImGui::MenuItem("World Position X")) { AddShaderInputFloatNode(material, "WorldPositionX", "World Position X", position); changed = true; }
+			if(ImGui::MenuItem("World Position Y")) { AddShaderInputFloatNode(material, "WorldPositionY", "World Position Y", position); changed = true; }
+			if(ImGui::MenuItem("World Position Z")) { AddShaderInputFloatNode(material, "WorldPositionZ", "World Position Z", position); changed = true; }
+			ImGui::Separator();
+			if(ImGui::MenuItem("World Normal X")) { AddShaderInputFloatNode(material, "WorldNormalX", "World Normal X", position); changed = true; }
+			if(ImGui::MenuItem("World Normal Y")) { AddShaderInputFloatNode(material, "WorldNormalY", "World Normal Y", position); changed = true; }
+			if(ImGui::MenuItem("World Normal Z")) { AddShaderInputFloatNode(material, "WorldNormalZ", "World Normal Z", position); changed = true; }
+			ImGui::Separator();
+			if(ImGui::MenuItem("View Direction X")) { AddShaderInputFloatNode(material, "ViewDirectionX", "View Direction X", position); changed = true; }
+			if(ImGui::MenuItem("View Direction Y")) { AddShaderInputFloatNode(material, "ViewDirectionY", "View Direction Y", position); changed = true; }
+			if(ImGui::MenuItem("View Direction Z")) { AddShaderInputFloatNode(material, "ViewDirectionZ", "View Direction Z", position); changed = true; }
+			ImGui::EndMenu();
+		}
 		if(ImGui::BeginMenu("Operators")) {
+			if(ImGui::MenuItem("Add Float")) {
+				AddBinaryNode(material, "AddFloat", "Add Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Subtract Float")) {
+				AddBinaryNode(material, "SubtractFloat", "Subtract Float", NodeValueType::Float, position);
+				changed = true;
+			}
 			if(ImGui::MenuItem("Multiply Color")) {
 				AddBinaryNode(material, "MultiplyColor", "Multiply Color", NodeValueType::Color, position);
 				changed = true;
 			}
 			if(ImGui::MenuItem("Multiply Float")) {
 				AddBinaryNode(material, "MultiplyFloat", "Multiply Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Divide Float")) {
+				AddBinaryNode(material, "DivideFloat", "Divide Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Power Float")) {
+				AddBinaryNode(material, "PowerFloat", "Power Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Min Float")) {
+				AddBinaryNode(material, "MinFloat", "Min Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Max Float")) {
+				AddBinaryNode(material, "MaxFloat", "Max Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lerp Color")) {
+				AddLerpNode(material, "LerpColor", "Lerp Color", NodeValueType::Color, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Lerp Float")) {
+				AddLerpNode(material, "LerpFloat", "Lerp Float", NodeValueType::Float, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Saturate Float")) {
+				AddUnaryFloatNode(material, "SaturateFloat", "Saturate Float", position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Frac Float")) {
+				AddUnaryFloatNode(material, "FracFloat", "Frac Float", position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("One Minus Float")) {
+				AddUnaryFloatNode(material, "OneMinusFloat", "One Minus Float", position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Combine Float2")) {
+				AddCombineFloat2Node(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Split Float2")) {
+				AddSplitFloat2Node(material, position);
 				changed = true;
 			}
 			ImGui::EndMenu();
@@ -182,8 +522,13 @@ namespace CalyxEngine {
 			AddColorNode(material, position);
 			changed = true;
 		}
-		if(ImGui::MenuItem("Lighting Mode##quick")) {
-			AddLightingModeNode(material, position);
+		if(ImGui::MenuItem("Toon Lighting##quick")) {
+			AddToonMasterNode(material, position);
+			changed = true;
+		}
+		if(ImGui::MenuItem("Texture Sample##quick")) {
+			AddObjectTextureNode(material, {position.x - 240.0f, position.y});
+			AddTextureSampleNode(material, position);
 			changed = true;
 		}
 		return changed;
@@ -321,15 +666,31 @@ namespace CalyxEngine {
 		ImGui::CloseCurrentPopup();
 	}
 
-	bool MaterialNodeEditorPanel::DrawNodeBody(Node& node) {
+	bool MaterialNodeEditorPanel::DrawNodeBody(MaterialAsset& material, Node& node) {
 		bool changed = false;
 		ImGui::PushID(node.id);
 		if(node.type == "Color") {
 			ImGui::SetNextItemWidth(188.0f);
 			changed |= ImGui::ColorEdit4("Color", &node.colorValue.x);
-		} else if(node.type == "Shininess" || node.type == "Roughness") {
+		} else if(node.type == "Float2") {
+			float x = GetFloatProperty(node, "x", 0.0f);
+			float y = GetFloatProperty(node, "y", 0.0f);
+			ImGui::SetNextItemWidth(86.0f);
+			if(ImGui::DragFloat("X", &x, 0.01f)) {
+				SetFloatProperty(node, "x", x);
+				changed = true;
+			}
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(86.0f);
+			if(ImGui::DragFloat("Y", &y, 0.01f)) {
+				SetFloatProperty(node, "y", y);
+				changed = true;
+			}
+		} else if(node.type == "Float" || node.type == "Shininess" || node.type == "Roughness") {
 			ImGui::SetNextItemWidth(178.0f);
-			changed |= ImGui::DragFloat("Value", &node.floatValue, 0.01f, 0.0f, 256.0f);
+			const float minValue = node.type == "Float" ? -1000.0f : 0.0f;
+			const float maxValue = node.type == "Float" ? 1000.0f : 256.0f;
+			changed |= ImGui::DragFloat("Value", &node.floatValue, 0.01f, minValue, maxValue);
 		} else if(node.type == "Reflect") {
 			changed |= ImGui::Checkbox("Value", &node.boolValue);
 		} else if(node.type == "LightingMode") {
@@ -363,8 +724,180 @@ namespace CalyxEngine {
 				lightingModePopupPos_.x = popupPos.x;
 				lightingModePopupPos_.y = popupPos.y;
 			}
+		} else if(node.type == "ToonMaster") {
+			if(ImGui::Button("Reset Toon Master", ImVec2(188.0f, 0.0f))) {
+				SetDefaultToonMasterProperties(node);
+				changed = true;
+			}
+
+			Vector4 base = GetColorProperty(node, "baseColor", {1, 1, 1, 1});
+			Vector4 highlight = GetColorProperty(node, "highlightColor", {1.08f, 1.06f, 1.02f, 1.0f});
+			Vector4 firstShade = GetColorProperty(node, "firstShadeColor", {0.72f, 0.76f, 0.86f, 1.0f});
+			Vector4 secondShade = GetColorProperty(node, "secondShadeColor", {0.42f, 0.46f, 0.58f, 1.0f});
+			float baseStep = GetFloatProperty(node, "baseStep", 0.25f);
+			float baseFeather = GetFloatProperty(node, "baseFeather", 0.03f);
+			float shadeStep = GetFloatProperty(node, "shadeStep", -0.15f);
+			float shadeFeather = GetFloatProperty(node, "shadeFeather", 0.03f);
+			float specThreshold = GetFloatProperty(node, "specularThreshold", 0.96f);
+			float specSoftness = GetFloatProperty(node, "specularSoftness", 0.02f);
+			float specIntensity = GetFloatProperty(node, "specularIntensity", 0.35f);
+
+			auto drawColorFallback = [&](const char* pinName, const char* label, const char* property, Vector4& value) {
+				const bool linked = IsInputLinked(material, node, pinName);
+				ImGui::BeginDisabled(linked);
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4(label, &value.x)) {
+					SetColorProperty(node, property, value);
+					changed = true;
+				}
+				ImGui::EndDisabled();
+				if(linked) {
+					ImGui::SameLine();
+					ImGui::TextDisabled("Linked");
+				}
+			};
+			auto drawFloatFallback = [&](const char* pinName, const char* label, const char* property, float& value, float minValue, float maxValue) {
+				const bool linked = IsInputLinked(material, node, pinName);
+				ImGui::BeginDisabled(linked);
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat(label, &value, minValue, maxValue)) {
+					SetFloatProperty(node, property, value);
+					changed = true;
+				}
+				ImGui::EndDisabled();
+				if(linked) {
+					ImGui::SameLine();
+					ImGui::TextDisabled("Linked");
+				}
+			};
+
+			drawColorFallback("Base Color", "Base", "baseColor", base);
+			drawColorFallback("Highlight", "Highlight", "highlightColor", highlight);
+			drawColorFallback("1st Shade", "1st Shade", "firstShadeColor", firstShade);
+			drawColorFallback("2nd Shade", "2nd Shade", "secondShadeColor", secondShade);
+			drawFloatFallback("Base Step", "Base Step", "baseStep", baseStep, -1.0f, 1.0f);
+			drawFloatFallback("Base Feather", "Base Feather", "baseFeather", baseFeather, 0.0f, 0.25f);
+			drawFloatFallback("Shade Step", "Shade Step", "shadeStep", shadeStep, -1.0f, 1.0f);
+			drawFloatFallback("Shade Feather", "Shade Feather", "shadeFeather", shadeFeather, 0.0f, 0.25f);
+			drawFloatFallback("Spec Threshold", "Spec Threshold", "specularThreshold", specThreshold, 0.0f, 1.0f);
+			drawFloatFallback("Spec Softness", "Spec Softness", "specularSoftness", specSoftness, 0.0f, 0.25f);
+			drawFloatFallback("Spec Intensity", "Spec Intensity", "specularIntensity", specIntensity, 0.0f, 4.0f);
+		} else if(node.type == "LitMaster") {
+			ImGui::TextDisabled("Standard Lit Surface");
+		} else if(node.type == "UnlitMaster") {
+			ImGui::TextDisabled("Unlit Surface");
+		} else if(IsLightingNode(node.type)) {
+			if(node.type == "ToonLighting") {
+				if(ImGui::Button("Reset Toon Defaults", ImVec2(188.0f, 0.0f))) {
+					SetDefaultToonProperties(node);
+					changed = true;
+				}
+
+				Vector4 highlight = GetColorProperty(node, "toonHighlightColor", {1.15f, 1.10f, 1.00f, 1.0f});
+				Vector4 base = GetColorProperty(node, "toonBaseColor", {1.0f, 1.0f, 1.0f, 1.0f});
+				Vector4 midShadow = GetColorProperty(node, "toonMidShadowColor", {0.72f, 0.76f, 0.86f, 1.0f});
+				Vector4 shadow = GetColorProperty(node, "toonShadowColor", {0.42f, 0.46f, 0.58f, 1.0f});
+				float threshold1 = GetFloatProperty(node, "toonThreshold1", -0.15f);
+				float threshold2 = GetFloatProperty(node, "toonThreshold2", 0.25f);
+				float threshold3 = GetFloatProperty(node, "toonThreshold3", 0.82f);
+				float edgeSoftness = GetFloatProperty(node, "toonEdgeSoftness", 0.03f);
+				float specThreshold = GetFloatProperty(node, "toonSpecularThreshold", 0.96f);
+				float specSoftness = GetFloatProperty(node, "toonSpecularSoftness", 0.02f);
+				float specIntensity = GetFloatProperty(node, "toonSpecularIntensity", 0.35f);
+
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Highlight", &highlight.x)) {
+					SetColorProperty(node, "toonHighlightColor", highlight);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Base", &base.x)) {
+					SetColorProperty(node, "toonBaseColor", base);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Mid Shadow", &midShadow.x)) {
+					SetColorProperty(node, "toonMidShadowColor", midShadow);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::ColorEdit4("Shadow", &shadow.x)) {
+					SetColorProperty(node, "toonShadowColor", shadow);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Threshold 1", &threshold1, -1.0f, 1.0f)) {
+					SetFloatProperty(node, "toonThreshold1", threshold1);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Threshold 2", &threshold2, -1.0f, 1.0f)) {
+					SetFloatProperty(node, "toonThreshold2", threshold2);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Threshold 3", &threshold3, -1.0f, 1.0f)) {
+					SetFloatProperty(node, "toonThreshold3", threshold3);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Edge Softness", &edgeSoftness, 0.0f, 0.25f)) {
+					SetFloatProperty(node, "toonEdgeSoftness", edgeSoftness);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Spec Threshold", &specThreshold, 0.0f, 1.0f)) {
+					SetFloatProperty(node, "toonSpecularThreshold", specThreshold);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Spec Softness", &specSoftness, 0.0f, 0.25f)) {
+					SetFloatProperty(node, "toonSpecularSoftness", specSoftness);
+					changed = true;
+				}
+				ImGui::SetNextItemWidth(188.0f);
+				if(ImGui::SliderFloat("Spec Intensity", &specIntensity, 0.0f, 4.0f)) {
+					SetFloatProperty(node, "toonSpecularIntensity", specIntensity);
+					changed = true;
+				}
+			} else {
+				ImGui::TextDisabled("%s", kLightingModes[LightingModeFromNodeType(node.type, 0)]);
+			}
+		} else if(node.type == "AddFloat") {
+			ImGui::TextDisabled("A + B");
+		} else if(node.type == "SubtractFloat") {
+			ImGui::TextDisabled("A - B");
 		} else if(node.type == "MultiplyColor" || node.type == "MultiplyFloat") {
 			ImGui::TextDisabled("A * B");
+		} else if(node.type == "DivideFloat") {
+			ImGui::TextDisabled("A / B");
+		} else if(node.type == "PowerFloat") {
+			ImGui::TextDisabled("pow(A, B)");
+		} else if(node.type == "MinFloat") {
+			ImGui::TextDisabled("min(A, B)");
+		} else if(node.type == "MaxFloat") {
+			ImGui::TextDisabled("max(A, B)");
+		} else if(node.type == "LerpColor" || node.type == "LerpFloat") {
+			ImGui::TextDisabled("lerp(A, B, T)");
+		} else if(node.type == "SaturateFloat") {
+			ImGui::TextDisabled("saturate(Value)");
+		} else if(node.type == "FracFloat") {
+			ImGui::TextDisabled("frac(Value)");
+		} else if(node.type == "OneMinusFloat") {
+			ImGui::TextDisabled("1 - Value");
+		} else if(node.type == "CombineFloat2") {
+			ImGui::TextDisabled("float2(X, Y)");
+		} else if(node.type == "SplitFloat2") {
+			ImGui::TextDisabled("float2 -> X/Y");
+		} else if(node.type == "ObjectTexture") {
+			ImGui::TextDisabled("Object gTexture");
+		} else if(node.type == "TextureSample") {
+			ImGui::TextDisabled("Sample Texture2D");
+		} else if(node.type == "UV" || node.type == "UVX" || node.type == "UVY" || node.type == "Time" ||
+				  node.type == "WorldPositionX" || node.type == "WorldPositionY" || node.type == "WorldPositionZ" ||
+				  node.type == "WorldNormalX" || node.type == "WorldNormalY" || node.type == "WorldNormalZ" ||
+				  node.type == "ViewDirectionX" || node.type == "ViewDirectionY" || node.type == "ViewDirectionZ") {
+			ImGui::TextDisabled("Shader input");
 		} else if(node.type == "Output") {
 			ImGui::TextUnformatted("Material Output");
 		}
@@ -389,8 +922,21 @@ namespace CalyxEngine {
 		node.type		= type;
 		node.title		= title;
 		node.position	= position;
-		node.floatValue = node.type == "Roughness" ? material.roughness : material.shininess;
+		if(node.type == "Float") node.floatValue = 0.0f;
+		else node.floatValue = node.type == "Roughness" ? material.roughness : material.shininess;
 		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddFloat2Node(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id = material.graph.AllocateId();
+		node.type = "Float2";
+		node.title = "Float2";
+		node.position = position;
+		node.properties["x"] = 0.0f;
+		node.properties["y"] = 0.0f;
+		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float2});
 		material.graph.nodes.push_back(std::move(node));
 	}
 
@@ -417,6 +963,136 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddLightingNode(MaterialAsset& material, const char* type, const char* title, int32_t mode, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = type;
+		node.title	  = title;
+		node.position = position;
+		node.intValue = mode;
+		node.outputs.push_back({material.graph.AllocateId(), "Lighting", NodePinKind::Output, NodeValueType::Int});
+		if(node.type == "ToonLighting") {
+			SetDefaultToonProperties(node);
+		}
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddToonMasterNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "ToonMaster";
+		node.title	  = "Toon Master";
+		node.position = position;
+		SetDefaultToonMasterProperties(node);
+		node.inputs.push_back({material.graph.AllocateId(), "Base Color", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Highlight", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "1st Shade", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "2nd Shade", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Base Step", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Base Feather", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Shade Step", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Shade Feather", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Spec Threshold", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Spec Softness", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Spec Intensity", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddLitMasterNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "LitMaster";
+		node.title	  = "Lit Master";
+		node.position = position;
+		node.properties["lightingMode"] = 0.0f;
+		node.properties["shininess"] = material.shininess;
+		node.properties["roughness"] = material.roughness;
+		node.inputs.push_back({material.graph.AllocateId(), "Base Color", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Shininess", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Roughness", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Reflect", NodePinKind::Input, NodeValueType::Bool});
+		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddUnlitMasterNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "UnlitMaster";
+		node.title	  = "Unlit Master";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Base Color", NodePinKind::Input, NodeValueType::Color});
+		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddObjectTextureNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "ObjectTexture";
+		node.title	  = "Object Texture";
+		node.position = position;
+		node.outputs.push_back({material.graph.AllocateId(), "Texture", NodePinKind::Output, NodeValueType::Texture2D});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddTextureSampleNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "TextureSample";
+		node.title	  = "Texture Sample";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Texture", NodePinKind::Input, NodeValueType::Texture2D});
+		node.inputs.push_back({material.graph.AllocateId(), "UV", NodePinKind::Input, NodeValueType::Float2});
+		node.outputs.push_back({material.graph.AllocateId(), "Color", NodePinKind::Output, NodeValueType::Color});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddShaderInputFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position) {
+		Node node;
+		node.id = material.graph.AllocateId();
+		node.type = type;
+		node.title = title;
+		node.position = position;
+		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddShaderInputFloat2Node(MaterialAsset& material, const char* type, const char* title, Vector2 position) {
+		Node node;
+		node.id = material.graph.AllocateId();
+		node.type = type;
+		node.title = title;
+		node.position = position;
+		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float2});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddCombineFloat2Node(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id = material.graph.AllocateId();
+		node.type = "CombineFloat2";
+		node.title = "Combine Float2";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "X", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Y", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float2});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddSplitFloat2Node(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id = material.graph.AllocateId();
+		node.type = "SplitFloat2";
+		node.title = "Split Float2";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Input, NodeValueType::Float2});
+		node.outputs.push_back({material.graph.AllocateId(), "X", NodePinKind::Output, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Y", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position) {
 		Node node;
 		node.id		  = material.graph.AllocateId();
@@ -429,15 +1105,79 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddLerpNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = type;
+		node.title	  = title;
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "A", NodePinKind::Input, valueType});
+		node.inputs.push_back({material.graph.AllocateId(), "B", NodePinKind::Input, valueType});
+		node.inputs.push_back({material.graph.AllocateId(), "T", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Result", NodePinKind::Output, valueType});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddUnaryFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = type;
+		node.title	  = title;
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Result", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::EnsureOutputNode(MaterialAsset& material) {
+		const ShaderGraphSchema schema = ShaderGraphSchemas::Object3DMaterial();
+
+		for(auto& node : material.graph.nodes) {
+			if(const ShaderGraphNodeSchema* schemaNode = FindSchemaNode(schema, node.type)) {
+				EnsureSchemaPins(material, node, *schemaNode);
+			}
+		}
+
 		for(auto& node : material.graph.nodes) {
 			if(node.type != "Output") continue;
-			const auto hasLightingMode = std::any_of(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
-				return pin.name == "Lighting Mode";
+			auto ensureInput = [&material, &node](const char* name, NodeValueType type) {
+				const auto exists = std::any_of(node.inputs.begin(), node.inputs.end(), [name](const NodePin& pin) {
+					return pin.name == name;
+				});
+				if(!exists) node.inputs.push_back({material.graph.AllocateId(), name, NodePinKind::Input, type});
+			};
+			ensureInput("Surface", NodeValueType::Material);
+
+			const auto surfaceIt = std::find_if(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
+				return pin.name == "Surface";
 			});
-			if(!hasLightingMode) {
-				node.inputs.push_back({material.graph.AllocateId(), "Lighting Mode", NodePinKind::Input, NodeValueType::Int});
+			const bool hasSurfaceLink = surfaceIt != node.inputs.end() &&
+				std::any_of(material.graph.links.begin(), material.graph.links.end(), [&surfaceIt](const NodeLink& link) {
+					return link.toPinId == surfaceIt->id;
+				});
+
+			if(hasSurfaceLink) {
+				std::vector<int32_t> removedPinIds;
+				for(const auto& pin : node.inputs) {
+					if(IsLegacyOutputPin(pin.name)) {
+						removedPinIds.push_back(pin.id);
+					}
+				}
+				node.inputs.erase(
+					std::remove_if(node.inputs.begin(), node.inputs.end(), [](const NodePin& pin) {
+						return IsLegacyOutputPin(pin.name);
+					}),
+					node.inputs.end());
+				material.graph.links.erase(
+					std::remove_if(material.graph.links.begin(), material.graph.links.end(), [&removedPinIds](const NodeLink& link) {
+						return std::find(removedPinIds.begin(), removedPinIds.end(), link.toPinId) != removedPinIds.end() ||
+							   std::find(removedPinIds.begin(), removedPinIds.end(), link.fromPinId) != removedPinIds.end();
+					}),
+					material.graph.links.end());
+				return;
 			}
+
+			ensureInput("Lighting Mode", NodeValueType::Int);
 			return;
 		}
 		Node node;
@@ -445,11 +1185,7 @@ namespace CalyxEngine {
 		node.type	  = "Output";
 		node.title	  = "Output";
 		node.position = {420.0f, 120.0f};
-		node.inputs.push_back({material.graph.AllocateId(), "BaseColor", NodePinKind::Input, NodeValueType::Color});
-		node.inputs.push_back({material.graph.AllocateId(), "Shininess", NodePinKind::Input, NodeValueType::Float});
-		node.inputs.push_back({material.graph.AllocateId(), "Roughness", NodePinKind::Input, NodeValueType::Float});
-		node.inputs.push_back({material.graph.AllocateId(), "Reflect", NodePinKind::Input, NodeValueType::Bool});
-		node.inputs.push_back({material.graph.AllocateId(), "Lighting Mode", NodePinKind::Input, NodeValueType::Int});
+		node.inputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Input, NodeValueType::Material});
 		material.graph.nodes.push_back(std::move(node));
 	}
 
@@ -460,6 +1196,7 @@ namespace CalyxEngine {
 			const NodePin* fromPin	= material.graph.FindPin(link.fromPinId, &fromNode);
 			if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Color) return fallback;
 			if(fromNode->type == "Color") return fromNode->colorValue;
+			if(fromNode->type == "TextureSample") return {1, 1, 1, 1};
 			if(fromNode->type == "MultiplyColor") {
 				return EvaluateColor(material, fromNode->inputs[0].id, {1, 1, 1, 1}) *
 					   EvaluateColor(material, fromNode->inputs[1].id, {1, 1, 1, 1});
@@ -474,10 +1211,60 @@ namespace CalyxEngine {
 			const Node*	   fromNode = nullptr;
 			const NodePin* fromPin	= material.graph.FindPin(link.fromPinId, &fromNode);
 			if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Float) return fallback;
-			if(fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+			if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+			if(fromNode->type == "UVX" || fromNode->type == "UVY" || fromNode->type == "Time" ||
+			   fromNode->type == "WorldPositionX" || fromNode->type == "WorldPositionY" || fromNode->type == "WorldPositionZ" ||
+			   fromNode->type == "WorldNormalX" || fromNode->type == "WorldNormalY" || fromNode->type == "WorldNormalZ" ||
+			   fromNode->type == "ViewDirectionX" || fromNode->type == "ViewDirectionY" || fromNode->type == "ViewDirectionZ") {
+				return fallback;
+			}
+			if(fromNode->type == "AddFloat") {
+				return EvaluateFloat(material, fromNode->inputs[0].id, 0.0f) +
+					   EvaluateFloat(material, fromNode->inputs[1].id, 0.0f);
+			}
+			if(fromNode->type == "SubtractFloat") {
+				return EvaluateFloat(material, fromNode->inputs[0].id, 0.0f) -
+					   EvaluateFloat(material, fromNode->inputs[1].id, 0.0f);
+			}
 			if(fromNode->type == "MultiplyFloat") {
 				return EvaluateFloat(material, fromNode->inputs[0].id, 1.0f) *
 					   EvaluateFloat(material, fromNode->inputs[1].id, 1.0f);
+			}
+			if(fromNode->type == "DivideFloat") {
+				const float b = EvaluateFloat(material, fromNode->inputs[1].id, 1.0f);
+				const float denominator = std::abs(b) < 0.0001f ? (b < 0.0f ? -0.0001f : 0.0001f) : b;
+				return EvaluateFloat(material, fromNode->inputs[0].id, fallback) / denominator;
+			}
+			if(fromNode->type == "PowerFloat") {
+				return std::pow(
+					(std::max)(EvaluateFloat(material, fromNode->inputs[0].id, 1.0f), 0.0f),
+					EvaluateFloat(material, fromNode->inputs[1].id, 1.0f));
+			}
+			if(fromNode->type == "MinFloat") {
+				return (std::min)(
+					EvaluateFloat(material, fromNode->inputs[0].id, fallback),
+					EvaluateFloat(material, fromNode->inputs[1].id, fallback));
+			}
+			if(fromNode->type == "MaxFloat") {
+				return (std::max)(
+					EvaluateFloat(material, fromNode->inputs[0].id, fallback),
+					EvaluateFloat(material, fromNode->inputs[1].id, fallback));
+			}
+			if(fromNode->type == "LerpFloat") {
+				const float a = EvaluateFloat(material, fromNode->inputs[0].id, fallback);
+				const float b = EvaluateFloat(material, fromNode->inputs[1].id, fallback);
+				const float t = std::clamp(EvaluateFloat(material, fromNode->inputs[2].id, 0.0f), 0.0f, 1.0f);
+				return a + (b - a) * t;
+			}
+			if(fromNode->type == "SaturateFloat") {
+				return std::clamp(EvaluateFloat(material, fromNode->inputs[0].id, fallback), 0.0f, 1.0f);
+			}
+			if(fromNode->type == "FracFloat") {
+				const float value = EvaluateFloat(material, fromNode->inputs[0].id, fallback);
+				return value - std::floor(value);
+			}
+			if(fromNode->type == "OneMinusFloat") {
+				return 1.0f - EvaluateFloat(material, fromNode->inputs[0].id, fallback);
 			}
 		}
 		return fallback;
@@ -507,22 +1294,34 @@ namespace CalyxEngine {
 				}
 				return base;
 			}
+			if(IsLightingNode(fromNode->type)) {
+				return LightingModeFromNodeType(fromNode->type, fallback);
+			}
 		}
 		return fallback;
 	}
 
+	void MaterialNodeEditorPanel::ApplyToonLightingNode(MaterialAsset& material, const Node& node) const {
+		if(node.type != "ToonLighting") return;
+		material.toonHighlightColor = GetColorProperty(node, "toonHighlightColor", material.toonHighlightColor);
+		material.toonBaseColor = GetColorProperty(node, "toonBaseColor", material.toonBaseColor);
+		material.toonMidShadowColor = GetColorProperty(node, "toonMidShadowColor", material.toonMidShadowColor);
+		material.toonShadowColor = GetColorProperty(node, "toonShadowColor", material.toonShadowColor);
+		material.toonThreshold1 = GetFloatProperty(node, "toonThreshold1", material.toonThreshold1);
+		material.toonThreshold2 = GetFloatProperty(node, "toonThreshold2", material.toonThreshold2);
+		material.toonThreshold3 = GetFloatProperty(node, "toonThreshold3", material.toonThreshold3);
+		material.toonEdgeSoftness = GetFloatProperty(node, "toonEdgeSoftness", material.toonEdgeSoftness);
+		material.toonShadeStep = material.toonThreshold1;
+		material.toonShadeFeather = material.toonEdgeSoftness;
+		material.toonBaseStep = material.toonThreshold2;
+		material.toonBaseFeather = material.toonEdgeSoftness;
+		material.toonSpecularThreshold = GetFloatProperty(node, "toonSpecularThreshold", material.toonSpecularThreshold);
+		material.toonSpecularSoftness = GetFloatProperty(node, "toonSpecularSoftness", material.toonSpecularSoftness);
+		material.toonSpecularIntensity = GetFloatProperty(node, "toonSpecularIntensity", material.toonSpecularIntensity);
+	}
+
 	void MaterialNodeEditorPanel::Evaluate(MaterialAsset& material) {
-		for(const auto& node : material.graph.nodes) {
-			if(node.type != "Output") continue;
-			for(const auto& pin : node.inputs) {
-				if(pin.name == "BaseColor") material.color = EvaluateColor(material, pin.id, material.color);
-				if(pin.name == "Shininess") material.shininess = EvaluateFloat(material, pin.id, material.shininess);
-				if(pin.name == "Roughness") material.roughness = EvaluateFloat(material, pin.id, material.roughness);
-				if(pin.name == "Reflect") material.isReflect = EvaluateBool(material, pin.id, material.isReflect);
-				if(pin.name == "Lighting Mode") material.lightingMode = EvaluateInt(material, pin.id, material.lightingMode);
-			}
-			return;
-		}
+		MaterialGraphCompiler::Compile(material);
 	}
 
 	void MaterialNodeEditorPanel::Save(MaterialAsset& material) {

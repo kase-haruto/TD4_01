@@ -13,6 +13,18 @@ struct Material {
     int isReflect;
     float environmentCoefficient;
     float roughness;
+    float4 toonHighlightColor;
+    float4 toonBaseColor;
+    float4 toonMidShadowColor;
+    float4 toonShadowColor;
+    float toonBaseStep;
+    float toonBaseFeather;
+    float toonShadeStep;
+    float toonShadeFeather;
+    float toonSpecularThreshold;
+    float toonSpecularSoftness;
+    float toonSpecularIntensity;
+    float pad3;
 };
 
 struct DirectionalLight {

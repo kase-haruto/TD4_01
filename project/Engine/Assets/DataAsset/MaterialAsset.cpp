@@ -15,6 +15,21 @@ namespace CalyxEngine {
 		AddField("isReflect", isReflect);
 		AddField("envirometCoefficient", envirometCoefficient);
 		AddField("roughness", roughness);
+		AddField("toonHighlightColor", toonHighlightColor);
+		AddField("toonBaseColor", toonBaseColor);
+		AddField("toonMidShadowColor", toonMidShadowColor);
+		AddField("toonShadowColor", toonShadowColor);
+		AddField("toonBaseStep", toonBaseStep);
+		AddField("toonBaseFeather", toonBaseFeather);
+		AddField("toonShadeStep", toonShadeStep);
+		AddField("toonShadeFeather", toonShadeFeather);
+		AddField("toonThreshold1", toonThreshold1);
+		AddField("toonThreshold2", toonThreshold2);
+		AddField("toonThreshold3", toonThreshold3);
+		AddField("toonEdgeSoftness", toonEdgeSoftness);
+		AddField("toonSpecularThreshold", toonSpecularThreshold);
+		AddField("toonSpecularSoftness", toonSpecularSoftness);
+		AddField("toonSpecularIntensity", toonSpecularIntensity);
 		// uvTransform のシリアライズは必要に応じて追加
 	}
 

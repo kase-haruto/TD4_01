@@ -231,11 +231,21 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
 
 DirectX::ScratchImage LoadTextureImage(const std::string& filePath) {
 	using namespace DirectX;
+	std::string textureFilePath = filePath;
+
+	//テクスチャファイルがあるか判定
+	std::filesystem::path rootDir = FileSystemHelper::GetRootDirectory(filePath);
+	if(FileSystemHelper::HasExtensionFile(rootDir, ".png") || FileSystemHelper::HasExtensionFile(rootDir, ".dds")) {
+		// あるならそのまま読み込む
+	} else {
+		// ないなら白テクスチャを読み込む
+		textureFilePath = "Resources/Assets/Textures/white1x1.dds";
+	}
 
 	ScratchImage image{};
 	ScratchImage mipImages{};
 
-	std::filesystem::path path(filePath);
+	std::filesystem::path path(textureFilePath);
 	std::filesystem::path ddsPath = path;
 	ddsPath.replace_extension(".dds");
 
@@ -252,7 +262,7 @@ DirectX::ScratchImage LoadTextureImage(const std::string& filePath) {
 		useDDS = true;
 		filePathW = ConvertString(ddsPath.string());
 	} else {
-		filePathW = ConvertString(filePath);
+		filePathW = ConvertString(textureFilePath);
 	}
 
 	// ファイル形式に応じて読み込み

@@ -1,0 +1,627 @@
+{
+  "fields": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "envirometCoefficient": 0.5,
+    "isReflect": false,
+    "lightingMode": 2,
+    "roughness": 0.5,
+    "shininess": 20.0,
+    "toonBaseColor": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "toonBaseFeather": 0.029999999329447746,
+    "toonBaseStep": 0.25,
+    "toonEdgeSoftness": 0.029999999329447746,
+    "toonHighlightColor": [
+      1.0800000429153442,
+      1.059999942779541,
+      1.0199999809265137,
+      1.0
+    ],
+    "toonMidShadowColor": [
+      0.7200000286102295,
+      0.7599999904632568,
+      0.8600000143051147,
+      1.0
+    ],
+    "toonShadeFeather": 0.029999999329447746,
+    "toonShadeStep": -0.15000000596046448,
+    "toonShadowColor": [
+      0.41999998688697815,
+      0.46000000834465027,
+      0.5799999833106995,
+      1.0
+    ],
+    "toonSpecularIntensity": 0.3499999940395355,
+    "toonSpecularSoftness": 0.019999999552965164,
+    "toonSpecularThreshold": 0.9599999785423279,
+    "toonThreshold1": -0.15000000596046448,
+    "toonThreshold2": 0.25,
+    "toonThreshold3": 0.8199999928474426
+  },
+  "graph": {
+    "links": [
+      {
+        "fromPinId": 5,
+        "id": 10,
+        "toPinId": 7
+      },
+      {
+        "fromPinId": 8,
+        "id": 15,
+        "toPinId": 12
+      },
+      {
+        "fromPinId": 22,
+        "id": 29,
+        "toPinId": 27
+      },
+      {
+        "fromPinId": 42,
+        "id": 43,
+        "toPinId": 2
+      },
+      {
+        "fromPinId": 60,
+        "id": 61,
+        "toPinId": 26
+      },
+      {
+        "fromPinId": 28,
+        "id": 62,
+        "toPinId": 31
+      },
+      {
+        "fromPinId": 64,
+        "id": 69,
+        "toPinId": 66
+      },
+      {
+        "fromPinId": 71,
+        "id": 72,
+        "toPinId": 67
+      },
+      {
+        "fromPinId": 68,
+        "id": 73,
+        "toPinId": 13
+      },
+      {
+        "fromPinId": 14,
+        "id": 77,
+        "toPinId": 75
+      },
+      {
+        "fromPinId": 76,
+        "id": 78,
+        "toPinId": 20
+      },
+      {
+        "fromPinId": 9,
+        "id": 79,
+        "toPinId": 21
+      }
+    ],
+    "nextId": 80,
+    "nodes": [
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 1,
+        "inputs": [
+          {
+            "id": 2,
+            "kind": 0,
+            "name": "Surface",
+            "valueType": 5
+          }
+        ],
+        "intValue": 0,
+        "outputs": [],
+        "position": [
+          2055.0,
+          272.0
+        ],
+        "properties": {},
+        "title": "Output",
+        "type": "Output"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 4,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 5,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          383.0,
+          -331.0
+        ],
+        "properties": {},
+        "title": "UV",
+        "type": "UV"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 6,
+        "inputs": [
+          {
+            "id": 7,
+            "kind": 0,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 8,
+            "kind": 1,
+            "name": "X",
+            "valueType": 1
+          },
+          {
+            "id": 9,
+            "kind": 1,
+            "name": "Y",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          620.0,
+          -343.0
+        ],
+        "properties": {},
+        "title": "Split Float2",
+        "type": "SplitFloat2"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 11,
+        "inputs": [
+          {
+            "id": 12,
+            "kind": 0,
+            "name": "A",
+            "valueType": 1
+          },
+          {
+            "id": 13,
+            "kind": 0,
+            "name": "B",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 14,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          890.0,
+          -284.0
+        ],
+        "properties": {},
+        "title": "Add Float",
+        "type": "AddFloat"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 19,
+        "inputs": [
+          {
+            "id": 20,
+            "kind": 0,
+            "name": "X",
+            "valueType": 1
+          },
+          {
+            "id": 21,
+            "kind": 0,
+            "name": "Y",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 22,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          1038.0,
+          240.0
+        ],
+        "properties": {},
+        "title": "Combine Float2",
+        "type": "CombineFloat2"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 25,
+        "inputs": [
+          {
+            "id": 26,
+            "kind": 0,
+            "name": "Texture",
+            "valueType": 6
+          },
+          {
+            "id": 27,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 28,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          1302.0,
+          240.0
+        ],
+        "properties": {},
+        "title": "Texture Sample",
+        "type": "TextureSample"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 30,
+        "inputs": [
+          {
+            "id": 31,
+            "kind": 0,
+            "name": "Base Color",
+            "valueType": 2
+          },
+          {
+            "id": 32,
+            "kind": 0,
+            "name": "Highlight",
+            "valueType": 2
+          },
+          {
+            "id": 33,
+            "kind": 0,
+            "name": "1st Shade",
+            "valueType": 2
+          },
+          {
+            "id": 34,
+            "kind": 0,
+            "name": "2nd Shade",
+            "valueType": 2
+          },
+          {
+            "id": 35,
+            "kind": 0,
+            "name": "Base Step",
+            "valueType": 1
+          },
+          {
+            "id": 36,
+            "kind": 0,
+            "name": "Base Feather",
+            "valueType": 1
+          },
+          {
+            "id": 37,
+            "kind": 0,
+            "name": "Shade Step",
+            "valueType": 1
+          },
+          {
+            "id": 38,
+            "kind": 0,
+            "name": "Shade Feather",
+            "valueType": 1
+          },
+          {
+            "id": 39,
+            "kind": 0,
+            "name": "Spec Threshold",
+            "valueType": 1
+          },
+          {
+            "id": 40,
+            "kind": 0,
+            "name": "Spec Softness",
+            "valueType": 1
+          },
+          {
+            "id": 41,
+            "kind": 0,
+            "name": "Spec Intensity",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 42,
+            "kind": 1,
+            "name": "Surface",
+            "valueType": 5
+          }
+        ],
+        "position": [
+          1632.0,
+          -108.0
+        ],
+        "properties": {
+          "baseColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "baseFeather": 0.029999999329447746,
+          "baseStep": 0.25,
+          "firstShadeColor": [
+            0.7200000286102295,
+            0.7599999904632568,
+            0.8600000143051147,
+            1.0
+          ],
+          "highlightColor": [
+            1.0800000429153442,
+            1.059999942779541,
+            1.0199999809265137,
+            1.0
+          ],
+          "secondShadeColor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.5799999833106995,
+            1.0
+          ],
+          "shadeFeather": 0.029999999329447746,
+          "shadeStep": -0.15000000596046448,
+          "specularIntensity": 0.3499999940395355,
+          "specularSoftness": 0.019999999552965164,
+          "specularThreshold": 0.9599999785423279
+        },
+        "title": "Toon Master",
+        "type": "ToonMaster"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 59,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 60,
+            "kind": 1,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "position": [
+          1034.0,
+          113.0
+        ],
+        "properties": {},
+        "title": "Object Texture",
+        "type": "ObjectTexture"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 63,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 64,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          258.0,
+          -199.0
+        ],
+        "properties": {},
+        "title": "Time",
+        "type": "Time"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 65,
+        "inputs": [
+          {
+            "id": 66,
+            "kind": 0,
+            "name": "A",
+            "valueType": 1
+          },
+          {
+            "id": 67,
+            "kind": 0,
+            "name": "B",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 68,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          572.0,
+          -168.0
+        ],
+        "properties": {},
+        "title": "Multiply Float",
+        "type": "MultiplyFloat"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.3400000035762787,
+        "id": 70,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 71,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          258.0,
+          -81.0
+        ],
+        "properties": {},
+        "title": "Float",
+        "type": "Float"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 74,
+        "inputs": [
+          {
+            "id": 75,
+            "kind": 0,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 76,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          685.0,
+          240.0
+        ],
+        "properties": {},
+        "title": "Frac Float",
+        "type": "FracFloat"
+      }
+    ]
+  },
+  "guid": "c7df6dde-2a5a-4c08-92ab-f7d69c33408c",
+  "name": "AnimationMaterial",
+  "type": "MaterialAsset"
+}
