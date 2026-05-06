@@ -11,6 +11,7 @@ namespace CalyxEngine {
 	class MaterialGraphCompiler {
 	public:
 		static void Compile(MaterialAsset& material) {
+			SyncGraphTextureGuid(material);
 			const CompiledMaterialGraph compiled = CompileToIR(material);
 			ApplyCompiled(material, compiled);
 		}
@@ -45,6 +46,22 @@ namespace CalyxEngine {
 		}
 
 	private:
+		static Guid GetGuidProperty(const Node& node, const char* key) {
+			auto it = node.properties.find(key);
+			if(it == node.properties.end() || !it->is_string()) return Guid::Empty();
+			return Guid::FromString(it->get<std::string>());
+		}
+
+		static void SyncGraphTextureGuid(MaterialAsset& material) {
+			for(const Node& node : material.graph.nodes) {
+				if(node.type != "ObjectTexture") continue;
+				const Guid guid = GetGuidProperty(node, "textureGuid");
+				if(!guid.isValid()) continue;
+				material.objectTextureGuid = guid;
+				return;
+			}
+		}
+
 		static CompiledMaterialGraph MakeDefaultCompiled(const MaterialAsset& material) {
 			CompiledMaterialGraph compiled;
 			compiled.lightingMode = material.lightingMode;
@@ -212,6 +229,19 @@ namespace CalyxEngine {
 				}
 				if(fromNode->type == "OneMinusFloat") {
 					return 1.0f - EvaluateFloat(material, fromNode->inputs[0].id, fallback);
+				}
+				if(fromNode->type == "StepFloat") {
+					const float edge = EvaluateFloat(material, fromNode->inputs[0].id, 0.5f);
+					const float value = EvaluateFloat(material, fromNode->inputs[1].id, fallback);
+					return value < edge ? 0.0f : 1.0f;
+				}
+				if(fromNode->type == "SmoothstepFloat") {
+					const float edge0 = EvaluateFloat(material, fromNode->inputs[0].id, 0.4f);
+					const float edge1 = EvaluateFloat(material, fromNode->inputs[1].id, 0.6f);
+					const float value = EvaluateFloat(material, fromNode->inputs[2].id, fallback);
+					const float width = std::abs(edge1 - edge0) < 0.0001f ? 0.0001f : edge1 - edge0;
+					const float t = std::clamp((value - edge0) / width, 0.0f, 1.0f);
+					return t * t * (3.0f - 2.0f * t);
 				}
 			}
 			return fallback;

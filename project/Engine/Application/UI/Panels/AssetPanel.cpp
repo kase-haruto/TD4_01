@@ -323,6 +323,12 @@ namespace CalyxEngine {
 
 					ImGui::SameLine();
 					ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
+					if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+						AssetDragPayload payload{rec->type, rec->guid};
+						ImGui::SetDragDropPayload("CALYX_ASSET", &payload, sizeof(payload));
+						ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
+						ImGui::EndDragDropSource();
+					}
 
 					ImGui::EndGroup();
 					ImGui::PopID();
@@ -370,6 +376,12 @@ namespace CalyxEngine {
 				}
 
 				ImGui::TextWrapped("%s", rec->sourcePath.filename().string().c_str());
+				if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+					AssetDragPayload payload{rec->type, rec->guid};
+					ImGui::SetDragDropPayload("CALYX_ASSET", &payload, sizeof(payload));
+					ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
+					ImGui::EndDragDropSource();
+				}
 
 				ImGui::EndGroup();
 				ImGui::PopID();

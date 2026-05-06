@@ -796,6 +796,23 @@ float GeneratedValueNoise(float2 p) {
 				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
 				return {"(1.0f - " + value.hlsl + ")", value.usesObjectTexture, value.usesNoiseTexture};
 			}
+			if(fromNode->type == "StepFloat" && fromNode->inputs.size() >= 2) {
+				const MaterialExpression edge = FloatExpressionFromInput(graph, fromNode->inputs[0].id, FloatExpression(0.5f), depth + 1);
+				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[1].id, fallback, depth + 1);
+				return {
+					"step(" + edge.hlsl + ", " + value.hlsl + ")",
+					edge.usesObjectTexture || value.usesObjectTexture,
+					edge.usesNoiseTexture || value.usesNoiseTexture};
+			}
+			if(fromNode->type == "SmoothstepFloat" && fromNode->inputs.size() >= 3) {
+				const MaterialExpression edge0 = FloatExpressionFromInput(graph, fromNode->inputs[0].id, FloatExpression(0.4f), depth + 1);
+				const MaterialExpression edge1 = FloatExpressionFromInput(graph, fromNode->inputs[1].id, FloatExpression(0.6f), depth + 1);
+				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[2].id, fallback, depth + 1);
+				return {
+					"smoothstep(" + edge0.hlsl + ", " + edge1.hlsl + ", " + value.hlsl + ")",
+					edge0.usesObjectTexture || edge1.usesObjectTexture || value.usesObjectTexture,
+					edge0.usesNoiseTexture || edge1.usesNoiseTexture || value.usesNoiseTexture};
+			}
 			return fallback;
 		}
 
