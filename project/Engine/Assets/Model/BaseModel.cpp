@@ -423,6 +423,12 @@ void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transf
 
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetInstanceSrv() const { return instanceBuffer_.GetGpuSrvHandle(); }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const {
+	if(auto material = GetMaterialAsset()) {
+		if(material->objectTextureGuid.isValid()) {
+			auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material->objectTextureGuid);
+			if(h.ptr) return h;
+		}
+	}
 	if(handle_ && handle_->ptr) {
 		return handle_.value();
 	}
@@ -432,6 +438,12 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const {
 	return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds");
 }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t materialIndex) const {
+	if(auto material = GetMaterialAsset()) {
+		if(material->objectTextureGuid.isValid()) {
+			auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material->objectTextureGuid);
+			if(h.ptr) return h;
+		}
+	}
 	if(handle_ && handle_->ptr) {
 		return handle_.value();
 	}

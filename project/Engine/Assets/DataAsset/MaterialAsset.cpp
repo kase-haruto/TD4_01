@@ -30,6 +30,7 @@ namespace CalyxEngine {
 		AddField("toonSpecularThreshold", toonSpecularThreshold);
 		AddField("toonSpecularSoftness", toonSpecularSoftness);
 		AddField("toonSpecularIntensity", toonSpecularIntensity);
+		AddField("objectTextureGuid", objectTextureGuid);
 		// uvTransform のシリアライズは必要に応じて追加
 	}
 
