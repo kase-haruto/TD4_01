@@ -12,7 +12,6 @@ Shockwave::Shockwave(const std::string& modelName, std::optional<std::string> ob
 
 void Shockwave::Initialize() {
 	param_.LoadParams();
-	SetBlendMode(BlendMode::ADD);
 
 	// 球体コライダーを初期化
 	InitializeCollider(ColliderKind::Sphere);
