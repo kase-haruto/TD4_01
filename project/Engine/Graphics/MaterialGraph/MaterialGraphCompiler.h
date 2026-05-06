@@ -130,6 +130,9 @@ namespace CalyxEngine {
 				if(fromNode->type == "TextureSample") {
 					return {1, 1, 1, 1};
 				}
+				if(fromNode->type == "NoiseTexture") {
+					return {0.5f, 0.5f, 0.5f, 1.0f};
+				}
 				if(fromNode->type == "MultiplyColor") {
 					return EvaluateColor(material, fromNode->inputs[0].id, {1, 1, 1, 1}) *
 						   EvaluateColor(material, fromNode->inputs[1].id, {1, 1, 1, 1});
@@ -155,6 +158,7 @@ namespace CalyxEngine {
 				const NodePin* fromPin = material.graph.FindPin(link.fromPinId, &fromNode);
 				if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Float) return fallback;
 				if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+				if(fromNode->type == "NoiseTexture") return 0.5f;
 				if(fromNode->type == "UVX" || fromNode->type == "UVY" || fromNode->type == "Time" ||
 				   fromNode->type == "WorldPositionX" || fromNode->type == "WorldPositionY" || fromNode->type == "WorldPositionZ" ||
 				   fromNode->type == "WorldNormalX" || fromNode->type == "WorldNormalY" || fromNode->type == "WorldNormalZ" ||

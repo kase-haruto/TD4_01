@@ -137,6 +137,12 @@ Toon Master / Surface -> Output / Surface
   - `UV` 入力に `Float2` を接続した場合はその UV を使います。
   - 未接続の場合は Object3D の標準 UV を使います。
 
+- `Noise Texture`
+  - HLSL 内で生成する 2D value noise を出力します。
+  - `Color` はグレースケール色、`Value` は 0..1 の float です。
+  - `UV` 入力が未接続の場合は Object3D の標準 UV を使います。
+  - `Scale` 入力が未接続の場合はノード内の Scale 値を使います。
+
 ### Vector ノード
 
 - `Float2`
@@ -269,6 +275,7 @@ DXC コンパイルに失敗した場合、エディタの `Compile HLSL` / `Bui
 - Master ノード単位で Toon、Lit、Unlit を選べます。
 - Toon の色、しきい値、ぼかし幅、スペキュラをノード入力から調整できます。
 - Object3D の既存テクスチャを shader graph 内でサンプリングできます。
+- Procedural な `Noise Texture` で、テクスチャアセットなしのノイズマテリアルを作れます。
 - Color と Float の基本演算を組み合わせられます。
 - UV、Time、World Position、World Normal、View Direction の float 入力を使えます。
 - static model の Object3D 描画で、生成 Pixel Shader と生成 PSO を使用できます。
@@ -279,7 +286,7 @@ DXC コンパイルに失敗した場合、エディタの `Compile HLSL` / `Bui
   skinned model への経路はまだ整理が必要です。
 
 - `Texture Sample` は Object3D の標準テクスチャを使います。
-  任意の Texture Asset、UV 入力付きサンプリング、UV 変換ノード、複数テクスチャスロットはまだありません。
+  任意の Texture Asset、UV 変換専用ノード、複数テクスチャスロットはまだありません。
 
 - `Float2` は使用できます。
   `Float3`, `Float4`, `Vector`, `Normal` 型は型定義の準備だけで、実用ノードはまだありません。

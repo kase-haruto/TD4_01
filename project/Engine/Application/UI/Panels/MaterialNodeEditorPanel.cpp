@@ -433,6 +433,10 @@ namespace CalyxEngine {
 				AddTextureSampleNode(material, position);
 				changed = true;
 			}
+			if(ImGui::MenuItem("Noise Texture")) {
+				AddNoiseTextureNode(material, position);
+				changed = true;
+			}
 			ImGui::EndMenu();
 		}
 		if(ImGui::BeginMenu("Inputs")) {
@@ -893,6 +897,20 @@ namespace CalyxEngine {
 			ImGui::TextDisabled("Object gTexture");
 		} else if(node.type == "TextureSample") {
 			ImGui::TextDisabled("Sample Texture2D");
+		} else if(node.type == "NoiseTexture") {
+			float scale = GetFloatProperty(node, "scale", 8.0f);
+			const bool linked = IsInputLinked(material, node, "Scale");
+			ImGui::BeginDisabled(linked);
+			ImGui::SetNextItemWidth(188.0f);
+			if(ImGui::SliderFloat("Scale", &scale, 0.1f, 128.0f)) {
+				SetFloatProperty(node, "scale", scale);
+				changed = true;
+			}
+			ImGui::EndDisabled();
+			if(linked) {
+				ImGui::SameLine();
+				ImGui::TextDisabled("Linked");
+			}
 		} else if(node.type == "UV" || node.type == "UVX" || node.type == "UVY" || node.type == "Time" ||
 				  node.type == "WorldPositionX" || node.type == "WorldPositionY" || node.type == "WorldPositionZ" ||
 				  node.type == "WorldNormalX" || node.type == "WorldNormalY" || node.type == "WorldNormalZ" ||
@@ -1049,6 +1067,20 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddNoiseTextureNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "NoiseTexture";
+		node.title	  = "Noise Texture";
+		node.position = position;
+		node.properties["scale"] = 8.0f;
+		node.inputs.push_back({material.graph.AllocateId(), "UV", NodePinKind::Input, NodeValueType::Float2});
+		node.inputs.push_back({material.graph.AllocateId(), "Scale", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Color", NodePinKind::Output, NodeValueType::Color});
+		node.outputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::AddShaderInputFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position) {
 		Node node;
 		node.id = material.graph.AllocateId();
@@ -1197,6 +1229,7 @@ namespace CalyxEngine {
 			if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Color) return fallback;
 			if(fromNode->type == "Color") return fromNode->colorValue;
 			if(fromNode->type == "TextureSample") return {1, 1, 1, 1};
+			if(fromNode->type == "NoiseTexture") return {0.5f, 0.5f, 0.5f, 1.0f};
 			if(fromNode->type == "MultiplyColor") {
 				return EvaluateColor(material, fromNode->inputs[0].id, {1, 1, 1, 1}) *
 					   EvaluateColor(material, fromNode->inputs[1].id, {1, 1, 1, 1});
@@ -1212,6 +1245,7 @@ namespace CalyxEngine {
 			const NodePin* fromPin	= material.graph.FindPin(link.fromPinId, &fromNode);
 			if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Float) return fallback;
 			if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+			if(fromNode->type == "NoiseTexture") return 0.5f;
 			if(fromNode->type == "UVX" || fromNode->type == "UVY" || fromNode->type == "Time" ||
 			   fromNode->type == "WorldPositionX" || fromNode->type == "WorldPositionY" || fromNode->type == "WorldPositionZ" ||
 			   fromNode->type == "WorldNormalX" || fromNode->type == "WorldNormalY" || fromNode->type == "WorldNormalZ" ||
