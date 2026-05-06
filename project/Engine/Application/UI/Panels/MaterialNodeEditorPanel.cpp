@@ -3,10 +3,16 @@
 #include <Engine\Assets\DataAsset\MaterialAsset.h>
 #include <Engine\Assets\Database\AssetDatabase.h>
 #include <Engine\Assets\Manager\AssetManager.h>
+#include <Engine\Assets\Texture\TextureManager.h>
+#include <Engine\Application\UI\Panels\AssetPanel.h>
+#include <Engine\Foundation\Clock\ClockManager.h>
+#include <Engine\Graphics\Context\GraphicsGroup.h>
+#include <Engine\Graphics\Descriptor\DescriptorAllocator.h>
 #include <Engine\Graphics\MaterialGraph\MaterialGraphCompiler.h>
 #include <Engine\Graphics\MaterialGraph\ShaderGraphCodeGenerator.h>
 #include <Engine\Graphics\MaterialGraph\ShaderGraphSchema.h>
 #include <Engine\Graphics\MaterialGraph\ShaderGraphValidator.h>
+#include <Engine\Graphics\Pipeline\Factory\PsoFactory.h>
 #include <Engine\Graphics\Pipeline\Shader\ShaderCompiler.h>
 #include <externals\imgui\imgui.h>
 
@@ -14,6 +20,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include <vector>
 
@@ -80,6 +87,23 @@ namespace CalyxEngine {
 			return std::any_of(material.graph.links.begin(), material.graph.links.end(), [pin](const NodeLink& link) {
 				return link.toPinId == pin->id;
 			});
+		}
+
+		const Node* FindLinkedNode(const MaterialAsset& material, const Node& node, const char* inputName) {
+			const NodePin* pin = FindInputPin(node, inputName);
+			if(!pin) return nullptr;
+			for(const NodeLink& link : material.graph.links) {
+				if(link.toPinId != pin->id) continue;
+				const NodePin* fromPin = material.graph.FindPin(link.fromPinId);
+				if(!fromPin) return nullptr;
+				for(const Node& candidate : material.graph.nodes) {
+					const auto ownsOutput = std::any_of(candidate.outputs.begin(), candidate.outputs.end(), [fromPin](const NodePin& output) {
+						return output.id == fromPin->id;
+					});
+					if(ownsOutput) return &candidate;
+				}
+			}
+			return nullptr;
 		}
 
 		const ShaderGraphNodeSchema* FindSchemaNode(const ShaderGraphSchema& schema, const std::string& type) {
@@ -149,6 +173,179 @@ namespace CalyxEngine {
 			SetFloatProperty(node, "specularThreshold", 0.96f);
 			SetFloatProperty(node, "specularSoftness", 0.02f);
 			SetFloatProperty(node, "specularIntensity", 0.35f);
+		}
+
+		const AssetRecord* FindTextureRecord(const Guid& guid) {
+			if(!guid.isValid()) return nullptr;
+			for(auto* rec : AssetDatabase::GetInstance()->GetView()) {
+				if(rec && rec->type == AssetType::Texture && rec->guid == guid) return rec;
+			}
+			return nullptr;
+		}
+
+		std::string TextureLabelFromGuid(const Guid& guid) {
+			if(const AssetRecord* rec = FindTextureRecord(guid)) {
+				return rec->sourcePath.filename().string();
+			}
+			return guid.isValid() ? "(missing texture)" : "(object/model texture)";
+		}
+
+		bool DrawTextureAssetSelector(const char* label, Guid& guid) {
+			bool changed = false;
+			const std::string current = TextureLabelFromGuid(guid);
+
+			ImGui::SetNextItemWidth(188.0f);
+			if(ImGui::BeginCombo(label, current.c_str())) {
+				const bool noneSelected = !guid.isValid();
+				if(ImGui::Selectable("(object/model texture)", noneSelected)) {
+					guid = Guid::Empty();
+					changed = true;
+				}
+				if(noneSelected) ImGui::SetItemDefaultFocus();
+
+				for(auto* rec : AssetDatabase::GetInstance()->GetView()) {
+					if(!rec || rec->type != AssetType::Texture) continue;
+					const bool selected = guid == rec->guid;
+					const std::string itemLabel = rec->sourcePath.filename().string();
+					if(ImGui::Selectable(itemLabel.c_str(), selected)) {
+						guid = rec->guid;
+						changed = true;
+					}
+					if(selected) ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+
+			return changed;
+		}
+
+		Guid GetGuidProperty(const Node& node, const char* key) {
+			auto it = node.properties.find(key);
+			if(it == node.properties.end() || !it->is_string()) return Guid::Empty();
+			return Guid::FromString(it->get<std::string>());
+		}
+
+		void SetGuidProperty(Node& node, const char* key, const Guid& guid) {
+			if(guid.isValid()) {
+				node.properties[key] = guid.ToString();
+			} else {
+				node.properties.erase(key);
+			}
+		}
+
+		Guid FindGraphTextureGuid(const MaterialAsset& material) {
+			for(const Node& node : material.graph.nodes) {
+				if(node.type != "ObjectTexture") continue;
+				const Guid guid = GetGuidProperty(node, "textureGuid");
+				if(guid.isValid()) return guid;
+			}
+			if(material.objectTextureGuid.isValid()) return material.objectTextureGuid;
+			return Guid::Empty();
+		}
+
+		Guid ResolveTextureInputGuid(const MaterialAsset& material, const Node& node, const char* inputName) {
+			const Node* linked = FindLinkedNode(material, node, inputName);
+			if(!linked) return Guid::Empty();
+
+			const Guid guid = GetGuidProperty(*linked, "textureGuid");
+			if(guid.isValid()) return guid;
+
+			if(linked->type == "ObjectTexture") return material.objectTextureGuid;
+			return Guid::Empty();
+		}
+
+		float PreviewHash(float x, float y) {
+			const float n = std::sin(x * 12.9898f + y * 78.233f) * 43758.5453f;
+			return n - std::floor(n);
+		}
+
+		float PreviewNoise(float x, float y) {
+			const float ix = std::floor(x);
+			const float iy = std::floor(y);
+			const float fx = x - ix;
+			const float fy = y - iy;
+			const float ux = fx * fx * (3.0f - 2.0f * fx);
+			const float uy = fy * fy * (3.0f - 2.0f * fy);
+
+			const float a = PreviewHash(ix, iy);
+			const float b = PreviewHash(ix + 1.0f, iy);
+			const float c = PreviewHash(ix, iy + 1.0f);
+			const float d = PreviewHash(ix + 1.0f, iy + 1.0f);
+			const float x0 = a + (b - a) * ux;
+			const float x1 = c + (d - c) * ux;
+			return x0 + (x1 - x0) * uy;
+		}
+
+		void DrawNoiseThumbnail(float scale, ImVec2 size) {
+			const ImVec2 min = ImGui::GetCursorScreenPos();
+			const ImVec2 max{min.x + size.x, min.y + size.y};
+			ImGui::InvisibleButton("##noise-preview", size);
+
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+			constexpr int32_t grid = 36;
+			const float cellW = size.x / static_cast<float>(grid);
+			const float cellH = size.y / static_cast<float>(grid);
+			for(int32_t y = 0; y < grid; ++y) {
+				for(int32_t x = 0; x < grid; ++x) {
+					const float u = (static_cast<float>(x) + 0.5f) / static_cast<float>(grid);
+					const float v = (static_cast<float>(y) + 0.5f) / static_cast<float>(grid);
+					const float value = std::clamp(PreviewNoise(u * scale, v * scale), 0.0f, 1.0f);
+					const int32_t c = static_cast<int32_t>(value * 255.0f);
+					drawList->AddRectFilled(
+						{min.x + x * cellW, min.y + y * cellH},
+						{min.x + (x + 1) * cellW + 0.5f, min.y + (y + 1) * cellH + 0.5f},
+						IM_COL32(c, c, c, 255));
+				}
+			}
+			drawList->AddRect(min, max, IM_COL32(255, 255, 255, 64), 3.0f);
+		}
+
+		bool TryReadTextureDragPayload(Guid& outGuid) {
+			const ImGuiPayload* payload = ImGui::GetDragDropPayload();
+			if(!payload || !payload->IsDataType("CALYX_ASSET") || payload->DataSize != sizeof(AssetDragPayload)) return false;
+
+			const AssetDragPayload assetPayload = *reinterpret_cast<const AssetDragPayload*>(payload->Data);
+			if(assetPayload.type != AssetType::Texture) return false;
+
+			outGuid = assetPayload.guid;
+			return outGuid.isValid();
+		}
+
+		bool AcceptTextureDropRect(Guid& guid, const ImVec2& min, const ImVec2& max) {
+			Guid droppedGuid = Guid::Empty();
+			const bool hasTexturePayload = TryReadTextureDragPayload(droppedGuid);
+			const bool hovered = hasTexturePayload && ImGui::IsMouseHoveringRect(min, max, true);
+			if(!hovered) return false;
+
+			ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(120, 180, 255, 235), 4.0f, 0, 3.0f);
+			if(!ImGui::IsMouseReleased(ImGuiMouseButton_Left)) return false;
+
+			guid = droppedGuid;
+			return true;
+		}
+
+		bool DrawTexturePreviewSlot(Guid& guid, ImVec2 size, bool allowDrop = true) {
+			bool changed = false;
+			const ImVec2 min = ImGui::GetCursorScreenPos();
+			const ImVec2 max{min.x + size.x, min.y + size.y};
+
+			if(const AssetRecord* rec = FindTextureRecord(guid); rec && rec->previewTex) {
+				ImGui::Image(rec->previewTex, size);
+			} else {
+				ImGui::InvisibleButton("##texture-preview", size);
+			}
+
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+			if(!FindTextureRecord(guid)) {
+				drawList->AddRectFilled(min, max, IM_COL32(38, 38, 42, 255), 4.0f);
+				drawList->AddText(
+					{min.x + 8.0f, min.y + size.y * 0.5f - ImGui::GetTextLineHeight() * 0.5f},
+					IM_COL32(180, 180, 185, 255),
+					"Drop Texture");
+			}
+			drawList->AddRect(min, max, IM_COL32(255, 255, 255, 55), 4.0f);
+			if(allowDrop) changed |= AcceptTextureDropRect(guid, min, max);
+			return changed;
 		}
 	} // namespace
 
@@ -251,6 +448,68 @@ namespace CalyxEngine {
 			}
 			ImGui::EndPopup();
 		}
+	}
+
+	void MaterialNodeEditorPanel::DrawMaterialPreview(MaterialAsset& material, bool framed) {
+		if(framed) {
+			ImGui::BeginChild("##material-preview", ImVec2(0.0f, 188.0f), true);
+		}
+		ImGui::TextUnformatted("Preview");
+		ImGui::SameLine();
+		ImGui::TextDisabled("Base Color");
+
+		const MaterialGraphRuntimeShader shader = runtimeShaderCache_.GetOrCompilePreviewPixelShader(material);
+		if(!shader.pixelShader || !shader.compileSucceeded) {
+			ImGui::TextColored(ImVec4(1.0f, 0.35f, 0.25f, 1.0f), "Preview shader compile failed.");
+			if(!shader.compileMessage.empty()) {
+				ImGui::TextWrapped("%s", shader.compileMessage.c_str());
+			}
+			if(framed) ImGui::EndChild();
+			return;
+		}
+
+		if(!EnsurePreviewResources() || !EnsurePreviewPipeline(shader)) {
+			ImGui::TextColored(ImVec4(1.0f, 0.35f, 0.25f, 1.0f), "Preview renderer is not available.");
+			if(framed) ImGui::EndChild();
+			return;
+		}
+
+		ID3D12GraphicsCommandList* cmd = GraphicsGroup::GetInstance()->GetCommandList().Get();
+		if(cmd && previewTarget_) {
+			if(ID3D12DescriptorHeap* heap = DescriptorAllocator::GetHeap(DescriptorUsage::CbvSrvUav)) {
+				cmd->SetDescriptorHeaps(1, &heap);
+			}
+
+			previewMaterialBuffer_.TransferData(BuildPreviewMaterial(material));
+			previewTarget_->Clear(cmd);
+			previewTarget_->SetRenderTarget(cmd);
+
+			const PipelineSet set = previewPipeline_->GetPipelineSet();
+			set.SetCommand(cmd);
+			previewMaterialBuffer_.SetCommand(GraphicsGroup::GetInstance()->GetCommandList(), 0);
+			cmd->SetGraphicsRootDescriptorTable(1, ResolvePreviewTexture(material));
+			cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			cmd->DrawInstanced(3, 1, 0, 0);
+
+			previewTarget_->TransitionTo(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		}
+
+		const ImTextureID previewTex = reinterpret_cast<ImTextureID>(previewTarget_->GetSRV().ptr);
+		const float imageSize = framed ? 144.0f : 172.0f;
+		ImGui::Image(previewTex, ImVec2(imageSize, imageSize));
+		if(framed) ImGui::SameLine();
+		ImGui::BeginGroup();
+		if(framed) {
+			ImGui::TextDisabled("Shader: %zu", shader.hash);
+		} else {
+			ImGui::TextDisabled("Shader: %08zx", shader.hash & 0xffffffffu);
+		}
+		ImGui::TextDisabled("%s", shader.cacheHit ? "Cache hit" : "Compiled");
+		if(shader.usesObjectTexture) {
+			ImGui::TextDisabled("Uses Object Texture");
+		}
+		ImGui::EndGroup();
+		if(framed) ImGui::EndChild();
 	}
 
 	void MaterialNodeEditorPanel::DrawToolbar(MaterialAsset& material) {
@@ -509,6 +768,14 @@ namespace CalyxEngine {
 			}
 			if(ImGui::MenuItem("One Minus Float")) {
 				AddUnaryFloatNode(material, "OneMinusFloat", "One Minus Float", position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Step Float")) {
+				AddStepFloatNode(material, position);
+				changed = true;
+			}
+			if(ImGui::MenuItem("Smoothstep Float")) {
+				AddSmoothstepFloatNode(material, position);
 				changed = true;
 			}
 			if(ImGui::MenuItem("Combine Float2")) {
@@ -889,14 +1156,32 @@ namespace CalyxEngine {
 			ImGui::TextDisabled("frac(Value)");
 		} else if(node.type == "OneMinusFloat") {
 			ImGui::TextDisabled("1 - Value");
+		} else if(node.type == "StepFloat") {
+			ImGui::TextDisabled("Value >= Edge ? 1 : 0");
+		} else if(node.type == "SmoothstepFloat") {
+			ImGui::TextDisabled("smoothstep(Edge0, Edge1, Value)");
 		} else if(node.type == "CombineFloat2") {
 			ImGui::TextDisabled("float2(X, Y)");
 		} else if(node.type == "SplitFloat2") {
 			ImGui::TextDisabled("float2 -> X/Y");
 		} else if(node.type == "ObjectTexture") {
 			ImGui::TextDisabled("Object gTexture");
+			Guid textureGuid = GetGuidProperty(node, "textureGuid");
+			if(!textureGuid.isValid()) textureGuid = material.objectTextureGuid;
+			if(DrawTextureAssetSelector("Texture", textureGuid)) {
+				SetGuidProperty(node, "textureGuid", textureGuid);
+				material.objectTextureGuid = textureGuid;
+				changed = true;
+			}
+			if(DrawTexturePreviewSlot(textureGuid, ImVec2(112.0f, 112.0f))) {
+				SetGuidProperty(node, "textureGuid", textureGuid);
+				material.objectTextureGuid = textureGuid;
+				changed = true;
+			}
 		} else if(node.type == "TextureSample") {
 			ImGui::TextDisabled("Sample Texture2D");
+			Guid textureGuid = ResolveTextureInputGuid(material, node, "Texture");
+			DrawTexturePreviewSlot(textureGuid, ImVec2(112.0f, 112.0f), false);
 		} else if(node.type == "NoiseTexture") {
 			float scale = GetFloatProperty(node, "scale", 8.0f);
 			const bool linked = IsInputLinked(material, node, "Scale");
@@ -911,6 +1196,7 @@ namespace CalyxEngine {
 				ImGui::SameLine();
 				ImGui::TextDisabled("Linked");
 			}
+			DrawNoiseThumbnail(scale, ImVec2(112.0f, 112.0f));
 		} else if(node.type == "UV" || node.type == "UVX" || node.type == "UVY" || node.type == "Time" ||
 				  node.type == "WorldPositionX" || node.type == "WorldPositionY" || node.type == "WorldPositionZ" ||
 				  node.type == "WorldNormalX" || node.type == "WorldNormalY" || node.type == "WorldNormalZ" ||
@@ -918,6 +1204,7 @@ namespace CalyxEngine {
 			ImGui::TextDisabled("Shader input");
 		} else if(node.type == "Output") {
 			ImGui::TextUnformatted("Material Output");
+			DrawMaterialPreview(material, false);
 		}
 		ImGui::PopID();
 		return changed;
@@ -1161,6 +1448,31 @@ namespace CalyxEngine {
 		material.graph.nodes.push_back(std::move(node));
 	}
 
+	void MaterialNodeEditorPanel::AddStepFloatNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "StepFloat";
+		node.title	  = "Step Float";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Edge", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Result", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
+	void MaterialNodeEditorPanel::AddSmoothstepFloatNode(MaterialAsset& material, Vector2 position) {
+		Node node;
+		node.id		  = material.graph.AllocateId();
+		node.type	  = "SmoothstepFloat";
+		node.title	  = "Smoothstep Float";
+		node.position = position;
+		node.inputs.push_back({material.graph.AllocateId(), "Edge 0", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Edge 1", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Value", NodePinKind::Input, NodeValueType::Float});
+		node.outputs.push_back({material.graph.AllocateId(), "Result", NodePinKind::Output, NodeValueType::Float});
+		material.graph.nodes.push_back(std::move(node));
+	}
+
 	void MaterialNodeEditorPanel::EnsureOutputNode(MaterialAsset& material) {
 		const ShaderGraphSchema schema = ShaderGraphSchemas::Object3DMaterial();
 
@@ -1300,6 +1612,19 @@ namespace CalyxEngine {
 			if(fromNode->type == "OneMinusFloat") {
 				return 1.0f - EvaluateFloat(material, fromNode->inputs[0].id, fallback);
 			}
+			if(fromNode->type == "StepFloat") {
+				const float edge = EvaluateFloat(material, fromNode->inputs[0].id, 0.5f);
+				const float value = EvaluateFloat(material, fromNode->inputs[1].id, fallback);
+				return value < edge ? 0.0f : 1.0f;
+			}
+			if(fromNode->type == "SmoothstepFloat") {
+				const float edge0 = EvaluateFloat(material, fromNode->inputs[0].id, 0.4f);
+				const float edge1 = EvaluateFloat(material, fromNode->inputs[1].id, 0.6f);
+				const float value = EvaluateFloat(material, fromNode->inputs[2].id, fallback);
+				const float width = std::abs(edge1 - edge0) < 0.0001f ? 0.0001f : edge1 - edge0;
+				const float t = std::clamp((value - edge0) / width, 0.0f, 1.0f);
+				return t * t * (3.0f - 2.0f * t);
+			}
 		}
 		return fallback;
 	}
@@ -1366,5 +1691,94 @@ namespace CalyxEngine {
 				return;
 			}
 		}
+	}
+
+	bool MaterialNodeEditorPanel::EnsurePreviewResources() {
+		if(previewInitialized_) return true;
+
+		auto device = GraphicsGroup::GetInstance()->GetDevice();
+		if(!device) return false;
+
+		previewRtv_ = DescriptorAllocator::Allocate(DescriptorUsage::Rtv);
+		previewDsv_ = DescriptorAllocator::Allocate(DescriptorUsage::Dsv);
+		if(!previewRtv_.IsValid() || !previewDsv_.IsValid()) return false;
+
+		previewTarget_ = std::make_unique<OffscreenRenderTarget>();
+		previewTarget_->SetRenderTargetType(RenderTargetType::Offscreen);
+		previewTarget_->Initialize(device.Get(), 256, 256, DXGI_FORMAT_R8G8B8A8_UNORM, previewRtv_, previewDsv_);
+		previewMaterialBuffer_.Initialize(device);
+
+		previewInitialized_ = true;
+		return true;
+	}
+
+	bool MaterialNodeEditorPanel::EnsurePreviewPipeline(const MaterialGraphRuntimeShader& shader) {
+		if(previewPipeline_ && previewPipelineHash_ == shader.hash) return true;
+		if(!shader.pixelShader) return false;
+
+		try {
+			ShaderCompiler compiler;
+			compiler.InitializeDXC();
+			PsoFactory factory(&compiler);
+
+			GraphicsPipelineDesc desc;
+			desc.VS(L"CopyImage.VS.hlsl")
+				.BlendNone()
+				.CullNone()
+				.DepthEnable(false)
+				.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+				.Samples(1);
+			desc.inputElems_.clear();
+			desc.root_
+				.AllowIA()
+				.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL)
+				.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+				.SamplerWrapLinear(0);
+
+			previewPipeline_ = factory.CreateWithPixelShaderBlob(desc, shader.pixelShader);
+			previewPipelineHash_ = shader.hash;
+		} catch(const std::exception& e) {
+			graphStatusMessage_ = std::string("Preview PSO creation failed: ") + e.what();
+			graphStatusIsError_ = true;
+			previewPipeline_.reset();
+			previewPipelineHash_ = 0;
+			return false;
+		}
+
+		return previewPipeline_ != nullptr;
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE MaterialNodeEditorPanel::ResolvePreviewTexture(const MaterialAsset& material) const {
+		auto* textureManager = AssetManager::GetInstance()->GetTextureManager();
+		const Guid graphTextureGuid = FindGraphTextureGuid(material);
+		if(graphTextureGuid.isValid()) {
+			D3D12_GPU_DESCRIPTOR_HANDLE handle = textureManager->LoadTexture(graphTextureGuid);
+			if(handle.ptr) return handle;
+		}
+		return textureManager->LoadTexture("textures/white1x1.dds");
+	}
+
+	Material MaterialNodeEditorPanel::BuildPreviewMaterial(const MaterialAsset& material) const {
+		Material data{};
+		data.color = material.color;
+		data.lightingMode = material.lightingMode;
+		data.shininess = material.shininess;
+		data.isReflect = material.isReflect ? 1 : 0;
+		data.envirometCoefficient = material.envirometCoefficient;
+		data.roughness = material.roughness;
+		data.toonHighlightColor = material.toonHighlightColor;
+		data.toonBaseColor = material.toonBaseColor;
+		data.toonMidShadowColor = material.toonMidShadowColor;
+		data.toonShadowColor = material.toonShadowColor;
+		data.toonBaseStep = material.toonBaseStep;
+		data.toonBaseFeather = material.toonBaseFeather;
+		data.toonShadeStep = material.toonShadeStep;
+		data.toonShadeFeather = material.toonShadeFeather;
+		data.toonSpecularThreshold = material.toonSpecularThreshold;
+		data.toonSpecularSoftness = material.toonSpecularSoftness;
+		data.toonSpecularIntensity = material.toonSpecularIntensity;
+		data.uvTransform = material.uvTransform;
+		data.pad3 = ClockManager::GetInstance()->GetTotalTime();
+		return data;
 	}
 } // namespace CalyxEngine

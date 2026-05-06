@@ -4,6 +4,7 @@
 #include <Engine/Foundation/Math/Vector2.h>
 #include <Engine/Foundation/Math/Vector3.h>
 #include <Engine/Foundation/Math/Vector4.h>
+#include <Engine/Foundation/Utility/Guid/Guid.h>
 #include <externals/nlohmann/json.hpp>
 
 
@@ -28,6 +29,7 @@ namespace CalyxEngine {
 		CalyxEngine::Vector3*,
 		CalyxEngine::Vector4*,
 		CalyxEngine::Quaternion*,
+		Guid*,
 		const int32_t*,
 		const size_t*,
 		const float*,
@@ -35,7 +37,8 @@ namespace CalyxEngine {
 		const CalyxEngine::Vector2*,
 		const CalyxEngine::Vector3*,
 		const CalyxEngine::Vector4*,
-		const CalyxEngine::Quaternion*>;
+		const CalyxEngine::Quaternion*,
+		const Guid*>;
 
 	/* =========================================================================
 	   シリアライズ可能なフィールド情報
@@ -80,6 +83,8 @@ namespace CalyxEngine {
 				out = Json::array({p->x, p->y, p->z, p->w});
 			} else if constexpr(std::is_same_v<T, CalyxEngine::Quaternion> || std::is_same_v<T, const CalyxEngine::Quaternion>) {
 				out = Json::array({p->x, p->y, p->z, p->w});
+			} else if constexpr(std::is_same_v<T, Guid> || std::is_same_v<T, const Guid>) {
+				out = p->ToString();
 			} else {
 				out = *p;
 			}
@@ -134,6 +139,10 @@ namespace CalyxEngine {
 						p->y = in.at(1).get<float>();
 						p->z = in.at(2).get<float>();
 						p->w = in.at(3).get<float>();
+						return true;
+					} else if constexpr(std::is_same_v<T, Guid>) {
+						if(!in.is_string()) return false;
+						*p = Guid::FromString(in.get<std::string>());
 						return true;
 					} else {
 						return false;

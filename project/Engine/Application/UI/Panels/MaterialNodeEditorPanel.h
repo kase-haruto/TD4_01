@@ -3,10 +3,15 @@
 #include <Engine\Application\UI\EngineUI\IEngineUI.h>
 #include <Engine\Editor\NodeEditor\NodeEditorCanvas.h>
 #include <Engine\Foundation\Utility\Guid\Guid.h>
+#include <Engine\Graphics\Buffer\DxConstantBuffer.h>
+#include <Engine\Graphics\Material.h>
 #include <Engine\Graphics\MaterialGraph\MaterialGraphRuntimeShaderCache.h>
+#include <Engine\Graphics\Pipeline\Pso\PipelineStateObject.h>
+#include <Engine\Graphics\RenderTarget\OffscreenRT\OffscreenRenderTarget.h>
 
 #include <array>
 #include <filesystem>
+#include <memory>
 #include <string>
 
 namespace CalyxEngine {
@@ -20,6 +25,7 @@ namespace CalyxEngine {
 	private:
 		void DrawMaterialList();
 		void DrawToolbar(MaterialAsset& material);
+		void DrawMaterialPreview(MaterialAsset& material, bool framed);
 		bool DrawAddNodeMenu(MaterialAsset& material, Vector2 position);
 		bool DrawContextMenu(MaterialAsset& material, const NodeEditorCanvas::ContextMenu& menu);
 		bool DrawLightingModePopup(MaterialAsset& material);
@@ -47,6 +53,8 @@ namespace CalyxEngine {
 		void AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position);
 		void AddLerpNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position);
 		void AddUnaryFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position);
+		void AddStepFloatNode(MaterialAsset& material, Vector2 position);
+		void AddSmoothstepFloatNode(MaterialAsset& material, Vector2 position);
 		void EnsureOutputNode(MaterialAsset& material);
 		Vector4 EvaluateColor(const MaterialAsset& material, int32_t inputPinId, const Vector4& fallback) const;
 		float EvaluateFloat(const MaterialAsset& material, int32_t inputPinId, float fallback) const;
@@ -55,6 +63,10 @@ namespace CalyxEngine {
 		void ApplyToonLightingNode(MaterialAsset& material, const Node& node) const;
 		void Evaluate(MaterialAsset& material);
 		void Save(MaterialAsset& material);
+		bool EnsurePreviewResources();
+		bool EnsurePreviewPipeline(const MaterialGraphRuntimeShader& shader);
+		D3D12_GPU_DESCRIPTOR_HANDLE ResolvePreviewTexture(const MaterialAsset& material) const;
+		Material BuildPreviewMaterial(const MaterialAsset& material) const;
 
 	private:
 		Guid selectedMaterial_;
@@ -70,5 +82,12 @@ namespace CalyxEngine {
 		std::string graphStatusMessage_;
 		bool graphStatusIsError_ = false;
 		MaterialGraphRuntimeShaderCache runtimeShaderCache_;
+		std::unique_ptr<OffscreenRenderTarget> previewTarget_;
+		DescriptorHandle previewRtv_{};
+		DescriptorHandle previewDsv_{};
+		DxConstantBuffer<Material> previewMaterialBuffer_;
+		std::unique_ptr<PipelineStateObject> previewPipeline_;
+		std::size_t previewPipelineHash_ = 0;
+		bool previewInitialized_ = false;
 	};
 }
