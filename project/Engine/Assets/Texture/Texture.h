@@ -39,6 +39,7 @@ public:
 	//--------- accessor -----------------------------------------------------
 	// getter
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandle() const { return srvHandleGPU_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuSrvHandle() const { return srvHandleCPU_; }
 	const DirectX::TexMetadata& GetMetaData();
 
 private:

@@ -450,6 +450,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				}
 				model->BindMaterialCB(cmdList);
 				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
+				cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(0));
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
 
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -463,6 +464,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				} else {
 					for(const auto& subMesh : subMeshes) {
 						cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(subMesh.materialIndex));
+						cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(subMesh.materialIndex));
 						cmdList->DrawIndexedInstanced(subMesh.indexCount, need, subMesh.indexStart, 0, 0);
 					}
 				}
@@ -583,6 +585,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				}
 				model->BindMaterialCB(cmdList);
 				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
+				cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(0));
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
 				model->SetCommandPalletSrv(7, cmdList);
 
@@ -597,6 +600,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				} else {
 					for(const auto& subMesh : subMeshes) {
 						cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(subMesh.materialIndex));
+						cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(subMesh.materialIndex));
 						cmdList->DrawIndexedInstanced(subMesh.indexCount, need, subMesh.indexStart, 0, 0);
 					}
 				}

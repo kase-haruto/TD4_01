@@ -130,7 +130,7 @@ namespace CalyxEngine {
 					return link.toPinId == texturePin->id;
 				});
 				if(!hasTextureLink) {
-					result.Warning("Texture Sample.Texture is not connected. Connect Object Texture for a valid material graph.");
+					result.Warning("Texture Sample.Texture is not connected. Connect Object Texture or Texture2D for a valid material graph.");
 				}
 			}
 		}

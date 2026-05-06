@@ -11,7 +11,6 @@ namespace CalyxEngine {
 	class MaterialGraphCompiler {
 	public:
 		static void Compile(MaterialAsset& material) {
-			SyncGraphTextureGuid(material);
 			const CompiledMaterialGraph compiled = CompileToIR(material);
 			ApplyCompiled(material, compiled);
 		}
@@ -46,22 +45,6 @@ namespace CalyxEngine {
 		}
 
 	private:
-		static Guid GetGuidProperty(const Node& node, const char* key) {
-			auto it = node.properties.find(key);
-			if(it == node.properties.end() || !it->is_string()) return Guid::Empty();
-			return Guid::FromString(it->get<std::string>());
-		}
-
-		static void SyncGraphTextureGuid(MaterialAsset& material) {
-			for(const Node& node : material.graph.nodes) {
-				if(node.type != "ObjectTexture") continue;
-				const Guid guid = GetGuidProperty(node, "textureGuid");
-				if(!guid.isValid()) continue;
-				material.objectTextureGuid = guid;
-				return;
-			}
-		}
-
 		static CompiledMaterialGraph MakeDefaultCompiled(const MaterialAsset& material) {
 			CompiledMaterialGraph compiled;
 			compiled.lightingMode = material.lightingMode;
@@ -175,6 +158,7 @@ namespace CalyxEngine {
 				const NodePin* fromPin = material.graph.FindPin(link.fromPinId, &fromNode);
 				if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Float) return fallback;
 				if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+				if(fromNode->type == "TextureSample") return 0.5f;
 				if(fromNode->type == "NoiseTexture") return 0.5f;
 				if(fromNode->type == "UVX" || fromNode->type == "UVY" || fromNode->type == "Time" ||
 				   fromNode->type == "WorldPositionX" || fromNode->type == "WorldPositionY" || fromNode->type == "WorldPositionZ" ||
