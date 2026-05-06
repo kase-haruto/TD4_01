@@ -32,4 +32,13 @@ public:
 	/// ディレクトリをスキャンしてファイルキャッシュを構築（ワイド文字版）
 	/// </summary>
 	static std::unordered_map<std::wstring, std::wstring> BuildFileCacheW(const std::wstring& searchDir);
+
+	/// <summary>
+	/// 指定されたディレクトリ配下に特定の拡張子を持つファイルが存在するか
+	/// </summary> <param name="rootDir">検索対象のディレクトリ</param>
+	/// <param name="extension">検索する拡張子（例: ".txt"）</param>
+	/// <returns>存在する場合はtrue、存在しない場合はfalse</returns>
+	static bool HasExtensionFile(const std::filesystem::path& rootDir,const std::string& extension);
+
+	static std::string GetRootDirectory(const std::string& filePath);
 };

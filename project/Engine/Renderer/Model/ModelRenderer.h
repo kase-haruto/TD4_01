@@ -3,6 +3,7 @@
 #include "Engine/Objects/3D/Actor/SceneObject.h"
 
 #include <Engine/Graphics/Buffer/DxStructuredBuffer.h>
+#include <Engine/Graphics/MaterialGraph/MaterialGraphRuntimeShaderCache.h>
 #include <Engine/Graphics/Pipeline/Service/PipelineService.h>
 #include <Engine/Graphics/Shadow/Raytracing/RaytracingScene.h>
 #include <Engine/Graphics/Shadow/Raytracing/RaytracingSystem.h>
@@ -211,6 +212,7 @@ private:
 
 	std::unordered_map<BaseModel*, std::vector<WorldTransform>>					  staticVisibleForShadow_;	//< シャドウ用可視スタティックリスト
 	std::unordered_map<CalyxEngine::AnimationModel*, std::vector<WorldTransform>> skinnedVisibleForShadow_; //< シャドウ用可視スキンメッシュリスト
+	CalyxEngine::MaterialGraphRuntimeShaderCache runtimeMaterialShaderCache_;
 
 	// Raytracing
 	std::unique_ptr<CalyxEngine::RaytracingSystem> raytracingSystem_; //< レイトレーシングシステム

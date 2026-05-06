@@ -5,6 +5,8 @@
 
 #include <externals/imgui/imgui.h>
 
+#include <algorithm>
+
 void Material::ApplyConfig(const MaterialConfig& config) {
 	color                 = config.color;
 	lightingMode          = config.enableLighting;
@@ -12,6 +14,17 @@ void Material::ApplyConfig(const MaterialConfig& config) {
 	envirometCoefficient = config.enviromentCoefficient;
 	isReflect             = config.isReflect ? 1 : 0;
 	roughness             = config.roughness;
+    toonHighlightColor    = config.toonHighlightColor;
+    toonBaseColor         = config.toonBaseColor;
+    toonMidShadowColor    = config.toonMidShadowColor;
+    toonShadowColor       = config.toonShadowColor;
+    toonBaseStep          = config.toonBaseStep;
+    toonBaseFeather       = config.toonBaseFeather;
+    toonShadeStep         = config.toonShadeStep;
+    toonShadeFeather      = config.toonShadeFeather;
+    toonSpecularThreshold = config.toonSpecularThreshold;
+    toonSpecularSoftness  = config.toonSpecularSoftness;
+    toonSpecularIntensity = config.toonSpecularIntensity;
 
 }
 
@@ -23,6 +36,21 @@ MaterialConfig Material::ExtractConfig() const {
 	config.enviromentCoefficient = envirometCoefficient;
 	config.isReflect             = isReflect != 0;
 	config.roughness             = roughness;
+    config.toonHighlightColor    = toonHighlightColor;
+    config.toonBaseColor         = toonBaseColor;
+    config.toonMidShadowColor    = toonMidShadowColor;
+    config.toonShadowColor       = toonShadowColor;
+    config.toonBaseStep          = toonBaseStep;
+    config.toonBaseFeather       = toonBaseFeather;
+    config.toonShadeStep         = toonShadeStep;
+    config.toonShadeFeather      = toonShadeFeather;
+    config.toonThreshold1        = toonShadeStep;
+    config.toonThreshold2        = toonBaseStep;
+    config.toonThreshold3        = 0.82f;
+    config.toonEdgeSoftness      = std::max(toonShadeFeather, toonBaseFeather);
+    config.toonSpecularThreshold = toonSpecularThreshold;
+    config.toonSpecularSoftness  = toonSpecularSoftness;
+    config.toonSpecularIntensity = toonSpecularIntensity;
 	return config;
 }
 
@@ -61,6 +89,21 @@ void Material::ShowImGui() {
     ImGui::SeparatorText("Color");
     GuiCmd::ColorEdit4("color", color);
 
+    if (lightingMode == 2) {
+        ImGui::SeparatorText("Toon");
+        GuiCmd::ColorEdit4("highlight", toonHighlightColor);
+        GuiCmd::ColorEdit4("base ramp", toonBaseColor);
+        GuiCmd::ColorEdit4("mid shadow", toonMidShadowColor);
+        GuiCmd::ColorEdit4("shadow", toonShadowColor);
+        GuiCmd::SliderFloat("base step", toonBaseStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("base feather", toonBaseFeather, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("shade step", toonShadeStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("shade feather", toonShadeFeather, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular threshold", toonSpecularThreshold, 0.0f, 1.0f);
+        GuiCmd::SliderFloat("specular softness", toonSpecularSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular intensity", toonSpecularIntensity, 0.0f, 4.0f);
+    }
+
     ImGui::SeparatorText("EnviromentCoefficient");
     // 環境マップ
     bool reflect = isReflect != 0;
@@ -79,6 +122,21 @@ void Material::ShowImGui(MaterialConfig& config) {
     // color
     if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
         GuiCmd::ColorEdit4("color", config.color);
+        ImGui::TreePop();
+    }
+
+    if (config.enableLighting == 2 && ImGui::TreeNodeEx("Toon", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+        GuiCmd::ColorEdit4("highlight", config.toonHighlightColor);
+        GuiCmd::ColorEdit4("base ramp", config.toonBaseColor);
+        GuiCmd::ColorEdit4("mid shadow", config.toonMidShadowColor);
+        GuiCmd::ColorEdit4("shadow", config.toonShadowColor);
+        GuiCmd::SliderFloat("base step", config.toonBaseStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("base feather", config.toonBaseFeather, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("shade step", config.toonShadeStep, -1.0f, 1.0f);
+        GuiCmd::SliderFloat("shade feather", config.toonShadeFeather, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular threshold", config.toonSpecularThreshold, 0.0f, 1.0f);
+        GuiCmd::SliderFloat("specular softness", config.toonSpecularSoftness, 0.0f, 0.25f);
+        GuiCmd::SliderFloat("specular intensity", config.toonSpecularIntensity, 0.0f, 4.0f);
         ImGui::TreePop();
     }
 

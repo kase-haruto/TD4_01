@@ -1,3 +1,25 @@
+float ToonBand(float value, float threshold, float softness) {
+    float width = max(softness, 0.0001f);
+    return smoothstep(threshold - width, threshold + width, value);
+}
+
+float3 EvaluateToonRamp(float ndotl, float3 albedo) {
+    float shadeStep = min(gMaterial.toonShadeStep, gMaterial.toonBaseStep);
+    float baseStep = max(gMaterial.toonShadeStep, gMaterial.toonBaseStep);
+
+    float3 shadow = albedo * gMaterial.toonShadowColor.rgb;
+    float3 midShadow = albedo * gMaterial.toonMidShadowColor.rgb;
+    float3 base = albedo * gMaterial.toonBaseColor.rgb;
+
+    float3 shadeRamp = lerp(shadow, midShadow, ToonBand(ndotl, shadeStep, gMaterial.toonShadeFeather));
+    return lerp(shadeRamp, base, ToonBand(ndotl, baseStep, gMaterial.toonBaseFeather));
+}
+
+float EvaluateToonSpecular(float ndoth) {
+    return ToonBand(ndoth, saturate(gMaterial.toonSpecularThreshold), gMaterial.toonSpecularSoftness) *
+           max(gMaterial.toonSpecularIntensity, 0.0f);
+}
+
 void ComputeToonDirectionalLight(
     float3 normal,
     float3 toEye,
@@ -10,19 +32,14 @@ void ComputeToonDirectionalLight(
 
     float3 L = -gDirectionalLight.direction;
     float rawNdotL = dot(normal, L);
-
-    float toonDiffuse = step(0.0f, rawNdotL); 
-
-    float3 shadowColor = albedo * 0.4f;
-
-    float3 baseDiffuse = lerp(shadowColor, albedo, toonDiffuse);
-    diffuse = baseDiffuse * gDirectionalLight.color.rgb * gDirectionalLight.intensity;
+    float3 rampDiffuse = EvaluateToonRamp(rawNdotL, albedo);
+    diffuse = rampDiffuse * gDirectionalLight.color.rgb * gDirectionalLight.intensity;
 
     float3 H    = normalize(L + toEye);
     float NdotH = saturate(dot(normal, H));
     
-    float toonSpecular = step(0.98f, NdotH); 
-    specular = gDirectionalLight.color.rgb * toonSpecular * gDirectionalLight.intensity;
+    float toonSpecular = EvaluateToonSpecular(NdotH);
+    specular = gDirectionalLight.color.rgb * gMaterial.toonHighlightColor.rgb * toonSpecular * gDirectionalLight.intensity;
 }
 
 void ComputeToonPointLight(
@@ -41,17 +58,14 @@ void ComputeToonPointLight(
     float  attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
 
     float rawNdotL = dot(normal, -lightDir);
-    
-    float toonDiffuse = step(0.0f, rawNdotL);
 
-    float3 shadowColor = albedo * 0.4f;
-    float3 baseDiffuse = lerp(shadowColor, albedo, toonDiffuse);
+    float3 baseDiffuse = EvaluateToonRamp(rawNdotL, albedo);
     
     diffuse = baseDiffuse * gPointLight.color.rgb * gPointLight.intensity * attenuation;
 
     float3 halfVec = normalize(-lightDir + toEye);
     float  NdotH   = saturate(dot(normal, halfVec));
-    float toonSpecular = step(0.98f, NdotH);
+    float toonSpecular = EvaluateToonSpecular(NdotH);
 
-    specular = gPointLight.color.rgb * toonSpecular * gPointLight.intensity * attenuation;
+    specular = gPointLight.color.rgb * gMaterial.toonHighlightColor.rgb * toonSpecular * gPointLight.intensity * attenuation;
 }
