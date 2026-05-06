@@ -41,7 +41,7 @@ void Shockwave::Update(float dt) {
 	float easeOut = 1.0f - std::pow(1.0f - progress, 3.0f);
 	float currentScale = std::lerp(param_.startScale, currentMaxScale_, easeOut);
 	
-	worldTransform_.scale = {currentScale, currentScale, currentScale};
+	worldTransform_.scale = {currentScale, currentScale*0.25f, currentScale};
 	
 }
 
