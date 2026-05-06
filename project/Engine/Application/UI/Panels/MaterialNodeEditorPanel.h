@@ -39,6 +39,7 @@ namespace CalyxEngine {
 		void AddUnlitMasterNode(MaterialAsset& material, Vector2 position);
 		void AddObjectTextureNode(MaterialAsset& material, Vector2 position);
 		void AddTextureSampleNode(MaterialAsset& material, Vector2 position);
+		void AddNoiseTextureNode(MaterialAsset& material, Vector2 position);
 		void AddShaderInputFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position);
 		void AddShaderInputFloat2Node(MaterialAsset& material, const char* type, const char* title, Vector2 position);
 		void AddCombineFloat2Node(MaterialAsset& material, Vector2 position);

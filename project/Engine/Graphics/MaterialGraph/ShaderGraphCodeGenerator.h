@@ -97,6 +97,7 @@ namespace CalyxEngine {
 		struct MaterialExpression {
 			std::string hlsl;
 			bool usesObjectTexture = false;
+			bool usesNoiseTexture = false;
 		};
 
 		struct MaterialExpressionSurface {
@@ -126,6 +127,21 @@ namespace CalyxEngine {
 				surface.toonBaseColor.usesObjectTexture ||
 				surface.toonFirstShadeColor.usesObjectTexture ||
 				surface.toonSecondShadeColor.usesObjectTexture;
+			const bool usesNoiseTexture =
+				surface.baseColor.usesNoiseTexture ||
+				surface.shininess.usesNoiseTexture ||
+				surface.roughness.usesNoiseTexture ||
+				surface.toonHighlightColor.usesNoiseTexture ||
+				surface.toonBaseColor.usesNoiseTexture ||
+				surface.toonFirstShadeColor.usesNoiseTexture ||
+				surface.toonSecondShadeColor.usesNoiseTexture ||
+				surface.toonBaseStep.usesNoiseTexture ||
+				surface.toonBaseFeather.usesNoiseTexture ||
+				surface.toonShadeStep.usesNoiseTexture ||
+				surface.toonShadeFeather.usesNoiseTexture ||
+				surface.toonSpecularThreshold.usesNoiseTexture ||
+				surface.toonSpecularSoftness.usesNoiseTexture ||
+				surface.toonSpecularIntensity.usesNoiseTexture;
 
 			std::ostringstream out;
 			out << "struct GeneratedMaterialSurface {\n";
@@ -146,6 +162,9 @@ namespace CalyxEngine {
 			out << "    float toonSpecularSoftness;\n";
 			out << "    float toonSpecularIntensity;\n";
 			out << "};\n\n";
+			if(usesNoiseTexture) {
+				AppendNoiseTextureFunctions(out);
+			}
 
 			out << "GeneratedMaterialSurface EvaluateGeneratedMaterial(float2 uv, float3 worldPosition, float3 normal, float3 viewDirection) {\n";
 			out << "    GeneratedMaterialSurface surface;\n";
@@ -496,6 +515,28 @@ PixelShaderOutput main(VertexShaderOutput input) {
 			return out.str();
 		}
 
+		static void AppendNoiseTextureFunctions(std::ostringstream& out) {
+			out << R"(
+float GeneratedNoiseHash21(float2 p) {
+    float3 p3 = frac(float3(p.xyx) * 0.1031f);
+    p3 += dot(p3, p3.yzx + 33.33f);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+float GeneratedValueNoise(float2 p) {
+    float2 i = floor(p);
+    float2 f = frac(p);
+    float a = GeneratedNoiseHash21(i);
+    float b = GeneratedNoiseHash21(i + float2(1.0f, 0.0f));
+    float c = GeneratedNoiseHash21(i + float2(0.0f, 1.0f));
+    float d = GeneratedNoiseHash21(i + float2(1.0f, 1.0f));
+    float2 u = f * f * (3.0f - 2.0f * f);
+    return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
+}
+
+)";
+		}
+
 		static std::string Float4Expr(const Vector4& value) {
 			return "float4(" +
 				   FloatExpr(value.x) + ", " +
@@ -519,7 +560,22 @@ PixelShaderOutput main(VertexShaderOutput input) {
 		}
 
 		static MaterialExpression Combine(std::string hlsl, const MaterialExpression& a, const MaterialExpression& b) {
-			return {std::move(hlsl), a.usesObjectTexture || b.usesObjectTexture};
+			return {std::move(hlsl), a.usesObjectTexture || b.usesObjectTexture, a.usesNoiseTexture || b.usesNoiseTexture};
+		}
+
+		static MaterialExpression NoiseValueExpression(const NodeGraph& graph, const Node& node, int32_t depth) {
+			MaterialExpression noiseUv = {"uv", false};
+			if(const NodePin* uvPin = FindInput(node, "UV")) {
+				noiseUv = Float2ExpressionFromInput(graph, uvPin->id, noiseUv, depth + 1);
+			}
+			MaterialExpression scale = FloatExpression(GetFloatProperty(node, "scale", 8.0f));
+			if(const NodePin* scalePin = FindInput(node, "Scale")) {
+				scale = FloatExpressionFromInput(graph, scalePin->id, scale, depth + 1);
+			}
+			return {
+				"GeneratedValueNoise(" + noiseUv.hlsl + " * max(" + scale.hlsl + ", 0.0001f))",
+				noiseUv.usesObjectTexture || scale.usesObjectTexture,
+				true};
 		}
 
 		static const Node* FindOutput(const NodeGraph& graph) {
@@ -605,7 +661,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 			if(fromNode->type == "CombineFloat2" && fromNode->inputs.size() >= 2) {
 				const MaterialExpression x = FloatExpressionFromInput(graph, fromNode->inputs[0].id, FloatExpression(0.0f), depth + 1);
 				const MaterialExpression y = FloatExpressionFromInput(graph, fromNode->inputs[1].id, FloatExpression(0.0f), depth + 1);
-				return {"float2(" + x.hlsl + ", " + y.hlsl + ")", x.usesObjectTexture || y.usesObjectTexture};
+				return {"float2(" + x.hlsl + ", " + y.hlsl + ")", x.usesObjectTexture || y.usesObjectTexture, x.usesNoiseTexture || y.usesNoiseTexture};
 			}
 			return fallback;
 		}
@@ -627,6 +683,10 @@ PixelShaderOutput main(VertexShaderOutput input) {
 				}
 				return {"gTexture.Sample(gSampler, " + sampleUv.hlsl + ")", true};
 			}
+			if(fromNode->type == "NoiseTexture") {
+				const MaterialExpression value = NoiseValueExpression(graph, *fromNode, depth);
+				return {"float4(" + value.hlsl + ", " + value.hlsl + ", " + value.hlsl + ", 1.0f)", value.usesObjectTexture, value.usesNoiseTexture};
+			}
 			if(fromNode->type == "MultiplyColor" && fromNode->inputs.size() >= 2) {
 				const MaterialExpression a = ColorExpressionFromInput(graph, fromNode->inputs[0].id, ColorExpression({1, 1, 1, 1}), depth + 1);
 				const MaterialExpression b = ColorExpressionFromInput(graph, fromNode->inputs[1].id, ColorExpression({1, 1, 1, 1}), depth + 1);
@@ -636,7 +696,10 @@ PixelShaderOutput main(VertexShaderOutput input) {
 				const MaterialExpression a = ColorExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
 				const MaterialExpression b = ColorExpressionFromInput(graph, fromNode->inputs[1].id, fallback, depth + 1);
 				const MaterialExpression t = FloatExpressionFromInput(graph, fromNode->inputs[2].id, FloatExpression(0.0f), depth + 1);
-				return {("lerp(" + a.hlsl + ", " + b.hlsl + ", saturate(" + t.hlsl + "))"), a.usesObjectTexture || b.usesObjectTexture || t.usesObjectTexture};
+				return {
+					("lerp(" + a.hlsl + ", " + b.hlsl + ", saturate(" + t.hlsl + "))"),
+					a.usesObjectTexture || b.usesObjectTexture || t.usesObjectTexture,
+					a.usesNoiseTexture || b.usesNoiseTexture || t.usesNoiseTexture};
 			}
 			return fallback;
 		}
@@ -659,10 +722,11 @@ PixelShaderOutput main(VertexShaderOutput input) {
 			}
 
 			if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return FloatExpression(fromNode->floatValue);
+			if(fromNode->type == "NoiseTexture") return NoiseValueExpression(graph, *fromNode, depth);
 			if(fromNode->type == "SplitFloat2" && fromPin && !fromNode->inputs.empty()) {
 				const MaterialExpression value = Float2ExpressionFromInput(graph, fromNode->inputs[0].id, {"float2(0.0f, 0.0f)", false}, depth + 1);
-				if(fromPin->name == "X") return {value.hlsl + ".x", value.usesObjectTexture};
-				if(fromPin->name == "Y") return {value.hlsl + ".y", value.usesObjectTexture};
+				if(fromPin->name == "X") return {value.hlsl + ".x", value.usesObjectTexture, value.usesNoiseTexture};
+				if(fromPin->name == "Y") return {value.hlsl + ".y", value.usesObjectTexture, value.usesNoiseTexture};
 			}
 			if(fromNode->type == "UVX") return {"uv.x", false};
 			if(fromNode->type == "UVY") return {"uv.y", false};
@@ -715,19 +779,22 @@ PixelShaderOutput main(VertexShaderOutput input) {
 				const MaterialExpression a = FloatExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
 				const MaterialExpression b = FloatExpressionFromInput(graph, fromNode->inputs[1].id, fallback, depth + 1);
 				const MaterialExpression t = FloatExpressionFromInput(graph, fromNode->inputs[2].id, FloatExpression(0.0f), depth + 1);
-				return {("lerp(" + a.hlsl + ", " + b.hlsl + ", saturate(" + t.hlsl + "))"), a.usesObjectTexture || b.usesObjectTexture || t.usesObjectTexture};
+				return {
+					("lerp(" + a.hlsl + ", " + b.hlsl + ", saturate(" + t.hlsl + "))"),
+					a.usesObjectTexture || b.usesObjectTexture || t.usesObjectTexture,
+					a.usesNoiseTexture || b.usesNoiseTexture || t.usesNoiseTexture};
 			}
 			if(fromNode->type == "SaturateFloat" && !fromNode->inputs.empty()) {
 				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
-				return {"saturate(" + value.hlsl + ")", value.usesObjectTexture};
+				return {"saturate(" + value.hlsl + ")", value.usesObjectTexture, value.usesNoiseTexture};
 			}
 			if(fromNode->type == "FracFloat" && !fromNode->inputs.empty()) {
 				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
-				return {"frac(" + value.hlsl + ")", value.usesObjectTexture};
+				return {"frac(" + value.hlsl + ")", value.usesObjectTexture, value.usesNoiseTexture};
 			}
 			if(fromNode->type == "OneMinusFloat" && !fromNode->inputs.empty()) {
 				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
-				return {"(1.0f - " + value.hlsl + ")", value.usesObjectTexture};
+				return {"(1.0f - " + value.hlsl + ")", value.usesObjectTexture, value.usesNoiseTexture};
 			}
 			return fallback;
 		}

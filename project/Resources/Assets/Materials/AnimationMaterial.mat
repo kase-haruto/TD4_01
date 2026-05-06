@@ -2,9 +2,9 @@
   "fields": {
     "color": [
       1.0,
+      0.9921568632125854,
       1.0,
-      1.0,
-      1.0
+      0.6098039150238037
     ],
     "envirometCoefficient": 0.5,
     "isReflect": false,
@@ -32,7 +32,7 @@
       0.8600000143051147,
       1.0
     ],
-    "toonShadeFeather": 0.029999999329447746,
+    "toonShadeFeather": 0.25,
     "toonShadeStep": -0.15000000596046448,
     "toonShadowColor": [
       0.41999998688697815,
@@ -75,11 +75,6 @@
         "toPinId": 26
       },
       {
-        "fromPinId": 28,
-        "id": 62,
-        "toPinId": 31
-      },
-      {
         "fromPinId": 64,
         "id": 69,
         "toPinId": 66
@@ -108,9 +103,79 @@
         "fromPinId": 9,
         "id": 79,
         "toPinId": 21
+      },
+      {
+        "fromPinId": 28,
+        "id": 85,
+        "toPinId": 81
+      },
+      {
+        "fromPinId": 84,
+        "id": 92,
+        "toPinId": 31
+      },
+      {
+        "fromPinId": 90,
+        "id": 93,
+        "toPinId": 83
+      },
+      {
+        "fromPinId": 95,
+        "id": 96,
+        "toPinId": 82
+      },
+      {
+        "fromPinId": 98,
+        "id": 105,
+        "toPinId": 102
+      },
+      {
+        "fromPinId": 100,
+        "id": 106,
+        "toPinId": 103
+      },
+      {
+        "fromPinId": 113,
+        "id": 118,
+        "toPinId": 115
+      },
+      {
+        "fromPinId": 116,
+        "id": 119,
+        "toPinId": 109
+      },
+      {
+        "fromPinId": 104,
+        "id": 120,
+        "toPinId": 110
+      },
+      {
+        "fromPinId": 111,
+        "id": 125,
+        "toPinId": 122
+      },
+      {
+        "fromPinId": 117,
+        "id": 126,
+        "toPinId": 123
+      },
+      {
+        "fromPinId": 124,
+        "id": 127,
+        "toPinId": 87
+      },
+      {
+        "fromPinId": 129,
+        "id": 130,
+        "toPinId": 88
+      },
+      {
+        "fromPinId": 129,
+        "id": 131,
+        "toPinId": 88
       }
     ],
-    "nextId": 80,
+    "nextId": 132,
     "nodes": [
       {
         "boolValue": false,
@@ -133,8 +198,8 @@
         "intValue": 0,
         "outputs": [],
         "position": [
-          2055.0,
-          272.0
+          3411.0,
+          304.0
         ],
         "properties": {},
         "title": "Output",
@@ -161,8 +226,8 @@
           }
         ],
         "position": [
-          383.0,
-          -331.0
+          719.0,
+          129.0
         ],
         "properties": {},
         "title": "UV",
@@ -202,8 +267,8 @@
           }
         ],
         "position": [
-          620.0,
-          -343.0
+          956.0,
+          117.0
         ],
         "properties": {},
         "title": "Split Float2",
@@ -243,8 +308,8 @@
           }
         ],
         "position": [
-          890.0,
-          -284.0
+          1226.0,
+          176.0
         ],
         "properties": {},
         "title": "Add Float",
@@ -284,8 +349,8 @@
           }
         ],
         "position": [
-          1038.0,
-          240.0
+          1978.0,
+          284.0
         ],
         "properties": {},
         "title": "Combine Float2",
@@ -325,8 +390,8 @@
           }
         ],
         "position": [
-          1302.0,
-          240.0
+          2242.0,
+          284.0
         ],
         "properties": {},
         "title": "Texture Sample",
@@ -420,8 +485,8 @@
           }
         ],
         "position": [
-          1632.0,
-          -108.0
+          2987.0,
+          8.0
         ],
         "properties": {
           "baseColor": [
@@ -450,7 +515,7 @@
             0.5799999833106995,
             1.0
           ],
-          "shadeFeather": 0.029999999329447746,
+          "shadeFeather": 0.25,
           "shadeStep": -0.15000000596046448,
           "specularIntensity": 0.3499999940395355,
           "specularSoftness": 0.019999999552965164,
@@ -480,8 +545,8 @@
           }
         ],
         "position": [
-          1034.0,
-          113.0
+          1974.0,
+          157.0
         ],
         "properties": {},
         "title": "Object Texture",
@@ -508,8 +573,8 @@
           }
         ],
         "position": [
-          258.0,
-          -199.0
+          594.0,
+          261.0
         ],
         "properties": {},
         "title": "Time",
@@ -549,8 +614,8 @@
           }
         ],
         "position": [
-          572.0,
-          -168.0
+          908.0,
+          292.0
         ],
         "properties": {},
         "title": "Multiply Float",
@@ -577,8 +642,8 @@
           }
         ],
         "position": [
-          258.0,
-          -81.0
+          594.0,
+          379.0
         ],
         "properties": {},
         "title": "Float",
@@ -612,12 +677,412 @@
           }
         ],
         "position": [
-          685.0,
-          240.0
+          1625.0,
+          284.0
         ],
         "properties": {},
         "title": "Frac Float",
         "type": "FracFloat"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 80,
+        "inputs": [
+          {
+            "id": 81,
+            "kind": 0,
+            "name": "A",
+            "valueType": 2
+          },
+          {
+            "id": 82,
+            "kind": 0,
+            "name": "B",
+            "valueType": 2
+          },
+          {
+            "id": 83,
+            "kind": 0,
+            "name": "T",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 84,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          2566.0,
+          288.0
+        ],
+        "properties": {},
+        "title": "Lerp Color",
+        "type": "LerpColor"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 86,
+        "inputs": [
+          {
+            "id": 87,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          },
+          {
+            "id": 88,
+            "kind": 0,
+            "name": "Scale",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 89,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          },
+          {
+            "id": 90,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          2318.0,
+          678.0
+        ],
+        "properties": {
+          "scale": 75.28299713134766
+        },
+        "title": "Noise Texture",
+        "type": "NoiseTexture"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          0.9843137264251709,
+          1.0,
+          0.21960784494876862
+        ],
+        "floatValue": 0.0,
+        "id": 94,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 95,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          2129.0,
+          567.0
+        ],
+        "properties": {},
+        "title": "Color",
+        "type": "Color"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 97,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 98,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1298.0,
+          788.0
+        ],
+        "properties": {},
+        "title": "Time",
+        "type": "Time"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": -0.7200000286102295,
+        "id": 99,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 100,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1298.0,
+          906.0
+        ],
+        "properties": {},
+        "title": "Float",
+        "type": "Float"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 101,
+        "inputs": [
+          {
+            "id": 102,
+            "kind": 0,
+            "name": "A",
+            "valueType": 1
+          },
+          {
+            "id": 103,
+            "kind": 0,
+            "name": "B",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 104,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1581.0,
+          820.0
+        ],
+        "properties": {},
+        "title": "Multiply Float",
+        "type": "MultiplyFloat"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 108,
+        "inputs": [
+          {
+            "id": 109,
+            "kind": 0,
+            "name": "A",
+            "valueType": 1
+          },
+          {
+            "id": 110,
+            "kind": 0,
+            "name": "B",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 111,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1837.0,
+          688.0
+        ],
+        "properties": {},
+        "title": "Add Float",
+        "type": "AddFloat"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 112,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 113,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          1316.0,
+          588.0
+        ],
+        "properties": {},
+        "title": "UV",
+        "type": "UV"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 114,
+        "inputs": [
+          {
+            "id": 115,
+            "kind": 0,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 116,
+            "kind": 1,
+            "name": "X",
+            "valueType": 1
+          },
+          {
+            "id": 117,
+            "kind": 1,
+            "name": "Y",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1585.0,
+          576.0
+        ],
+        "properties": {},
+        "title": "Split Float2",
+        "type": "SplitFloat2"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 121,
+        "inputs": [
+          {
+            "id": 122,
+            "kind": 0,
+            "name": "X",
+            "valueType": 1
+          },
+          {
+            "id": 123,
+            "kind": 0,
+            "name": "Y",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 124,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          2046.0,
+          688.0
+        ],
+        "properties": {},
+        "title": "Combine Float2",
+        "type": "CombineFloat2"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 9.479999542236328,
+        "id": 128,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 129,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          2016.0,
+          839.0
+        ],
+        "properties": {},
+        "title": "Float",
+        "type": "Float"
       }
     ]
   },

@@ -165,7 +165,7 @@ namespace CalyxEngine {
 	ImVec4 NodeEditorCanvas::GetNodeHeaderColor(const Node& node) const {
 		if(node.type == "Output") return ImVec4(0.16f, 0.31f, 0.47f, 1.0f);
 		if(node.type == "ToonMaster" || node.type == "LitMaster" || node.type == "UnlitMaster") return ImVec4(0.30f, 0.24f, 0.40f, 1.0f);
-		if(node.type == "Color" || node.type == "MultiplyColor" || node.type == "LerpColor" || node.type == "TextureSample") return ImVec4(0.38f, 0.30f, 0.13f, 1.0f);
+		if(node.type == "Color" || node.type == "MultiplyColor" || node.type == "LerpColor" || node.type == "TextureSample" || node.type == "NoiseTexture") return ImVec4(0.38f, 0.30f, 0.13f, 1.0f);
 		if(node.type == "ObjectTexture") return ImVec4(0.20f, 0.32f, 0.36f, 1.0f);
 		if(node.type == "LightingMode") return ImVec4(0.17f, 0.34f, 0.52f, 1.0f);
 		if(node.type == "Reflect") return ImVec4(0.20f, 0.38f, 0.35f, 1.0f);
