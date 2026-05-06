@@ -12,7 +12,8 @@ Shockwave::Shockwave(const std::string& modelName, std::optional<std::string> ob
 
 void Shockwave::Initialize() {
 	param_.LoadParams();
-	
+	SetBlendMode(BlendMode::ADD);
+
 	// 球体コライダーを初期化
 	InitializeCollider(ColliderKind::Sphere);
 	if (collider_) {
@@ -40,7 +41,7 @@ void Shockwave::Update(float dt) {
 	float easeOut = 1.0f - std::pow(1.0f - progress, 3.0f);
 	float currentScale = std::lerp(param_.startScale, currentMaxScale_, easeOut);
 	
-	worldTransform_.scale = { currentScale, currentScale, currentScale };
+	worldTransform_.scale = {currentScale, currentScale, currentScale};
 	
 }
 

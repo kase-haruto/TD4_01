@@ -37,7 +37,7 @@ private:
 	struct ShockwaveParameter : public CalyxEngine::SerializableObject {
 		float lifeTime	 = 0.5f;
 		float startScale = 0.5f;
-		float endScale	 = 5.0f;
+		float endScale	 = 3.5f;
 		float pushForce	 = 20.0f; // 跳ね返す力
 
 		ShockwaveParameter() {
