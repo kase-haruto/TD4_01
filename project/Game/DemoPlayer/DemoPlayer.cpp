@@ -90,6 +90,11 @@ void DemoPlayer::Update(float dt) {
 	ApplyGravity(dt);
 	UpdatePopScale(dt);
 	HammerControl(dt);
+
+	if(collider_) {
+	collider_->Update(worldTransform_.translation, worldTransform_.rotation);
+	}
+	
 }
 
 void DemoPlayer::TakeDamage(int32_t damage) {
@@ -114,7 +119,7 @@ void DemoPlayer::DerivativeGui() {
 void DemoPlayer::OnCollisionEnter(Collider* other) {
 	BaseGameObject* otherObj = other->GetOwner();
 	if(otherObj) {
-
+		TakeDamage(1);
 	}
 }
 
@@ -181,7 +186,7 @@ void DemoPlayer::Move(float dt) {
 			}
 
 			// 衝撃波を発生（ハンマー振り下ろし）
-			ShockwaveManager::GetInstance()->Emit(worldTransform_.translation, param_.defaultShockScale);
+			ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.defaultShockScale);
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
 			velocity_.y = param_.jumpForce;
 			isDiving_	= true;
@@ -229,7 +234,7 @@ void DemoPlayer::ApplyGravity(float dt) {
 		if(isJumping_) {
 			// 着地衝撃波（急降下中なら大きく、通常なら少し大きめ）
 			if(isDiving_) {
-				ShockwaveManager::GetInstance()->Emit(worldTransform_.translation, param_.strongShockScale);
+				ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale);
 				// リカバリー開始
 				isRecovering_  = true;
 				recoveryTimer_ = 0.0f;

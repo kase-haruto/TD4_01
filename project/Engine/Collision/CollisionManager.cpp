@@ -28,6 +28,7 @@ void CollisionManager::UpdateCollisionAllCollider() {
 	// 前フレームの衝突を保存
 	previousCollisions_ = std::move(currentCollisions_);
 	currentCollisions_.clear();
+	isUpdatingCollisions_ = true;
 
 	for(auto itA = colliders_.begin(); itA != colliders_.end(); ++itA) {
 		Collider* a = *itA;
@@ -78,15 +79,42 @@ void CollisionManager::UpdateCollisionAllCollider() {
 			collisionLogs_.emplace_back("Exit: " + pair.a->GetName() + " VS " + pair.b->GetName());
 		}
 	}
+
+	isUpdatingCollisions_ = false;
+	FlushPendingColliderChanges();
 }
 
 void CollisionManager::Register(Collider* collider) {
+	if(isUpdatingCollisions_) {
+		std::erase(pendingUnregisters_, collider);
+		if(std::find(pendingRegisters_.begin(), pendingRegisters_.end(), collider) == pendingRegisters_.end()) {
+			pendingRegisters_.push_back(collider);
+		}
+		return;
+	}
+
+	RegisterImmediate(collider);
+}
+
+void CollisionManager::Unregister(Collider* collider) {
+	if(isUpdatingCollisions_) {
+		std::erase(pendingRegisters_, collider);
+		if(std::find(pendingUnregisters_.begin(), pendingUnregisters_.end(), collider) == pendingUnregisters_.end()) {
+			pendingUnregisters_.push_back(collider);
+		}
+		return;
+	}
+
+	UnregisterImmediate(collider);
+}
+
+void CollisionManager::RegisterImmediate(Collider* collider) {
 	if(std::find(colliders_.begin(), colliders_.end(), collider) == colliders_.end()) {
 		colliders_.push_back(collider);
 	}
 }
 
-void CollisionManager::Unregister(Collider* collider) {
+void CollisionManager::UnregisterImmediate(Collider* collider) {
 	std::erase(colliders_, collider);
 
 	// 削除されるコライダーに関連する衝突ペアを現在のリストから削除
@@ -98,6 +126,18 @@ void CollisionManager::Unregister(Collider* collider) {
 	std::erase_if(previousCollisions_, [collider](const CollisionPair& pair) {
 		return pair.a == collider || pair.b == collider;
 	});
+}
+
+void CollisionManager::FlushPendingColliderChanges() {
+	for(Collider* collider : pendingUnregisters_) {
+		UnregisterImmediate(collider);
+	}
+	pendingUnregisters_.clear();
+
+	for(Collider* collider : pendingRegisters_) {
+		RegisterImmediate(collider);
+	}
+	pendingRegisters_.clear();
 }
 
 void CollisionManager::DebugLog() {
@@ -116,9 +156,12 @@ void CollisionManager::DebugLog() {
 
 void CollisionManager::ClearColliders() {
 	colliders_.clear();
+	pendingRegisters_.clear();
+	pendingUnregisters_.clear();
 	collisionLogs_.clear();
 	currentCollisions_.clear();
 	previousCollisions_.clear();
+	isUpdatingCollisions_ = false;
 }
 
 bool CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {

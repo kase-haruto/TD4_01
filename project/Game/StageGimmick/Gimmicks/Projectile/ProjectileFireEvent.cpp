@@ -22,11 +22,13 @@ void ProjectileFireEvent::OnCollisionEnter(Collider* other) {
 	// プレイヤーがイベント内に入ったら飛んでくる
 	if(auto target = targetObject_.lock()) {
 		target->SetIsFlying(true);
-		target->SetIsHoming(isHoming_);
+		target->SetIsHoming(param_.isHoming);
 	}
 }
 
 void ProjectileFireEvent::EventInitialize() {
+
+	param_.LoadParams();
 
 	if(!targetObject_.expired()) {
 		return;
@@ -65,4 +67,8 @@ void ProjectileFireEvent::EventUpdate(float dt) {
 	}
 
 	dt;
+}
+
+void ProjectileFireEvent::DerivativeGui() {
+	param_.ShowGui();
 }
