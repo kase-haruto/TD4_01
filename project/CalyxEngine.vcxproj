@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -384,6 +384,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Pipeline\Pso\PipelineStateObject.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\Shader\ShaderManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\Shader\ShaderCompiler.cpp" />
+    <ClCompile Include="Game\3d\Camera\RailCamera.cpp" />
     <ClCompile Include="Engine\Assets\Model\Model.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Renderer\Sprite\Sprite.cpp" />
