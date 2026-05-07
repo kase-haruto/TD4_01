@@ -19,6 +19,12 @@ void GroundSpikeObject::Spike() {
 void GroundSpikeObject::ObjectInitialize() {
 
 	BaseGameObject::InitializeCollider(ColliderKind::Sphere);
+	if(collider_) {
+		collider_->SetType(ColliderType::Type_StageGimmick);
+		collider_->SetTargetType(ColliderType::Type_Player);
+		collider_->SetOwner(this);
+		collider_->SetCollisionEnabled(true);
+	}
 	isSpike_ = false;
 }
 

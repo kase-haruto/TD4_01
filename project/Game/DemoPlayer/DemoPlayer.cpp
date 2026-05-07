@@ -117,9 +117,13 @@ void DemoPlayer::DerivativeGui() {
 }
 
 void DemoPlayer::OnCollisionEnter(Collider* other) {
-	BaseGameObject* otherObj = other->GetOwner();
-	if(otherObj) {
+	if(other->GetType() == ColliderType::Type_StageGimmick) {
 		TakeDamage(1);
+	}
+
+	BaseGameObject* otherObj = other->GetOwner();
+	if(!otherObj) {
+		return;
 	}
 }
 
