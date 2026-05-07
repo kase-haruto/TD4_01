@@ -40,6 +40,12 @@ void Shockwave::Update(float dt) {
 	float easeOut = 1.0f - std::pow(1.0f - progress, 3.0f);
 	float currentScale = std::lerp(param_.startScale, currentMaxScale_, easeOut);
 	
+	if(collider_) {
+		if(auto* radius = dynamic_cast<SphereCollider*>(collider_.get())) {
+			radius->SetRadius(currentScale);
+		}
+		collider_->Update(worldTransform_.translation, worldTransform_.rotation);
+	}
 	worldTransform_.scale = { currentScale, currentScale, currentScale };
 	
 }

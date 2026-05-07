@@ -5,6 +5,7 @@
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
 #include "Game\StageGimmick\Gimmicks\DroolRain\DroolRainObject.h"
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
+#include "Engine/Foundation/Serialization/SerializableObject.h"
 
 /// <summary>
 /// よだれ雨のイベントクラス

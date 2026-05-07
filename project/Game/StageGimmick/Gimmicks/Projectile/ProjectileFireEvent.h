@@ -3,6 +3,7 @@
 #include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
+#include "Engine/Foundation/Serialization/SerializableObject.h"
 
 /// <summary>
 /// 飛んでくる弾のイベントクラス
@@ -34,12 +35,35 @@ protected:
 	// 更新
 	void EventUpdate(float dt) override;
 
+	// gui
+	void DerivativeGui() override;
+
+
+private:
+
+	/// <summary>
+	/// 飛んでくる弾イベントのパラメータ
+	/// </summary>
+	struct ProjectileFireEventParam : public CalyxEngine::SerializableObject {
+
+		// ホーミングするか
+		bool isHoming = true;
+
+		ProjectileFireEventParam() {
+			AddField("isHoming", isHoming).Category("ProjectileFireEvent");
+		}
+
+		CalyxEngine::ParamPath GetParamPath() const override {
+			return {CalyxEngine::ParamDomain::Game, "ProjectileFireEvent", "StageGimmick"};
+		}
+	};
+
 private:
 
 	// ターゲットの地面スパイクオブジェクト
 	std::weak_ptr<ProjectileObject> targetObject_;
 
-	// ホーミングするか
-	bool isHoming_ = false;
+	// 調整するパラメーター
+	ProjectileFireEventParam param_;
 
 };

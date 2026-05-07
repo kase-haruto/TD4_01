@@ -84,6 +84,8 @@ void DemoPlayer::Update(float dt) {
 	ApplyGravity(dt);
 	UpdatePopScale(dt);
 	HammerControl(dt);
+
+	collider_->Update(worldTransform_.translation, worldTransform_.rotation);
 }
 
 void DemoPlayer::TakeDamage(int32_t damage) {
