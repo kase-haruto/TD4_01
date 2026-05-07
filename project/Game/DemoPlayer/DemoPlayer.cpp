@@ -141,12 +141,14 @@ void DemoPlayer::Move(float dt) {
 	CalyxEngine::Vector2 leftStick = CalyxFoundation::Input::GetInstance()->GetLeftStick();
 	horizonVelocity.x += leftStick.x;
 
-	if(horizonVelocity.Length() > 0.0f) {
-		horizonVelocity.Normalize();
+	CalyxEngine::Vector3 horizonRotateV = horizonVelocity;
+	horizonRotateV.z += 1.0f;
+	if(horizonRotateV.Length() > 0.0f) {
+		horizonRotateV.Normalize();
 
 		// 回転（移動方向を向く目標）
 		CalyxEngine::Vector3	from		   = CalyxEngine::Vector3::Forward();
-		CalyxEngine::Vector3	to			   = horizonVelocity;
+		CalyxEngine::Vector3	to			   = horizonRotateV;
 		CalyxEngine::Quaternion targetRotation = CalyxEngine::Quaternion::FromToQuaternion(from, to);
 
 		// 線形補間(SLERP)による滑らかな回転
