@@ -5,10 +5,6 @@
 /* ===================================================================== */
 #include <Engine/Application/System/Environment.h>
 
-// c++
-#include <thread>
-#include <algorithm>
-
 void DxSwapChain::Initialize(
 	ComPtr<IDXGIFactory7> dxgiFactory,
 	ComPtr<ID3D12CommandQueue> commandQueue,
@@ -43,33 +39,8 @@ void DxSwapChain::Initialize(
 	hr = tempSwapChain.As(&swapChain_);
 	assert(SUCCEEDED(hr));
 
-	// モニターのリフレッシュレートを取得
-	ComPtr<IDXGIOutput> output;
-	hr = swapChain_->GetContainingOutput(&output);
-
-	if (FAILED(hr)){
-		OutputDebugStringA("Failed to get containing output. Using default refresh rate.\n");
-		refreshRate_ = 60.0f; // デフォルト値
-	} else{
-		// リフレッシュレート取得
-		DXGI_MODE_DESC modeDesc = {};
-		modeDesc.Width = width;
-		modeDesc.Height = height;
-		modeDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-		DXGI_MODE_DESC closestMatch = {};
-		hr = output->FindClosestMatchingMode(&modeDesc, &closestMatch, nullptr);
-
-		if (FAILED(hr) || closestMatch.RefreshRate.Numerator == 0 || closestMatch.RefreshRate.Denominator == 0){
-			OutputDebugStringA("Failed to get refresh rate, using default 60Hz.\n");
-			refreshRate_ = 60.0f;
-		} else{
-			refreshRate_ = static_cast< float >(closestMatch.RefreshRate.Numerator) / closestMatch.RefreshRate.Denominator;
-		}
-	}
-
-	syncInterval_ = static_cast< UINT >(std::round(refreshRate_ / 60.0f));
-	if (syncInterval_ < 1) syncInterval_ = 1;
+	// 1 = VSyncあり。現在のモニターリフレッシュレートに同期してティアリングを防ぐ。
+	syncInterval_ = 1;
 
 	// バックバッファリソースを取得
 	for (UINT i = 0; i < swapChainDesc_.BufferCount; ++i) {
