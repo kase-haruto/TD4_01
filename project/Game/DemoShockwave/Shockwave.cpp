@@ -12,14 +12,13 @@ Shockwave::Shockwave(const std::string& modelName, std::optional<std::string> ob
 
 void Shockwave::Initialize() {
 	param_.LoadParams();
-	
+
 	// 球体コライダーを初期化
 	InitializeCollider(ColliderKind::Sphere);
 	if (collider_) {
 		collider_->SetType(ColliderType::Type_PlayerAttack);
 		// 敵、イベントオブジェクト、ステージギミックを対象にする
 		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack | ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
-		collider_->SetCollisionEnabled(false);
 	}
 
 	SetDrawEnable(false);
@@ -44,18 +43,19 @@ void Shockwave::Update(float dt) {
 		if(auto* radius = dynamic_cast<SphereCollider*>(collider_.get())) {
 			radius->SetRadius(currentScale);
 		}
-		collider_->Update(worldTransform_.translation, worldTransform_.rotation);
+ 		collider_->Update(worldTransform_.translation, worldTransform_.rotation);
 	}
-	worldTransform_.scale = { currentScale, currentScale, currentScale };
+	worldTransform_.scale = {currentScale, currentScale*0.25f, currentScale};
 	
 }
 
 void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier) {
 	worldTransform_.translation = pos;
-	worldTransform_.scale = { param_.startScale, param_.startScale, param_.startScale };
-	currentMaxScale_ = param_.endScale * scaleMultiplier;
-	timer_ = 0.0f;
-	isActive_ = true;
+	worldTransform_.scale		= {param_.startScale, param_.startScale, param_.startScale};
+	currentMaxScale_			= param_.endScale * scaleMultiplier;
+	scaleMultiplier_			= scaleMultiplier;
+	timer_						= 0.0f;
+	isActive_					= true;
 	
 	SetDrawEnable(true);
 	if (collider_) {

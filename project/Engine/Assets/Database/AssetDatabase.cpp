@@ -128,9 +128,23 @@ void AssetDatabase::BuildPreview(AssetRecord& rec) {
 				auto icon	   = tm.LoadTexture("UI/Tool/AssetPanel/generic.dds");
 				rec.previewTex = (ImTextureID)icon.ptr;
 			} else {
-				// テクスチャタイプの場合は実際の画像をプレビューとして使用
-				auto texHandle = tm.LoadTexture(rel.string());
-				rec.previewTex = (ImTextureID)texHandle.ptr;
+				std::filesystem::path previewPath = rec.sourcePath;
+				std::string			  ext		  = previewPath.extension().string();
+				std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+				if(ext == ".dds") {
+					previewPath.replace_extension(".png");
+					ext = ".png";
+				}
+
+				if(ext == ".png" && std::filesystem::exists(previewPath)) {
+					auto previewRel = std::filesystem::relative(previewPath, assetsRoot_);
+					auto texHandle  = tm.LoadTexture(previewRel.generic_string());
+					rec.previewTex	= (ImTextureID)texHandle.ptr;
+				} else {
+					auto icon	   = tm.LoadTexture("UI/Tool/AssetPanel/generic.dds");
+					rec.previewTex = (ImTextureID)icon.ptr;
+				}
 			}
 		} else {
 			// その他のタイプは共通アイコンを使用

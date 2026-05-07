@@ -10,6 +10,7 @@
 #include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
 #include <Engine/Objects/Transform/Transform.h>
 #include <Engine/Graphics/Buffer/DxStructuredBuffer.h>
+#include <Engine/Graphics/Descriptor/DescriptorAllocator.h>
 #include <Engine/Objects/3D/Details/BillboardParams.h>
 #include <Engine/Graphics/Shadow/Raytracing/RaytracingMesh.h>
 
@@ -21,9 +22,13 @@
 
 /* c++ */
 #include <d3d12.h>
-#include <array>
 #include <string>
 #include <optional>
+#include <memory>
+
+namespace CalyxEngine {
+	class MaterialAsset;
+}
 
 /*-----------------------------------------------------------------------------------------
  * BaseModel
@@ -32,8 +37,6 @@
  *---------------------------------------------------------------------------------------*/
 class BaseModel {
 public:
-	static constexpr size_t kMaxTextureSlots = BaseModelConfig::kMaxTextureSlots;
-
 	//===================================================================*/
 	//			public methods
 	//===================================================================*/
@@ -52,7 +55,6 @@ public:
 	BaseModelConfig ExtractConfig() const;
 	void ShowImGui(BaseModelConfig& config);
 	bool LoadTextureByGuid(const Guid& g);
-	bool LoadTextureSlotByGuid(size_t slot, const Guid& g);
 
 	//--------- accessor -----------------------------------------------------
 	BlendMode GetBlendMode() const { return blendMode_; }
@@ -80,9 +82,13 @@ public:
 	// レンダラーが使うハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInstanceSrv()const;  //< VS:t0 (gTransMat)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv()const;       //< PS:t0 (gTexture)
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv(size_t slot)const;
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv(size_t materialIndex)const;
+	D3D12_GPU_DESCRIPTOR_HANDLE GetMaterialGraphTextureSrvTable(size_t materialIndex) const;
 	D3D12_GPU_DESCRIPTOR_HANDLE GetEnvMapSrv()const;    //< PS:t1 (gEnvironmentMap)
 	const Material& GetMaterialForBatch() const { return currentMaterial_; }
+	std::shared_ptr<CalyxEngine::MaterialAsset> GetMaterialAsset() const;
+	const Guid& GetMaterialGuid() const { return materialGuid_; }
+	bool UsesRuntimeMaterialGraph() const;
 
 	virtual void BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList)const;
 	void BindMaterialCB(ID3D12GraphicsCommandList* cmdList)const;
@@ -100,7 +106,8 @@ protected:
 	Material currentMaterial_{};
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle_{};
-	std::array<std::optional<D3D12_GPU_DESCRIPTOR_HANDLE>, kMaxTextureSlots> textureSlotHandles_{};
+	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> materialTextureHandles_;
+	mutable std::vector<DescriptorHandle> materialGraphTextureTables_;
 
 	std::string fileName_;
 	std::string textureName_ = "textures/white1x1.dds"; // デフォルトのテクスチャ名
@@ -121,7 +128,6 @@ protected:
 
 protected:
 	Guid textureGuid_;
-	std::array<Guid, kMaxTextureSlots> textureGuids_{};
 	static const std::string directoryPath_;
 	bool isDrawEnable_ = true;
 

@@ -52,6 +52,7 @@ public:
 	 * \return GPUハンドル
 	 */
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& textureName) const;
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuSrvHandle(const std::string& textureName) const;
 
 	/**
 	 * \brief ロード済みテクスチャリストを取得
@@ -73,6 +74,7 @@ public:
 	 * \return GPUハンドル
 	 */
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const Guid& guid) const;
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuSrvHandle(const Guid& guid) const;
 
 	/**
 	 * \brief 指定したGUIDのテクスチャがロードされているか

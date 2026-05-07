@@ -1,5 +1,3 @@
-
-
 #include "SceneObject.h"
 #include <Engine/Foundation/Json/JsonUtils.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>

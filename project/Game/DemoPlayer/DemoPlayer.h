@@ -63,6 +63,8 @@ private:
 		CalyxEngine::Vector3 diveScale = {0.9f, 1.2f, 0.9f};
 		CalyxEngine::Vector3 landScale = {1.4f, 0.5f, 1.4f};
 
+		CalyxEngine::Vector3 hammerSwingScale = {2.5f, 1.5f, 2.5f};
+
 		PlayerParameter() {
 			AddField("HP", playerHP).Category("Base Param");
 			AddField("Move Speed", moveSpeed).Category("Move Param");
@@ -80,6 +82,7 @@ private:
 			AddField("Jump Scale", jumpScale).Category("Pop Scale");
 			AddField("Dive Scale", diveScale).Category("Pop Scale");
 			AddField("Land Scale", landScale).Category("Pop Scale");
+			AddField("Hammer Swing Scale", hammerSwingScale).Category("Pop Scale");
 		}
 		
 		CalyxEngine::ParamPath GetParamPath() const override {
@@ -112,6 +115,10 @@ private:
 	// Pop Scale
 	CalyxEngine::Vector3 targetScale_ = {1.0f, 1.0f, 1.0f};
 	CalyxEngine::Vector3 scaleVelocity_ = {0.0f, 0.0f, 0.0f};
+
+	CalyxEngine::Vector3 hammerTargetScale_ = {1.0f, 1.0f, 1.0f};
+	CalyxEngine::Vector3 hammerScaleVelocity_ = {0.0f, 0.0f, 0.0f};
+	CalyxEngine::Vector3 hammerInitialScale_ = {1.0f, 1.0f, 1.0f};
 
 	// ハンマー
 	std::shared_ptr<DemoHammer> hammer_;

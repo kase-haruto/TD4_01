@@ -567,18 +567,23 @@ namespace CalyxEngine {
 
 		materialBuffer_.SetCommand(cmdList, 0);
 		cmdList->SetGraphicsRootDescriptorTable(1, GetInstanceSrv());
-		cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(0));
+		cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv());
 		cmdList->SetGraphicsRootDescriptorTable(6, GetEnvMapSrv());
-		cmdList->SetGraphicsRootDescriptorTable(12, GetTexSrv(1));
-		cmdList->SetGraphicsRootDescriptorTable(13, GetTexSrv(2));
-		cmdList->SetGraphicsRootDescriptorTable(14, GetTexSrv(3));
 		SetCommandPalletSrv(7, cmdList);
 
 		// 頂点バッファ/インデックスバッファをセット
 		BindVertexIndexBuffers(cmdList);
 
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		cmdList->DrawIndexedInstanced(UINT(modelData_->meshResource.Indices().size()), 1, 0, 0, 0);
+		const auto& subMeshes = modelData_->meshResource.SubMeshes();
+		if(subMeshes.empty()) {
+			cmdList->DrawIndexedInstanced(UINT(modelData_->meshResource.Indices().size()), 1, 0, 0, 0);
+		} else {
+			for(const auto& subMesh : subMeshes) {
+				cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(subMesh.materialIndex));
+				cmdList->DrawIndexedInstanced(subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
+			}
+		}
 
 		if(isDrawSkeleton_) {
 			CalyxEngine::Vector4 col = {jointHighlightCol_.x, jointHighlightCol_.y,

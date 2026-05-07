@@ -20,6 +20,7 @@ namespace CalyxEngine {
 		bool DrawNodeBody(Node& node);
 		bool DrawNodeInspector(Node& node);
 		void DrawInspector();
+		bool DrawBlendInputControls(Node& node);
 		void AddInputNode(Vector2 position);
 		void AddOutputNode(Vector2 position);
 		void AddEffectNode(const std::string& type, Vector2 position);

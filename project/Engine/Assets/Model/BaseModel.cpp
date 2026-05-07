@@ -11,6 +11,7 @@
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Assets/DataAsset/MaterialAsset.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
+#include <Engine/Foundation/Clock/ClockManager.h>
 
 
 // lib
@@ -26,6 +27,7 @@
 #include "Engine/Foundation/Utility/Func/CxUtils.h"
 #include "Engine/Graphics/Context/GraphicsGroup.h"
 
+#include <array>
 
 const std::string BaseModel::directoryPath_ = "Resource/models";
 
@@ -69,16 +71,21 @@ void BaseModel::OnModelLoaded() {
 		modelData_->meshResource.IndexBuffer().TransferVectorData(modelData_->meshResource.Indices());
 	}
 
-	// テクスチャ設定
-	if(!handle_) {
-		auto defaultHandle = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(
-			"Textures/" + modelData_->meshResource.Material().textureFilePath);
-		textureName_ = "textures/" + modelData_->meshResource.Material().textureFilePath;
-		if(!defaultHandle.ptr) { // 読み込み失敗・空文字列など
-			defaultHandle = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds");
+	// テクスチャ設定。モデル側マテリアルの相対パスは Asset ルート相対に解決済み。
+	materialTextureHandles_.clear();
+	for(const auto& material : modelData_->meshResource.Materials()) {
+		auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material.textureFilePath);
+		if(!h.ptr) {
+			h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds");
 		}
-		handle_ = defaultHandle;
-		textureSlotHandles_[0] = defaultHandle;
+		materialTextureHandles_.push_back(h);
+	}
+	if(materialTextureHandles_.empty()) {
+		materialTextureHandles_.push_back(
+			CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds"));
+	}
+	if(!handle_) {
+		textureName_ = modelData_->meshResource.Material().textureFilePath;
 	}
 
 	// -------- インスタンシングバッファの初期確保 --------
@@ -148,7 +155,7 @@ void BaseModel::ShowImGuiInterface() {
 void BaseModel::Draw(const WorldTransform& transform) {
 	if(!isDrawEnable_) return;
 	if(!modelData_) return;
-	if(!handle_) return;
+	if(!handle_ && materialTextureHandles_.empty()) return;
 
 	ID3D12GraphicsCommandList* cmdList = GraphicsGroup::GetInstance()->GetCommandList().Get();
 	ID3D12Device*			   device  = GraphicsGroup::GetInstance()->GetDevice().Get();
@@ -167,18 +174,25 @@ void BaseModel::Draw(const WorldTransform& transform) {
 	materialBuffer_.SetCommand(cmdList, 0);
 	cmdList->SetGraphicsRootDescriptorTable(1, GetInstanceSrv());
 
-	cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(0));
-	cmdList->SetGraphicsRootDescriptorTable(12, GetTexSrv(1));
-	cmdList->SetGraphicsRootDescriptorTable(13, GetTexSrv(2));
-	cmdList->SetGraphicsRootDescriptorTable(14, GetTexSrv(3));
+	cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv());
+	cmdList->SetGraphicsRootDescriptorTable(12, GetMaterialGraphTextureSrvTable(0));
 
 	// 環境マップ
 	D3D12_GPU_DESCRIPTOR_HANDLE envMapHandle = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle();
 	cmdList->SetGraphicsRootDescriptorTable(6, envMapHandle);
 	cmdList->SetGraphicsRootDescriptorTable(7, GetBillboardSrv());
 
-	// 描画
-	cmdList->DrawIndexedInstanced(UINT(modelData_->meshResource.Indices().size()), 1, 0, 0, 0);
+	const auto& subMeshes = modelData_->meshResource.SubMeshes();
+	if(subMeshes.empty()) {
+		cmdList->DrawIndexedInstanced(UINT(modelData_->meshResource.Indices().size()), 1, 0, 0, 0);
+		return;
+	}
+
+	for(const auto& subMesh : subMeshes) {
+		cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(subMesh.materialIndex));
+		cmdList->SetGraphicsRootDescriptorTable(12, GetMaterialGraphTextureSrvTable(subMesh.materialIndex));
+		cmdList->DrawIndexedInstanced(subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
+	}
 }
 
 void BaseModel::ApplyConfig(const BaseModelConfig& config) {
@@ -186,21 +200,12 @@ void BaseModel::ApplyConfig(const BaseModelConfig& config) {
 	uvTransform.ApplyConfig(config.uvTransConfig);
 	blendMode_ = static_cast<BlendMode>(config.blendMode);
 	fileName_  = config.modelName;
-	textureGuids_.fill(Guid::Empty());
-	textureSlotHandles_.fill(std::nullopt);
 
 	bool ok = false;
 
-	for(size_t i = 0; i < textureGuids_.size(); ++i) {
-		if(config.textureGuids[i].isValid()) {
-			const bool slotOk = LoadTextureSlotByGuid(i, config.textureGuids[i]);
-			ok = ok || (i == 0 && slotOk);
-		}
-	}
-
-	// 旧 textureGuid があれば slot0 として扱う
-	if(!ok && config.textureGuid.isValid()) {
-		ok = LoadTextureSlotByGuid(0, config.textureGuid);
+	// GUID があれば手動上書きとして最優先
+	if(config.textureGuid.isValid()) {
+		ok = LoadTextureByGuid(config.textureGuid);
 	}
 
 	if(!ok && config.legacyTextureName && !config.legacyTextureName->empty()) {
@@ -217,20 +222,16 @@ void BaseModel::ApplyConfig(const BaseModelConfig& config) {
 			const std::string key = (ec ? r->sourcePath : rel).generic_string();
 
 			if(key == want || r->sourcePath.filename().string() == want) {
-				ok = LoadTextureSlotByGuid(0, r->guid);
+				ok = LoadTextureByGuid(r->guid);
 				break;
 			}
 		}
 	}
 
 	if(!ok) {
-		handle_      = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds");
-		textureSlotHandles_[0] = handle_;
+		handle_.reset();
 		textureGuid_ = Guid{}; // 未設定
 	}
-
-	currentMaterial_.textureBlendWeights = config.textureBlendWeights;
-	currentMaterial_.textureBlendMode = std::clamp(config.textureBlendMode, 0, 1);
 }
 
 BaseModelConfig BaseModel::ExtractConfig() const {
@@ -242,9 +243,6 @@ BaseModelConfig BaseModel::ExtractConfig() const {
 
 	// 保存は GUID のみ
 	config.textureGuid = textureGuid_;
-	config.textureGuids = textureGuids_;
-	config.textureBlendWeights = currentMaterial_.textureBlendWeights;
-	config.textureBlendMode = currentMaterial_.textureBlendMode;
 	// config.legacyTextureName は保存しない（後方互換用の読取専用）
 
 	return config;
@@ -327,7 +325,6 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 					if(LoadTextureByGuid(payload.guid)) {
 						// コンフィグ（保存用）にも反映
 						config.textureGuid = payload.guid;
-						config.textureGuids[0] = payload.guid;
 					} else {
 						ImGui::OpenPopup("TextureDropError");
 					}
@@ -362,76 +359,6 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 		ImGui::TreePop();
 	}
 
-	if(ImGui::TreeNodeEx("Multi Texture", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
-		static constexpr const char* blendModes[] = {"Weighted Blend", "Multiply"};
-		int blendMode = std::clamp(config.textureBlendMode, 0, 1);
-		if(GuiCmd::Combo("Texture Blend Mode", blendMode, blendModes, IM_ARRAYSIZE(blendModes))) {
-			config.textureBlendMode = blendMode;
-			currentMaterial_.textureBlendMode = blendMode;
-			TransferMaterial();
-		}
-
-		float weights[4] = {
-			config.textureBlendWeights.x,
-			config.textureBlendWeights.y,
-			config.textureBlendWeights.z,
-			config.textureBlendWeights.w,
-		};
-		if(ImGui::DragFloat4("Blend Weights", weights, 0.01f, 0.0f, 1.0f)) {
-			config.textureBlendWeights = {weights[0], weights[1], weights[2], weights[3]};
-			currentMaterial_.textureBlendWeights = config.textureBlendWeights;
-			TransferMaterial();
-		}
-
-		auto labelFromGuid = [](const Guid& g) -> std::string {
-			if(!g.isValid()) return "(none)";
-			auto* db = AssetDatabase::GetInstance();
-			for(auto* r : db->GetView()) {
-				if(r && r->type == AssetType::Texture && r->guid == g) {
-					return r->sourcePath.filename().string();
-				}
-			}
-			return "(missing)";
-		};
-
-		for(size_t slot = 0; slot < kMaxTextureSlots; ++slot) {
-			ImGui::PushID(static_cast<int>(slot));
-			ImGui::Text("Slot %zu: %s", slot, labelFromGuid(textureGuids_[slot]).c_str());
-			ImVec2 dropSize(ImGui::GetContentRegionAvail().x, 36.0f);
-			ImGui::InvisibleButton("##MultiTextureDrop", dropSize);
-			const bool hovered = ImGui::IsItemHovered();
-			const ImVec2 rmin = ImGui::GetItemRectMin();
-			const ImVec2 rmax = ImGui::GetItemRectMax();
-			ImGui::GetWindowDrawList()->AddRect(
-				rmin, rmax, hovered ? IM_COL32(120, 180, 255, 220) : IM_COL32(90, 90, 90, 160),
-				6.0f, 0, 2.0f);
-			ImGui::GetWindowDrawList()->AddText(
-				ImVec2(rmin.x + 8.0f, rmin.y + 8.0f),
-				IM_COL32(230, 230, 230, 255),
-				"Drop a Texture here");
-
-			if(ImGui::BeginDragDropTarget()) {
-				if(const ImGuiPayload* p = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
-					const AssetDragPayload payload =
-						*reinterpret_cast<const AssetDragPayload*>(p->Data);
-					if(payload.type == AssetType::Texture) {
-						if(LoadTextureSlotByGuid(slot, payload.guid)) {
-							config.textureGuids[slot] = payload.guid;
-							config.textureGuid = config.textureGuids[0];
-							TransferMaterial();
-						} else {
-							ImGui::OpenPopup("TextureDropError");
-						}
-					}
-				}
-				ImGui::EndDragDropTarget();
-			}
-			ImGui::PopID();
-		}
-
-		ImGui::TreePop();
-	}
-
 	// materialData_.ShowImGui(config.materialConfig); // TODO: マテリアルアセットの切り替えUIをここに実装
 
 	// ブレンドモード
@@ -449,22 +376,13 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 }
 
 bool BaseModel::LoadTextureByGuid(const Guid& g) {
-	return LoadTextureSlotByGuid(0, g);
-}
-
-bool BaseModel::LoadTextureSlotByGuid(size_t slot, const Guid& g) {
-	if(slot >= kMaxTextureSlots) return false;
 	if(!g.isValid()) return false;
 
 	auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(g);
 	if(!h.ptr) return false;
 
-	textureSlotHandles_[slot] = h;
-	textureGuids_[slot] = g;
-	if(slot == 0) {
-		handle_		 = h;
-		textureGuid_ = g;
-	}
+	handle_		 = h;
+	textureGuid_ = g;
 	return true;
 }
 
@@ -474,7 +392,6 @@ ModelData* BaseModel::GetModelData() const { return modelData_; }
 
 void BaseModel::SetTex(const std::string& name) {
 	handle_ = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/" + name);
-	textureSlotHandles_[0] = handle_;
 }
 
 void BaseModel::EnsureInstanceCapacity(ID3D12Device* device, UINT needCount) {
@@ -508,17 +425,122 @@ void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transf
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetInstanceSrv() const { return instanceBuffer_.GetGpuSrvHandle(); }
-D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const { return GetTexSrv(0); }
-D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t slot) const {
-	if(slot < textureSlotHandles_.size() && textureSlotHandles_[slot] && textureSlotHandles_[slot]->ptr) {
-		return textureSlotHandles_[slot].value();
+D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const {
+	if(auto material = GetMaterialAsset()) {
+		if(material->objectTextureGuid.isValid()) {
+			auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material->objectTextureGuid);
+			if(h.ptr) return h;
+		}
 	}
-	if(slot == 0 && handle_ && handle_->ptr) {
+	if(handle_ && handle_->ptr) {
 		return handle_.value();
+	}
+	if(!materialTextureHandles_.empty() && materialTextureHandles_[0].ptr) {
+		return materialTextureHandles_[0];
 	}
 	return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds");
 }
+D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t materialIndex) const {
+	if(auto material = GetMaterialAsset()) {
+		if(material->objectTextureGuid.isValid()) {
+			auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material->objectTextureGuid);
+			if(h.ptr) return h;
+		}
+	}
+	if(handle_ && handle_->ptr) {
+		return handle_.value();
+	}
+	if(materialIndex < materialTextureHandles_.size() && materialTextureHandles_[materialIndex].ptr) {
+		return materialTextureHandles_[materialIndex];
+	}
+	return GetTexSrv();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t materialIndex) const {
+	constexpr uint32_t kMaxGraphTextures = 8;
+	auto* textureManager = CalyxEngine::AssetManager::GetInstance()->GetTextureManager();
+	ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
+	if(!textureManager || !device) return {};
+
+	if(materialGraphTextureTables_.size() <= materialIndex) {
+		materialGraphTextureTables_.resize(materialIndex + 1);
+	}
+	DescriptorHandle& textureTable = materialGraphTextureTables_[materialIndex];
+	if(!textureTable.IsValid()) {
+		textureTable = DescriptorAllocator::AllocateRange(DescriptorUsage::CbvSrvUav, kMaxGraphTextures);
+	}
+
+	const UINT descriptorSize = DescriptorAllocator::GetDescriptorSize(DescriptorUsage::CbvSrvUav);
+	const D3D12_GPU_DESCRIPTOR_HANDLE gpuStart = DescriptorAllocator::GetGpuHandleStart(DescriptorUsage::CbvSrvUav);
+	const D3D12_CPU_DESCRIPTOR_HANDLE cpuStart = DescriptorAllocator::GetCpuHandleStart(DescriptorUsage::CbvSrvUav);
+	auto cpuFromGpu = [gpuStart, cpuStart, descriptorSize](D3D12_GPU_DESCRIPTOR_HANDLE gpu) {
+		D3D12_CPU_DESCRIPTOR_HANDLE cpu{};
+		if(!gpu.ptr || gpu.ptr < gpuStart.ptr) return cpu;
+		const SIZE_T offset = (gpu.ptr - gpuStart.ptr) / descriptorSize;
+		cpu.ptr = cpuStart.ptr + offset * descriptorSize;
+		return cpu;
+	};
+
+	D3D12_CPU_DESCRIPTOR_HANDLE fallbackCpu = textureManager->GetCpuSrvHandle("textures/white1x1.dds");
+	if(auto fallbackGpu = GetTexSrv(materialIndex); fallbackGpu.ptr) {
+		if(auto cpu = cpuFromGpu(fallbackGpu); cpu.ptr) fallbackCpu = cpu;
+	}
+
+	std::array<D3D12_CPU_DESCRIPTOR_HANDLE, kMaxGraphTextures> sourceCpu{};
+	sourceCpu.fill(fallbackCpu);
+
+	if(auto material = GetMaterialAsset()) {
+		uint32_t slot = 0;
+		for(const auto& node : material->graph.nodes) {
+			if(node.type != "ObjectTexture" && node.type != "Texture2D") continue;
+			if(slot >= kMaxGraphTextures) break;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE cpu = fallbackCpu;
+			if(node.type == "ObjectTexture") {
+				if(material->objectTextureGuid.isValid()) {
+					D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(material->objectTextureGuid);
+					if(guidCpu.ptr) cpu = guidCpu;
+				}
+			} else if(auto it = node.properties.find("textureGuid"); it != node.properties.end() && it->is_string()) {
+				const Guid guid = Guid::FromString(it->get<std::string>());
+				if(guid.isValid()) {
+					D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(guid);
+					if(guidCpu.ptr) cpu = guidCpu;
+				}
+			}
+			sourceCpu[slot++] = cpu;
+		}
+	}
+
+	for(uint32_t i = 0; i < kMaxGraphTextures; ++i) {
+		D3D12_CPU_DESCRIPTOR_HANDLE dest = textureTable.cpu;
+		dest.ptr += static_cast<SIZE_T>(i) * descriptorSize;
+		device->CopyDescriptorsSimple(1, dest, sourceCpu[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	return textureTable.gpu;
+}
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetEnvMapSrv() const { return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle(); }
+
+std::shared_ptr<CalyxEngine::MaterialAsset> BaseModel::GetMaterialAsset() const {
+	return CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<CalyxEngine::MaterialAsset>(materialGuid_);
+}
+
+bool BaseModel::UsesRuntimeMaterialGraph() const {
+	auto material = GetMaterialAsset();
+	if(!material) return false;
+
+	for(const auto& node : material->graph.nodes) {
+		if(node.type != "Output") continue;
+		for(const auto& pin : node.inputs) {
+			if(pin.name != "Surface") continue;
+			return std::any_of(material->graph.links.begin(), material->graph.links.end(), [&pin](const auto& graphLink) {
+				return graphLink.toPinId == pin.id;
+			});
+		}
+	}
+	return false;
+}
 
 void BaseModel::BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList) const {
 	modelData_->meshResource.SetCommand(cmdList);
@@ -561,6 +583,17 @@ void BaseModel::TransferMaterial() {
 		data.isReflect = ma->isReflect ? 1 : 0;
 		data.envirometCoefficient = ma->envirometCoefficient;
 		data.roughness = ma->roughness;
+		data.toonHighlightColor = ma->toonHighlightColor;
+		data.toonBaseColor = ma->toonBaseColor;
+		data.toonMidShadowColor = ma->toonMidShadowColor;
+		data.toonShadowColor = ma->toonShadowColor;
+		data.toonBaseStep = ma->toonBaseStep;
+		data.toonBaseFeather = ma->toonBaseFeather;
+		data.toonShadeStep = ma->toonShadeStep;
+		data.toonShadeFeather = ma->toonShadeFeather;
+		data.toonSpecularThreshold = ma->toonSpecularThreshold;
+		data.toonSpecularSoftness = ma->toonSpecularSoftness;
+		data.toonSpecularIntensity = ma->toonSpecularIntensity;
 	} else {
 		// Default fallback
 		data.color = {1, 1, 1, 1};
@@ -570,14 +603,13 @@ void BaseModel::TransferMaterial() {
 	if(colorOverride_) {
 		data.color = *colorOverride_;
 	}
-	data.textureBlendWeights = currentMaterial_.textureBlendWeights;
-	data.textureBlendMode = currentMaterial_.textureBlendMode;
 
 	// UV transform を適用
 	CalyxEngine::Matrix4x4 uvTransformMatrix = CalyxEngine::MakeScaleMatrix(CalyxEngine::Vector3(uvTransform.scale.x, uvTransform.scale.y, 1.0f));
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeRotateZMatrix(uvTransform.rotate));
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 	data.uvTransform = uvTransformMatrix;
+	data.pad3 = ClockManager::GetInstance()->GetTotalTime();
 
 	currentMaterial_ = data;
 	materialBuffer_.TransferData(data);

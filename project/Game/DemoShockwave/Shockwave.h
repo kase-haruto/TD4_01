@@ -31,13 +31,14 @@ public:
 
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "Shockwave"; }
+	float			 GetPushForce() const { return param_.pushForce * scaleMultiplier_; }
 	bool			 IsActive() const { return isActive_; }
 
 private:
 	struct ShockwaveParameter : public CalyxEngine::SerializableObject {
 		float lifeTime	 = 0.5f;
 		float startScale = 0.5f;
-		float endScale	 = 5.0f;
+		float endScale	 = 3.5f;
 		float pushForce	 = 20.0f; // 跳ね返す力
 
 		ShockwaveParameter() {
@@ -53,6 +54,7 @@ private:
 	};
 
 	ShockwaveParameter param_;
+	float			   scaleMultiplier_ = 1.0f;
 	float			   timer_			= 0.0f;
 	float			   currentMaxScale_ = 5.0f;
 	bool			   isActive_		= false;

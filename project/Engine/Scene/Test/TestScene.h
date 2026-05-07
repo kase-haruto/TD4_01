@@ -11,8 +11,10 @@
 #include <memory>
 #include <vector>
 
+#include <Game\Stage\Stage.h>
 #include <Game\DemoPlayer\DemoPlayer.h>
 #include <Game\StageGimmick\Manager\StageGimmickManager.h>
+#include <Game/3d/Camera/RailCamera.h>
 
 
 ///デバッグ関連///
@@ -57,5 +59,6 @@ private:
 
 	int selectedIndex_ = 0;
 	
+	std::unique_ptr<Stage> stage_ = nullptr;
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 };

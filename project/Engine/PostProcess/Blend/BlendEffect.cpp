@@ -46,7 +46,7 @@ void BlendEffect::ShowImGui() {
 }
 
 void BlendEffect::ResetParameters() {
-	param_.opacity = 1.0f;
+	param_.opacity = 0.5f;
 	param_.mode = 0.0f;
 }
 

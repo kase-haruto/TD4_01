@@ -33,6 +33,12 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 void ProjectileObject::ObjectInitialize() {
 
 	BaseGameObject::InitializeCollider(ColliderKind::Box);
+	if(collider_) {
+		collider_->SetType(ColliderType::Type_StageGimmick);
+		collider_->SetTargetType(ColliderType::Type_Player | ColliderType::Type_PlayerAttack);
+		collider_->SetOwner(this);
+		collider_->SetCollisionEnabled(true);
+	}
 	isFlying_ = false;
 }
 
@@ -42,7 +48,7 @@ void ProjectileObject::ObjectUpdate(float dt) {
 		return;
 	}
 	auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
-	CalyxEngine::Vector3 velocity = player->GetWorldTransform().translation - worldTransform_.translation;
+	CalyxEngine::Vector3 velocity = player->GetWorldTransform().GetWorldPosition() - worldTransform_.translation;
 
 	if(!isHoming_){
 		velocity = CalyxEngine::Vector3(0.0f, -0.5f, -1.0f);

@@ -27,9 +27,18 @@ struct Material {
 	int32_t   isReflect             = 0;
 	float     envirometCoefficient = 0.5f;
 	float     roughness             = 0.5f; // 反射率
-	CalyxEngine::Vector4 textureBlendWeights = {1.0f, 0.0f, 0.0f, 0.0f};
-	int32_t   textureBlendMode = 0; // 0: weighted blend, 1: multiply
-	float     texturePad[3] = {};
+	CalyxEngine::Vector4 toonHighlightColor = {1.15f, 1.10f, 1.00f, 1.0f};
+	CalyxEngine::Vector4 toonBaseColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	CalyxEngine::Vector4 toonMidShadowColor = {0.72f, 0.76f, 0.86f, 1.0f};
+	CalyxEngine::Vector4 toonShadowColor = {0.42f, 0.46f, 0.58f, 1.0f};
+	float     toonBaseStep = 0.25f;
+	float     toonBaseFeather = 0.03f;
+	float     toonShadeStep = -0.15f;
+	float     toonShadeFeather = 0.03f;
+	float     toonSpecularThreshold = 0.96f;
+	float     toonSpecularSoftness = 0.02f;
+	float     toonSpecularIntensity = 0.35f;
+	float     pad3 = 0.0f;
 
 	//config
 	void           ApplyConfig(const MaterialConfig& config);

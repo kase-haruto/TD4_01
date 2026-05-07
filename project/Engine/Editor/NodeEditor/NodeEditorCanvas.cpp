@@ -11,8 +11,8 @@ namespace CalyxEngine {
 		struct BlueprintNodeStyle {
 			float nodeWidth = 220.0f;
 			float headerHeight = 30.0f;
-			float pinRadius = 5.0f;
-			float pinHitSize = 16.0f;
+			float pinRadius = 6.0f;
+			float pinHitSize = 18.0f;
 			float rowHeight = 24.0f;
 			float bodyPaddingX = 12.0f;
 			float bodyPaddingY = 8.0f;
@@ -29,7 +29,9 @@ namespace CalyxEngine {
 			ImVec4 selectedBorder = ImVec4(1.00f, 0.62f, 0.18f, 1.0f);
 			ImVec4 text = ImVec4(0.88f, 0.91f, 0.94f, 1.0f);
 			ImVec4 textMuted = ImVec4(0.62f, 0.67f, 0.72f, 1.0f);
-			ImVec4 pinOutline = ImVec4(0.015f, 0.017f, 0.020f, 1.0f);
+			ImVec4 pinOutline = ImVec4(0.030f, 0.035f, 0.042f, 1.0f);
+			ImVec4 pinHighlight = ImVec4(1.00f, 1.00f, 1.00f, 0.26f);
+			ImVec4 pinShadow = ImVec4(0.00f, 0.00f, 0.00f, 0.35f);
 			ImVec4 reject = ImVec4(0.95f, 0.20f, 0.16f, 1.0f);
 		};
 
@@ -41,10 +43,12 @@ namespace CalyxEngine {
 
 		void DrawPinShape(ImDrawList* drawList, const ImVec2& center, NodeValueType type, const ImVec4& fill, const ImVec4& outline) {
 			const float r = kStyle.pinRadius;
+			drawList->AddCircleFilled(ImVec2(center.x + 1.0f, center.y + 1.0f), r + 2.0f, ToU32(kStyle.pinShadow), 18);
 			switch(type) {
 			case NodeValueType::Color:
-				drawList->AddRectFilled(ImVec2(center.x - r, center.y - r), ImVec2(center.x + r, center.y + r), ToU32(fill), 2.0f);
-				drawList->AddRect(ImVec2(center.x - r, center.y - r), ImVec2(center.x + r, center.y + r), ToU32(outline), 2.0f, 0, 1.2f);
+				drawList->AddCircleFilled(center, r, ToU32(fill), 20);
+				drawList->AddCircle(center, r + 1.5f, ToU32(outline), 20, 1.8f);
+				drawList->AddCircle(ImVec2(center.x - 1.5f, center.y - 1.5f), r * 0.45f, ToU32(kStyle.pinHighlight), 12, 1.0f);
 				break;
 			case NodeValueType::Bool: {
 				const ImVec2 pts[] = {
@@ -65,9 +69,17 @@ namespace CalyxEngine {
 				drawList->AddPolyline(pts, 4, ToU32(outline), ImDrawFlags_Closed, 1.2f);
 				break;
 			}
+			case NodeValueType::Texture2D: {
+				const ImVec2 min(center.x - r - 1.0f, center.y - r - 1.0f);
+				const ImVec2 max(center.x + r + 1.0f, center.y + r + 1.0f);
+				drawList->AddRectFilled(min, max, ToU32(fill), 2.0f);
+				drawList->AddRect(min, max, ToU32(outline), 2.0f, 0, 1.4f);
+				break;
+			}
 			default:
 				drawList->AddCircleFilled(center, r, ToU32(fill), 18);
-				drawList->AddCircle(center, r, ToU32(outline), 18, 1.2f);
+				drawList->AddCircle(center, r + 1.5f, ToU32(outline), 18, 1.8f);
+				drawList->AddCircle(ImVec2(center.x - 1.5f, center.y - 1.5f), r * 0.42f, ToU32(kStyle.pinHighlight), 12, 1.0f);
 				break;
 			}
 		}
@@ -152,7 +164,9 @@ namespace CalyxEngine {
 
 	ImVec4 NodeEditorCanvas::GetNodeHeaderColor(const Node& node) const {
 		if(node.type == "Output") return ImVec4(0.16f, 0.31f, 0.47f, 1.0f);
-		if(node.type == "Color" || node.type == "MultiplyColor") return ImVec4(0.38f, 0.30f, 0.13f, 1.0f);
+		if(node.type == "ToonMaster" || node.type == "LitMaster" || node.type == "UnlitMaster") return ImVec4(0.30f, 0.24f, 0.40f, 1.0f);
+		if(node.type == "Color" || node.type == "MultiplyColor" || node.type == "LerpColor" || node.type == "TextureSample" || node.type == "NoiseTexture") return ImVec4(0.38f, 0.30f, 0.13f, 1.0f);
+		if(node.type == "ObjectTexture") return ImVec4(0.20f, 0.32f, 0.36f, 1.0f);
 		if(node.type == "LightingMode") return ImVec4(0.17f, 0.34f, 0.52f, 1.0f);
 		if(node.type == "Reflect") return ImVec4(0.20f, 0.38f, 0.35f, 1.0f);
 		if(node.type == "Shininess" || node.type == "Roughness" || node.type == "MultiplyFloat") return ImVec4(0.18f, 0.28f, 0.46f, 1.0f);
@@ -163,12 +177,22 @@ namespace CalyxEngine {
 		switch(type) {
 		case NodeValueType::Float:
 			return ImVec4(0.25f, 0.58f, 1.0f, 1.0f);
+		case NodeValueType::Float2:
+			return ImVec4(0.20f, 0.72f, 0.95f, 1.0f);
+		case NodeValueType::Float3:
+			return ImVec4(0.20f, 0.82f, 0.72f, 1.0f);
+		case NodeValueType::Float4:
+			return ImVec4(0.55f, 0.72f, 1.0f, 1.0f);
 		case NodeValueType::Color:
 			return ImVec4(0.95f, 0.28f, 0.24f, 1.0f);
 		case NodeValueType::Bool:
 			return ImVec4(0.88f, 0.20f, 0.18f, 1.0f);
 		case NodeValueType::Int:
 			return ImVec4(0.34f, 0.86f, 0.42f, 1.0f);
+		case NodeValueType::Material:
+			return ImVec4(0.84f, 0.46f, 1.0f, 1.0f);
+		case NodeValueType::Texture2D:
+			return ImVec4(0.22f, 0.76f, 0.82f, 1.0f);
 		default:
 			return ImVec4(0.82f, 0.86f, 0.90f, 1.0f);
 		}
