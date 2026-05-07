@@ -76,6 +76,9 @@ void TestScene::Initialize(){
 	toTitleBtn_->Initialize({640.0f, 500.0f}, {300.0f, 60.0f});
 	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+
+	railCamera_ = SceneAPI::Instantiate<RailCamera>();
+	railCamera_->Initialize();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

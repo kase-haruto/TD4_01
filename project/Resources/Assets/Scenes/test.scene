@@ -299,7 +299,7 @@
             "guid": "af9fb71b-81ae-4d76-a20d-93636d6bd101",
             "name": "MainCamera",
             "objectType": 0,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "parentGuid": "5cea663f-3afb-4b5b-aca3-5b57fef30653",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -469,7 +469,7 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "parentGuid": "5cea663f-3afb-4b5b-aca3-5b57fef30653",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -492,6 +492,418 @@
                 }
             },
             "type": "DemoPlayer"
+        },
+        {
+            "guid": "a494e3cf-7f90-413d-897e-e19c6ff068c9",
+            "name": "RailCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "RailCamera"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "ac92a251-58cc-46a8-a4b5-112ae39f04ae",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "debugCube.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "DroolRainEvent(1)/DroolRainObject(0)(2)",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": -0.5,
+                    "z": 0.0
+                }
+            },
+            "type": "DroolRainObject"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "6fa81461-886a-4dd1-b7c9-42be5bbe2226",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "4367fd92-8f1f-4b12-b601-94e996adf837",
+                "modelName": "plane.obj",
+                "textureGuid": "4d294822-af4c-4da4-872f-4caebf7dd058",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 5.039999961853027,
+                        "y": 5.019999980926514
+                    }
+                }
+            },
+            "name": "ground",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.7979520094968393e-08,
+                    "x": 8.535648987617606e-08,
+                    "y": 0.7071297764778137,
+                    "z": -0.7070838809013367
+                },
+                "scale": {
+                    "x": 99.97000122070313,
+                    "y": 99.94000244140625,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": -0.004099011421203613,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "7aeb34f9-9b86-4dc3-b624-c24e43399a0e",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "debugCube.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "DroolRainEvent(1)/DroolRainObject(1)",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 1.2025225162506104,
+                    "y": 3.5555779933929443,
+                    "z": 4.582842826843262
+                }
+            },
+            "type": "DroolRainObject"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 32,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 1
+            },
+            "guid": "a3215cdb-c514-4f5a-b8ac-8accbc268c7a",
+            "name": "GroundSpikeEvent(1)",
+            "objectType": 5,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.23910650610923767,
+                    "y": 0.4423545002937317,
+                    "z": 1.1708784103393555
+                }
+            },
+            "type": "GroundSpikeEvent"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "9fc0f8fd-03b5-499f-ae0e-a16846483180",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "debugCube.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "DroolRainEvent(1)/DroolRainObject(0)",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": -0.5,
+                    "z": 0.0
+                }
+            },
+            "type": "DroolRainObject"
+        },
+        {
+            "colliderConfig": {
+                "colliderType": 32,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 5.381071090698242,
+                    "y": 1.0,
+                    "z": 15.895553588867188
+                },
+                "targetType": 1
+            },
+            "guid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
+            "name": "DroolRainEvent(1)",
+            "objectType": 5,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 5.381071090698242,
+                    "y": 1.0,
+                    "z": 15.895553588867188
+                },
+                "translation": {
+                    "x": 0.206179678440094,
+                    "y": 0.4602239727973938,
+                    "z": 11.527445793151855
+                }
+            },
+            "type": "DroolRainEvent"
         },
         {
             "colliderConfig": {
@@ -566,127 +978,6 @@
         },
         {
             "colliderConfig": {
-                "colliderType": 32,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 1
-            },
-            "guid": "a3215cdb-c514-4f5a-b8ac-8accbc268c7a",
-            "name": "GroundSpikeEvent(1)",
-            "objectType": 5,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.23910650610923767,
-                    "y": 0.4423545002937317,
-                    "z": 1.1708784103393555
-                }
-            },
-            "type": "GroundSpikeEvent"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "c883bade-870a-45f8-a1d0-c71bb3c766f6",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "4367fd92-8f1f-4b12-b601-94e996adf837",
-                "modelName": "cone.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "cone(1)",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 2.1002416610717773,
-                    "y": 2.39841890335083,
-                    "z": 5.430449485778809
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": true,
                 "isDraw": true,
@@ -722,7 +1013,7 @@
                     }
                 }
             },
-            "name": "DroolRainEvent(1)/DroolRainObject(0)",
+            "name": "DroolRainEvent(1)/DroolRainObject(0)(1)",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -850,269 +1141,6 @@
                 },
                 "targetType": 0
             },
-            "guid": "fa05566d-d362-4e47-b67e-1c09b37eda9e",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "debugCube.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "DroolRainEvent(1)/DroolRainObject(0)",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -1.798525333404541,
-                    "y": 3.686051607131958,
-                    "z": 0.0
-                }
-            },
-            "type": "DroolRainObject"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "6fa81461-886a-4dd1-b7c9-42be5bbe2226",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "4367fd92-8f1f-4b12-b601-94e996adf837",
-                "modelName": "plane.obj",
-                "textureGuid": "4d294822-af4c-4da4-872f-4caebf7dd058",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 5.039999961853027,
-                        "y": 5.019999980926514
-                    }
-                }
-            },
-            "name": "ground",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.7979520094968393e-08,
-                    "x": 8.535648987617606e-08,
-                    "y": 0.7071297764778137,
-                    "z": -0.7070838809013367
-                },
-                "scale": {
-                    "x": 99.97000122070313,
-                    "y": 99.94000244140625,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": -0.004099011421203613,
-                    "z": 0.0
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 32,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 5.381071090698242,
-                    "y": 1.0,
-                    "z": 15.895553588867188
-                },
-                "targetType": 1
-            },
-            "guid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
-            "name": "DroolRainEvent(1)",
-            "objectType": 5,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 5.381071090698242,
-                    "y": 1.0,
-                    "z": 15.895553588867188
-                },
-                "translation": {
-                    "x": 0.206179678440094,
-                    "y": 0.4602239727973938,
-                    "z": 11.527445793151855
-                }
-            },
-            "type": "DroolRainEvent"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "7aeb34f9-9b86-4dc3-b624-c24e43399a0e",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "debugCube.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "DroolRainEvent(1)/DroolRainObject(1)",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "306caf3f-ad1f-4966-8ec6-9300a11e613a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 1.2025225162506104,
-                    "y": 3.5555779933929443,
-                    "z": 4.582842826843262
-                }
-            },
-            "type": "DroolRainObject"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
             "guid": "18cf51af-847c-4a1c-8275-6fba07dcffac",
             "modelConfig": {
                 "blendMode": 5,
@@ -1187,9 +1215,9 @@
             "guid": "1d024112-002f-42eb-bc7f-6da15f1f87f6",
             "modelConfig": {
                 "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "materialGuid": "c7df6dde-2a5a-4c08-92ab-f7d69c33408c",
                 "modelName": "Torus.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "textureGuid": "e1514dba-fe63-41fb-a919-844da7950139",
                 "uvTransConfig": {
                     "rotation": 0.0,
                     "scale": {
@@ -1206,7 +1234,7 @@
                 "y": 0.019999999552965164,
                 "z": 0.02500000037252903
             },
-            "outlineEnabled": true,
+            "outlineEnabled": false,
             "outlineThickness": 0.03500000014901161,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
             "transform": {
@@ -1226,11 +1254,67 @@
                 },
                 "translation": {
                     "x": 2.3408854007720947,
-                    "y": -0.004471197724342346,
-                    "z": -0.3798385262489319
+                    "y": 3.1942198276519775,
+                    "z": 3.615389108657837
                 }
             },
             "type": "BaseGameObject"
+        },
+        {
+            "guid": "5cea663f-3afb-4b5b-aca3-5b57fef30653",
+            "name": "RailCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "RailCamera"
+        },
+        {
+            "guid": "c99347e7-872d-410e-bb75-a1c4891a3684",
+            "name": "RailCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "RailCamera"
         }
     ],
     "sceneName": "TestScene",
