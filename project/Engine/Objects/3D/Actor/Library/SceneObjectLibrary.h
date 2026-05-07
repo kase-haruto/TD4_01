@@ -33,6 +33,23 @@ public:
      */
     void AddObject(const std::shared_ptr<SceneObject>& object);
 
+	/**
+	 * @brief オブジェクト名をシーン内で一意になるように変更
+	 * @param object 対象オブジェクト
+	 * @param requestedName 希望名
+	 * @return 実際に設定された名前
+	 */
+	std::string RenameObject(const std::shared_ptr<SceneObject>& object,
+							 const std::string& requestedName);
+
+	/**
+	 * @brief 現在の登録済みオブジェクトから一意な名前を作る
+	 * @param requestedName 希望名
+	 * @param ignore 同名判定から除外するオブジェクト
+	 */
+	std::string MakeUniqueName(const std::string& requestedName,
+							   const SceneObject* ignore = nullptr) const;
+
     /**
      * @brief オブジェクトの削除
      * @param object
@@ -113,8 +130,8 @@ private:
     //      private variables
     //====================================================================*//
     std::unordered_map<Guid, std::shared_ptr<SceneObject>> objects_;
-    std::unordered_map<std::string, uint32_t>              nameCounters_;
 	EventBus::Connection connDestroy_;
+	bool suppressDestroySync_ = false;
 
     static uint32_t nextPickingID_;
 };
