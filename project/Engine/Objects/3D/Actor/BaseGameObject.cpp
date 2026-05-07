@@ -2,6 +2,8 @@
 
 #include "Engine/Application/UI/Panels/InspectorPanel.h"
 
+#include <Engine/Application/UI/Panels/AssetPanel.h>
+#include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/foundation/Utility/FileSystem/ConfigPathResolver/ConfigPathResolver.h>
 #include <Engine/objects/Collider/BoxCollider.h>
@@ -126,7 +128,19 @@ void BaseGameObject::ShowGui() {
 
 	// --- マテリアル・モデル ---
 	if(GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::Material)) {
-		model_->ShowImGui(config_.GetConfig().modelConfig);
+		if(ImGui::TreeNodeEx("Model Asset (Drag & Drop from Assets)", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+			Guid droppedGuid = Guid::Empty();
+			if(CalyxEngine::AssetPanel::DrawAssetDropTarget(AssetType::Model, &droppedGuid)) {
+				SetModelByGuid(droppedGuid);
+			}
+
+			ImGui::TextDisabled("Current: %s", config_.GetConfig().modelConfig.modelName.c_str());
+			ImGui::TreePop();
+		}
+
+		if(model_) {
+			model_->ShowImGui(config_.GetConfig().modelConfig);
+		}
 		GuiCmd::EndSection();
 	}
 
@@ -177,17 +191,7 @@ void BaseGameObject::DerivativeGui() { ImGui::SeparatorText("derivative"); }
 void BaseGameObject::ApplyConfig() {
 	const BaseGameObjectConfig& cfg = config_.GetConfig();
 
-	const std::string& modelPath = cfg.modelConfig.modelName;
-	if(!modelPath.empty()) {
-		auto dot = modelPath.find_last_of('.');
-		if(dot != std::string::npos && modelPath.substr(dot) == ".gltf") {
-			objectModelType_ = ObjectModelType::ModelType_Animation;
-			model_			 = std::make_unique<CalyxEngine::AnimationModel>(modelPath);
-		} else {
-			objectModelType_ = ObjectModelType::ModelType_Static;
-			model_			 = std::make_unique<Model>(modelPath);
-		}
-	}
+	SetModelFromFileName(cfg.modelConfig.modelName);
 
 	if(model_)
 		model_->ApplyConfig(cfg.modelConfig);
@@ -297,6 +301,45 @@ void BaseGameObject::SetCollider(std::unique_ptr<Collider> collider) { collider_
 Collider* BaseGameObject::GetCollider() { return collider_.get(); }
 
 void BaseGameObject::SetTexture(const std::string& texName) { model_->SetTex(texName); }
+
+bool BaseGameObject::SetModelByGuid(const Guid& guid) {
+	if(!guid.isValid()) return false;
+
+	auto* db = AssetDatabase::GetInstance();
+	if(!db) return false;
+
+	const AssetRecord* record = db->Get(guid);
+	if(!record || record->type != AssetType::Model) return false;
+
+	BaseModelConfig& modelConfig = config_.GetConfig().modelConfig;
+	modelConfig.modelName		  = record->sourcePath.filename().string();
+
+	if(!SetModelFromFileName(modelConfig.modelName)) return false;
+	if(model_) {
+		model_->ApplyConfig(modelConfig);
+	}
+
+	return true;
+}
+
+bool BaseGameObject::SetModelFromFileName(const std::string& modelName) {
+	if(modelName.empty()) return false;
+
+	auto dot = modelName.find_last_of('.');
+	if(dot == std::string::npos) return false;
+
+	const std::string extension = modelName.substr(dot);
+
+	if(extension == ".gltf") {
+		objectModelType_ = ObjectModelType::ModelType_Animation;
+		model_			 = std::make_unique<CalyxEngine::AnimationModel>(modelName);
+		return true;
+	}
+
+	objectModelType_ = ObjectModelType::ModelType_Static;
+	model_			 = std::make_unique<Model>(modelName);
+	return true;
+}
 
 Model* BaseGameObject::GetStaticModel() {
 	return (objectModelType_ == ObjectModelType::ModelType_Static)

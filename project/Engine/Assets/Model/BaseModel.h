@@ -55,6 +55,7 @@ public:
 	BaseModelConfig ExtractConfig() const;
 	void ShowImGui(BaseModelConfig& config);
 	bool LoadTextureByGuid(const Guid& g);
+	void SetMaterialGuid(const Guid& g);
 
 	//--------- accessor -----------------------------------------------------
 	BlendMode GetBlendMode() const { return blendMode_; }

@@ -26,6 +26,7 @@ namespace CalyxEngine {
 }
 class BaseCamera;
 class SceneObject;
+struct AssetDragPayload;
 
 namespace CalyxEngine {
 	class PickingPass;
@@ -64,6 +65,8 @@ namespace CalyxEngine {
 		ImVec2 CalcToolPosition(IOnViewportTool* tool,
 								const ImVec2&	 viewportPos,
 								const ImVec2&	 viewportSize);
+		std::shared_ptr<SceneObject> PickObjectAtLocalPoint(const CalyxEngine::Vector2& localPoint) const;
+		bool ApplyAssetToObjectAtLocalPoint(const AssetDragPayload& payload, const CalyxEngine::Vector2& localPoint);
 
 	private:
 		enum class GhostKind {

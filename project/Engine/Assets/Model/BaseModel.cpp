@@ -386,6 +386,11 @@ bool BaseModel::LoadTextureByGuid(const Guid& g) {
 	return true;
 }
 
+void BaseModel::SetMaterialGuid(const Guid& g) {
+	materialGuid_ = g;
+	TransferMaterial();
+}
+
 ModelData* BaseModel::GetModelData() const { return modelData_; }
 
 // ======================================= renderer 専用 ==========================================
