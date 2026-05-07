@@ -1,13 +1,63 @@
 #include "SceneObjectLibrary.h"
 
 #include <Engine/Objects/3D/Actor/SceneObject.h>
+#include <Engine/Objects/Event/Destroying/ObjectDestroying.h>
 #include <Engine/System/Event/EventBus.h>
+#include <cctype>
 #include <iostream>
 
 uint32_t SceneObjectLibrary::nextPickingID_ = 1;
 
-SceneObjectLibrary::SceneObjectLibrary()  = default;
+SceneObjectLibrary::SceneObjectLibrary() {
+	connDestroy_ = EventBus::Subscribe<ObjectDestroying>(
+		[this](const ObjectDestroying& ev) {
+			if(suppressDestroySync_ || !ev.object) return;
+
+			const Guid id = ev.object->GetGuid();
+			auto	   it = objects_.find(id);
+			if(it == objects_.end()) return;
+
+			EventBus::Publish(ObjectRemoved{ev.object});
+			objects_.erase(it);
+		});
+}
 SceneObjectLibrary::~SceneObjectLibrary() = default;
+
+namespace {
+	std::string TrimName(const std::string& name) {
+		const auto first = name.find_first_not_of(" \t\r\n");
+		if(first == std::string::npos) return {};
+
+		const auto last = name.find_last_not_of(" \t\r\n");
+		return name.substr(first, last - first + 1);
+	}
+
+	std::string RemoveTrailingNumberSuffix(const std::string& name) {
+		if(name.size() < 3 || name.back() != ')') return name;
+
+		const auto open = name.find_last_of('(');
+		if(open == std::string::npos || open + 1 >= name.size() - 1) return name;
+
+		for(size_t i = open + 1; i < name.size() - 1; ++i) {
+			if(!std::isdigit(static_cast<unsigned char>(name[i]))) {
+				return name;
+			}
+		}
+
+		return TrimName(name.substr(0, open));
+	}
+
+	bool IsNameUsed(const std::unordered_map<Guid, std::shared_ptr<SceneObject>>& objects,
+					const std::string&											 name,
+					const SceneObject*											 ignore) {
+		for(const auto& [id, sp] : objects) {
+			(void)id;
+			if(!sp || sp.get() == ignore) continue;
+			if(sp->GetName() == name) return true;
+		}
+		return false;
+	}
+} // namespace
 
 //////////////////////////////////////////////////////////////////////////////////
 ///     オブジェクトの追加
@@ -16,19 +66,9 @@ void SceneObjectLibrary::AddObject(const std::shared_ptr<SceneObject>& object) {
 	if(!object) return;
 
 	const Guid	id		  = object->GetGuid();
-	std::string baseName  = object->GetName();
-	std::string finalName = baseName;
+	if(objects_.contains(id)) return;
 
-	// -----------------------------------------
-	// 名前重複回避
-	// -----------------------------------------
-	auto it = nameCounters_.find(baseName);
-	if(it == nameCounters_.end()) {
-		nameCounters_[baseName] = 1;
-	} else {
-		finalName = baseName + "(" + std::to_string(it->second++) + ")";
-	}
-
+	std::string finalName = MakeUniqueName(object->GetName(), object.get());
 	object->SetName(finalName, object->GetObjectType());
 
 	// Picking ID 割り当て
@@ -41,6 +81,51 @@ void SceneObjectLibrary::AddObject(const std::shared_ptr<SceneObject>& object) {
 
 	// イベント発火
 	EventBus::Publish(ObjectAdded{object});
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+///     オブジェクト名の変更
+//////////////////////////////////////////////////////////////////////////////////
+std::string SceneObjectLibrary::RenameObject(const std::shared_ptr<SceneObject>& object,
+											 const std::string&					requestedName) {
+	if(!object) return {};
+
+	const std::string finalName = MakeUniqueName(requestedName, object.get());
+	object->SetName(finalName, object->GetObjectType());
+	return finalName;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+///     現在存在するオブジェクト集合から一意な名前を生成
+//////////////////////////////////////////////////////////////////////////////////
+std::string SceneObjectLibrary::MakeUniqueName(const std::string& requestedName,
+											   const SceneObject* ignore) const {
+	std::string baseName = TrimName(requestedName);
+	if(baseName.empty()) {
+		baseName = ignore ? std::string(ignore->GetObjectClassName()) : "SceneObject";
+		if(baseName.empty()) baseName = "SceneObject";
+	}
+
+	if(!IsNameUsed(objects_, baseName, ignore)) {
+		return baseName;
+	}
+
+	baseName = RemoveTrailingNumberSuffix(baseName);
+	if(baseName.empty()) {
+		baseName = ignore ? std::string(ignore->GetObjectClassName()) : "SceneObject";
+		if(baseName.empty()) baseName = "SceneObject";
+	}
+
+	if(!IsNameUsed(objects_, baseName, ignore)) {
+		return baseName;
+	}
+
+	for(uint32_t index = 1;; ++index) {
+		const std::string candidate = baseName + "(" + std::to_string(index) + ")";
+		if(!IsNameUsed(objects_, candidate, ignore)) {
+			return candidate;
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +150,9 @@ bool SceneObjectLibrary::RemoveObject(const std::shared_ptr<SceneObject>& object
 	EventBus::Publish(ObjectRemoved{object});
 
 	// DestroyRecursive で階層を断つ
+	suppressDestroySync_ = true;
 	object->Destroy();
+	suppressDestroySync_ = false;
 
 	// 最後にライブラリから除外
 	objects_.erase(id);
@@ -91,7 +178,9 @@ bool SceneObjectLibrary::RemoveObject(Guid id) {
 			}
 		}
 
+		suppressDestroySync_ = true;
 		sp->Destroy();
+		suppressDestroySync_ = false;
 		EventBus::Publish(ObjectRemoved{sp});
 	}
 
@@ -106,12 +195,13 @@ void SceneObjectLibrary::Clear() {
 	// Destroy → イベント → クリア
 	for(auto& [id, sp] : objects_) {
 		if(!sp) continue;
+		suppressDestroySync_ = true;
 		sp->Destroy();
+		suppressDestroySync_ = false;
 		EventBus::Publish(ObjectRemoved{sp});
 	}
 
 	objects_.clear();
-	nameCounters_.clear(); // ここは好み。リセットしたいなら消す
 }
 
 //////////////////////////////////////////////////////////////////////////////////

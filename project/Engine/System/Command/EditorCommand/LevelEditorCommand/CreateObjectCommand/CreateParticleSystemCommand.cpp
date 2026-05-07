@@ -21,17 +21,10 @@ namespace CalyxEngine {
 		// SceneObjectLibrary へ登録
 		context_->GetObjectLibrary()->AddObject(obj);
 
-		// FxSystem は参照だけ保持
-		context_->GetFxSystem()->AddEmitter(
-			particleSystem_->GetEmitter(),
-			particleSystem_->GetGuid());
 	}
 
 	void CreateParticleSystemObjectCommand::Undo() {
 		if(!particleSystem_) return;
-
-		// サブシステムから先に外す
-		context_->GetFxSystem()->RemoveEmitter(particleSystem_->GetEmitter().get());
 
 		// ライブラリから削除
 		context_->GetObjectLibrary()->RemoveObject(particleSystem_);

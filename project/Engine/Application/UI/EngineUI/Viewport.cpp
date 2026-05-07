@@ -124,12 +124,6 @@ namespace {
             }
 
             ctx->AddObject(sp);
-
-            if(auto fxObj = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(sp)) {
-                if(auto* fxSys = ctx->GetFxSystem()) {
-                    fxSys->AddEmitter(fxObj->GetEmitter(), fxObj->GetGuid());
-                }
-            }
         }
     }
 }
@@ -342,7 +336,7 @@ void Viewport::Render(const ImTextureID& tex) {
         if(ImGui::BeginDragDropTarget()) {
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_PLACE_ITEM")) {
                 const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(payload);
-                if(item && hoverImageRect) {
+                if(item && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     item->createFunc(spawnPos);
 
@@ -356,7 +350,7 @@ void Viewport::Render(const ImTextureID& tex) {
             }
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
                 const AssetDragPayload* assetPayload = ReadAssetPayload(payload);
-                if(assetPayload && hoverImageRect &&
+                if(assetPayload && hoverImageRect && payload->IsDelivery() &&
                    (assetPayload->type == AssetType::Material || assetPayload->type == AssetType::Texture)) {
                     const ImVec2 mousePos = ImGui::GetMousePos();
                     const CalyxEngine::Vector2 localMouse(mousePos.x - imagePos.x, mousePos.y - imagePos.y);
@@ -364,7 +358,7 @@ void Viewport::Render(const ImTextureID& tex) {
                 }
 
                 const AssetRecord* record = GetDraggedModelRecord(payload);
-                if(record && hoverImageRect) {
+                if(record && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     const AssetGUID guid = record->guid;
 
@@ -389,7 +383,7 @@ void Viewport::Render(const ImTextureID& tex) {
                 }
 
                 const AssetRecord* prefabRecord = GetDraggedPrefabRecord(payload);
-                if(prefabRecord && hoverImageRect) {
+                if(prefabRecord && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     auto objects = PrefabSerializer::Load(prefabRecord->sourcePath.string());
                     AddPrefabObjectsToCurrentScene(objects, spawnPos);
