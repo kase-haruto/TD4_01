@@ -74,12 +74,19 @@ private:
 	bool SphereToOBB(const Sphere& sphere, const OBB obb);
 	bool OBBToOBB(const OBB& obbA, const OBB& obbB);
 
+	void RegisterImmediate(Collider* collider);
+	void UnregisterImmediate(Collider* collider);
+	void FlushPendingColliderChanges();
+
 private:
 	//===================================================================*/
 	//                   private variable
 	//===================================================================*/
 	std::list<Collider*>								 colliders_;
+	std::vector<Collider*>								 pendingRegisters_;
+	std::vector<Collider*>								 pendingUnregisters_;
 	std::vector<std::string>							 collisionLogs_;	  // 衝突ログ
 	std::unordered_set<CollisionPair, CollisionPairHash> currentCollisions_;  // 現在のフレームの衝突ペア
 	std::unordered_set<CollisionPair, CollisionPairHash> previousCollisions_; // 前のフレームの衝突ペア
+	bool												 isUpdatingCollisions_ = false;
 };

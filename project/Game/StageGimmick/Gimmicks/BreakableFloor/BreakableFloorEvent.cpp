@@ -16,7 +16,11 @@ void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
 
 	other;
 	// ハンマー判定かどうか確認する
-	if(other->GetType() != ColliderType::Type_Player) return;
+	// ギミックなどへの干渉 or 相手側に追加する
+	BaseGameObject* otherObj = other->GetOwner();
+	if (otherObj && other->GetType() != ColliderType::Type_PlayerAttack) {
+		return;
+	}
 
 	// プレイヤーの攻撃に当たったら床を壊す
 	auto floor = targetObject_.lock();
@@ -31,6 +35,9 @@ void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
 }
 
 void BreakableFloorEvent::EventInitialize() {
+
+	param_.LoadParams();
+
 	if(!targetObject_.expired()) {
 		return;
 	}
@@ -70,4 +77,8 @@ void BreakableFloorEvent::EventUpdate(float dt) {
 
 
 	dt;
+}
+
+void BreakableFloorEvent::DerivativeGui() {
+	param_.ShowGui();
 }
