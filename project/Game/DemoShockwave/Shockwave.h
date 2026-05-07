@@ -31,6 +31,7 @@ public:
 
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "Shockwave"; }
+	float			 GetPushForce() const { return param_.pushForce * scaleMultiplier_; }
 	bool			 IsActive() const { return isActive_; }
 
 private:
@@ -53,6 +54,7 @@ private:
 	};
 
 	ShockwaveParameter param_;
+	float			   scaleMultiplier_ = 1.0f;
 	float			   timer_			= 0.0f;
 	float			   currentMaxScale_ = 5.0f;
 	bool			   isActive_		= false;

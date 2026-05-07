@@ -46,10 +46,11 @@ void Shockwave::Update(float dt) {
 
 void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier) {
 	worldTransform_.translation = pos;
-	worldTransform_.scale = { param_.startScale, param_.startScale, param_.startScale };
-	currentMaxScale_ = param_.endScale * scaleMultiplier;
-	timer_ = 0.0f;
-	isActive_ = true;
+	worldTransform_.scale		= {param_.startScale, param_.startScale, param_.startScale};
+	currentMaxScale_			= param_.endScale * scaleMultiplier;
+	scaleMultiplier_			= scaleMultiplier;
+	timer_						= 0.0f;
+	isActive_					= true;
 	
 	SetDrawEnable(true);
 	if (collider_) {
