@@ -56,7 +56,6 @@ private:
 	std::unique_ptr<Sprite> resumeBtn_ = nullptr;
 	std::unique_ptr<Sprite> toSelectBtn_ = nullptr;
 	std::unique_ptr<Sprite> toTitleBtn_ = nullptr;
-	std::shared_ptr<RailCamera> railCamera_;
 
 	int selectedIndex_ = 0;
 	
