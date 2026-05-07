@@ -29,6 +29,7 @@ namespace CalyxEngine {
 		bool DrawAddNodeMenu(MaterialAsset& material, Vector2 position);
 		bool DrawContextMenu(MaterialAsset& material, const NodeEditorCanvas::ContextMenu& menu);
 		bool DrawLightingModePopup(MaterialAsset& material);
+		void ExecuteGraphCommand(MaterialAsset& material, const char* name, const NodeGraph& before, const NodeGraph& after);
 		void CreateMaterialAsset();
 		void BeginRenameMaterial(const Guid& guid, const std::filesystem::path& path);
 		void CommitRenameMaterial();
@@ -94,5 +95,8 @@ namespace CalyxEngine {
 		std::unique_ptr<PipelineStateObject> previewPipeline_;
 		std::size_t previewPipelineHash_ = 0;
 		bool previewInitialized_ = false;
+		bool nodeEditCommandActive_ = false;
+		Guid nodeEditMaterial_;
+		NodeGraph nodeEditBefore_;
 	};
 }

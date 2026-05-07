@@ -22,6 +22,7 @@ namespace CalyxEngine {
 			int32_t nodeId = 0;
 		};
 		using DrawContextMenu = std::function<bool(const ContextMenu&)>;
+		using GraphMutationCommand = std::function<void(const char* name, const NodeGraph& before, const NodeGraph& after)>;
 
 		explicit NodeEditorCanvas(std::string id);
 		~NodeEditorCanvas();
@@ -29,7 +30,7 @@ namespace CalyxEngine {
 		NodeEditorCanvas(const NodeEditorCanvas&) = delete;
 		NodeEditorCanvas& operator=(const NodeEditorCanvas&) = delete;
 
-		bool Draw(NodeGraph& graph, const DrawNodeBody& drawBody = {}, const DrawContextMenu& drawContextMenu = {});
+		bool Draw(NodeGraph& graph, const DrawNodeBody& drawBody = {}, const DrawContextMenu& drawContextMenu = {}, const GraphMutationCommand& graphMutationCommand = {});
 		bool ConsumeBackgroundContextRequest(Vector2& outCanvasPos);
 		bool ConsumeNodeContextRequest(int32_t& outNodeId);
 		Vector2 GetLastViewCenter() const { return lastViewCenter_; }

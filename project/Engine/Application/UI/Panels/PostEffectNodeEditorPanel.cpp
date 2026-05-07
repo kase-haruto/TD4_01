@@ -3,6 +3,8 @@
 #include <Engine/PostProcess/Manager/PostEffectManager.h>
 #include <Engine/PostProcess/Slot/PostEffectSlot.h>
 #include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
+#include <Engine/System/Command/EditorCommand/ValueEditCommand.h>
+#include <Engine/System/Command/Manager/CommandManager.h>
 #include <externals/imgui/imgui.h>
 
 #include <algorithm>
@@ -90,10 +92,37 @@ namespace CalyxEngine {
 			DrawToolbar();
 			EnsureIoNodes();
 			ImGui::BeginChild("##post-effect-graph-canvas", ImVec2(-330.0f, 0.0f), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			bool pendingGraphCommand = false;
+			std::string pendingGraphCommandName;
+			NodeGraph pendingGraphBefore;
+			NodeGraph pendingGraphAfter;
 			const bool graphChanged = canvas_.Draw(
 				graph_,
-				[this](Node& node) { return DrawNodeBody(node); },
-				[this](const NodeEditorCanvas::ContextMenu& menu) { return DrawContextMenu(menu); });
+				[this, &pendingGraphCommand, &pendingGraphCommandName, &pendingGraphBefore, &pendingGraphAfter](Node& node) {
+					const NodeGraph before = graph_;
+					const bool changed = DrawNodeBody(node);
+					if(changed) {
+						if(ImGui::IsAnyItemActive()) {
+							if(!nodeEditCommandActive_) {
+								nodeEditCommandActive_ = true;
+								nodeEditBefore_ = before;
+							}
+						} else {
+							pendingGraphCommand = true;
+							pendingGraphCommandName = "Edit Post Effect Node";
+							pendingGraphBefore = before;
+							pendingGraphAfter = graph_;
+						}
+					}
+					return changed;
+				},
+				[this](const NodeEditorCanvas::ContextMenu& menu) { return DrawContextMenu(menu); },
+				[&pendingGraphCommand, &pendingGraphCommandName, &pendingGraphBefore, &pendingGraphAfter](const char* name, const NodeGraph& before, const NodeGraph& after) {
+					pendingGraphCommand = true;
+					pendingGraphCommandName = name;
+					pendingGraphBefore = before;
+					pendingGraphAfter = after;
+				});
 			ImGui::EndChild();
 
 			ImGui::SameLine();
@@ -102,6 +131,13 @@ namespace CalyxEngine {
 			ImGui::EndChild();
 
 			if(graphChanged) {
+			}
+			if(nodeEditCommandActive_ && !ImGui::IsAnyItemActive()) {
+				ExecuteGraphCommand("Edit Post Effect Node", nodeEditBefore_, graph_);
+				nodeEditCommandActive_ = false;
+			}
+			if(pendingGraphCommand) {
+				ExecuteGraphCommand(pendingGraphCommandName.c_str(), pendingGraphBefore, pendingGraphAfter);
 			}
 		}
 		ImGui::End();
@@ -145,6 +181,7 @@ namespace CalyxEngine {
 	}
 
 	bool PostEffectNodeEditorPanel::DrawAddNodeMenu(Vector2 position) {
+		const NodeGraph before = graph_;
 		bool changed = false;
 		for(const char* type : kEffectTypes) {
 			if(ImGui::MenuItem(type)) {
@@ -152,7 +189,20 @@ namespace CalyxEngine {
 				changed = true;
 			}
 		}
+		if(changed) {
+			ExecuteGraphCommand("Add Post Effect Node", before, graph_);
+		}
 		return changed;
+	}
+
+	void PostEffectNodeEditorPanel::ExecuteGraphCommand(const char* name, const NodeGraph& before, const NodeGraph& after) {
+		auto apply = [this](const NodeGraph& graph) {
+			graph_ = graph;
+			graph_.EnsureNextId();
+			EnsureIoNodes();
+		};
+		CommandManager::GetInstance()->Execute(
+			std::make_unique<ValueEditCommand<NodeGraph>>(name, before, after, apply));
 	}
 
 	bool PostEffectNodeEditorPanel::DrawNodeBody(Node& node) {

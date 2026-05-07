@@ -46,6 +46,7 @@ namespace CalyxEngine {
 		void Stop() override; //< ストップ
 		void Reset();		  //< リセット
 		bool LoadTextureByGuid(const Guid& g);
+		void SetTextureGuid(const Guid& g);
 
 		void SetCameraFade(float nearZ, float farZ) override;
 
@@ -62,6 +63,7 @@ namespace CalyxEngine {
 		void							   SetDrawEnable(bool isEnable) { SetFlag(DrawEnable, isEnable); }
 		bool							   IsPlaying() const override { return HasFlag(Playing); }
 		const D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureHandle() const { return textureHandle_; }
+		const Guid&						   GetTextureGuid() const { return textureGuid_; }
 
 		//--------- Timed Preview（一定間隔での自動再生） ---------------//
 		void	  SetTimedPreview(bool v) { timedPreview_ = v; }

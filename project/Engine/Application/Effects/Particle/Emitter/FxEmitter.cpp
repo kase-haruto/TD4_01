@@ -678,6 +678,16 @@ namespace CalyxEngine {
 		return true;
 	}
 
+	void FxEmitter::SetTextureGuid(const Guid& g) {
+		if(!g.isValid()) {
+			textureGuid_ = Guid::Empty();
+			textureHandle_ = AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material_.texturePath.empty() ? "particle.dds" : material_.texturePath);
+			return;
+		}
+
+		LoadTextureByGuid(g);
+	}
+
 	void FxEmitter::SetCameraFade(float nearZ,float farZ) {
 		fadeParams_.fadeNear = nearZ;
 		fadeParams_.fadeFar  = farZ;
