@@ -10,6 +10,7 @@
 #include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
 #include <Engine/Objects/Transform/Transform.h>
 #include <Engine/Graphics/Buffer/DxStructuredBuffer.h>
+#include <Engine/Graphics/Descriptor/DescriptorAllocator.h>
 #include <Engine/Objects/3D/Details/BillboardParams.h>
 #include <Engine/Graphics/Shadow/Raytracing/RaytracingMesh.h>
 
@@ -82,6 +83,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInstanceSrv()const;  //< VS:t0 (gTransMat)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv()const;       //< PS:t0 (gTexture)
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTexSrv(size_t materialIndex)const;
+	D3D12_GPU_DESCRIPTOR_HANDLE GetMaterialGraphTextureSrvTable(size_t materialIndex) const;
 	D3D12_GPU_DESCRIPTOR_HANDLE GetEnvMapSrv()const;    //< PS:t1 (gEnvironmentMap)
 	const Material& GetMaterialForBatch() const { return currentMaterial_; }
 	std::shared_ptr<CalyxEngine::MaterialAsset> GetMaterialAsset() const;
@@ -105,6 +107,7 @@ protected:
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle_{};
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> materialTextureHandles_;
+	mutable std::vector<DescriptorHandle> materialGraphTextureTables_;
 
 	std::string fileName_;
 	std::string textureName_ = "textures/white1x1.dds"; // デフォルトのテクスチャ名

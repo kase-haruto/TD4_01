@@ -12,10 +12,13 @@ namespace CalyxEngine {
 	struct GeneratedShaderGraphCode {
 		std::string hlsl;
 		bool usesObjectTexture = false;
+		int32_t textureSlotCount = 0;
 	};
 
 	class ShaderGraphCodeGenerator {
 	public:
+		static constexpr int32_t kMaxGraphTextures = 8;
+
 		static GeneratedShaderGraphCode GenerateObject3DMaterialFunction(const MaterialAsset& material) {
 			MaterialExpressionSurface surface = CompileMaterialExpressions(material);
 			return GenerateObject3DMaterialFunction(surface);
@@ -102,6 +105,7 @@ namespace CalyxEngine {
 
 		struct MaterialExpressionSurface {
 			int32_t lightingMode = 0;
+			int32_t textureSlotCount = 0;
 			MaterialExpression baseColor;
 			MaterialExpression shininess;
 			MaterialExpression roughness;
@@ -127,6 +131,7 @@ namespace CalyxEngine {
 				surface.toonBaseColor.usesObjectTexture ||
 				surface.toonFirstShadeColor.usesObjectTexture ||
 				surface.toonSecondShadeColor.usesObjectTexture;
+			code.textureSlotCount = surface.textureSlotCount;
 			const bool usesNoiseTexture =
 				surface.baseColor.usesNoiseTexture ||
 				surface.shininess.usesNoiseTexture ||
@@ -194,9 +199,11 @@ namespace CalyxEngine {
 		static GeneratedShaderGraphCode GeneratePreviewPixelShaderSource(const GeneratedShaderGraphCode& materialFunction) {
 			GeneratedShaderGraphCode code;
 			code.usesObjectTexture = materialFunction.usesObjectTexture;
+			code.textureSlotCount = materialFunction.textureSlotCount;
 
 			std::ostringstream out;
 			out << "Texture2D<float4> gTexture : register(t0);\n";
+			out << "Texture2D<float4> gGraphTextures[8] : register(t9);\n";
 			out << "SamplerState gSampler : register(s0);\n\n";
 			out << "struct Material {\n";
 			out << "    float4 color;\n";
@@ -243,6 +250,7 @@ namespace CalyxEngine {
 		static GeneratedShaderGraphCode GenerateObject3DRuntimePixelShaderSource(const GeneratedShaderGraphCode& materialFunction) {
 			GeneratedShaderGraphCode code;
 			code.usesObjectTexture = materialFunction.usesObjectTexture;
+			code.textureSlotCount = materialFunction.textureSlotCount;
 
 			std::ostringstream out;
 			out << "struct VertexShaderOutput {\n";
@@ -294,6 +302,7 @@ namespace CalyxEngine {
 			out << "TextureCube<float4> gEnvironmentMap : register(t1);\n";
 			out << "Texture2D<float> gShadowMap : register(t2);\n";
 			out << "RaytracingAccelerationStructure gRtScene : register(t3);\n";
+			out << "Texture2D<float4> gGraphTextures[8] : register(t9);\n";
 			out << "SamplerState gSampler : register(s0);\n\n";
 			out << "struct PixelShaderOutput { float4 color : SV_TARGET0; };\n\n";
 			out << materialFunction.hlsl << "\n";
@@ -602,6 +611,35 @@ float GeneratedValueNoise(float2 p) {
 			return nullptr;
 		}
 
+		static int32_t TextureSlotCount(const NodeGraph& graph) {
+			int32_t count = 0;
+			for(const Node& node : graph.nodes) {
+				if(IsTextureSourceNode(node)) ++count;
+			}
+			return count;
+		}
+
+		static bool IsTextureSourceNode(const Node& node) {
+			return node.type == "ObjectTexture" || node.type == "Texture2D";
+		}
+
+		static int32_t TextureSlotForTextureSourceNode(const NodeGraph& graph, const Node& textureNode) {
+			int32_t slot = 0;
+			for(const Node& node : graph.nodes) {
+				if(!IsTextureSourceNode(node)) continue;
+				if(node.id == textureNode.id) return slot;
+				++slot;
+			}
+			return 0;
+		}
+
+		static int32_t TextureSlotForSampleNode(const NodeGraph& graph, const Node& sampleNode) {
+			const NodePin* texturePin = FindInput(sampleNode, "Texture");
+			const Node* textureNode = texturePin ? FindLinkedNode(graph, texturePin->id) : nullptr;
+			if(!textureNode || !IsTextureSourceNode(*textureNode)) return 0;
+			return (std::min)(TextureSlotForTextureSourceNode(graph, *textureNode), kMaxGraphTextures - 1);
+		}
+
 		static bool HasInputLink(const NodeGraph& graph, int32_t inputPinId) {
 			return std::any_of(graph.links.begin(), graph.links.end(), [inputPinId](const NodeLink& link) {
 				return link.toPinId == inputPinId;
@@ -658,10 +696,52 @@ float GeneratedValueNoise(float2 p) {
 					GetFloatProperty(*fromNode, "x", 0.0f),
 					GetFloatProperty(*fromNode, "y", 0.0f));
 			}
+			if(fromNode->type == "UVTransform") {
+				MaterialExpression sourceUv = {"uv", false};
+				MaterialExpression scale = Float2Expression(
+					GetFloatProperty(*fromNode, "scaleX", 1.0f),
+					GetFloatProperty(*fromNode, "scaleY", 1.0f));
+				MaterialExpression offset = Float2Expression(
+					GetFloatProperty(*fromNode, "offsetX", 0.0f),
+					GetFloatProperty(*fromNode, "offsetY", 0.0f));
+				if(const NodePin* uvPin = FindInput(*fromNode, "UV")) {
+					sourceUv = Float2ExpressionFromInput(graph, uvPin->id, sourceUv, depth + 1);
+				}
+				if(const NodePin* scalePin = FindInput(*fromNode, "Scale")) {
+					scale = Float2ExpressionFromInput(graph, scalePin->id, scale, depth + 1);
+				}
+				if(const NodePin* offsetPin = FindInput(*fromNode, "Offset")) {
+					offset = Float2ExpressionFromInput(graph, offsetPin->id, offset, depth + 1);
+				}
+				return {
+					"((" + sourceUv.hlsl + " * " + scale.hlsl + ") + " + offset.hlsl + ")",
+					sourceUv.usesObjectTexture || scale.usesObjectTexture || offset.usesObjectTexture,
+					sourceUv.usesNoiseTexture || scale.usesNoiseTexture || offset.usesNoiseTexture};
+			}
 			if(fromNode->type == "CombineFloat2" && fromNode->inputs.size() >= 2) {
 				const MaterialExpression x = FloatExpressionFromInput(graph, fromNode->inputs[0].id, FloatExpression(0.0f), depth + 1);
 				const MaterialExpression y = FloatExpressionFromInput(graph, fromNode->inputs[1].id, FloatExpression(0.0f), depth + 1);
 				return {"float2(" + x.hlsl + ", " + y.hlsl + ")", x.usesObjectTexture || y.usesObjectTexture, x.usesNoiseTexture || y.usesNoiseTexture};
+			}
+			if(fromNode->type == "AddFloat2" && fromNode->inputs.size() >= 2) {
+				const MaterialExpression a = Float2ExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
+				const MaterialExpression b = Float2ExpressionFromInput(graph, fromNode->inputs[1].id, {"float2(0.0f, 0.0f)", false}, depth + 1);
+				return Combine("(" + a.hlsl + " + " + b.hlsl + ")", a, b);
+			}
+			if(fromNode->type == "SubtractFloat2" && fromNode->inputs.size() >= 2) {
+				const MaterialExpression a = Float2ExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
+				const MaterialExpression b = Float2ExpressionFromInput(graph, fromNode->inputs[1].id, {"float2(0.0f, 0.0f)", false}, depth + 1);
+				return Combine("(" + a.hlsl + " - " + b.hlsl + ")", a, b);
+			}
+			if(fromNode->type == "MultiplyFloat2" && fromNode->inputs.size() >= 2) {
+				const MaterialExpression a = Float2ExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
+				const MaterialExpression b = Float2ExpressionFromInput(graph, fromNode->inputs[1].id, {"float2(1.0f, 1.0f)", false}, depth + 1);
+				return Combine("(" + a.hlsl + " * " + b.hlsl + ")", a, b);
+			}
+			if(fromNode->type == "DivideFloat2" && fromNode->inputs.size() >= 2) {
+				const MaterialExpression a = Float2ExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
+				const MaterialExpression b = Float2ExpressionFromInput(graph, fromNode->inputs[1].id, {"float2(1.0f, 1.0f)", false}, depth + 1);
+				return Combine("(" + a.hlsl + " / max(abs(" + b.hlsl + "), float2(0.0001f, 0.0001f)))", a, b);
 			}
 			return fallback;
 		}
@@ -681,7 +761,8 @@ float GeneratedValueNoise(float2 p) {
 				if(const NodePin* uvPin = FindInput(*fromNode, "UV")) {
 					sampleUv = Float2ExpressionFromInput(graph, uvPin->id, sampleUv, depth + 1);
 				}
-				return {"gTexture.Sample(gSampler, " + sampleUv.hlsl + ")", true};
+				const int32_t textureSlot = TextureSlotForSampleNode(graph, *fromNode);
+				return {"gGraphTextures[" + std::to_string(textureSlot) + "].Sample(gSampler, " + sampleUv.hlsl + ")", true};
 			}
 			if(fromNode->type == "NoiseTexture") {
 				const MaterialExpression value = NoiseValueExpression(graph, *fromNode, depth);
@@ -722,6 +803,18 @@ float GeneratedValueNoise(float2 p) {
 			}
 
 			if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return FloatExpression(fromNode->floatValue);
+			if(fromNode->type == "TextureSample") {
+				MaterialExpression sampleUv = {"uv", false};
+				if(const NodePin* uvPin = FindInput(*fromNode, "UV")) {
+					sampleUv = Float2ExpressionFromInput(graph, uvPin->id, sampleUv, depth + 1);
+				}
+				const int32_t textureSlot = TextureSlotForSampleNode(graph, *fromNode);
+				const std::string sample = "gGraphTextures[" + std::to_string(textureSlot) + "].Sample(gSampler, " + sampleUv.hlsl + ")";
+				if(fromPin && fromPin->name == "Value") {
+					return {"dot((" + sample + ").rgb, float3(0.299f, 0.587f, 0.114f))", true};
+				}
+				return fallback;
+			}
 			if(fromNode->type == "NoiseTexture") return NoiseValueExpression(graph, *fromNode, depth);
 			if(fromNode->type == "SplitFloat2" && fromPin && !fromNode->inputs.empty()) {
 				const MaterialExpression value = Float2ExpressionFromInput(graph, fromNode->inputs[0].id, {"float2(0.0f, 0.0f)", false}, depth + 1);
@@ -796,11 +889,29 @@ float GeneratedValueNoise(float2 p) {
 				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[0].id, fallback, depth + 1);
 				return {"(1.0f - " + value.hlsl + ")", value.usesObjectTexture, value.usesNoiseTexture};
 			}
+			if(fromNode->type == "StepFloat" && fromNode->inputs.size() >= 2) {
+				const MaterialExpression edge = FloatExpressionFromInput(graph, fromNode->inputs[0].id, FloatExpression(0.5f), depth + 1);
+				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[1].id, fallback, depth + 1);
+				return {
+					"step(" + edge.hlsl + ", " + value.hlsl + ")",
+					edge.usesObjectTexture || value.usesObjectTexture,
+					edge.usesNoiseTexture || value.usesNoiseTexture};
+			}
+			if(fromNode->type == "SmoothstepFloat" && fromNode->inputs.size() >= 3) {
+				const MaterialExpression edge0 = FloatExpressionFromInput(graph, fromNode->inputs[0].id, FloatExpression(0.4f), depth + 1);
+				const MaterialExpression edge1 = FloatExpressionFromInput(graph, fromNode->inputs[1].id, FloatExpression(0.6f), depth + 1);
+				const MaterialExpression value = FloatExpressionFromInput(graph, fromNode->inputs[2].id, fallback, depth + 1);
+				return {
+					"smoothstep(" + edge0.hlsl + ", " + edge1.hlsl + ", " + value.hlsl + ")",
+					edge0.usesObjectTexture || edge1.usesObjectTexture || value.usesObjectTexture,
+					edge0.usesNoiseTexture || edge1.usesNoiseTexture || value.usesNoiseTexture};
+			}
 			return fallback;
 		}
 
 		static MaterialExpressionSurface MakeDefaultExpressionSurface(const MaterialAsset& material, bool useMaterialCBufferDefaults) {
 			MaterialExpressionSurface surface;
+			surface.textureSlotCount = (std::min)(TextureSlotCount(material.graph), kMaxGraphTextures);
 			surface.lightingMode = material.lightingMode;
 			surface.baseColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.color", false} : ColorExpression(material.color);
 			surface.shininess = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.shiniess", false} : FloatExpression(material.shininess);

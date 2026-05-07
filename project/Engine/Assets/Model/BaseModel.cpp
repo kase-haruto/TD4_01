@@ -27,6 +27,7 @@
 #include "Engine/Foundation/Utility/Func/CxUtils.h"
 #include "Engine/Graphics/Context/GraphicsGroup.h"
 
+#include <array>
 
 const std::string BaseModel::directoryPath_ = "Resource/models";
 
@@ -174,6 +175,7 @@ void BaseModel::Draw(const WorldTransform& transform) {
 	cmdList->SetGraphicsRootDescriptorTable(1, GetInstanceSrv());
 
 	cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv());
+	cmdList->SetGraphicsRootDescriptorTable(12, GetMaterialGraphTextureSrvTable(0));
 
 	// 環境マップ
 	D3D12_GPU_DESCRIPTOR_HANDLE envMapHandle = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle();
@@ -188,6 +190,7 @@ void BaseModel::Draw(const WorldTransform& transform) {
 
 	for(const auto& subMesh : subMeshes) {
 		cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(subMesh.materialIndex));
+		cmdList->SetGraphicsRootDescriptorTable(12, GetMaterialGraphTextureSrvTable(subMesh.materialIndex));
 		cmdList->DrawIndexedInstanced(subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
 	}
 }
@@ -423,6 +426,12 @@ void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transf
 
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetInstanceSrv() const { return instanceBuffer_.GetGpuSrvHandle(); }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const {
+	if(auto material = GetMaterialAsset()) {
+		if(material->objectTextureGuid.isValid()) {
+			auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material->objectTextureGuid);
+			if(h.ptr) return h;
+		}
+	}
 	if(handle_ && handle_->ptr) {
 		return handle_.value();
 	}
@@ -432,6 +441,12 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const {
 	return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/white1x1.dds");
 }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t materialIndex) const {
+	if(auto material = GetMaterialAsset()) {
+		if(material->objectTextureGuid.isValid()) {
+			auto h = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material->objectTextureGuid);
+			if(h.ptr) return h;
+		}
+	}
 	if(handle_ && handle_->ptr) {
 		return handle_.value();
 	}
@@ -439,6 +454,71 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t materialIndex) const {
 		return materialTextureHandles_[materialIndex];
 	}
 	return GetTexSrv();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t materialIndex) const {
+	constexpr uint32_t kMaxGraphTextures = 8;
+	auto* textureManager = CalyxEngine::AssetManager::GetInstance()->GetTextureManager();
+	ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
+	if(!textureManager || !device) return {};
+
+	if(materialGraphTextureTables_.size() <= materialIndex) {
+		materialGraphTextureTables_.resize(materialIndex + 1);
+	}
+	DescriptorHandle& textureTable = materialGraphTextureTables_[materialIndex];
+	if(!textureTable.IsValid()) {
+		textureTable = DescriptorAllocator::AllocateRange(DescriptorUsage::CbvSrvUav, kMaxGraphTextures);
+	}
+
+	const UINT descriptorSize = DescriptorAllocator::GetDescriptorSize(DescriptorUsage::CbvSrvUav);
+	const D3D12_GPU_DESCRIPTOR_HANDLE gpuStart = DescriptorAllocator::GetGpuHandleStart(DescriptorUsage::CbvSrvUav);
+	const D3D12_CPU_DESCRIPTOR_HANDLE cpuStart = DescriptorAllocator::GetCpuHandleStart(DescriptorUsage::CbvSrvUav);
+	auto cpuFromGpu = [gpuStart, cpuStart, descriptorSize](D3D12_GPU_DESCRIPTOR_HANDLE gpu) {
+		D3D12_CPU_DESCRIPTOR_HANDLE cpu{};
+		if(!gpu.ptr || gpu.ptr < gpuStart.ptr) return cpu;
+		const SIZE_T offset = (gpu.ptr - gpuStart.ptr) / descriptorSize;
+		cpu.ptr = cpuStart.ptr + offset * descriptorSize;
+		return cpu;
+	};
+
+	D3D12_CPU_DESCRIPTOR_HANDLE fallbackCpu = textureManager->GetCpuSrvHandle("textures/white1x1.dds");
+	if(auto fallbackGpu = GetTexSrv(materialIndex); fallbackGpu.ptr) {
+		if(auto cpu = cpuFromGpu(fallbackGpu); cpu.ptr) fallbackCpu = cpu;
+	}
+
+	std::array<D3D12_CPU_DESCRIPTOR_HANDLE, kMaxGraphTextures> sourceCpu{};
+	sourceCpu.fill(fallbackCpu);
+
+	if(auto material = GetMaterialAsset()) {
+		uint32_t slot = 0;
+		for(const auto& node : material->graph.nodes) {
+			if(node.type != "ObjectTexture" && node.type != "Texture2D") continue;
+			if(slot >= kMaxGraphTextures) break;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE cpu = fallbackCpu;
+			if(node.type == "ObjectTexture") {
+				if(material->objectTextureGuid.isValid()) {
+					D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(material->objectTextureGuid);
+					if(guidCpu.ptr) cpu = guidCpu;
+				}
+			} else if(auto it = node.properties.find("textureGuid"); it != node.properties.end() && it->is_string()) {
+				const Guid guid = Guid::FromString(it->get<std::string>());
+				if(guid.isValid()) {
+					D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(guid);
+					if(guidCpu.ptr) cpu = guidCpu;
+				}
+			}
+			sourceCpu[slot++] = cpu;
+		}
+	}
+
+	for(uint32_t i = 0; i < kMaxGraphTextures; ++i) {
+		D3D12_CPU_DESCRIPTOR_HANDLE dest = textureTable.cpu;
+		dest.ptr += static_cast<SIZE_T>(i) * descriptorSize;
+		device->CopyDescriptorsSimple(1, dest, sourceCpu[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	return textureTable.gpu;
 }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetEnvMapSrv() const { return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle(); }
 

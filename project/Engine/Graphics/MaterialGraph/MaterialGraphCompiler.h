@@ -158,6 +158,7 @@ namespace CalyxEngine {
 				const NodePin* fromPin = material.graph.FindPin(link.fromPinId, &fromNode);
 				if(!fromNode || !fromPin || fromPin->valueType != NodeValueType::Float) return fallback;
 				if(fromNode->type == "Float" || fromNode->type == "Shininess" || fromNode->type == "Roughness") return fromNode->floatValue;
+				if(fromNode->type == "TextureSample") return 0.5f;
 				if(fromNode->type == "NoiseTexture") return 0.5f;
 				if(fromNode->type == "UVX" || fromNode->type == "UVY" || fromNode->type == "Time" ||
 				   fromNode->type == "WorldPositionX" || fromNode->type == "WorldPositionY" || fromNode->type == "WorldPositionZ" ||
@@ -212,6 +213,19 @@ namespace CalyxEngine {
 				}
 				if(fromNode->type == "OneMinusFloat") {
 					return 1.0f - EvaluateFloat(material, fromNode->inputs[0].id, fallback);
+				}
+				if(fromNode->type == "StepFloat") {
+					const float edge = EvaluateFloat(material, fromNode->inputs[0].id, 0.5f);
+					const float value = EvaluateFloat(material, fromNode->inputs[1].id, fallback);
+					return value < edge ? 0.0f : 1.0f;
+				}
+				if(fromNode->type == "SmoothstepFloat") {
+					const float edge0 = EvaluateFloat(material, fromNode->inputs[0].id, 0.4f);
+					const float edge1 = EvaluateFloat(material, fromNode->inputs[1].id, 0.6f);
+					const float value = EvaluateFloat(material, fromNode->inputs[2].id, fallback);
+					const float width = std::abs(edge1 - edge0) < 0.0001f ? 0.0001f : edge1 - edge0;
+					const float t = std::clamp((value - edge0) / width, 0.0f, 1.0f);
+					return t * t * (3.0f - 2.0f * t);
 				}
 			}
 			return fallback;
