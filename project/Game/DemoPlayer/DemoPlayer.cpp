@@ -132,8 +132,6 @@ void DemoPlayer::Move(float dt) {
 		TakeDamage(1);
 	}
 #endif
-	// ずっと前へすすむ
-	horizonVelocity.z += 1.0f;
 
 	CalyxEngine::Vector2 leftStick = CalyxFoundation::Input::GetInstance()->GetLeftStick();
 	horizonVelocity.x += leftStick.x;
