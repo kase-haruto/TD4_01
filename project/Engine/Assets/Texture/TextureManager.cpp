@@ -68,6 +68,18 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandle(const std::string& text
 	return {};
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE TextureManager::GetCpuSrvHandle(const std::string& textureName) const {
+	auto it = textures_.find(textureName);
+	if(it != textures_.end()) {
+		return it->second.GetCpuSrvHandle();
+	}
+	const_cast<TextureManager*>(this)->LoadTexture(textureName);
+	if(auto loaded = textures_.find(textureName); loaded != textures_.end()) {
+		return loaded->second.GetCpuSrvHandle();
+	}
+	return {};
+}
+
 const std::unordered_map<std::string, Texture>& TextureManager::GetLoadedTextures() const {
 	return textures_;
 }
@@ -122,6 +134,22 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandle(const Guid& guid) const
 	}
 	// const だがロードしたいケース用に const_cast（薄いラッパなので許容）
 	return const_cast<TextureManager*>(this)->LoadTexture(guid);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE TextureManager::GetCpuSrvHandle(const Guid& guid) const {
+	if(!guid.isValid()) return {};
+	if(auto it = guidToKey_.find(guid); it != guidToKey_.end()) {
+		if(auto it2 = textures_.find(it->second); it2 != textures_.end()) {
+			return it2->second.GetCpuSrvHandle();
+		}
+	}
+	const_cast<TextureManager*>(this)->LoadTexture(guid);
+	if(auto it = guidToKey_.find(guid); it != guidToKey_.end()) {
+		if(auto it2 = textures_.find(it->second); it2 != textures_.end()) {
+			return it2->second.GetCpuSrvHandle();
+		}
+	}
+	return {};
 }
 
 bool TextureManager::HasTexture(const Guid& guid) const {

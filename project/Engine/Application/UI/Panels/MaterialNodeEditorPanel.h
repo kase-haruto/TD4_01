@@ -44,10 +44,12 @@ namespace CalyxEngine {
 		void AddLitMasterNode(MaterialAsset& material, Vector2 position);
 		void AddUnlitMasterNode(MaterialAsset& material, Vector2 position);
 		void AddObjectTextureNode(MaterialAsset& material, Vector2 position);
+		void AddTexture2DNode(MaterialAsset& material, Vector2 position);
 		void AddTextureSampleNode(MaterialAsset& material, Vector2 position);
 		void AddNoiseTextureNode(MaterialAsset& material, Vector2 position);
 		void AddShaderInputFloatNode(MaterialAsset& material, const char* type, const char* title, Vector2 position);
 		void AddShaderInputFloat2Node(MaterialAsset& material, const char* type, const char* title, Vector2 position);
+		void AddUVTransformNode(MaterialAsset& material, Vector2 position);
 		void AddCombineFloat2Node(MaterialAsset& material, Vector2 position);
 		void AddSplitFloat2Node(MaterialAsset& material, Vector2 position);
 		void AddBinaryNode(MaterialAsset& material, const char* type, const char* title, NodeValueType valueType, Vector2 position);
@@ -56,6 +58,7 @@ namespace CalyxEngine {
 		void AddStepFloatNode(MaterialAsset& material, Vector2 position);
 		void AddSmoothstepFloatNode(MaterialAsset& material, Vector2 position);
 		void EnsureOutputNode(MaterialAsset& material);
+		bool EnsureTextureSampleNodePins(MaterialAsset& material);
 		Vector4 EvaluateColor(const MaterialAsset& material, int32_t inputPinId, const Vector4& fallback) const;
 		float EvaluateFloat(const MaterialAsset& material, int32_t inputPinId, float fallback) const;
 		bool EvaluateBool(const MaterialAsset& material, int32_t inputPinId, bool fallback) const;
@@ -66,6 +69,7 @@ namespace CalyxEngine {
 		bool EnsurePreviewResources();
 		bool EnsurePreviewPipeline(const MaterialGraphRuntimeShader& shader);
 		D3D12_GPU_DESCRIPTOR_HANDLE ResolvePreviewTexture(const MaterialAsset& material) const;
+		D3D12_GPU_DESCRIPTOR_HANDLE ResolvePreviewTextureTable(const MaterialAsset& material);
 		Material BuildPreviewMaterial(const MaterialAsset& material) const;
 
 	private:
@@ -85,6 +89,7 @@ namespace CalyxEngine {
 		std::unique_ptr<OffscreenRenderTarget> previewTarget_;
 		DescriptorHandle previewRtv_{};
 		DescriptorHandle previewDsv_{};
+		DescriptorHandle previewTextureTable_{};
 		DxConstantBuffer<Material> previewMaterialBuffer_;
 		std::unique_ptr<PipelineStateObject> previewPipeline_;
 		std::size_t previewPipelineHash_ = 0;
