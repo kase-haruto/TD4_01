@@ -183,6 +183,48 @@
             "type": "DirectionalLight"
         },
         {
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 1.0,
+            "guid": "f7440fd4-c2c5-48bd-a8ce-b192e2618fe9",
+            "intensity": 0.25,
+            "name": "PointLight",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 20.0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "PointLight"
+        },
+        {
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -254,48 +296,6 @@
             "type": "BaseGameObject"
         },
         {
-            "color": {
-                "w": 1.0,
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "decay": 1.0,
-            "guid": "f7440fd4-c2c5-48bd-a8ce-b192e2618fe9",
-            "intensity": 0.25,
-            "name": "PointLight",
-            "objectType": 0,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "position": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 20.0,
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "PointLight"
-        },
-        {
             "guid": "af9fb71b-81ae-4d76-a20d-93636d6bd101",
             "name": "MainCamera",
             "objectType": 0,
@@ -322,6 +322,34 @@
                 }
             },
             "type": "Camera3d"
+        },
+        {
+            "guid": "752b6d6f-8df6-448c-a75f-0c2ec1a86b5b",
+            "name": "DebugCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "DebugCamera"
         },
         {
             "colliderConfig": {
@@ -395,34 +423,6 @@
             "type": "DemoHammer"
         },
         {
-            "guid": "752b6d6f-8df6-448c-a75f-0c2ec1a86b5b",
-            "name": "DebugCamera",
-            "objectType": 0,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "DebugCamera"
-        },
-        {
             "colliderConfig": {
                 "colliderType": 1,
                 "isCollisionEnabled": true,
@@ -492,6 +492,34 @@
                 }
             },
             "type": "DemoPlayer"
+        },
+        {
+            "guid": "c99347e7-872d-410e-bb75-a1c4891a3684",
+            "name": "RailCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "RailCamera"
         },
         {
             "guid": "a494e3cf-7f90-413d-897e-e19c6ff068c9",
@@ -872,9 +900,9 @@
                     "z": 0.0
                 },
                 "size": {
-                    "x": 5.381071090698242,
-                    "y": 1.0,
-                    "z": 15.895553588867188
+                    "x": 21.039987564086914,
+                    "y": 19.142742156982422,
+                    "z": 62.151611328125
                 },
                 "targetType": 1
             },
@@ -893,14 +921,14 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 5.381071090698242,
-                    "y": 1.0,
-                    "z": 15.895553588867188
+                    "x": 21.039987564086914,
+                    "y": 19.142742156982422,
+                    "z": 62.151611328125
                 },
                 "translation": {
                     "x": 0.206179678440094,
                     "y": 0.4602239727973938,
-                    "z": 11.527445793151855
+                    "z": 11.158707618713379
                 }
             },
             "type": "DroolRainEvent"
@@ -1289,7 +1317,7 @@
             "type": "RailCamera"
         },
         {
-            "guid": "c99347e7-872d-410e-bb75-a1c4891a3684",
+            "guid": "0328a399-49fd-453c-a856-1c5fafc76176",
             "name": "RailCamera",
             "objectType": 0,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
