@@ -34,7 +34,12 @@ void BreakableFloorObject::ObjectInitialize() {
 
 	// コライダーの初期化
 	BaseGameObject::InitializeCollider(ColliderKind::Box);
-
+	if(collider_) {
+		collider_->SetType(ColliderType::Type_StageGimmick);
+		collider_->SetTargetType(ColliderType::Type_Player);
+		collider_->SetOwner(this);
+		collider_->SetCollisionEnabled(true);
+	}
 	isBroken_ = false;
 }
 
