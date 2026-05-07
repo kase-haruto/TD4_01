@@ -51,10 +51,10 @@ void GroundSpikeEvent::EventInitialize() {
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<GroundSpikeObject>("debugCube.obj", targetName);
+	targetObject_ = SceneAPI::Instantiate<GroundSpikeObject>("teeth.obj", targetName);
 	targetObject_.lock()->SetParent(shared_from_this());
 	targetObject_.lock()->Initialize();
-	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;
+	targetObject_.lock()->GetWorldTransform().translation.y -= 5.0f;
 	targetObject_.lock()->GetWorldTransform().inheritScale = false;
 }
 

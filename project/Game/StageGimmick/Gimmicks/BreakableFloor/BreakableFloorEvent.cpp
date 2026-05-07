@@ -62,7 +62,7 @@ void BreakableFloorEvent::EventInitialize() {
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<BreakableFloorObject>("debugCube.obj", targetName);
+	targetObject_ = SceneAPI::Instantiate<BreakableFloorObject>("breakableFloor.obj", targetName);
 	targetObject_.lock()->SetParent(shared_from_this());
 	targetObject_.lock()->Initialize();
 	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;

@@ -34,6 +34,7 @@ void BreakableFloorObject::ObjectInitialize() {
 
 	// コライダーの初期化
 	BaseGameObject::InitializeCollider(ColliderKind::Box);
+
 	isBroken_ = false;
 }
 

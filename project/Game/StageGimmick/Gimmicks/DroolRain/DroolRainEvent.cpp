@@ -65,11 +65,11 @@ void DroolRainEvent::EventInitialize() {
 			targetObjects_[i] = object;
 			continue;
 		}
-		auto targetObject = SceneAPI::Instantiate<DroolRainObject>("debugCube.obj", indexedTargetName);
+		auto targetObject = SceneAPI::Instantiate<DroolRainObject>("waterDrop.obj", indexedTargetName);
 		if(targetObject) {
 			targetObject->SetParent(shared_from_this());
 			targetObject->Initialize();
-			targetObject->GetWorldTransform().translation.y -= 0.5f;
+			targetObject->GetWorldTransform().translation.y += 2.5f;
 			targetObject->GetWorldTransform().inheritScale = false;
 			targetObjects_[i] = (targetObject);
 		}
