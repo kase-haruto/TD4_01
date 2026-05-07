@@ -228,6 +228,8 @@ public:
 	 */
 	void SetTexture(const std::string& texName);
 	bool SetModelByGuid(const Guid& guid);
+	bool SetModelFileNameForEditor(const std::string& modelName);
+	const std::string& GetModelFileName() const { return config_.GetConfig().modelConfig.modelName; }
 	/**
 	 * \brief UVスケールを設定
 	 * \param scale スケール

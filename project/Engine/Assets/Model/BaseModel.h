@@ -55,6 +55,7 @@ public:
 	BaseModelConfig ExtractConfig() const;
 	void ShowImGui(BaseModelConfig& config);
 	bool LoadTextureByGuid(const Guid& g);
+	void SetTextureGuid(const Guid& g);
 	void SetMaterialGuid(const Guid& g);
 
 	//--------- accessor -----------------------------------------------------
@@ -89,6 +90,7 @@ public:
 	const Material& GetMaterialForBatch() const { return currentMaterial_; }
 	std::shared_ptr<CalyxEngine::MaterialAsset> GetMaterialAsset() const;
 	const Guid& GetMaterialGuid() const { return materialGuid_; }
+	const Guid& GetTextureGuid() const { return textureGuid_; }
 	bool UsesRuntimeMaterialGraph() const;
 
 	virtual void BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList)const;

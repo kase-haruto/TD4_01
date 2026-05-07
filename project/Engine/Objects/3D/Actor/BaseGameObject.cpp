@@ -8,6 +8,8 @@
 #include <Engine/foundation/Utility/FileSystem/ConfigPathResolver/ConfigPathResolver.h>
 #include <Engine/objects/Collider/BoxCollider.h>
 #include <Engine/objects/Collider/SphereCollider.h>
+#include <Engine/System/Command/EditorCommand/ValueEditCommand.h>
+#include <Engine/System/Command/Manager/CommandManager.h>
 
 #include "externals/imgui/imgui.h"
 #include "externals/nlohmann/json.hpp"
@@ -131,7 +133,19 @@ void BaseGameObject::ShowGui() {
 		if(ImGui::TreeNodeEx("Model Asset (Drag & Drop from Assets)", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
 			Guid droppedGuid = Guid::Empty();
 			if(CalyxEngine::AssetPanel::DrawAssetDropTarget(AssetType::Model, &droppedGuid)) {
-				SetModelByGuid(droppedGuid);
+				if(auto* db = AssetDatabase::GetInstance()) {
+					if(const AssetRecord* record = db->Get(droppedGuid); record && record->type == AssetType::Model) {
+						const std::string before = config_.GetConfig().modelConfig.modelName;
+						const std::string after = record->sourcePath.filename().string();
+						if(before != after) {
+							auto apply = [this](const std::string& modelName) {
+								SetModelFileNameForEditor(modelName);
+							};
+							CommandManager::GetInstance()->Execute(
+								std::make_unique<ValueEditCommand<std::string>>("Apply Model Asset", before, after, apply));
+						}
+					}
+				}
 			}
 
 			ImGui::TextDisabled("Current: %s", config_.GetConfig().modelConfig.modelName.c_str());
@@ -311,8 +325,12 @@ bool BaseGameObject::SetModelByGuid(const Guid& guid) {
 	const AssetRecord* record = db->Get(guid);
 	if(!record || record->type != AssetType::Model) return false;
 
+	return SetModelFileNameForEditor(record->sourcePath.filename().string());
+}
+
+bool BaseGameObject::SetModelFileNameForEditor(const std::string& modelName) {
 	BaseModelConfig& modelConfig = config_.GetConfig().modelConfig;
-	modelConfig.modelName		  = record->sourcePath.filename().string();
+	modelConfig.modelName = modelName;
 
 	if(!SetModelFromFileName(modelConfig.modelName)) return false;
 	if(model_) {

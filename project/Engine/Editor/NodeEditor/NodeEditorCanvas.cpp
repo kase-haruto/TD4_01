@@ -214,7 +214,7 @@ namespace CalyxEngine {
 		return true;
 	}
 
-	bool NodeEditorCanvas::Draw(NodeGraph& graph, const DrawNodeBody& drawBody, const DrawContextMenu& drawContextMenu) {
+	bool NodeEditorCanvas::Draw(NodeGraph& graph, const DrawNodeBody& drawBody, const DrawContextMenu& drawContextMenu, const GraphMutationCommand& graphMutationCommand) {
 		bool changed = false;
 		backgroundContextRequested_ = false;
 		nodeContextRequested_ = false;
@@ -287,7 +287,9 @@ namespace CalyxEngine {
 					const NodePin* fromPin = graph.FindPin(from);
 					const ImVec4 previewColor = fromPin ? GetPinColor(fromPin->valueType) : ImVec4(0.70f, 0.76f, 0.84f, 1.0f);
 					if(ed::AcceptNewItem(previewColor, kStyle.validPreviewThickness)) {
+						const NodeGraph before = graph;
 						graph.links.push_back({graph.AllocateId(), from, to});
+						if(graphMutationCommand) graphMutationCommand("Create Node Link", before, graph);
 						changed = true;
 					}
 				} else {
@@ -312,12 +314,14 @@ namespace CalyxEngine {
 			ed::NodeId deletedNode;
 			while(ed::QueryDeletedNode(&deletedNode)) {
 				if(ed::AcceptDeletedItem()) {
+					const NodeGraph before = graph;
 					const int32_t nodeId = static_cast<int32_t>(deletedNode.Get());
 					std::erase_if(graph.nodes, [nodeId](const Node& n) { return n.id == nodeId; });
 					std::erase_if(graph.links, [&graph](const NodeLink& l) {
 						return graph.FindPin(l.fromPinId) == nullptr || graph.FindPin(l.toPinId) == nullptr;
 					});
 					positionedNodes_.erase(nodeId);
+					if(graphMutationCommand) graphMutationCommand("Delete Node", before, graph);
 					changed = true;
 				}
 			}
@@ -325,8 +329,10 @@ namespace CalyxEngine {
 			ed::LinkId deletedLink;
 			while(ed::QueryDeletedLink(&deletedLink)) {
 				if(ed::AcceptDeletedItem()) {
+					const NodeGraph before = graph;
 					const int32_t id = static_cast<int32_t>(deletedLink.Get());
 					std::erase_if(graph.links, [id](const NodeLink& l) { return l.id == id; });
+					if(graphMutationCommand) graphMutationCommand("Delete Node Link", before, graph);
 					changed = true;
 				}
 			}

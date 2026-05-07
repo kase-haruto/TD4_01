@@ -24,6 +24,7 @@
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/System/Command/EditorCommand/LevelEditorCommand/CreateObjectCommand/CreateObjectCommand.h>
+#include <Engine/System/Command/EditorCommand/ValueEditCommand.h>
 #include <Engine/System/Command/Manager/CommandManager.h>
 #include <externals/imgui/ImGuizmo.h>
 #include <externals/imgui/imgui.h>
@@ -227,18 +228,54 @@ bool Viewport::ApplyAssetToObjectAtLocalPoint(const AssetDragPayload& payload, c
         auto gameObject = std::dynamic_pointer_cast<BaseGameObject>(target);
         if(!gameObject || !gameObject->GetModel()) return false;
 
-        gameObject->GetModel()->SetMaterialGuid(payload.guid);
+        const Guid before = gameObject->GetModel()->GetMaterialGuid();
+        const Guid after = payload.guid;
+        if(before == after) return false;
+
+        auto apply = [gameObject](const Guid& guid) {
+            if(gameObject && gameObject->GetModel()) {
+                gameObject->GetModel()->SetMaterialGuid(guid);
+            }
+        };
+        CommandManager::GetInstance()->Execute(
+            std::make_unique<ValueEditCommand<Guid>>("Apply Material Asset", before, after, apply));
         return true;
     }
 
     if(payload.type == AssetType::Texture) {
         if(auto gameObject = std::dynamic_pointer_cast<BaseGameObject>(target)) {
-            return gameObject->GetModel() && gameObject->GetModel()->LoadTextureByGuid(payload.guid);
+            if(!gameObject->GetModel()) return false;
+
+            const Guid before = gameObject->GetModel()->GetTextureGuid();
+            const Guid after = payload.guid;
+            if(before == after) return false;
+
+            auto apply = [gameObject](const Guid& guid) {
+                if(gameObject && gameObject->GetModel()) {
+                    gameObject->GetModel()->SetTextureGuid(guid);
+                }
+            };
+            CommandManager::GetInstance()->Execute(
+                std::make_unique<ValueEditCommand<Guid>>("Apply Texture Asset", before, after, apply));
+            return true;
         }
 
         if(auto particleObject = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(target)) {
             auto emitter = particleObject->GetEmitter();
-            return emitter && emitter->LoadTextureByGuid(payload.guid);
+            if(!emitter) return false;
+
+            const Guid before = emitter->GetTextureGuid();
+            const Guid after = payload.guid;
+            if(before == after) return false;
+
+            auto apply = [emitter](const Guid& guid) {
+                if(emitter) {
+                    emitter->SetTextureGuid(guid);
+                }
+            };
+            CommandManager::GetInstance()->Execute(
+                std::make_unique<ValueEditCommand<Guid>>("Apply Particle Texture Asset", before, after, apply));
+            return true;
         }
     }
 

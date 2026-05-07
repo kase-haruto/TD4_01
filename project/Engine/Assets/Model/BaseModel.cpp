@@ -12,6 +12,8 @@
 #include <Engine/Assets/DataAsset/MaterialAsset.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
+#include <Engine/System/Command/EditorCommand/ValueEditCommand.h>
+#include <Engine/System/Command/Manager/CommandManager.h>
 
 
 // lib
@@ -265,9 +267,15 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 
 		Guid droppedGuid = materialGuid_;
 		if(CalyxEngine::AssetPanel::DrawAssetDropTarget(AssetType::Material, &droppedGuid)) {
-			materialGuid_ = droppedGuid;
-			config.materialGuid = droppedGuid;
-			TransferMaterial();
+			const Guid before = materialGuid_;
+			if(before != droppedGuid) {
+				auto apply = [this, &config](const Guid& guid) {
+					config.materialGuid = guid;
+					SetMaterialGuid(guid);
+				};
+				CommandManager::GetInstance()->Execute(
+					std::make_unique<ValueEditCommand<Guid>>("Apply Material Asset", before, droppedGuid, apply));
+			}
 		}
 
 		ImGui::TextDisabled("Current: %s", labelFromGuid(materialGuid_).c_str());
@@ -322,11 +330,17 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 				const AssetDragPayload payload =
 					*reinterpret_cast<const AssetDragPayload*>(p->Data);
 				if(payload.type == AssetType::Texture) {
-					if(LoadTextureByGuid(payload.guid)) {
-						// コンフィグ（保存用）にも反映
-						config.textureGuid = payload.guid;
-					} else {
+					const Guid before = textureGuid_;
+					const Guid after = payload.guid;
+					if(before != after && !CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetSrvHandle(after).ptr) {
 						ImGui::OpenPopup("TextureDropError");
+					} else if(before != after) {
+						auto apply = [this, &config](const Guid& guid) {
+							config.textureGuid = guid;
+							SetTextureGuid(guid);
+						};
+						CommandManager::GetInstance()->Execute(
+							std::make_unique<ValueEditCommand<Guid>>("Apply Texture Asset", before, after, apply));
 					}
 				}
 			}
@@ -384,6 +398,16 @@ bool BaseModel::LoadTextureByGuid(const Guid& g) {
 	handle_		 = h;
 	textureGuid_ = g;
 	return true;
+}
+
+void BaseModel::SetTextureGuid(const Guid& g) {
+	if(!g.isValid()) {
+		handle_.reset();
+		textureGuid_ = Guid::Empty();
+		return;
+	}
+
+	LoadTextureByGuid(g);
 }
 
 void BaseModel::SetMaterialGuid(const Guid& g) {
