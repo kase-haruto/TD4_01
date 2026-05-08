@@ -1,6 +1,7 @@
 #pragma once
 #include <Engine/Application/UI/EngineUI/IEngineUI.h>
 #include <Engine/Objects/3D/Geometory/Spline/SplineData.h>
+#include <Engine/Objects/3D/Geometory/Spline/SplineRegistry.h>
 #include <Engine/Foundation/Math/Vector2.h>
 #include <Engine/Application/UI/EngineUI/Manipulator.h>
 #include <Engine/Objects/Transform/Transform.h>
@@ -33,7 +34,8 @@ namespace CalyxEngine {
 			vpSize_ = size;
 		}
 
-		SplineData& Data() { return data_; }
+		SplineData& Data() { return *data_; }
+		const SplineData& Data() const { return *data_; }
 		int			GetSelectedIndex() const { return selectedPoint_; }
 		void		SetSelectedIndex(int i) { selectedPoint_ = i; }
 
@@ -48,7 +50,7 @@ namespace CalyxEngine {
 		bool IntersectPlane(const Ray& ray, const CalyxEngine::Vector3& n, float d, CalyxEngine::Vector3& out) const;
 
 	private:
-		SplineData data_;
+		std::shared_ptr<SplineData> data_ = SplineRegistry::Create();
 		int		   selectedPoint_ = -1;
 
 		std::string currentPath_;
