@@ -4,7 +4,6 @@
 #include <wrl.h>
 #include <array>
 #include <cassert>
-#include <chrono>
 
 /*-----------------------------------------------------------------------------------------
  * DxSwapChain
@@ -81,6 +80,5 @@ private:
     std::array<ComPtr<ID3D12Resource>, 2> backBuffers_; //< バックバッファリソース
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc_ {}; //< スワップチェーン設定情報
 
-    float refreshRate_ = 60.0f; //< リフレッシュレート
 	UINT syncInterval_ = 1; //< 垂直同期の間隔
 };

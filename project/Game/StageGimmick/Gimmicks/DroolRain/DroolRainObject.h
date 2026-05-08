@@ -36,4 +36,5 @@ private:
 
 	// 雨が降っているか
 	bool isRaining_ = false;
+	bool isOnceSet_ = true; // 初期Offset用
 };

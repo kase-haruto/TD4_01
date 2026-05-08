@@ -34,9 +34,18 @@
 #include "Engine/Foundation/HotReload/LivePP/LivePPService.h"
 
 #include <Engine/Foundation/Utility/FileSystem/FileScanner.h>
+#include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include <Engine/Objects/ConfigurableObject/IConfigurable.h>
+#include <Engine/System/Command/EditorCommand/BaseLevelEditorCommand.h>
+#include <Engine/System/Command/Manager/CommandManager.h>
+#include <externals/nlohmann/json.hpp>
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
+<<<<<<< fix/selectionSystemToObject
+=======
+#include <functional>
+>>>>>>> master
 #include <unordered_map>
 
 using namespace EngineEdit;
@@ -246,6 +255,152 @@ namespace {
 
 namespace CalyxEngine {
 
+	namespace {
+		// PrefabSerializer 相当のスナップショット（ファイルに書かずメモリに保持）
+		// - 削除対象のルートと子を再帰的に JSON 配列へ変換
+		// - Undo ではこの JSON から SceneObject を再生成し GUID/親子関係を復元する
+		nlohmann::json SerializeSubtree(SceneObject* root) {
+			nlohmann::json jArray = nlohmann::json::array();
+			std::function<void(SceneObject*)> rec;
+			rec = [&](SceneObject* obj) {
+				if(!obj || !obj->IsSerializable()) return;
+
+				nlohmann::json j;
+				j["type"] = obj->GetObjectClassName();
+				j["guid"] = obj->GetGuid();
+				j["pickingID"] = obj->GetPickingID();
+				j["name"] = obj->GetName();
+				j["objectType"] = static_cast<int>(obj->GetObjectType());
+				if(auto parent = obj->GetParent()) {
+					j["parentGuid"] = parent->GetGuid();
+				} else {
+					j["parentGuid"] = Guid::Empty();
+				}
+
+				if(auto* cfg = dynamic_cast<IConfigurable*>(obj)) {
+					// 既存のキーと衝突しないよう一旦作ってマージ
+					nlohmann::json jCfg;
+					cfg->ExtractConfigToJson(jCfg);
+					for(auto it = jCfg.begin(); it != jCfg.end(); ++it) {
+						j[it.key()] = it.value();
+					}
+				}
+
+				jArray.push_back(std::move(j));
+				// FxObject は ApplyConfig 時に emitter 子を再構築するため、
+				// ここで子まで保存すると Undo 時に二重生成されやすい。
+				const std::string_view className = obj->GetObjectClassName();
+				if(className != "FxObject") {
+					for(auto& childSp : obj->GetChildren()) {
+						if(childSp) rec(childSp.get());
+					}
+				}
+			};
+			rec(root);
+			return jArray;
+		}
+	} // namespace
+
+	class DeleteObjectCommand final : public BaseLevelEditorCommand {
+	public:
+		DeleteObjectCommand(SceneContext* ctx,
+							const std::shared_ptr<SceneObject>& object,
+							LevelEditor* editor,
+							const char* label = "Delete Object")
+			: BaseLevelEditorCommand(label), ctx_(ctx), editor_(editor) {
+			if(object) {
+				rootGuid_ = object->GetGuid();
+				snapshot_ = SerializeSubtree(object.get());
+			}
+		}
+
+		void Execute() override {
+			if(!ctx_ || !rootGuid_.isValid()) return;
+			auto* lib = ctx_->GetObjectLibrary();
+			if(!lib) return;
+			auto rootSp = lib->Find(rootGuid_);
+			if(!rootSp) return;
+
+			ctx_->RemoveObject(rootSp);
+			if(editor_ && editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
+		}
+
+		void Undo() override {
+			if(!ctx_) return;
+			auto* lib = ctx_->GetObjectLibrary();
+			if(!lib) return;
+			if(!snapshot_.is_array() || snapshot_.empty()) return;
+
+			std::unordered_map<Guid, std::shared_ptr<SceneObject>> guidMap;
+			guidMap.reserve(snapshot_.size());
+
+			// 1) 生成 + 設定適用 + GUID 復元 + ライブラリ登録 + Initialize
+			for(const auto& j : snapshot_) {
+				const std::string typeName = j.value("type", "");
+				if(typeName.empty()) continue;
+
+				auto sp = SceneObjectRegistry::Get().Create(typeName);
+				if(!sp) continue;
+
+				if(auto* cfg = dynamic_cast<IConfigurable*>(sp.get())) {
+					cfg->ApplyConfigFromJson(j);
+				}
+				// IConfigurable が無い型（例: SceneObject）でも最低限の情報を復元
+				if(!dynamic_cast<IConfigurable*>(sp.get())) {
+					const std::string name = j.value("name", "");
+					const int objTypeInt = j.value("objectType", static_cast<int>(sp->GetObjectType()));
+					if(!name.empty()) {
+						sp->SetName(name, static_cast<ObjectType>(objTypeInt));
+					}
+				}
+
+				const Guid guid = j.value("guid", Guid{});
+				if(guid.isValid()) {
+					sp->SetGuid(guid);
+				}
+				const uint32_t pickingID = j.value("pickingID", 0u);
+				if(pickingID != 0u) {
+					sp->SetPickingID(pickingID);
+				}
+
+				ctx_->AddObject(sp);
+				sp->Initialize();
+
+				guidMap[sp->GetGuid()] = sp;
+			}
+
+			// 2) 親子リンク復元
+			for(const auto& j : snapshot_) {
+				const Guid childGuid = j.value("guid", Guid{});
+				const Guid parentGuid = j.value("parentGuid", Guid{});
+				if(!childGuid.isValid() || !parentGuid.isValid()) continue;
+
+				auto childIt = guidMap.find(childGuid);
+				if(childIt == guidMap.end() || !childIt->second) continue;
+
+				std::shared_ptr<SceneObject> parentSp;
+				if(auto parentIt = guidMap.find(parentGuid); parentIt != guidMap.end()) {
+					parentSp = parentIt->second;
+				} else {
+					parentSp = lib->Find(parentGuid);
+				}
+
+				if(parentSp) {
+					auto& childTransform = childIt->second->GetWorldTransform();
+					childIt->second->SetParent(parentSp, childTransform.inheritScale);
+				}
+			}
+
+			if(editor_ && editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
+		}
+
+	private:
+		SceneContext* ctx_ = nullptr;
+		LevelEditor* editor_ = nullptr;
+		Guid rootGuid_{};
+		nlohmann::json snapshot_;
+	};
+
 	//=============================================================================
 	// Initialize
 	//=============================================================================
@@ -305,6 +460,18 @@ namespace CalyxEngine {
 
 		hierarchy_->SetOnObjectCreate(
 			[this](std::shared_ptr<SceneObject> sp) { CreateObject(std::move(sp)); });
+
+		hierarchy_->SetOnObjectRename(
+			[](std::shared_ptr<SceneObject> sp, const std::string& newName) {
+				if(!sp) return;
+				if(auto* ctx = SceneContext::Current()) {
+					if(auto* lib = ctx->GetObjectLibrary()) {
+						lib->RenameObject(sp, newName);
+						return;
+					}
+				}
+				sp->SetName(newName, sp->GetObjectType());
+			});
 
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
 
@@ -515,6 +682,14 @@ namespace CalyxEngine {
 
 		if(!selectedObjects_.empty() && !io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
 			DeleteSelectedObjects();
+		}
+
+		//オブジェクトが選択されている状態でdelkeyで削除
+		if(selectedObject_.lock()) {
+			// リネーム中など ImGui がキーボードを掴んでいる場合は誤爆させない
+			if(!io.WantCaptureKeyboard && CalyxFoundation::Input::GetInstance()->TriggerKey(DIK_DELETE)) {
+				DeleteObject(selectedObject_.lock());
+			}
 		}
 
 		// ----------------------------
@@ -911,15 +1086,6 @@ namespace CalyxEngine {
 		// SceneContext 経由で登録（内部で SceneObjectLibrary::AddObject を呼ぶ）
 		ctx->AddObject(obj);
 
-		// パーティクルなら FxSystem 側にも登録
-		if(obj->GetObjectType() == ObjectType::Effect) {
-			if(auto fxObj = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(obj)) {
-				if(auto* fxSys = ctx->GetFxSystem()) {
-					fxSys->AddEmitter(fxObj->GetEmitter(), fxObj->GetGuid());
-				}
-			}
-		}
-
 		if(hierarchy_) hierarchy_->RefreshCache();
 	}
 
@@ -934,21 +1100,8 @@ namespace CalyxEngine {
 			ClearSelection();
 		}
 
-		// ── パーティクルシステムなら FxSystem からも削除 ─────────────
-		if(sp->GetObjectType() == ObjectType::Effect) {
-			if(auto fxObj = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(sp)) {
-				if(auto* fxSys = ctx->GetFxSystem()) {
-					fxSys->RemoveEmitter(fxObj->GetEmitter().get());
-				}
-			}
-		}
-
-		// ── SceneContext 経由で削除 ─────────────────────────────────
-		// 内部で SceneObjectLibrary::RemoveObject が呼ばれ、
-		// さらに SceneContext::objectRemovedCallbacks_ も通知される。
-		ctx->RemoveObject(sp);
-
-		if(hierarchy_) hierarchy_->RefreshCache();
+		CommandManager::GetInstance()->Execute(
+			std::make_unique<DeleteObjectCommand>(ctx, sp, this));
 	}
 
 	void LevelEditor::DeleteSelectedObjects() {
