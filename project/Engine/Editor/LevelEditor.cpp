@@ -42,10 +42,7 @@
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
-<<<<<<< fix/selectionSystemToObject
-=======
 #include <functional>
->>>>>>> master
 #include <unordered_map>
 
 using namespace EngineEdit;
@@ -684,14 +681,6 @@ namespace CalyxEngine {
 			DeleteSelectedObjects();
 		}
 
-		//オブジェクトが選択されている状態でdelkeyで削除
-		if(selectedObject_.lock()) {
-			// リネーム中など ImGui がキーボードを掴んでいる場合は誤爆させない
-			if(!io.WantCaptureKeyboard && CalyxFoundation::Input::GetInstance()->TriggerKey(DIK_DELETE)) {
-				DeleteObject(selectedObject_.lock());
-			}
-		}
-
 		// ----------------------------
 		// Open Scene ダイアログ処理
 		// ----------------------------
@@ -1018,8 +1007,6 @@ namespace CalyxEngine {
 			validObjects.push_back(object);
 			selectedObjects_.push_back(object);
 		}
-
-		auto primary = GetPrimarySelectedObject();
 
 		// Hierarchy / Inspector / SceneObjectEditor にも通知
 		if(hierarchy_) {
