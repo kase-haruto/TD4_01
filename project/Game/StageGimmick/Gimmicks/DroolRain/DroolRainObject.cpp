@@ -24,6 +24,10 @@ void DroolRainObject::ObjectInitialize() {
 
 void DroolRainObject::ObjectUpdate(float dt) {
 
+	if(!isRaining_) {
+		return;
+	}
+
 	if(!isRaining_ && isOnceSet_) {
 		offsetY_ = worldTransform_.translation.y;
 		isOnceSet_ = false;
