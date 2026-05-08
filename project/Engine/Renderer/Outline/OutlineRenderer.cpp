@@ -54,6 +54,18 @@ void OutlineRenderer::RenderSelectionHighlight(ID3D12GraphicsCommandList* cmdLis
 	}
 }
 
+void OutlineRenderer::RenderSelectionHighlight(ID3D12GraphicsCommandList* cmdList,
+											   ID3D12Device*			   device,
+											   IRenderTarget*			   rt,
+											   PipelineService*		   psoService,
+											   const Camera3d*		   camera,
+											   const ModelRenderer&	   modelRenderer,
+											   const std::vector<SceneObject*>& selectedObjects) {
+	for(const auto* selected : selectedObjects) {
+		RenderSelectionHighlight(cmdList, device, rt, psoService, camera, modelRenderer, selected);
+	}
+}
+
 void OutlineRenderer::EnsureResources(ID3D12Device* device, const D3D12_VIEWPORT& viewport) {
 	const uint32_t width = static_cast<uint32_t>(viewport.Width);
 	const uint32_t height = static_cast<uint32_t>(viewport.Height);

@@ -85,6 +85,9 @@ void SceneContext::PostUpdate(PipelineService* psoService, ID3D12GraphicsCommand
 }
 
 void SceneContext::Clear() {
+	debugSelectedObject_ = nullptr;
+	debugSelectedObjects_.clear();
+
 	// Editor 側への通知（エディタで持っているハンドルを掃除させる）
 	if(objectLibrary_) {
 		if(onEditorObjectRemoved_) {

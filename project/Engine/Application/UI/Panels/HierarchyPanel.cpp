@@ -104,11 +104,10 @@ namespace CalyxEngine {
 			ctx->AddOnObjectRemovedListener([this](SceneObject* removed) {
 				cacheDirty_ = true;
 				// 選択が削除対象ならクリア
-				if(auto sp = selected_.lock()) {
-					if(sp.get() == removed) {
-						selected_.reset();
-						if(onSelect_) onSelect_(nullptr);
-					}
+				if(IsSelected(removed)) {
+					selected_.reset();
+					selectedObjects_.clear();
+					if(onSelect_) onSelect_(nullptr, false);
 				}
 			});
 		}
@@ -150,6 +149,13 @@ namespace CalyxEngine {
 			if(sp && !lib_->Contains(sp)) {
 				selected_.reset();
 			}
+			selectedObjects_.erase(
+				std::remove_if(selectedObjects_.begin(), selectedObjects_.end(),
+							   [this](const std::weak_ptr<SceneObject>& weak) {
+								   auto selected = weak.lock();
+								   return !selected || !lib_->Contains(selected);
+							   }),
+				selectedObjects_.end());
 		}
 
 		// ---------------------------------------------------------------------
@@ -205,7 +211,8 @@ namespace CalyxEngine {
 			if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered()) {
 				
 				selected_.reset();
-				if(onSelect_) onSelect_(nullptr);
+				selectedObjects_.clear();
+				if(onSelect_) onSelect_(nullptr, false);
 			}
 
 			// 右クリック空白メニュー (テーブル内の空白エリア)
@@ -372,8 +379,7 @@ namespace CalyxEngine {
 		auto renameSP		= renameTarget_.lock();
 		bool isRenamingThis = (renaming_ && renameSP.get() == obj);
 
-		auto selectedPtr = selected_.lock();
-		bool isSelected	 = (selectedPtr.get() == obj);
+		bool isSelected	 = IsSelected(obj);
 
 		// 16px アイコンを使用
 		float iconSize = 16.0f;
@@ -416,11 +422,29 @@ namespace CalyxEngine {
 			// インタラクション
 			if(ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
 				try {
-					selected_ = obj->shared_from_this();
-					if(onSelect_) onSelect_(selected_.lock());
+					auto sp = obj->shared_from_this();
+					const bool toggle = ImGui::GetIO().KeyCtrl;
+					if(toggle && IsSelected(obj)) {
+						selectedObjects_.erase(
+							std::remove_if(selectedObjects_.begin(), selectedObjects_.end(),
+										   [obj](const std::weak_ptr<SceneObject>& weak) {
+											   return weak.lock().get() == obj;
+										   }),
+							selectedObjects_.end());
+						selected_ = selectedObjects_.empty() ? std::weak_ptr<SceneObject>{} : selectedObjects_.back();
+					} else if(toggle) {
+						selectedObjects_.push_back(sp);
+						selected_ = sp;
+					} else {
+						selectedObjects_.clear();
+						selectedObjects_.push_back(sp);
+						selected_ = sp;
+					}
+					if(onSelect_) onSelect_(sp, toggle);
 				} catch(...) {
 					// Object might not be managed by shared_ptr, skip selection
 					selected_.reset();
+					selectedObjects_.clear();
 				}
 			}
 
@@ -586,6 +610,25 @@ namespace CalyxEngine {
 
 	const std::string& HierarchyPanel::GetPanelName() const {
 		return panelName_;
+	}
+
+	void HierarchyPanel::SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects) {
+		selectedObjects_.clear();
+		for(const auto& object : objects) {
+			if(!object) continue;
+			selectedObjects_.push_back(object);
+		}
+		selected_ = selectedObjects_.empty() ? std::weak_ptr<SceneObject>{} : selectedObjects_.back();
+	}
+
+	bool HierarchyPanel::IsSelected(SceneObject* obj) const {
+		if(!obj) return false;
+		for(const auto& weak : selectedObjects_) {
+			if(weak.lock().get() == obj) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/* ========================================================================
