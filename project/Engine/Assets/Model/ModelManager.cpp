@@ -13,6 +13,7 @@
 #include <assimp/postprocess.h>
 
 #include <filesystem>
+#include <sstream>
 
 
 ModelManager::ModelManager() {
@@ -429,6 +430,19 @@ void ModelManager::LoadMesh(const aiMesh* mesh, ModelData& modelData) {
 void ModelManager::LoadMaterials(const aiScene* scene, const std::filesystem::path& modelDirectory, ModelData& modelData) {
 	modelData.meshResource.Materials().clear();
 
+	auto normalizeTexturePath = [](const aiString& texPath) -> std::string {
+		std::istringstream stream(texPath.C_Str());
+		std::string token;
+		std::string texturePath;
+		while(stream >> token) {
+			if(!token.empty() && token[0] == '-') {
+				continue;
+			}
+			texturePath = token;
+		}
+		return texturePath.empty() ? texPath.C_Str() : texturePath;
+	};
+
 	auto resolveTexturePath = [&](const aiString& texPath) -> std::string {
 		std::error_code ec;
 		std::filesystem::path assetRoot = std::filesystem::weakly_canonical("Resources/Assets", ec);
@@ -436,7 +450,7 @@ void ModelManager::LoadMaterials(const aiScene* scene, const std::filesystem::pa
 			assetRoot = std::filesystem::path("Resources/Assets");
 			ec.clear();
 		}
-		std::filesystem::path path(texPath.C_Str());
+		std::filesystem::path path(normalizeTexturePath(texPath));
 		if(path.is_absolute()) {
 			auto rel = std::filesystem::relative(path, assetRoot, ec);
 			if(!ec) return rel.generic_string();

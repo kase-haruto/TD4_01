@@ -120,17 +120,13 @@ void Texture::Upload(ID3D12Device* device) {
 }
 
 
-void Texture::CreateShaderResourceView(ID3D12Device* device){
-	DescriptorHandle handle = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
-	srvHandleCPU_ = handle.cpu;
-	srvHandleGPU_ = handle.gpu;
-
+D3D12_SHADER_RESOURCE_VIEW_DESC BuildTextureSrvDesc(const DirectX::TexMetadata& metadata) {
 	// SRV の設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = metadata_.format;
+	srvDesc.Format = metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	if (metadata_.IsCubemap()){
+	if (metadata.IsCubemap()){
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		srvDesc.TextureCube.MostDetailedMip = 0;
 		srvDesc.TextureCube.MipLevels = UINT_MAX;
@@ -138,13 +134,25 @@ void Texture::CreateShaderResourceView(ID3D12Device* device){
 	} else{
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.Texture2D.MipLevels = static_cast< UINT >(metadata_.mipLevels);
+		srvDesc.Texture2D.MipLevels = static_cast< UINT >(metadata.mipLevels);
 		srvDesc.Texture2D.PlaneSlice = 0;
 		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 	}
+	return srvDesc;
+}
+
+void Texture::CreateShaderResourceView(ID3D12Device* device){
+	DescriptorHandle handle = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
+	srvHandleCPU_ = handle.cpu;
+	srvHandleGPU_ = handle.gpu;
 
 	// SRV を作成
-	device->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
+	CreateShaderResourceView(device, srvHandleCPU_);
+}
+
+void Texture::CreateShaderResourceView(ID3D12Device* device, D3D12_CPU_DESCRIPTOR_HANDLE destination) const {
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = BuildTextureSrvDesc(metadata_);
+	device->CreateShaderResourceView(resource_.Get(), &srvDesc, destination);
 }
 
 
