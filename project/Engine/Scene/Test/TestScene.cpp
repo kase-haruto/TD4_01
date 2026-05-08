@@ -9,6 +9,7 @@
 #include "Game/Scene/Details/SceneType.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
 #include <Game/DemoPlayer/DemoPlayer.h>
+#include <Game/DemoShockwave/ShockwaveManager.h>
 
 // engine
 #include <Engine/Collision/CollisionManager.h>
@@ -52,6 +53,8 @@ void TestScene::Initialize(){
 
 	stageGimmickManager_ = std::make_unique<StageGimmickManager>();
 	stageGimmickManager_->Initialize();
+
+	ShockwaveManager::GetInstance()->SetStage(stage_.get());
 
 	//=========================
 	// グラフィック関連
@@ -138,6 +141,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 		return;
 	}
 
+	ShockwaveManager::GetInstance()->CheckTakeDamageForStage();
 	stage_->Update(dt);
 
 	stageGimmickManager_->ShowGui();

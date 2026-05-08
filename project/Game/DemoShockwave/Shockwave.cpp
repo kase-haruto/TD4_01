@@ -1,5 +1,6 @@
 #include "Shockwave.h"
 #include "Engine/Objects/Collider/SphereCollider.h"
+#include "Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h"
 #include <algorithm>
 
 Shockwave::Shockwave() : Actor() {
@@ -57,6 +58,7 @@ void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier)
 	scaleMultiplier_			= scaleMultiplier;
 	timer_						= 0.0f;
 	isActive_					= true;
+	isTakeDamageForStage_		= false;
 	
 	SetDrawEnable(true);
 	if (collider_) {
@@ -81,7 +83,17 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();
-	if (otherObj) {
-		// ギミックなどへの干渉
+	if(!otherObj) return;
+
+	if(auto* spike = dynamic_cast<GroundSpikeObject*>(otherObj)) {
+		isTakeDamageForStage_ = true;
 	}
+
+}
+
+bool Shockwave::IsTakeDamageForStage() {
+	if(!isTakeDamageForStage_) return false;
+	bool result = isTakeDamageForStage_;
+	isTakeDamageForStage_ = !isTakeDamageForStage_;
+	return result;
 }

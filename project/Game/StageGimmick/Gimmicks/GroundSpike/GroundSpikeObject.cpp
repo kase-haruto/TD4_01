@@ -16,12 +16,28 @@ void GroundSpikeObject::Spike() {
 	isSpike_ = true;
 }
 
+void GroundSpikeObject::OnCollisionEnter(Collider* other) {
+	BaseGameObject* otherObj = other->GetOwner();
+	if(otherObj && other->GetType() != ColliderType::Type_PlayerAttack) {
+		return;
+	}
+
+	if(!isSpike_ || isBreak_) return;
+	isBreak_ = true;
+	if(collider_) {
+		collider_->SetCollisionEnabled(false);
+	}
+	if(model_) {
+		BaseGameObject::SetDrawEnable(false);
+	}
+}
+
 void GroundSpikeObject::ObjectInitialize() {
 
 	BaseGameObject::InitializeCollider(ColliderKind::Sphere);
 	if(collider_) {
 		collider_->SetType(ColliderType::Type_StageGimmick);
-		collider_->SetTargetType(ColliderType::Type_Player);
+		collider_->SetTargetType(ColliderType::Type_Player | ColliderType::Type_PlayerAttack);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
 	}
