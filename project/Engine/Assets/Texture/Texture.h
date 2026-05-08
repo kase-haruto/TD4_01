@@ -35,6 +35,7 @@ public:
 	/// </summary>
 	/// <param name="device"></param>
 	void CreateShaderResourceView(ID3D12Device* device);
+	void CreateShaderResourceView(ID3D12Device* device, D3D12_CPU_DESCRIPTOR_HANDLE destination) const;
 
 	//--------- accessor -----------------------------------------------------
 	// getter

@@ -31,6 +31,8 @@ void OutlineRenderer::Render(ID3D12GraphicsCommandList* cmdList,
 	compositeConstants_ = CompositeConstants{};
 	if(RenderNormalBuffer(cmdList, device, rt, psoService, camera, modelRenderer)) {
 		Composite(cmdList, rt, psoService);
+	} else {
+		rt->SetRenderTarget(cmdList);
 	}
 }
 
@@ -51,6 +53,8 @@ void OutlineRenderer::RenderSelectionHighlight(ID3D12GraphicsCommandList* cmdLis
 	compositeConstants_.insideMaskOnly = 1.0f;
 	if(RenderNormalBuffer(cmdList, device, rt, psoService, camera, modelRenderer, selected)) {
 		Composite(cmdList, rt, psoService);
+	} else {
+		rt->SetRenderTarget(cmdList);
 	}
 }
 

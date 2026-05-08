@@ -1954,28 +1954,24 @@ namespace CalyxEngine {
 		}
 
 		const UINT descriptorSize = DescriptorAllocator::GetDescriptorSize(DescriptorUsage::CbvSrvUav);
-		const D3D12_CPU_DESCRIPTOR_HANDLE whiteCpu = textureManager->GetCpuSrvHandle("textures/white1x1.dds");
-		std::array<D3D12_CPU_DESCRIPTOR_HANDLE, kMaxGraphTextures> sourceCpu{};
-		sourceCpu.fill(whiteCpu);
+		for(uint32_t i = 0; i < kMaxGraphTextures; ++i) {
+			D3D12_CPU_DESCRIPTOR_HANDLE dest = previewTextureTable_.cpu;
+			dest.ptr += static_cast<SIZE_T>(i) * descriptorSize;
+			textureManager->WriteSrvTo("textures/white1x1.dds", dest);
+		}
 
 		uint32_t slot = 0;
 		for(const Node& node : material.graph.nodes) {
 			if(!IsGraphTextureNodeType(node.type)) continue;
 			if(slot >= kMaxGraphTextures) break;
 
-			D3D12_CPU_DESCRIPTOR_HANDLE cpu = whiteCpu;
 			const Guid guid = ResolveGraphTextureGuid(material, node);
 			if(guid.isValid()) {
-				D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(guid);
-				if(guidCpu.ptr) cpu = guidCpu;
+				D3D12_CPU_DESCRIPTOR_HANDLE dest = previewTextureTable_.cpu;
+				dest.ptr += static_cast<SIZE_T>(slot) * descriptorSize;
+				textureManager->WriteSrvTo(guid, dest);
 			}
-			sourceCpu[slot++] = cpu;
-		}
-
-		for(uint32_t i = 0; i < kMaxGraphTextures; ++i) {
-			D3D12_CPU_DESCRIPTOR_HANDLE dest = previewTextureTable_.cpu;
-			dest.ptr += static_cast<SIZE_T>(i) * descriptorSize;
-			device->CopyDescriptorsSimple(1, dest, sourceCpu[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			++slot;
 		}
 
 		return previewTextureTable_.gpu;

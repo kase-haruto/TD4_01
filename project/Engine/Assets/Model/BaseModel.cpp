@@ -420,7 +420,8 @@ ModelData* BaseModel::GetModelData() const { return modelData_; }
 // ======================================= renderer 専用 ==========================================
 
 void BaseModel::SetTex(const std::string& name) {
-	handle_ = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("textures/" + name);
+	textureName_ = "textures/" + name;
+	handle_ = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(textureName_);
 }
 
 void BaseModel::EnsureInstanceCapacity(ID3D12Device* device, UINT needCount) {
@@ -500,23 +501,23 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t ma
 	}
 
 	const UINT descriptorSize = DescriptorAllocator::GetDescriptorSize(DescriptorUsage::CbvSrvUav);
-	const D3D12_GPU_DESCRIPTOR_HANDLE gpuStart = DescriptorAllocator::GetGpuHandleStart(DescriptorUsage::CbvSrvUav);
-	const D3D12_CPU_DESCRIPTOR_HANDLE cpuStart = DescriptorAllocator::GetCpuHandleStart(DescriptorUsage::CbvSrvUav);
-	auto cpuFromGpu = [gpuStart, cpuStart, descriptorSize](D3D12_GPU_DESCRIPTOR_HANDLE gpu) {
-		D3D12_CPU_DESCRIPTOR_HANDLE cpu{};
-		if(!gpu.ptr || gpu.ptr < gpuStart.ptr) return cpu;
-		const SIZE_T offset = (gpu.ptr - gpuStart.ptr) / descriptorSize;
-		cpu.ptr = cpuStart.ptr + offset * descriptorSize;
-		return cpu;
+	auto writeFallback = [this, textureManager, materialIndex](D3D12_CPU_DESCRIPTOR_HANDLE dest) {
+		if(textureGuid_.isValid() && textureManager->WriteSrvTo(textureGuid_, dest)) return;
+		if(handle_ && !textureName_.empty() && textureManager->WriteSrvTo(textureName_, dest)) return;
+		if(modelData_) {
+			const auto& materials = modelData_->meshResource.Materials();
+			if(materialIndex < materials.size() && textureManager->WriteSrvTo(materials[materialIndex].textureFilePath, dest)) return;
+			if(!materials.empty() && textureManager->WriteSrvTo(materials[0].textureFilePath, dest)) return;
+		}
+		if(!textureName_.empty() && textureName_ != "textures/white1x1.dds" && textureManager->WriteSrvTo(textureName_, dest)) return;
+		textureManager->WriteSrvTo("textures/white1x1.dds", dest);
 	};
 
-	D3D12_CPU_DESCRIPTOR_HANDLE fallbackCpu = textureManager->GetCpuSrvHandle("textures/white1x1.dds");
-	if(auto fallbackGpu = GetTexSrv(materialIndex); fallbackGpu.ptr) {
-		if(auto cpu = cpuFromGpu(fallbackGpu); cpu.ptr) fallbackCpu = cpu;
+	for(uint32_t i = 0; i < kMaxGraphTextures; ++i) {
+		D3D12_CPU_DESCRIPTOR_HANDLE dest = textureTable.cpu;
+		dest.ptr += static_cast<SIZE_T>(i) * descriptorSize;
+		writeFallback(dest);
 	}
-
-	std::array<D3D12_CPU_DESCRIPTOR_HANDLE, kMaxGraphTextures> sourceCpu{};
-	sourceCpu.fill(fallbackCpu);
 
 	if(auto material = GetMaterialAsset()) {
 		uint32_t slot = 0;
@@ -524,27 +525,20 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t ma
 			if(node.type != "ObjectTexture" && node.type != "Texture2D") continue;
 			if(slot >= kMaxGraphTextures) break;
 
-			D3D12_CPU_DESCRIPTOR_HANDLE cpu = fallbackCpu;
+			D3D12_CPU_DESCRIPTOR_HANDLE dest = textureTable.cpu;
+			dest.ptr += static_cast<SIZE_T>(slot) * descriptorSize;
 			if(node.type == "ObjectTexture") {
 				if(material->objectTextureGuid.isValid()) {
-					D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(material->objectTextureGuid);
-					if(guidCpu.ptr) cpu = guidCpu;
+					textureManager->WriteSrvTo(material->objectTextureGuid, dest);
 				}
 			} else if(auto it = node.properties.find("textureGuid"); it != node.properties.end() && it->is_string()) {
 				const Guid guid = Guid::FromString(it->get<std::string>());
 				if(guid.isValid()) {
-					D3D12_CPU_DESCRIPTOR_HANDLE guidCpu = textureManager->GetCpuSrvHandle(guid);
-					if(guidCpu.ptr) cpu = guidCpu;
+					textureManager->WriteSrvTo(guid, dest);
 				}
 			}
-			sourceCpu[slot++] = cpu;
+			++slot;
 		}
-	}
-
-	for(uint32_t i = 0; i < kMaxGraphTextures; ++i) {
-		D3D12_CPU_DESCRIPTOR_HANDLE dest = textureTable.cpu;
-		dest.ptr += static_cast<SIZE_T>(i) * descriptorSize;
-		device->CopyDescriptorsSimple(1, dest, sourceCpu[i], D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	return textureTable.gpu;
