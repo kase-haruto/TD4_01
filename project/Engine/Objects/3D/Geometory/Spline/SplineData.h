@@ -1,6 +1,7 @@
 #pragma once
 #include <Engine/Foundation/Math/Vector3.h>
 #include <algorithm>
+#include <cstdint>
 #include <numeric>
 #include <vector>
 
@@ -41,12 +42,18 @@ public:
 	void InsertPoint(int index, const CalyxEngine::Vector3& p) {
 		index = std::clamp(index, 0, (int)points.size());
 		points.insert(points.begin() + index, SplinePoint{p});
+		MarkDirty();
 	}
 	void RemovePoint(int index) {
-		if(index >= 0 && index < (int)points.size()) points.erase(points.begin() + index);
+		if(index >= 0 && index < (int)points.size()) {
+			points.erase(points.begin() + index);
+			MarkDirty();
+		}
 	}
 
 	float TotalLength() const { return totalLength_; }
+	uint64_t Revision() const { return revision_; }
+	void	 MarkDirty() { ++revision_; }
 
 private:
 	// 内部ユーティリティ
@@ -63,4 +70,5 @@ private:
 	std::vector<float> sCumulative_;
 	float			   totalLength_		  = 0.0f;
 	int				   samplesPerSegment_ = 0;
+	uint64_t		   revision_		  = 0;
 };
