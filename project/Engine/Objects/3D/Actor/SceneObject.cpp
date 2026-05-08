@@ -46,6 +46,7 @@ void SceneObject::ShowGui() {}
 ///		子を含めて階層階層から完全に切り離すObject破棄
 /////////////////////////////////////////////////////////////////////////////////////////
 void SceneObject::Destroy() {
+	[[maybe_unused]] auto self = shared_from_this();
 	DestroyRecursive();
 }
 

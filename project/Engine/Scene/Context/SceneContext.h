@@ -76,11 +76,20 @@ public:
 	bool				   IsRuntime() const { return isRuntime_; }
 	CameraManager*		   GetCameraMgr() { return cameraMgr_.get(); }
 	SceneObject*		   GetDebugSelectedObject() const { return debugSelectedObject_; }
+	const std::vector<SceneObject*>& GetDebugSelectedObjects() const { return debugSelectedObjects_; }
 
 	// setter
 	void SetSceneName(const std::string& n) { sceneName_ = n; }
 	void SetRuntime(bool f) { isRuntime_ = f; }
-	void SetDebugSelectedObject(SceneObject* obj) { debugSelectedObject_ = obj; }
+	void SetDebugSelectedObject(SceneObject* obj) {
+		debugSelectedObject_ = obj;
+		debugSelectedObjects_.clear();
+		if(obj) debugSelectedObjects_.push_back(obj);
+	}
+	void SetDebugSelectedObjects(std::vector<SceneObject*> objects) {
+		debugSelectedObjects_ = std::move(objects);
+		debugSelectedObject_ = debugSelectedObjects_.empty() ? nullptr : debugSelectedObjects_.back();
+	}
 
 	/* ---------- callbacks ----------- */
 	/// 個別削除時に飛ぶコールバック
@@ -119,7 +128,8 @@ private:
 	std::string sceneName_ = "scene";
 	bool		isRuntime_ = false;
 
-	SceneObject* debugSelectedObject_ = nullptr;
+	SceneObject*			   debugSelectedObject_ = nullptr;
+	std::vector<SceneObject*> debugSelectedObjects_;
 
 	EventBus::Connection connObjectAdded_;
 	EventBus::Connection connObjectRemoved_;
