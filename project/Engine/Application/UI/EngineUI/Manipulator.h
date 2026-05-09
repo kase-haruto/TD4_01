@@ -9,6 +9,7 @@
 #include <externals/imgui/ImGuizmo.h>
 #include <externals/imgui/imgui.h>
 
+#include <vector>
 
 class WorldTransform;
 class BaseCamera;
@@ -43,6 +44,7 @@ namespace CalyxEngine {
 
 		//--------- accessor -----------------------------------------------------
 		void SetTarget(WorldTransform* target);
+		void SetTargets(const std::vector<WorldTransform*>& targets);
 		void SetCamera(BaseCamera* camera);
 		void SetViewRect(const ImVec2& origin, const ImVec2& size);
 
@@ -58,6 +60,8 @@ namespace CalyxEngine {
 		/// <param name="out"></param>
 		void				 RowToColumnArray(const CalyxEngine::Matrix4x4& m, float out[16]);
 		CalyxEngine::Matrix4x4 ColumnArrayToRow(const float in_[16]);
+		void				 ApplyWorldMatrix(WorldTransform* target, const CalyxEngine::Matrix4x4& worldEdited);
+		void				 RefreshPivot();
 
 		/// <summary>
 		/// ImGuizmo による操作・描画処理
@@ -72,6 +76,10 @@ namespace CalyxEngine {
 		std::unique_ptr<ScopedGizmoCommand> scopedCmd;
 
 		WorldTransform* target_ = nullptr;
+		std::vector<WorldTransform*> targets_;
+		WorldTransform pivotTarget_;
+		CalyxEngine::Matrix4x4 groupStartPivot_ = CalyxEngine::Matrix4x4::MakeIdentity();
+		std::vector<CalyxEngine::Matrix4x4> groupStartWorlds_;
 		BaseCamera*		camera_ = nullptr;
 
 		ImVec2 viewOrigin_ = {0, 0};

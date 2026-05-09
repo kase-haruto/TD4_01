@@ -119,7 +119,7 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 												   pso,
 												   renderCam,
 												   *modelRenderer_,
-												   sceneContext_->GetDebugSelectedObject());
+												   sceneContext_->GetDebugSelectedObjects());
 	}
 #endif
 

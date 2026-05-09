@@ -1,5 +1,6 @@
 #include "ShockwaveManager.h"
 #include "Engine/Scene/Utility/SceneUtility.h"
+#include "Game\Stage\Stage.h"
 
 ShockwaveManager* ShockwaveManager::GetInstance() {
 	static ShockwaveManager instance;
@@ -37,5 +38,13 @@ void ShockwaveManager::Emit(const CalyxEngine::Vector3& pos, float scaleMultipli
 void ShockwaveManager::Clear() {
 	for (auto& sw : pool_) {
 		sw->Deactivate();
+	}
+}
+
+void ShockwaveManager::CheckTakeDamageForStage() {
+	if(!stage_) return;
+	for(auto& sw : pool_) {
+		if(!sw->IsTakeDamageForStage()) continue;
+		stage_->TakeDamage(1);
 	}
 }

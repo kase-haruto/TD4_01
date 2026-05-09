@@ -6,6 +6,7 @@
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include <Engine/Objects/3D/Actor/SplineDeformObject.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/System/Command/EditorCommand/LevelEditorCommand/CreateObjectCommand/CreateObjectCommand.h>
@@ -106,6 +107,27 @@ namespace CalyxEngine {
 									  return obj;
 								  }});
 		}
+
+		shapeItems.push_back({PlaceItemCategory::Shape,
+							  "Spline Wall Deform",
+							  AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/cylinder.dds"),
+							  {64, 64},
+							  []([[maybe_unused]] const CalyxEngine::Vector3& pos) {
+								  auto factory = []() {
+									  auto obj = SceneAPI::Instantiate<SplineDeformObject>();
+									  obj->Initialize();
+									  return obj;
+								  };
+								  CommandManager::GetInstance()->Execute(
+									  std::make_unique<CreateObjectCommand<SplineDeformObject>>(
+										  SceneContext::Current(), factory, "Create Spline Wall Deform"));
+							  },
+							  []() {
+								  auto obj = SceneAPI::Instantiate<SplineDeformObject>();
+								  obj->Initialize();
+								  obj->SetTransient(true);
+								  return obj;
+							  }});
 
 		// ---------------------------- Particle ----------------------------------
 		{

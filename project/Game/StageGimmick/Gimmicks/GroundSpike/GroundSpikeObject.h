@@ -23,6 +23,8 @@ public:
 	// 飛び出す
 	void Spike();
 
+	void OnCollisionEnter(Collider* other) override;
+
 protected:
 
 	// 初期化
@@ -35,6 +37,7 @@ private:
 
 	// 飛び出しているか
 	bool isSpike_ = false;
+	bool isBreak_ = false;
 
 	float time_ = 0.0f;
 

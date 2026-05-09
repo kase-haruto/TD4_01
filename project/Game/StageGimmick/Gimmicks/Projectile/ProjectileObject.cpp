@@ -45,15 +45,15 @@ void ProjectileObject::ObjectInitialize() {
 void ProjectileObject::ObjectUpdate(float dt) {
 
 	if(!isFlying_) {
+		if(isHoming_) {
+			auto player	  = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
+			velocity_ = player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
+		} else {
+			velocity_ = CalyxEngine::Vector3(0.0f, -0.5f, -1.0f);
+		}
 		return;
 	}
-	auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
-	CalyxEngine::Vector3 velocity = player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
 
-	if(!isHoming_){
-		velocity = CalyxEngine::Vector3(0.0f, -0.5f, -1.0f);
-	}
-
-	velocity = velocity.Normalize() * speed_ * dt;
-	worldTransform_.translation += velocity;
+	velocity_ = velocity_.Normalize() * speed_ * dt;
+	worldTransform_.translation += velocity_;
 }

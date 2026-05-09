@@ -4,6 +4,8 @@
 #include "Engine/Foundation/Math/Vector3.h"
 #include <Game/DemoShockwave/Shockwave.h>
 
+class Stage;
+
 class ShockwaveManager {
 public:
 	static ShockwaveManager* GetInstance();
@@ -20,6 +22,10 @@ public:
 	/// <summary> 全てを非アクティブ </summary>
 	void Clear();
 
+	void CheckTakeDamageForStage();
+
+	void SetStage(Stage* pStage) { stage_ = pStage; }
+
 private:
 	ShockwaveManager() = default;
 	~ShockwaveManager() = default;
@@ -28,4 +34,5 @@ private:
 
 private:
 	std::vector<std::shared_ptr<Shockwave>> pool_;
+	Stage*									stage_;
 };
