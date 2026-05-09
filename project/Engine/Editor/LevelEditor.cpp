@@ -1133,7 +1133,18 @@ namespace CalyxEngine {
 			}
 		} else if(type == ViewportType::VIEWPORT_DEBUG) {
 			if(debugViewport_ && debugViewport_->IsShow()) {
+				const bool focusDebugViewport = startupDebugViewportFocusFrames_ > 0;
+				if(focusDebugViewport) {
+					ImGui::SetNextWindowFocus();
+				}
+
 				debugViewport_->Render(tex);
+
+				if(focusDebugViewport) {
+					ImGui::SetWindowFocus("Debug Viewport");
+					--startupDebugViewportFocusFrames_;
+				}
+
 				DrawViewportSelectionRect();
 			}
 		} //else if(type == ViewportType::VIEWPORT_PICKING) {
