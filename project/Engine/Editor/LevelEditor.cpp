@@ -656,6 +656,9 @@ namespace CalyxEngine {
 
 		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect) {
 			UpdateParticlePreviewContext(ClockManager::GetInstance()->GetDeltaTime());
+			if(particlePreviewContext_) {
+				particlePreviewContext_->MakeCurrent();
+			}
 		}
 
 		SceneContext* ctx = SceneContext::Current();
@@ -715,6 +718,9 @@ namespace CalyxEngine {
 		NotifySceneContextChanged();
 		prevCtx_ = SceneContext::Current();
 		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect && particlePreviewFx_) {
+			if(particlePreviewContext_) {
+				particlePreviewContext_->MakeCurrent();
+			}
 			SetSelectedObject(particlePreviewFx_);
 		}
 
@@ -742,6 +748,12 @@ namespace CalyxEngine {
 	// Render
 	//=============================================================================
 	void LevelEditor::Render() {
+		SceneContext* previousContext = nullptr;
+		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect && particlePreviewContext_) {
+			previousContext = SceneContext::Current();
+			particlePreviewContext_->MakeCurrent();
+		}
+
 		// 各パネル描画
 		for(auto* p : editorPanels_) {
 			if(p->IsShow()) {
@@ -767,6 +779,10 @@ namespace CalyxEngine {
 		// SceneObjectEditor 側の更新（マニピュレータなど）
 		if(sceneEditor_) {
 			sceneEditor_->Update();
+		}
+
+		if(previousContext && previousContext != particlePreviewContext_.get()) {
+			previousContext->MakeCurrent();
 		}
 	}
 
