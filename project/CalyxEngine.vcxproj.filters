@@ -58,6 +58,9 @@
     <Filter Include="Engine\Renderer">
       <UniqueIdentifier>{AE427BE0-C314-4A29-A19E-5C70AAB41662}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Renderer\Grid">
+      <UniqueIdentifier>{E1D96240-6544-4BC7-8713-9DAD5FA23C80}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Scene">
       <UniqueIdentifier>{0A76956C-D5EB-4B58-AFB0-B395B8473E24}</UniqueIdentifier>
     </Filter>
@@ -855,6 +858,12 @@
     <ClCompile Include="Data\Engine\Configs\Scene\Objects\Particle\Module\ModuleConfig.cpp">
       <Filter>Data\Engine\Configs\Scene\Objects\Particle\Module</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Application\Effects\EffectAsset.cpp">
+      <Filter>Engine\Application\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Application\Effects\EffectPlayer.cpp">
+      <Filter>Engine\Application\Effects</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Application\Effects\FxGuiHelpers.cpp">
       <Filter>Engine\Application\Effects</Filter>
     </ClCompile>
@@ -971,6 +980,9 @@
     </ClCompile>
     <ClCompile Include="Engine\PostProcess\Manager\PostEffectManager.cpp">
       <Filter>Engine\PostProcess\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\Grid\GridRenderer.cpp">
+      <Filter>Engine\Renderer\Grid</Filter>
     </ClCompile>
     <ClCompile Include="Game\Scene\Utility\SceneTypeUtil.cpp">
       <Filter>Game\Scene\Utility</Filter>
@@ -1508,6 +1520,12 @@
       <Filter>Data\Engine\Configs\Scene\Objects\Particle</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Application\Effects\FxGuiHelpers.h">
+      <Filter>Engine\Application\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Application\Effects\EffectAsset.h">
+      <Filter>Engine\Application\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Application\Effects\EffectPlayer.h">
       <Filter>Engine\Application\Effects</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Application\Effects\FxObject.h">
@@ -2163,6 +2181,9 @@
     </ClInclude>
     <ClInclude Include="Engine\PostProcess\GrayScale\GrayScale.h">
       <Filter>Engine\PostProcess\GrayScale</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\Grid\GridRenderer.h">
+      <Filter>Engine\Renderer\Grid</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Application\UI\GUI\ImGuiManager.h">
       <Filter>Engine\Application\UI\GUI</Filter>

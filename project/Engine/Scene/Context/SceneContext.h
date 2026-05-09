@@ -4,6 +4,7 @@
 /* ===================================================================== */
 
 // engine
+#include <Engine/Application/Effects/EffectPlayer.h>
 #include <Engine/Application/Effects/FxSystem.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Lighting/LightLibrary.h>
@@ -72,6 +73,7 @@ public:
 	SceneObjectLibrary*	   GetObjectLibrary() const { return objectLibrary_.get(); }
 	LightLibrary*		   GetLightLibrary() const { return lightLibrary_.get(); }
 	CalyxEngine::FxSystem* GetFxSystem() const { return fxSystem_.get(); }
+	CalyxEngine::EffectPlayer* GetEffectPlayer() const { return effectPlayer_.get(); }
 	std::string			   GetSceneName() const { return sceneName_; }
 	bool				   IsRuntime() const { return isRuntime_; }
 	CameraManager*		   GetCameraMgr() { return cameraMgr_.get(); }
@@ -119,6 +121,7 @@ private:
 	std::unique_ptr<SceneObjectLibrary>	   objectLibrary_;
 	std::unique_ptr<LightLibrary>		   lightLibrary_;
 	std::unique_ptr<CalyxEngine::FxSystem> fxSystem_;
+	std::unique_ptr<CalyxEngine::EffectPlayer> effectPlayer_;
 	std::unique_ptr<CameraManager>		   cameraMgr_;
 
 	ObjectRemovedCallback			   onEditorObjectRemoved_;

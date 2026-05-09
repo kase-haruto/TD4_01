@@ -467,6 +467,32 @@ GraphicsPipelineDesc PipelinePresets::MakeGpuParticle(BlendMode mode) {
 	return desc;
 }
 
+GraphicsPipelineDesc PipelinePresets::MakeEditorInfiniteGrid() {
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = FALSE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	depthDesc.StencilEnable = FALSE;
+
+	GraphicsPipelineDesc desc;
+	desc.VS(L"EditorInfiniteGrid.VS.hlsl")
+		.PS(L"EditorInfiniteGrid.PS.hlsl")
+		.Blend(BlendMode::ALPHA)
+		.CullNone()
+		.DepthState(depthDesc)
+		.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+		.Samples(1);
+
+	desc.inputElems_.clear();
+
+	desc.root_
+		.AllowIA()
+		.CBV(0, D3D12_SHADER_VISIBILITY_ALL)
+		.CBV(1, D3D12_SHADER_VISIBILITY_ALL);
+
+	return desc;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //		2dObject
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -47,6 +47,10 @@ namespace CalyxEngine {
 		//--------- debugUi ---------------------------------------------------
 		void ShowGui() override;
 		void LoadFromPath(const std::string& path);
+		bool SaveEffectAsset(const std::string& path);
+		bool LoadEffectAsset(const std::string& path);
+		size_t GetLiveEmitterCount() const;
+		uint64_t GetEmitterRevision() const { return emitterRevision_; }
 
 		//--------- json ------------------------------------------------------
 		/// <summary>
@@ -90,6 +94,7 @@ namespace CalyxEngine {
 		//===================================================================*/
 		ConfigurableObject<EffectObjectConfig>			 config_;
 		std::vector<std::weak_ptr<ParticleSystemObject>> emitters_;
+		uint64_t										 emitterRevision_ = 0;
 	};
 
 } // namespace CalyxEngine

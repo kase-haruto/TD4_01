@@ -80,6 +80,7 @@ void PipelineService::RegisterAllPipelines() {
 		regObj(PipelineTag::Object::Particle, mode, PipelinePresets::MakeParticle);
 		regObj(PipelineTag::Object::GpuParticle, mode, PipelinePresets::MakeGpuParticle);
 	}
+	regObjNoBlend(PipelineTag::Object::EditorInfiniteGrid, PipelinePresets::MakeEditorInfiniteGrid);
 
 	//========================= Shadow ===================================
 	regObjNoBlend(PipelineTag::Object::OutlineObject3D, PipelinePresets::MakeOutlineObject3D);

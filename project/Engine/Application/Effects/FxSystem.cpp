@@ -11,12 +11,14 @@ namespace CalyxEngine {
 	/*===========================================================================*/
 	/*  ctor / dtor                                                              */
 	/*===========================================================================*/
-	FxSystem::FxSystem() {
+	FxSystem::FxSystem(SceneContext* owner)
+		: owner_(owner) {
 		particleRenderer_ = std::make_unique<ParticleRenderer>();
 
 		// 追加イベント
 		connAdd_ = EventBus::Subscribe<ObjectAdded>(
 			[this](const ObjectAdded& e) {
+				if(e.owner != owner_) return;
 				if(auto ps = std::dynamic_pointer_cast<ParticleSystemObject>(e.sp)) {
 					auto emitter = ps->GetEmitter(); // std::shared_ptr<CalyxEngine::BaseEmitter> など
 					if(emitter) {
@@ -28,6 +30,7 @@ namespace CalyxEngine {
 		// 削除イベント（SceneObject が消えたら GUID で emitter を外す）
 		connRem_ = EventBus::Subscribe<ObjectRemoved>(
 			[this](const ObjectRemoved& e) {
+				if(e.owner != owner_) return;
 				RemoveEmitterByGuid(e.sp->GetGuid());
 			});
 	}
@@ -81,6 +84,16 @@ namespace CalyxEngine {
 		}
 
 		// どちらでもなければ何もしない
+	}
+
+	Guid FxSystem::AddRuntimeEmitter(const std::shared_ptr<BaseEmitter>& emitter) {
+		const Guid ownerGuid = Guid::New();
+		AddEmitter(emitter, ownerGuid);
+		return ownerGuid;
+	}
+
+	void FxSystem::RemoveRuntimeEmitterOwner(const Guid& ownerGuid) {
+		RemoveEmitterByGuid(ownerGuid);
 	}
 
 	void FxSystem::RemoveEmitter(CalyxEngine::BaseEmitter* emitter) {
