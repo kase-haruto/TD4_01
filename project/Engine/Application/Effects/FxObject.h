@@ -95,6 +95,9 @@ namespace CalyxEngine {
 		ConfigurableObject<EffectObjectConfig>			 config_;
 		std::vector<std::weak_ptr<ParticleSystemObject>> emitters_;
 		uint64_t										 emitterRevision_ = 0;
+		bool                                             cameraDitherEnabled_ = false;
+		float                                            cameraDitherNear_ = 0.0f;
+		float                                            cameraDitherFar_ = 20.0f;
 	};
 
 } // namespace CalyxEngine

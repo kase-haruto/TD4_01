@@ -141,6 +141,28 @@ namespace CalyxEngine {
 			SaveEffectAsset("Resources/Assets/Effects/" + GetName() + ".effect");
 		}
 
+		if(ImGui::CollapsingHeader("Shared Particle Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
+			ImGui::Text("Camera Dither");
+			bool changed = false;
+			changed |= ImGui::Checkbox("Enable##fxCameraDither", &cameraDitherEnabled_);
+			ImGui::BeginDisabled(!cameraDitherEnabled_);
+			changed |= ImGui::DragFloat("Near##fxCameraDither", &cameraDitherNear_, 0.01f, 0.0f, 1000.0f);
+			changed |= ImGui::DragFloat("Far##fxCameraDither", &cameraDitherFar_, 0.01f, 0.0f, 1000.0f);
+			ImGui::EndDisabled();
+			if(cameraDitherFar_ < cameraDitherNear_) cameraDitherFar_ = cameraDitherNear_;
+
+			ImGui::SameLine();
+			if(ImGui::Button("Apply To All Emitters") || changed) {
+				for(auto& wp : emitters_) {
+					if(auto sp = wp.lock()) {
+						sp->GetEmitter()->SetCameraFadeEnabled(cameraDitherEnabled_);
+						sp->GetEmitter()->SetCameraFade(cameraDitherNear_, cameraDitherFar_);
+						sp->GetEmitter()->SetCameraFadeEnabled(cameraDitherEnabled_);
+					}
+				}
+			}
+		}
+
 		ImGui::SeparatorText("Emitters");
 
 		// タブバー開始

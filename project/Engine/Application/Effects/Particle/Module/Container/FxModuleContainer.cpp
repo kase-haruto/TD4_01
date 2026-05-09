@@ -140,14 +140,18 @@ namespace CalyxEngine {
 			ImGui::SameLine();
 
 			bool open = ImGui::CollapsingHeader(m->GetName().c_str());
+
+			ImGui::Indent();
+			bool remove = ImGui::SmallButton("Remove");
+			ImGui::Unindent();
+
 			if(open && enabled) {
 				ImGui::Indent();
 				m->ShowGuiContent();
 				ImGui::Unindent();
 			}
 
-			ImGui::SameLine();
-			if(ImGui::Button("Remove")) {
+			if(remove) {
 				it = modules_.erase(it);
 				ImGui::PopID();
 				continue;
