@@ -332,7 +332,7 @@ void Viewport::Render(const ImTextureID& tex) {
     // ============================================================
     // Drop target は Image の直後に固定（条件分岐の奥に入れない）
     // ============================================================
-    if(type_ == ViewportType::VIEWPORT_DEBUG) {
+    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
         if(ImGui::BeginDragDropTarget()) {
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_PLACE_ITEM")) {
                 const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(payload);
@@ -403,7 +403,7 @@ void Viewport::Render(const ImTextureID& tex) {
     // ============================================================
     // Ghost update（ドラッグ中＋画像矩形内のみ）
     // ============================================================
-    if(type_ == ViewportType::VIEWPORT_DEBUG) {
+    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
 
         const ImGuiPayload* dragPayload = ImGui::GetDragDropPayload();
         const bool draggingPlace = (dragPayload && dragPayload->IsDataType("DND_PLACE_ITEM"));
@@ -479,7 +479,7 @@ void Viewport::Render(const ImTextureID& tex) {
     }
 
     // ---------------- Overlay tools / gizmo ----------------
-    if(type_ == ViewportType::VIEWPORT_DEBUG) {
+    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
         ImGuizmo::SetRect(imagePos.x, imagePos.y, size_.x, size_.y);
         ImGuizmo::SetDrawlist();
 

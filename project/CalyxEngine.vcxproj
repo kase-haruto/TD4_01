@@ -234,6 +234,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Data\Engine\Configs\Scene\Objects\Particle\Module\ModuleConfig.cpp">
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
+    <ClCompile Include="Engine\Application\Effects\EffectAsset.cpp" />
+    <ClCompile Include="Engine\Application\Effects\EffectPlayer.cpp" />
     <ClCompile Include="Engine\Application\Effects\FxGuiHelpers.cpp" />
     <ClCompile Include="Engine\Application\Effects\FxObject.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Module\OverLifetime\OverLifetimeModule.cpp" />
@@ -289,6 +291,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Objects\Event\Camera\CameraEventObject.cpp" />
     <ClCompile Include="Engine\PostProcess\Blend\BlendEffect.cpp" />
     <ClCompile Include="Engine\PostProcess\Manager\PostEffectManager.cpp" />
+    <ClCompile Include="Engine\Renderer\Grid\GridRenderer.cpp" />
     <ClCompile Include="Game\DemoPlayer\DemoPlayer.cpp" />
     <ClCompile Include="Game\DemoHammer\DemoHammer.cpp" />
     <ClCompile Include="Game\DemoShockwave\Shockwave.cpp" />
@@ -505,6 +508,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Event\EventConfig.h" />
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Particle\EffectConfig.h" />
     <ClInclude Include="Engine\Application\Effects\FxGuiHelpers.h" />
+    <ClInclude Include="Engine\Application\Effects\EffectAsset.h" />
+    <ClInclude Include="Engine\Application\Effects\EffectPlayer.h" />
     <ClInclude Include="Engine\Application\Effects\FxObject.h" />
     <ClInclude Include="Engine\Application\Effects\Particle\Emitter\EmitterDetails.h" />
     <ClInclude Include="Engine\Application\Effects\Particle\Module\OverLifetime\OverLifetimeModule.h" />
@@ -759,6 +764,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\RenderTarget\Interface\IRenderTarget.h" />
     <ClInclude Include="Engine\PostProcess\Interface\IPostEffectPass.h" />
     <ClInclude Include="Engine\PostProcess\GrayScale\GrayScale.h" />
+    <ClInclude Include="Engine\Renderer\Grid\GridRenderer.h" />
     <ClInclude Include="Engine\Application\UI\GUI\ImGuiManager.h" />
     <ClInclude Include="Engine\Foundation\Utility\Func\DxFunc.h" />
     <ClInclude Include="Engine\Foundation\Utility\Func\MyFunc.h" />

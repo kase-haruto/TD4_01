@@ -60,6 +60,7 @@ namespace CalyxEngine {
 		ViewportType	   GetType() const;
 		void			   SetCamera(BaseCamera* camera);
 		void			   SetPickingPass(PickingPass* pickingPass) { pickingPass_ = pickingPass; }
+		void			   SetOverlayToolsEnabled(bool enabled) { overlayToolsEnabled_ = enabled; }
 
 	private:
 		ImVec2 CalcToolPosition(IOnViewportTool* tool,
@@ -87,6 +88,7 @@ namespace CalyxEngine {
 		bool			   isHovered_	 = false;
 		bool			   isClicked_	 = false;
 		bool			   wasTriggered_ = false;
+		bool			   overlayToolsEnabled_ = true;
 
 		std::shared_ptr<SceneObject> ghost_		  = nullptr;
 		GhostKind					 ghostKind_	  = GhostKind::None;

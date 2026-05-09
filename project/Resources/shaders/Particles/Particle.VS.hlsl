@@ -43,7 +43,8 @@ struct BillboardParm {
 struct FadeParm {
 	float fadeNear;
 	float fadeFar;
-	float2 fadePad;
+	uint enabled;
+	float fadePad;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,7 +131,7 @@ VertexShaderOutput main(VertexShaderInput input,
 	// ---- カメラ距離によるフェード ----
 	float dist = length(worldPos - gCamera.cameraPosition);
 	float cameraFade = 1.0f;
-	if(gFadeParm.fadeFar > gFadeParm.fadeNear) {
+	if(gFadeParm.enabled != 0 && gFadeParm.fadeFar > gFadeParm.fadeNear) {
 		cameraFade = saturate((dist - gFadeParm.fadeNear) / (gFadeParm.fadeFar - gFadeParm.fadeNear));
 	}
 

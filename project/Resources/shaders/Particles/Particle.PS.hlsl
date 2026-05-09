@@ -66,7 +66,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	float ditherThreshold = kBayerMatrix[pixelPos.y][pixelPos.x];
 
 	// カメラ近傍フェード値(0.0〜1.0)に基づいてピクセルを破棄
-	// fadeNear/Far が設定されていない(0,0)場合は常に 1.0 になり、破棄されない
+	// 無効時は VS 側で常に 1.0 にしているため破棄されない
 	if(input.fade < ditherThreshold) {
 		discard;
 	}

@@ -62,6 +62,7 @@ namespace CalyxEngine {
 		billboardParams_.mode = static_cast<uint32_t>(billboardMode_);
 		billboardCB_.Initialize(device);
 		billboardCB_.TransferData(billboardParams_);
+		fadeCB_.TransferData(fadeParams_);
 
 		// 各種パラメータ
 		velocity_ = FxParam<CalyxEngine::Vector3>::MakeRandom(CalyxEngine::Vector3(-1.0f,0.0f,-1.0f),
@@ -436,6 +437,29 @@ namespace CalyxEngine {
 				}
 			}
 
+			// ================= Camera Dither =================
+			if(FxGui::GridScope sec{"Camera Dither"}; sec.open) {
+				FxGui::RowLabel("Enable");
+				bool enabled = IsCameraDitherEnabled();
+				if(GuiCmd::CheckBox("##cameraDitherEnable",enabled)) {
+					SetCameraFadeEnabled(enabled);
+				}
+
+				ImGui::BeginDisabled(!enabled);
+				FxGui::RowLabel("Near");
+				if(GuiCmd::DragFloat("##cameraDitherNear",fadeParams_.fadeNear,0.01f,0.0f,1000.0f)) {
+					if(fadeParams_.fadeFar < fadeParams_.fadeNear) fadeParams_.fadeFar = fadeParams_.fadeNear;
+					fadeCB_.TransferData(fadeParams_);
+				}
+
+				FxGui::RowLabel("Far");
+				if(GuiCmd::DragFloat("##cameraDitherFar",fadeParams_.fadeFar,0.01f,0.0f,1000.0f)) {
+					if(fadeParams_.fadeFar < fadeParams_.fadeNear) fadeParams_.fadeNear = fadeParams_.fadeFar;
+					fadeCB_.TransferData(fadeParams_);
+				}
+				ImGui::EndDisabled();
+			}
+
 			// ================= Params =================
 			if(FxGui::GridScope sec{"Params"}; sec.open) {
 				FxGui::DrawParam("Scale",scale_);
@@ -599,6 +623,10 @@ namespace CalyxEngine {
 		billboardMode_   = config.billboardMode;
 		SetFlag(RandomSpinEmit,config.randomSpinEmit);
 		SetFlag(FollowOneShot,config.followOneShot);
+		fadeParams_.enabled = config.cameraDitherEnabled ? 1u : 0u;
+		fadeParams_.fadeNear = config.cameraDitherNear;
+		fadeParams_.fadeFar = config.cameraDitherFar;
+		fadeCB_.TransferData(fadeParams_);
 		blendMode_ = config.blendMode;
 		shape_ = config.emitterShape;
 		shapeSize_ = config.shapeSize;
@@ -637,6 +665,9 @@ namespace CalyxEngine {
 		config.emitDelay     = emitDelay_;
 		config.emitDuration  = emitDuration_;
 		config.billboardMode = billboardMode_;
+		config.cameraDitherEnabled = IsCameraDitherEnabled();
+		config.cameraDitherNear = fadeParams_.fadeNear;
+		config.cameraDitherFar = fadeParams_.fadeFar;
 		config.blendMode     = blendMode_;
 		config.emitterShape  = shape_;
 		config.shapeSize     = shapeSize_;
@@ -691,6 +722,13 @@ namespace CalyxEngine {
 	void FxEmitter::SetCameraFade(float nearZ,float farZ) {
 		fadeParams_.fadeNear = nearZ;
 		fadeParams_.fadeFar  = farZ;
+		fadeParams_.enabled  = 1u;
+		fadeCB_.TransferData(fadeParams_);
+	}
+
+	void FxEmitter::SetCameraFadeEnabled(bool enabled) {
+		fadeParams_.enabled = enabled ? 1u : 0u;
+		fadeCB_.TransferData(fadeParams_);
 	}
 
 	// ---- callback ----

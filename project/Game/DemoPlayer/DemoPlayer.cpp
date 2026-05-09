@@ -204,6 +204,38 @@ void DemoPlayer::Move(float dt) {
 
 	// ジャンプ回転の更新
 	if(isJumping_) {
+		if(!isDiving_) {
+			// 通常ジャンプの場合、残りの滞空時間に合わせて回転速度をに調整
+			bool isJumpPush =
+				CalyxFoundation::Input::PushKey(DIK_SPACE) || CalyxFoundation::Input::PushGamepadButton(CalyxFoundation::PadButton::A);
+			float currentGravity = param_.gravity;
+			if(!isJumpPush && velocity_.y > 0.0f) {
+				currentGravity *= param_.variableJumpMultiplier;
+			}
+
+			float remainingTime = 0.0f;
+			if(velocity_.y > 0.0f) {
+				// 頂点までの時間 + 頂点から地面までの時間
+				float tToApex	 = velocity_.y / currentGravity;
+				float apexHeight = worldTransform_.translation.y + (velocity_.y * velocity_.y) / (2.0f * currentGravity);
+				float tFromApex	 = std::sqrt(2.0f * (std::max)(0.0f, apexHeight) / param_.gravity);
+				remainingTime	 = tToApex + tFromApex;
+			} else {
+				// 地面までの落下時間
+				float v	  = -velocity_.y; // 落下速度
+				float y	  = (std::max)(0.0f, worldTransform_.translation.y);
+				float g	  = param_.gravity;
+				float det = v * v + 2.0f * g * y;
+				if(det > 0.0f) {
+					remainingTime = (-v + std::sqrt(det)) / g;
+				}
+			}
+
+			if(remainingTime > 0.001f) {
+				jumpRotationSpeed_ = jumpRotationRemaining_ / remainingTime;
+			}
+		}
+
 		if(jumpRotationRemaining_ > 0.0f) {
 			float rotateAmount = jumpRotationSpeed_ * dt;
 			if(rotateAmount > jumpRotationRemaining_) {
@@ -231,8 +263,16 @@ void DemoPlayer::Move(float dt) {
 }
 
 void DemoPlayer::ApplyGravity(float dt) {
+	// 可変ジャンプ：上昇中にボタンを離していたら重力を強くする
+	float gravity = param_.gravity;
+	bool  isJumpPush =
+		CalyxFoundation::Input::PushKey(DIK_SPACE) || CalyxFoundation::Input::PushGamepadButton(CalyxFoundation::PadButton::A);
+	if(isJumping_ && !isDiving_ && !isJumpPush && velocity_.y > 0.0f) {
+		gravity *= param_.variableJumpMultiplier;
+	}
+
 	// 重力加算
-	velocity_.y -= param_.gravity * dt;
+	velocity_.y -= gravity * dt;
 
 	// 接地判定（Y=0を床とする）
 	if(worldTransform_.translation.y <= 0.0f) {
