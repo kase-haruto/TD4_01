@@ -61,6 +61,7 @@ namespace CalyxEngine {
 		 * @param obj
 		 */
 		void SetSelectedObject(std::weak_ptr<SceneObject> obj);
+		void SetSelectedObjects(const std::vector<std::weak_ptr<SceneObject>>& objects);
 		/**
 		 * @調整先のエディタをセット
 		 * @param editor
@@ -77,9 +78,12 @@ namespace CalyxEngine {
 
 		void RenderSidebar();
 		void RenderContent();
+		void RenderMultiSelection();
+		bool IsMultiSelectionAllBaseGameObjects() const;
 
 		BaseEditor*                selectedEditor_ = nullptr;
 		std::weak_ptr<SceneObject> selectedObject_;
+		std::vector<std::weak_ptr<SceneObject>> selectedObjects_;
 		SceneObjectEditor*         sceneObjectEditor_ = nullptr;
 
 		int                       currentTabIndex_ = 0;

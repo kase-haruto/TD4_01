@@ -53,6 +53,7 @@ public:
 	 */
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& textureName) const;
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuSrvHandle(const std::string& textureName) const;
+	bool WriteSrvTo(const std::string& textureName, D3D12_CPU_DESCRIPTOR_HANDLE destination) const;
 
 	/**
 	 * \brief ロード済みテクスチャリストを取得
@@ -75,6 +76,7 @@ public:
 	 */
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const Guid& guid) const;
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuSrvHandle(const Guid& guid) const;
+	bool WriteSrvTo(const Guid& guid, D3D12_CPU_DESCRIPTOR_HANDLE destination) const;
 
 	/**
 	 * \brief 指定したGUIDのテクスチャがロードされているか

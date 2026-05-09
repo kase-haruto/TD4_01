@@ -76,11 +76,16 @@ namespace CalyxEngine {
 		void SetSelectedEditor(BaseEditor* editor);
 		/// SceneObject の選択（shared_ptr で受けて内部では weak_ptr で保持）
 		void SetSelectedObject(const std::shared_ptr<SceneObject>& sp);
+		void ToggleSelectedObject(const std::shared_ptr<SceneObject>& sp);
+		void SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects);
+		bool IsSelectedObject(const SceneObject* object) const;
+		std::shared_ptr<SceneObject> GetPrimarySelectedObject() const;
 
 		/// シーンへのオブジェクト追加（Prefab / PlaceTool などから呼ばれる）
 		void CreateObject(const std::shared_ptr<SceneObject>& obj);
 		/// シーンからオブジェクト削除（階層パネルなどから呼ばれる）
 		void DeleteObject(const std::shared_ptr<SceneObject>& sp);
+		void DeleteSelectedObjects();
 
 		// ビューポート関連 --------------------------------------------------------
 		void RenderViewport(ViewportType type, const ImTextureID& tex);
@@ -97,6 +102,12 @@ namespace CalyxEngine {
 	private:
 		// マウスピッキング関連 ----------------------------------------------------
 		void		 TryPickUnderCursor();
+		void		 UpdateViewportSelectionInput();
+		void		 SelectObjectsInViewportRect(const CalyxEngine::Vector2& startLocal,
+												 const CalyxEngine::Vector2& endLocal,
+												 bool append);
+		bool		 ProjectObjectToViewport(SceneObject* object, CalyxEngine::Vector2& outLocal) const;
+		void		 DrawViewportSelectionRect() const;
 		void		 TryPickObjectFromMouse(const CalyxEngine::Vector2&	mouse,
 											const CalyxEngine::Vector2&	viewportSize,
 											const CalyxEngine::Matrix4x4& view,
@@ -156,8 +167,12 @@ namespace CalyxEngine {
 		SceneContext* prevCtx_		  = nullptr;
 		BaseEditor*	  selectedEditor_ = nullptr;
 		/// SceneObject 選択は weak_ptr で保持（寿命を伸ばさない）
-		std::weak_ptr<SceneObject> selectedObject_;
+		std::vector<std::weak_ptr<SceneObject>> selectedObjects_;
 		nlohmann::json			   livePPSnapshot_;
+		bool					   rangeSelectCandidate_ = false;
+		bool					   rangeSelecting_ = false;
+		CalyxEngine::Vector2	   rangeSelectStart_{};
+		CalyxEngine::Vector2	   rangeSelectEnd_{};
 
 		// Editors メニューに並べるパネル群
 		std::vector<IEngineUI*> editorPanels_;

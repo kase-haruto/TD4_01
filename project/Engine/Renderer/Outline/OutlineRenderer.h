@@ -29,6 +29,13 @@ public:
 								  const Camera3d* camera,
 								  const ModelRenderer& modelRenderer,
 								  const SceneObject* selected);
+	void RenderSelectionHighlight(ID3D12GraphicsCommandList* cmdList,
+								  ID3D12Device* device,
+								  IRenderTarget* rt,
+								  PipelineService* psoService,
+								  const Camera3d* camera,
+								  const ModelRenderer& modelRenderer,
+								  const std::vector<SceneObject*>& selectedObjects);
 
 private:
 	struct CompositeConstants {

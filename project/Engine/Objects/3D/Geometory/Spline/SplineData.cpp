@@ -118,10 +118,12 @@ float SplineData::DistanceToT(float distance) const {
 	if(sCumulative_.empty() || totalLength_ <= 0.0f) return 0.0f;
 	// 端を扱う
 	float d = distance;
-	// ループさせたい場合：
-	d = std::fmod(d, totalLength_);
-	if(d < 0.0f) d += totalLength_;
-	// 非ループで止めたい場合は std::clamp(d, 0, totalLength_) にする
+	if(closed) {
+		d = std::fmod(d, totalLength_);
+		if(d < 0.0f) d += totalLength_;
+	} else {
+		d = std::clamp(d, 0.0f, totalLength_);
+	}
 
 	// 二分探索で sCumulative_ から t を補間
 	auto it = std::lower_bound(sCumulative_.begin(), sCumulative_.end(), d);

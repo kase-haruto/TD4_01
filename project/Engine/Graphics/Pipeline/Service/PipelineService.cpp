@@ -131,14 +131,10 @@ void PipelineService::SetCommand(const GraphicsPipelineDesc& desc, ID3D12Graphic
 }
 
 void PipelineService::SetCommand(const PipelineSet& set, ID3D12GraphicsCommandList* cmd) const {
-	if (set.pipelineState != lastPipelineState_){
-		cmd->SetPipelineState(set.pipelineState);
-		lastPipelineState_ = set.pipelineState;
-	}
-	if (set.rootSignature != lastRootSignature_){
-		cmd->SetGraphicsRootSignature(set.rootSignature);
-		lastRootSignature_ = set.rootSignature;
-	}
+	cmd->SetPipelineState(set.pipelineState);
+	cmd->SetGraphicsRootSignature(set.rootSignature);
+	lastPipelineState_ = set.pipelineState;
+	lastRootSignature_ = set.rootSignature;
 }
 
 const PipelineSet PipelineService::GetPipelineSet(const GraphicsPipelineDesc& desc) const {

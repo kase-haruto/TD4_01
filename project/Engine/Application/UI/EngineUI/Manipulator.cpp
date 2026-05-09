@@ -7,12 +7,15 @@
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Editor/SceneObjectEditor.h>
 #include <Engine/Foundation/Math/Matrix4x4.h>
+#include <Engine/Foundation/Math/MathUtil.h>
 #include <Engine/Foundation/Utility/Func/CxUtils.h>
 #include <Engine/Graphics/Camera/Base/BaseCamera.h>
 #include <Engine/Objects/Transform/Transform.h>
 #include <Engine/Renderer/Primitive/PrimitiveDrawer.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/System/Command/Manager/CommandManager.h>
+
+#include <algorithm>
 
 namespace CalyxEngine {
 
@@ -31,6 +34,24 @@ namespace CalyxEngine {
 		if(target_ != target) {
 			target_ = target;
 		}
+		targets_.clear();
+		if(target) {
+			targets_.push_back(target);
+		}
+	}
+
+	void Manipulator::SetTargets(const std::vector<WorldTransform*>& targets) {
+		targets_.clear();
+		for(auto* target : targets) {
+			if(!target) continue;
+			if(std::find(targets_.begin(), targets_.end(), target) != targets_.end()) continue;
+			targets_.push_back(target);
+		}
+		target_ = targets_.empty() ? nullptr : targets_.back();
+		if(targets_.size() <= 1) {
+			return;
+		}
+		RefreshPivot();
 	}
 
 	void Manipulator::SetCamera(BaseCamera* camera) {
@@ -45,12 +66,130 @@ namespace CalyxEngine {
 	void Manipulator::Update() {
 	}
 
+	void Manipulator::RefreshPivot() {
+		if(targets_.empty() || wasUsing) return;
+
+		CalyxEngine::Vector3 center = CalyxEngine::Vector3::Zero();
+		int count = 0;
+		for(auto* target : targets_) {
+			if(!target) continue;
+			center += target->GetWorldPosition();
+			++count;
+		}
+		if(count == 0) return;
+
+		center /= static_cast<float>(count);
+		pivotTarget_.Initialize();
+		pivotTarget_.scale = {1.0f, 1.0f, 1.0f};
+		pivotTarget_.rotation = CalyxEngine::Quaternion::MakeIdentity();
+		pivotTarget_.translation = center;
+		pivotTarget_.Update();
+	}
+
+	void Manipulator::ApplyWorldMatrix(WorldTransform* target, const CalyxEngine::Matrix4x4& worldEdited) {
+		if(!target) return;
+
+		float worldCol[16];
+		RowToColumnArray(worldEdited, worldCol);
+		float pW[3], rW[3], sW[3];
+		ImGuizmo::DecomposeMatrixToComponents(worldCol, pW, rW, sW);
+
+		CalyxEngine::Matrix4x4 rotMat = worldEdited;
+		if(std::abs(sW[0]) > 0.0001f) {
+			rotMat.m[0][0] /= sW[0];
+			rotMat.m[0][1] /= sW[0];
+			rotMat.m[0][2] /= sW[0];
+		}
+		if(std::abs(sW[1]) > 0.0001f) {
+			rotMat.m[1][0] /= sW[1];
+			rotMat.m[1][1] /= sW[1];
+			rotMat.m[1][2] /= sW[1];
+		}
+		if(std::abs(sW[2]) > 0.0001f) {
+			rotMat.m[2][0] /= sW[2];
+			rotMat.m[2][1] /= sW[2];
+			rotMat.m[2][2] /= sW[2];
+		}
+		rotMat.m[3][0] = rotMat.m[3][1] = rotMat.m[3][2] = 0.0f;
+		rotMat.m[3][3] = 1.0f;
+		const CalyxEngine::Quaternion worldRot = CalyxEngine::Quaternion::FromMatrix(rotMat);
+
+		if(target->parent) {
+			CalyxEngine::Vector3 pScl = {
+				CalyxEngine::Vector3(target->parent->matrix.world.m[0][0], target->parent->matrix.world.m[0][1], target->parent->matrix.world.m[0][2]).Length(),
+				CalyxEngine::Vector3(target->parent->matrix.world.m[1][0], target->parent->matrix.world.m[1][1], target->parent->matrix.world.m[1][2]).Length(),
+				CalyxEngine::Vector3(target->parent->matrix.world.m[2][0], target->parent->matrix.world.m[2][1], target->parent->matrix.world.m[2][2]).Length()};
+
+			CalyxEngine::Matrix4x4 pRotMat = target->parent->matrix.world;
+			if(pScl.x > 0.0001f) {
+				pRotMat.m[0][0] /= pScl.x;
+				pRotMat.m[0][1] /= pScl.x;
+				pRotMat.m[0][2] /= pScl.x;
+			}
+			if(pScl.y > 0.0001f) {
+				pRotMat.m[1][0] /= pScl.y;
+				pRotMat.m[1][1] /= pScl.y;
+				pRotMat.m[1][2] /= pScl.y;
+			}
+			if(pScl.z > 0.0001f) {
+				pRotMat.m[2][0] /= pScl.z;
+				pRotMat.m[2][1] /= pScl.z;
+				pRotMat.m[2][2] /= pScl.z;
+			}
+			pRotMat.m[3][0] = pRotMat.m[3][1] = pRotMat.m[3][2] = 0.0f;
+			pRotMat.m[3][3] = 1.0f;
+
+			const CalyxEngine::Quaternion pRotQ = CalyxEngine::Quaternion::FromMatrix(pRotMat);
+			const CalyxEngine::Vector3 pPos = {
+				target->parent->matrix.world.m[3][0],
+				target->parent->matrix.world.m[3][1],
+				target->parent->matrix.world.m[3][2]};
+
+			const CalyxEngine::Vector3 effPScl = target->inheritScale ? pScl : CalyxEngine::Vector3{1, 1, 1};
+			const CalyxEngine::Quaternion effPRot = target->inheritRotate ? pRotQ : CalyxEngine::Quaternion::MakeIdentity();
+			const CalyxEngine::Vector3 effPPos = target->inheritTranslate ? pPos : CalyxEngine::Vector3{0, 0, 0};
+
+			CalyxEngine::Vector3 localTrans = CalyxEngine::Quaternion::RotateVector(
+				CalyxEngine::Vector3{pW[0] - effPPos.x, pW[1] - effPPos.y, pW[2] - effPPos.z},
+				CalyxEngine::Quaternion::Inverse(effPRot));
+			if(std::abs(effPScl.x) > 0.0001f) localTrans.x /= effPScl.x;
+			if(std::abs(effPScl.y) > 0.0001f) localTrans.y /= effPScl.y;
+			if(std::abs(effPScl.z) > 0.0001f) localTrans.z /= effPScl.z;
+
+			CalyxEngine::Vector3 localScale = {sW[0], sW[1], sW[2]};
+			if(std::abs(effPScl.x) > 0.0001f) localScale.x /= effPScl.x;
+			if(std::abs(effPScl.y) > 0.0001f) localScale.y /= effPScl.y;
+			if(std::abs(effPScl.z) > 0.0001f) localScale.z /= effPScl.z;
+
+			target->translation = localTrans;
+			target->scale = localScale;
+			target->rotation = CalyxEngine::Quaternion::Multiply(worldRot, CalyxEngine::Quaternion::Inverse(effPRot));
+		} else {
+			target->translation = {pW[0], pW[1], pW[2]};
+			target->scale = {sW[0], sW[1], sW[2]};
+			target->rotation = worldRot;
+		}
+
+		target->rotationSource = RotationSource::Quaternion;
+		target->Update();
+	}
+
 	void Manipulator::Manipulate() {
 		if(camera_ != SceneContext::Current()->GetCameraMgr()->GetDebug()) {
 			camera_ = SceneContext::Current()->GetCameraMgr()->GetDebug();
 		}
 
-		if(!target_ || !camera_) return;
+		if(targets_.empty() || !camera_) return;
+
+		const bool groupMode = targets_.size() > 1;
+		if(groupMode) {
+			RefreshPivot();
+			target_ = &pivotTarget_;
+		} else {
+			target_ = targets_.front();
+		}
+
+		if(!target_) return;
 
 		float view[16], proj[16], world[16];
 
@@ -67,9 +206,39 @@ namespace CalyxEngine {
 
 		bool usingNow = ImGuizmo::IsUsing();
 
+		if(usingNow && !wasUsing) {
+			groupStartWorlds_.clear();
+			groupStartWorlds_.reserve(targets_.size());
+			for(auto* target : targets_) {
+				groupStartWorlds_.push_back(target ? target->matrix.world : CalyxEngine::Matrix4x4::MakeIdentity());
+			}
+			groupStartPivot_ = pivotTarget_.matrix.world;
+			scopedCmd = std::make_unique<ScopedGizmoCommand>(targets_, operation_);
+		}
+
 		if(usingNow) {
 			CalyxEngine::Matrix4x4 worldEdited = ColumnArrayToRow(world);
 
+			if(groupMode) {
+				if(groupStartWorlds_.size() != targets_.size()) {
+					groupStartWorlds_.clear();
+					groupStartWorlds_.reserve(targets_.size());
+					for(auto* target : targets_) {
+						groupStartWorlds_.push_back(target ? target->matrix.world : CalyxEngine::Matrix4x4::MakeIdentity());
+					}
+					groupStartPivot_ = pivotTarget_.matrix.world;
+				}
+
+				const CalyxEngine::Matrix4x4 delta = CalyxEngine::Matrix4x4::Inverse(groupStartPivot_) * worldEdited;
+				for(size_t i = 0; i < targets_.size(); ++i) {
+					auto* target = targets_[i];
+					if(!target || i >= groupStartWorlds_.size()) continue;
+					ApplyWorldMatrix(target, groupStartWorlds_[i] * delta);
+				}
+
+				pivotTarget_.matrix.world = worldEdited;
+				pivotTarget_.translation = CalyxEngine::Matrix4x4::Translation(worldEdited);
+			} else {
 			float wE[16];
 			RowToColumnArray(worldEdited, wE);
 			float pW[3], rW[3], sW[3];
@@ -196,17 +365,18 @@ namespace CalyxEngine {
 					target_->rotationSource = RotationSource::Quaternion;
 				}
 			}
+			}
 		}
 
 		// Undoコマンド管理
-		if(usingNow && !wasUsing) {
-			scopedCmd = std::make_unique<ScopedGizmoCommand>(target_, operation_);
-		} else if(!usingNow && wasUsing && scopedCmd) {
+		if(!usingNow && wasUsing && scopedCmd) {
 			scopedCmd->CaptureAfter();
 			if(!scopedCmd->IsTrivial())
 				CommandManager::GetInstance()->Execute(std::move(scopedCmd));
 			else
 				scopedCmd.reset();
+			groupStartWorlds_.clear();
+			RefreshPivot();
 		}
 		wasUsing = usingNow;
 	}

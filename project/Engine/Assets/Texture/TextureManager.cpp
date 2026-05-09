@@ -80,6 +80,20 @@ D3D12_CPU_DESCRIPTOR_HANDLE TextureManager::GetCpuSrvHandle(const std::string& t
 	return {};
 }
 
+bool TextureManager::WriteSrvTo(const std::string& textureName, D3D12_CPU_DESCRIPTOR_HANDLE destination) const {
+	if(!destination.ptr) return false;
+
+	auto it = textures_.find(textureName);
+	if(it == textures_.end()) {
+		const_cast<TextureManager*>(this)->LoadTexture(textureName);
+		it = textures_.find(textureName);
+	}
+	if(it == textures_.end()) return false;
+
+	it->second.CreateShaderResourceView(device_.Get(), destination);
+	return true;
+}
+
 const std::unordered_map<std::string, Texture>& TextureManager::GetLoadedTextures() const {
 	return textures_;
 }
@@ -150,6 +164,20 @@ D3D12_CPU_DESCRIPTOR_HANDLE TextureManager::GetCpuSrvHandle(const Guid& guid) co
 		}
 	}
 	return {};
+}
+
+bool TextureManager::WriteSrvTo(const Guid& guid, D3D12_CPU_DESCRIPTOR_HANDLE destination) const {
+	if(!guid.isValid() || !destination.ptr) return false;
+
+	if(auto it = guidToKey_.find(guid); it != guidToKey_.end()) {
+		return WriteSrvTo(it->second, destination);
+	}
+
+	const_cast<TextureManager*>(this)->LoadTexture(guid);
+	if(auto it = guidToKey_.find(guid); it != guidToKey_.end()) {
+		return WriteSrvTo(it->second, destination);
+	}
+	return false;
 }
 
 bool TextureManager::HasTexture(const Guid& guid) const {

@@ -19,7 +19,7 @@ namespace CalyxEngine {
 	// -------------------- ツールバー --------------------
 	void SplineEditorPanel::DrawToolbar() {
 		if(ImGui::Button("New")) {
-			data_		   = SplineData{};
+			data_		   = SplineRegistry::Create();
 			selectedPoint_ = -1;
 			currentPath_.clear();
 		}
@@ -36,7 +36,7 @@ namespace CalyxEngine {
 				c.path = "Resources/Assets/Splines/";
 				ImGuiFileDialog::Instance()->OpenDialog("SplineSave", "Save Spline", ".json", c);
 			} else {
-				SplineJson::Save(currentPath_, data_);
+				SplineRegistry::SaveFrom(currentPath_, data_);
 			}
 		}
 		ImGui::SameLine();
@@ -50,7 +50,7 @@ namespace CalyxEngine {
 		if(ImGuiFileDialog::Instance()->Display("SplineOpen")) {
 			if(ImGuiFileDialog::Instance()->IsOk()) {
 				currentPath_ = ImGuiFileDialog::Instance()->GetFilePathName();
-				SplineJson::Load(currentPath_, data_);
+				data_ = SplineRegistry::GetOrLoad(currentPath_);
 				selectedPoint_ = -1;
 			}
 			ImGuiFileDialog::Instance()->Close();
@@ -58,20 +58,22 @@ namespace CalyxEngine {
 		if(ImGuiFileDialog::Instance()->Display("SplineSave")) {
 			if(ImGuiFileDialog::Instance()->IsOk()) {
 				currentPath_ = ImGuiFileDialog::Instance()->GetFilePathName();
-				SplineJson::Save(currentPath_, data_);
+				SplineRegistry::SaveFrom(currentPath_, data_);
 			}
 			ImGuiFileDialog::Instance()->Close();
 		}
 		if(ImGuiFileDialog::Instance()->Display("SplineSaveAs")) {
 			if(ImGuiFileDialog::Instance()->IsOk()) {
 				currentPath_ = ImGuiFileDialog::Instance()->GetFilePathName();
-				SplineJson::Save(currentPath_, data_);
+				SplineRegistry::SaveFrom(currentPath_, data_);
 			}
 			ImGuiFileDialog::Instance()->Close();
 		}
 
 		ImGui::Separator();
-		ImGui::Checkbox("Closed", &data_.closed);
+		if(ImGui::Checkbox("Closed", &data_->closed)) {
+			data_->MarkDirty();
+		}
 		ImGui::SameLine();
 		ImGui::Checkbox("Enable Gizmo", &gizmoEnabled_);
 		ImGui::Separator();
@@ -80,23 +82,23 @@ namespace CalyxEngine {
 	// -------------------- ポイントリスト --------------------
 	void SplineEditorPanel::DrawPointsList() {
 		if(ImGui::Button("Add Point")) {
-			data_.InsertPoint((int)data_.points.size(), {0, 0, 0});
-			selectedPoint_ = (int)data_.points.size() - 1;
+			data_->InsertPoint((int)data_->points.size(), {0, 0, 0});
+			selectedPoint_ = (int)data_->points.size() - 1;
 		}
 		ImGui::SameLine();
 		if(ImGui::Button("Insert Before") && selectedPoint_ >= 0) {
-			data_.InsertPoint(selectedPoint_, data_.points[selectedPoint_].pos);
+			data_->InsertPoint(selectedPoint_, data_->points[selectedPoint_].pos);
 		}
 		ImGui::SameLine();
 		if(ImGui::Button("Remove") && selectedPoint_ >= 0) {
-			data_.RemovePoint(selectedPoint_);
+			data_->RemovePoint(selectedPoint_);
 			selectedPoint_ = -1;
 		}
 
 		ImGui::Separator();
-		ImGui::Text("Points: %d", (int)data_.points.size());
+		ImGui::Text("Points: %d", (int)data_->points.size());
 		ImGui::BeginChild("points", ImVec2(0, 160), true);
-		for(int i = 0; i < (int)data_.points.size(); ++i) {
+		for(int i = 0; i < (int)data_->points.size(); ++i) {
 			ImGui::PushID(i);
 			bool sel = (selectedPoint_ == i);
 			if(ImGui::Selectable(("Point " + std::to_string(i)).c_str(), sel)) {
@@ -106,11 +108,13 @@ namespace CalyxEngine {
 		}
 		ImGui::EndChild();
 
-		if(selectedPoint_ >= 0 && selectedPoint_ < (int)data_.points.size()) {
-			auto& p = data_.points[selectedPoint_].pos;
+		if(selectedPoint_ >= 0 && selectedPoint_ < (int)data_->points.size()) {
+			auto& p = data_->points[selectedPoint_].pos;
 			ImGui::Separator();
 			ImGui::Text("Edit Point %d", selectedPoint_);
-			ImGui::DragFloat3("Position", &p.x, 0.01f);
+			if(ImGui::DragFloat3("Position", &p.x, 0.01f)) {
+				data_->MarkDirty();
+			}
 		}
 	}
 
@@ -123,13 +127,13 @@ namespace CalyxEngine {
 		ImGui::InvisibleButton("preview", ImVec2(avail.x, 200.0f));
 		dl->AddRect(p0, p1, IM_COL32(100, 100, 100, 255));
 
-		if(data_.points.size() < 2) return;
+		if(data_->points.size() < 2) return;
 
 		float minx = 1e9f, minz = 1e9f, maxx = -1e9f, maxz = -1e9f;
 		auto  scan = [&](const CalyxEngine::Vector3& v) { minx = (std::min)(minx, v.x); minz = (std::min)(minz, v.z); maxx = (std::max)(maxx, v.x); maxz = (std::max)(maxz, v.z); };
-		for(auto& pt : data_.points) scan(pt.pos);
-		const int steps = (std::max)(2, data_.SegmentCount() * 16);
-		for(int i = 0; i <= steps; i++) scan(data_.Evaluate(i / (float)steps));
+		for(auto& pt : data_->points) scan(pt.pos);
+		const int steps = (std::max)(2, data_->SegmentCount() * 16);
+		for(int i = 0; i <= steps; i++) scan(data_->Evaluate(i / (float)steps));
 
 		float dx = (std::max)(1e-3f, maxx - minx), dz = (std::max)(1e-3f, maxz - minz);
 		auto  map = [&](const CalyxEngine::Vector3& v) {
@@ -137,15 +141,15 @@ namespace CalyxEngine {
 			 return ImVec2(p0.x + u * (p1.x - p0.x - 6) + 3, p1.y - (w * (p1.y - p0.y - 6) + 3));
 		};
 
-		ImVec2 prev = map(data_.Evaluate(0.0f));
+		ImVec2 prev = map(data_->Evaluate(0.0f));
 		for(int i = 1; i <= steps; i++) {
-			ImVec2 cur = map(data_.Evaluate(i / (float)steps));
+			ImVec2 cur = map(data_->Evaluate(i / (float)steps));
 			dl->AddLine(prev, cur, IM_COL32(0, 200, 255, 255), 2.0f);
 			prev = cur;
 		}
-		for(int i = 0; i < (int)data_.points.size(); ++i) {
+		for(int i = 0; i < (int)data_->points.size(); ++i) {
 			ImU32 col = (i == selectedPoint_) ? IM_COL32(255, 180, 0, 255) : IM_COL32(255, 255, 255, 220);
-			dl->AddCircleFilled(map(data_.points[i].pos), 3.5f, col);
+			dl->AddCircleFilled(map(data_->points[i].pos), 3.5f, col);
 		}
 	}
 
@@ -186,8 +190,8 @@ namespace CalyxEngine {
 	int SplineEditorPanel::PickPointByRayAABB(const Ray& ray, float halfSize, float& outT) const {
 		int	  best	= -1;
 		float bestT = FLT_MAX;
-		for(int i = 0; i < (int)data_.points.size(); ++i) {
-			const CalyxEngine::Vector3& p = data_.points[i].pos;
+		for(int i = 0; i < (int)data_->points.size(); ++i) {
+			const CalyxEngine::Vector3& p = data_->points[i].pos;
 			LocalAABB				  box{p - CalyxEngine::Vector3{halfSize, halfSize, halfSize}, p + CalyxEngine::Vector3{halfSize, halfSize, halfSize}};
 			float					  t = 1e6f;
 			if(IntersectRayAABB_Local(ray, box, t) && t < bestT) {
@@ -210,15 +214,15 @@ namespace CalyxEngine {
 
 	// -------------------- ：更新＋3Dプレビュー描画 --------------------
 	void SplineEditorPanel::HandleGizmoUpdateAndDraw3D() {
-		if(data_.points.empty()) return;
+		if(data_->points.empty()) return;
 		auto* drawer = PrimitiveDrawer::GetInstance();
 
 		// ---- AABBスケールの基準（全体境界の1%）----
 		CalyxEngine::Vector3 minP{FLT_MAX, FLT_MAX, FLT_MAX}, maxP{-FLT_MAX, -FLT_MAX, -FLT_MAX};
 		auto			   expand = [&](const CalyxEngine::Vector3& v) { minP = CalyxEngine::Vector3::Min(minP, v); maxP = CalyxEngine::Vector3::Max(maxP, v); };
-		for(auto& pt : data_.points) expand(pt.pos);
-		const int steps = (std::max)(2, data_.SegmentCount() * 16);
-		for(int i = 0; i <= steps; ++i) expand(data_.Evaluate(i / (float)steps));
+		for(auto& pt : data_->points) expand(pt.pos);
+		const int steps = (std::max)(2, data_->SegmentCount() * 16);
+		for(int i = 0; i <= steps; ++i) expand(data_->Evaluate(i / (float)steps));
 
 		CalyxEngine::Vector3 diag		= maxP - minP;
 		float			   aabbHalf = (std::max)({diag.x, diag.y, diag.z}) * 0.01f;
@@ -257,8 +261,9 @@ namespace CalyxEngine {
 		}
 
 		// ---- Manipulator で選択点を移動（選択があるときだけターゲットを結び付ける）----
-		if(gizmoOn && manipulator_ && selectedPoint_ >= 0 && selectedPoint_ < (int)data_.points.size()) {
-			CalyxEngine::Vector3& pos = data_.points[selectedPoint_].pos;
+		if(gizmoOn && manipulator_ && selectedPoint_ >= 0 && selectedPoint_ < (int)data_->points.size()) {
+			CalyxEngine::Vector3& pos = data_->points[selectedPoint_].pos;
+			const CalyxEngine::Vector3 before = pos;
 
 			gizmoTf_.translation = pos;
 			gizmoTf_.scale		 = {1, 1, 1};
@@ -269,6 +274,9 @@ namespace CalyxEngine {
 
 			// 位置の反映
 			pos = gizmoTf_.translation;
+			if(pos != before) {
+				data_->MarkDirty();
+			}
 		} else {
 			if(manipulator_) {
 				manipulator_->SetTarget(nullptr);
@@ -278,16 +286,16 @@ namespace CalyxEngine {
 		// ---- 3Dプレビュー ----
 		drawer->DrawAABB(minP, maxP, CalyxEngine::Vector4(1.0f, 0.0f, 0.498f, 1.0f)); // 全体AABB
 
-		CalyxEngine::Vector3 prev = data_.Evaluate(0.0f);
+		CalyxEngine::Vector3 prev = data_->Evaluate(0.0f);
 		for(int i = 1; i <= steps; i++) {
-			CalyxEngine::Vector3 cur = data_.Evaluate(i / (float)steps);
+			CalyxEngine::Vector3 cur = data_->Evaluate(i / (float)steps);
 			drawer->DrawLine3d(prev, cur, CalyxEngine::Vector4(0.0f, 0.8f, 0.9f, 1.0f)); // 曲線ライン
 			prev = cur;
 		}
 
 		int sel = GetSelectedIndex();
-		for(int i = 0; i < (int)data_.points.size(); ++i) {
-			const CalyxEngine::Vector3& p	   = data_.points[i].pos;
+		for(int i = 0; i < (int)data_->points.size(); ++i) {
+			const CalyxEngine::Vector3& p	   = data_->points[i].pos;
 			CalyxEngine::Vector3		  pmin = p - CalyxEngine::Vector3{aabbHalf, aabbHalf, aabbHalf};
 			CalyxEngine::Vector3		  pmax = p + CalyxEngine::Vector3{aabbHalf, aabbHalf, aabbHalf};
 			CalyxEngine::Vector4		  col  = (i == sel) ? CalyxEngine::Vector4(1.0f, 0.85f, 0.0f, 1.0f) : CalyxEngine::Vector4(1.0f, 1.0f, 1.0f, 0.9f);
@@ -309,7 +317,7 @@ namespace CalyxEngine {
 			// --- 起動時ロード ---
 			currentPath_ = "Resources/Assets/Spline/Rail.json";
 			if(std::filesystem::exists(currentPath_)) {
-				SplineJson::Load(currentPath_, data_);
+				data_ = SplineRegistry::GetOrLoad(currentPath_);
 				selectedPoint_ = -1;
 			}
 
