@@ -2,6 +2,7 @@
 /* ========================================================================
 /*		include space
 /* ===================================================================== */
+#include <Engine/Application/Effects/EffectAsset.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 
@@ -136,6 +137,31 @@ namespace CalyxEngine {
 		if(ImGui::Button("Stop All")) StopAll();
 		ImGui::SameLine();
 		if(ImGui::Button("Reset All")) RestartAll();
+		if(ImGui::Button("Save Effect Asset")) {
+			SaveEffectAsset("Resources/Assets/Effects/" + GetName() + ".effect");
+		}
+
+		if(ImGui::CollapsingHeader("Shared Particle Controls", ImGuiTreeNodeFlags_DefaultOpen)) {
+			ImGui::Text("Camera Dither");
+			bool changed = false;
+			changed |= ImGui::Checkbox("Enable##fxCameraDither", &cameraDitherEnabled_);
+			ImGui::BeginDisabled(!cameraDitherEnabled_);
+			changed |= ImGui::DragFloat("Near##fxCameraDither", &cameraDitherNear_, 0.01f, 0.0f, 1000.0f);
+			changed |= ImGui::DragFloat("Far##fxCameraDither", &cameraDitherFar_, 0.01f, 0.0f, 1000.0f);
+			ImGui::EndDisabled();
+			if(cameraDitherFar_ < cameraDitherNear_) cameraDitherFar_ = cameraDitherNear_;
+
+			ImGui::SameLine();
+			if(ImGui::Button("Apply To All Emitters") || changed) {
+				for(auto& wp : emitters_) {
+					if(auto sp = wp.lock()) {
+						sp->GetEmitter()->SetCameraFadeEnabled(cameraDitherEnabled_);
+						sp->GetEmitter()->SetCameraFade(cameraDitherNear_, cameraDitherFar_);
+						sp->GetEmitter()->SetCameraFadeEnabled(cameraDitherEnabled_);
+					}
+				}
+			}
+		}
 
 		ImGui::SeparatorText("Emitters");
 
@@ -224,8 +250,38 @@ namespace CalyxEngine {
 	}
 
 	void FxObject::LoadFromPath(const std::string& path) {
+		if(path.ends_with(".effect")) {
+			LoadEffectAsset(path);
+			return;
+		}
+
 		config_.LoadConfig(path);
 		ApplyConfig();
+	}
+
+	bool FxObject::SaveEffectAsset(const std::string& path) {
+		ExtractConfig();
+		auto asset = EffectAsset::FromObjectConfig(config_.GetConfig());
+		return asset.Save(path);
+	}
+
+	bool FxObject::LoadEffectAsset(const std::string& path) {
+		EffectAsset asset;
+		if(!asset.Load(path)) return false;
+
+		config_.GetConfig() = asset.ToObjectConfig();
+		ApplyConfig();
+		return true;
+	}
+
+	size_t FxObject::GetLiveEmitterCount() const {
+		size_t count = 0;
+		for(const auto& wp : emitters_) {
+			if(wp.lock()) {
+				++count;
+			}
+		}
+		return count;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -284,6 +340,8 @@ namespace CalyxEngine {
 	//		コンフィグからエフェクトの再構築
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::RebuildChildrenFromConfig() {
+		++emitterRevision_;
+
 		// 既存の子（このFxObject直下の ParticleSystemObject）を外す
 		for(auto& wp : emitters_) {
 			if(auto sp = wp.lock()) {
@@ -344,6 +402,7 @@ namespace CalyxEngine {
 		child->SetParent(shared_from_this());
 
 		emitters_.push_back(child);
+		++emitterRevision_;
 		return child;
 	}
 
@@ -360,6 +419,7 @@ namespace CalyxEngine {
 			if(sp->GetGuid() == id) {
 				sp->SetParent(nullptr);
 				it = emitters_.erase(it);
+				++emitterRevision_;
 			} else {
 				++it;
 			}

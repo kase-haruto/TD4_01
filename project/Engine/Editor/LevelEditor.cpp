@@ -2,7 +2,9 @@
 
 // engine
 #include <Engine/Application/Effects/FxSystem.h>
+#include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
+#include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Application/UI/EngineUI/Context/EditorContext.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
@@ -652,6 +654,13 @@ namespace CalyxEngine {
 			layoutSwitcher_->ApplyPending();
 		}
 
+		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect) {
+			UpdateParticlePreviewContext(ClockManager::GetInstance()->GetDeltaTime());
+			if(particlePreviewContext_) {
+				particlePreviewContext_->MakeCurrent();
+			}
+		}
+
 		SceneContext* ctx = SceneContext::Current();
 
 		const ImGuiIO& io			= ImGui::GetIO();
@@ -670,7 +679,8 @@ namespace CalyxEngine {
 			debugCam->SetInputEnabled(overDebugViewport);
 		}
 
-		if(debugViewport_ && debugViewport_->IsShow() && !guizmoActive && !uiBlocksClick) {
+		if(editToolMode_ != EngineEdit::EditToolMode::ParticleEffect &&
+		   debugViewport_ && debugViewport_->IsShow() && !guizmoActive && !uiBlocksClick) {
 			UpdateViewportSelectionInput();
 		} else if(!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
 			rangeSelectCandidate_ = false;
@@ -707,6 +717,12 @@ namespace CalyxEngine {
 		// シーンコンテキスト切り替え検出
 		NotifySceneContextChanged();
 		prevCtx_ = SceneContext::Current();
+		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect && particlePreviewFx_) {
+			if(particlePreviewContext_) {
+				particlePreviewContext_->MakeCurrent();
+			}
+			SetSelectedObject(particlePreviewFx_);
+		}
 
 		// PlaySession 状態と EditorMode の同期 ------------------------------
 		if(pPlaySesseion_) {
@@ -732,6 +748,12 @@ namespace CalyxEngine {
 	// Render
 	//=============================================================================
 	void LevelEditor::Render() {
+		SceneContext* previousContext = nullptr;
+		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect && particlePreviewContext_) {
+			previousContext = SceneContext::Current();
+			particlePreviewContext_->MakeCurrent();
+		}
+
 		// 各パネル描画
 		for(auto* p : editorPanels_) {
 			if(p->IsShow()) {
@@ -757,6 +779,10 @@ namespace CalyxEngine {
 		// SceneObjectEditor 側の更新（マニピュレータなど）
 		if(sceneEditor_) {
 			sceneEditor_->Update();
+		}
+
+		if(previousContext && previousContext != particlePreviewContext_.get()) {
+			previousContext->MakeCurrent();
 		}
 	}
 
@@ -796,6 +822,7 @@ namespace CalyxEngine {
 			}
 
 			const EngineEdit::EditToolMode modes[] = {
+				EngineEdit::EditToolMode::ParticleEffect,
 				EngineEdit::EditToolMode::PostEffect,
 				EngineEdit::EditToolMode::Material,
 				EngineEdit::EditToolMode::Animation,
@@ -816,6 +843,8 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			return "Object";
+		case EngineEdit::EditToolMode::ParticleEffect:
+			return "Particle";
 		case EngineEdit::EditToolMode::PostEffect:
 			return "PostEffect";
 		case EngineEdit::EditToolMode::Material:
@@ -833,6 +862,8 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			return layoutDir + "ObjectEdit.ini";
+		case EngineEdit::EditToolMode::ParticleEffect:
+			return layoutDir + "ParticleEffectEdit.ini";
 		case EngineEdit::EditToolMode::PostEffect:
 			return layoutDir + "PostEfectEdit.ini";
 		case EngineEdit::EditToolMode::Material:
@@ -857,8 +888,59 @@ namespace CalyxEngine {
 		return modeLayoutPath;
 	}
 
+	void LevelEditor::EnsureParticlePreviewContext() {
+		if(particlePreviewContext_) return;
+
+		SceneContext* previous = SceneContext::Current();
+
+		particlePreviewContext_ = std::make_unique<SceneContext>();
+		particlePreviewContext_->Initialize(false);
+		particlePreviewContext_->SetSceneName("ParticleEffectPreview");
+
+		particlePreviewFx_ = particlePreviewContext_->Instantiate<CalyxEngine::FxObject>("ParticlePreview");
+		particlePreviewFx_->SetTransient(true);
+		particlePreviewFx_->SetEnablePicking(false);
+		particlePreviewFx_->Initialize();
+		particlePreviewPlayedEmitterRevision_ = particlePreviewFx_->GetEmitterRevision();
+
+		if(auto* debugCamera = particlePreviewContext_->GetCameraMgr()->GetDebug()) {
+			debugCamera->GetWorldTransform().translation = {0.0f, 4.0f, -10.0f};
+			debugCamera->GetWorldTransform().Update();
+		}
+
+		if(previous) {
+			previous->MakeCurrent();
+		}
+	}
+
+	void LevelEditor::UpdateParticlePreviewContext(float dt) {
+		if(!particlePreviewContext_) return;
+
+		SceneContext* previous = SceneContext::Current();
+		particlePreviewContext_->MakeCurrent();
+
+		if(particlePreviewFx_) {
+			const uint64_t emitterRevision = particlePreviewFx_->GetEmitterRevision();
+			if(emitterRevision != particlePreviewPlayedEmitterRevision_) {
+				particlePreviewFx_->PlayAll();
+				particlePreviewPlayedEmitterRevision_ = emitterRevision;
+			}
+		}
+
+		particlePreviewContext_->Update(dt, dt, false);
+
+		if(previous && previous != particlePreviewContext_.get()) {
+			previous->MakeCurrent();
+		}
+	}
+
 	void LevelEditor::ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout) {
 		editToolMode_ = mode;
+		if(mode != EngineEdit::EditToolMode::ParticleEffect && sceneManager_) {
+			if(auto* active = sceneManager_->ActiveCtx()) {
+				active->MakeCurrent();
+			}
+		}
 
 		auto setShow = [](IEngineUI* panel, bool show) {
 			if(panel) {
@@ -868,9 +950,11 @@ namespace CalyxEngine {
 
 		if(mainViewport_) mainViewport_->SetShow(true);
 		if(debugViewport_) debugViewport_->SetShow(true);
+		if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(true);
 
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);
@@ -880,7 +964,25 @@ namespace CalyxEngine {
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), false);
 			break;
+		case EngineEdit::EditToolMode::ParticleEffect:
+			EnsureParticlePreviewContext();
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(particlePreviewContext_.get());
+			if(particlePreviewContext_) particlePreviewContext_->MakeCurrent();
+			if(particlePreviewFx_) SetSelectedObject(particlePreviewFx_);
+			if(mainViewport_) mainViewport_->SetShow(false);
+			if(debugViewport_) debugViewport_->SetShow(true);
+			if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(false);
+			setShow(hierarchy_.get(), false);
+			setShow(editor_.get(), false);
+			setShow(inspector_.get(), true);
+			setShow(placeToolPanel_.get(), false);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			break;
 		case EngineEdit::EditToolMode::PostEffect:
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), false);
@@ -891,6 +993,7 @@ namespace CalyxEngine {
 			setShow(postEffectNodeEditorPanel_.get(), true);
 			break;
 		case EngineEdit::EditToolMode::Material:
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
@@ -901,6 +1004,7 @@ namespace CalyxEngine {
 			setShow(postEffectNodeEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Animation:
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
@@ -1384,6 +1488,9 @@ namespace CalyxEngine {
 			if(mainViewport_) mainViewport_->SetPickingPass(pickingPass);
 			if(debugViewport_) debugViewport_->SetPickingPass(pickingPass);
 			if(pickingViewport_) pickingViewport_->SetPickingPass(pickingPass);
+		}
+		if(manager && editToolMode_ == EngineEdit::EditToolMode::ParticleEffect) {
+			manager->SetEditorPreviewContext(particlePreviewContext_.get());
 		}
 
 		if(sceneSwitchOverlay_) {

@@ -14,4 +14,5 @@ enum class AssetType
 	Material,
 	Audio,
 	Prefab,
+	Effect,
 };

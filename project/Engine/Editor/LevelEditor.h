@@ -15,6 +15,7 @@
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
 #include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
+#include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Editor/ImGuiLayoutSwitcher.h>
 #include <Engine/Editor/SceneObjectEditor.h>
 #include <externals/nlohmann/json.hpp>
@@ -32,6 +33,7 @@ namespace EngineEdit {
 
 	enum class EditToolMode {
 		Object,
+		ParticleEffect,
 		PostEffect,
 		Material,
 		Animation
@@ -128,6 +130,8 @@ namespace CalyxEngine {
 		const char* GetEditToolModeName(EngineEdit::EditToolMode mode) const;
 		std::string GetEditToolModeLayoutPath(EngineEdit::EditToolMode mode) const;
 		std::string GetEditToolModeLoadLayoutPath(EngineEdit::EditToolMode mode) const;
+		void EnsureParticlePreviewContext();
+		void UpdateParticlePreviewContext(float dt);
 
 		void TogglePanel(IEngineUI* p) {
 			if(p) p->SetShow(!p->IsShow());
@@ -161,6 +165,9 @@ namespace CalyxEngine {
 		std::unique_ptr<Viewport>			pickingViewport_;	 //< ピッキングビューポート
 		std::unique_ptr<PerformanceOverlay> performanceOverlay_; //< パフォーマンスオーバーレイ
 		std::unique_ptr<DebugOverlay>		debugOverlay_;		 //< デバッグオーバーレイ
+		std::unique_ptr<SceneContext>		particlePreviewContext_;
+		std::shared_ptr<CalyxEngine::FxObject> particlePreviewFx_;
+		uint64_t							particlePreviewPlayedEmitterRevision_ = 0;
 
 		// 状態
 		bool		  lastPlaying_	  = false;

@@ -49,6 +49,7 @@ namespace CalyxEngine {
 		void SetTextureGuid(const Guid& g);
 
 		void SetCameraFade(float nearZ, float farZ) override;
+		void SetCameraFadeEnabled(bool enabled) override;
 
 		//--------- config -------------------------------------------------//
 		// 適用
@@ -72,6 +73,9 @@ namespace CalyxEngine {
 		void	  SetPreviewInterval(float sec) { previewIntervalSec_ = (sec < 0.01f ? 0.01f : sec); }
 		float	  GetPreviewInterval() const { return previewIntervalSec_; }
 		BlendMode GetBlendMode() const { return blendMode_; }
+		bool IsCameraDitherEnabled() const { return fadeParams_.enabled != 0; }
+		float GetCameraDitherNear() const { return fadeParams_.fadeNear; }
+		float GetCameraDitherFar() const { return fadeParams_.fadeFar; }
 
 		//--------- callback -----------------------------------------------//
 
