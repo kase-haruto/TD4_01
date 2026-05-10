@@ -35,6 +35,7 @@ namespace CalyxEngine {
 			RenderCategory("View(V)", MenuCategory::View);
 			RenderCategory("Edit(E)", MenuCategory::Edit);
 			RenderCategory("Tools(T)", MenuCategory::Tools);
+			RenderCategory("Settings(S)", MenuCategory::Settings);
 			ImGui::EndMainMenuBar();
 		}
 	}

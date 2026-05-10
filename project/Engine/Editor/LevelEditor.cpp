@@ -4,6 +4,7 @@
 #include <Engine/Application/Effects/FxSystem.h>
 #include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
+#include <Engine/Application/Settings/EngineSettings.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Application/UI/EngineUI/Context/EditorContext.h>
@@ -491,6 +492,7 @@ namespace CalyxEngine {
 
 		// エディターメニューの初期化 ------------------------------------------
 		menu_ = std::make_unique<EditorMenu>();
+		EngineSettings::GetInstance().Initialize();
 
 		// --- Advanced Hot Reload (Object Re-instancing) ---
 		if(auto* lpp = CalyxEngine::LivePPService::GetInstance()) {
@@ -577,6 +579,12 @@ namespace CalyxEngine {
 						[p, this]() { TogglePanel(p); },
 						true});
 		}
+
+		menu_->Add(MenuCategory::Settings,
+				   {"Engine Settings",
+					"",
+					[] { EngineSettings::GetInstance().OpenSettingsWindow(); },
+					true});
 
 		// Viewport 表示トグル
 		menu_->Add(MenuCategory::View,
@@ -797,6 +805,10 @@ namespace CalyxEngine {
 			DrawEditModeCombo();
 			ImGui::EndMainMenuBar();
 		}
+	}
+
+	void LevelEditor::RenderSettingsWindow() {
+		EngineSettings::GetInstance().RenderSettingsWindow();
 	}
 
 	void LevelEditor::DrawEditModeCombo() {
@@ -1256,6 +1268,52 @@ namespace CalyxEngine {
 		// 		pickingViewport_->Render(tex);
 		// 	}
 		// }
+	}
+
+	void LevelEditor::RenderRuntimeFullscreenViewport(const ImTextureID& tex) {
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		const ImVec2 pos = viewport->WorkPos;
+		const ImVec2 size = viewport->WorkSize;
+
+		if(size.x <= 0.0f || size.y <= 0.0f) {
+			return;
+		}
+
+		if(auto* mainCamera = CameraManager::GetMain3d()) {
+			mainCamera->SetAspectRatio(size.x / size.y);
+			mainCamera->UpdateMatrix();
+			CameraManager::SetViewportSizeStatic(ViewportType::VIEWPORT_MAIN, {size.x, size.y});
+		}
+
+		ImGui::SetNextWindowPos(pos);
+		ImGui::SetNextWindowSize(size);
+		ImGui::SetNextWindowViewport(viewport->ID);
+
+		const ImGuiWindowFlags flags =
+			ImGuiWindowFlags_NoDecoration |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoSavedSettings |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoScrollWithMouse;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		if(ImGui::Begin("Runtime Game View", nullptr, flags)) {
+			ImGui::Image(tex, ImGui::GetContentRegionAvail());
+		}
+		ImGui::End();
+		ImGui::PopStyleVar();
+	}
+
+	bool LevelEditor::ShouldRenderRuntimeFullscreen() const {
+		return pPlaySesseion_ &&
+			   pPlaySesseion_->IsRuntime() &&
+			   EngineSettings::GetInstance().GetData().runtime.fullscreenGameViewOnPlay;
+	}
+
+	bool LevelEditor::ShouldHideEditorUiInGameMode() const {
+		return mode_ == EngineEdit::EditorMode::Game &&
+			   EngineSettings::GetInstance().GetData().runtime.fullscreenGameViewOnPlay;
 	}
 
 	void LevelEditor::SetCameraForViewport(BaseCamera* mainCamera, BaseCamera* debugCamera) {

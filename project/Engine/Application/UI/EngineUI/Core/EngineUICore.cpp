@@ -47,8 +47,15 @@ namespace CalyxEngine {
 
 		levelEditor_->RenderMenu();
 
-		// === Gameモード中はUIなど表示しない ===
-		if(levelEditor_->GetMode() == EngineEdit::EditorMode::Game) {
+		if(levelEditor_->ShouldRenderRuntimeFullscreen()) {
+			levelEditor_->RenderRuntimeFullscreenViewport(reinterpret_cast<ImTextureID>(mainViewportTextureID_));
+			levelEditor_->RenderSettingsWindow();
+			return;
+		}
+
+		// === 設定が有効な場合だけ、Gameモード中はUIなど表示しない ===
+		if(levelEditor_->ShouldHideEditorUiInGameMode()) {
+			levelEditor_->RenderSettingsWindow();
 			return;
 		}
 
@@ -64,6 +71,8 @@ namespace CalyxEngine {
 
 		// すべてのパネルをレンダリング
 		panelController_->RenderPanels();
+
+		levelEditor_->RenderSettingsWindow();
 
 #endif // _DEBUG
 	}
