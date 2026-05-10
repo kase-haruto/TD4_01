@@ -23,6 +23,8 @@ void DroolRainObject::ObjectInitialize() {
 	}
 
 	defaultScale_ = worldTransform_.scale;
+	worldTransform_.translation.y += 2.5f;
+	worldTransform_.inheritScale = false;
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {

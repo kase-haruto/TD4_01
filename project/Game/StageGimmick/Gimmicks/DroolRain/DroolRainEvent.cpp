@@ -73,10 +73,8 @@ void DroolRainEvent::EventInitialize() {
 		auto targetObject = SceneAPI::Instantiate<DroolRainObject>("waterDrop.obj", indexedObjectName);
 		if(targetObject) {
 			targetObject->SetParent(shared_from_this());
-			targetObject->Initialize();
 			targetObject->SetParam(eventParam_.param_);
-			targetObject->GetWorldTransform().translation.y += 2.5f;
-			targetObject->GetWorldTransform().inheritScale = false;
+			targetObject->Initialize();
 			targetObjects_[i] = (targetObject);
 		}
 	}
@@ -86,14 +84,14 @@ void DroolRainEvent::EventInitialize() {
 		auto object = SceneContext::Current()->FindObjectByName<PredictionCircle>(indexedPredictionCircleName);
 		if(object) {
 			predictionCircles_[i] = object;
+			object->SetTargetObject(targetObjects_[i].lock().get());
 			continue;
 		}
 		auto targetObject = SceneAPI::Instantiate<PredictionCircle>("PredictionCircle.obj", indexedPredictionCircleName);
 		if(targetObject) {
-			targetObject->Initialize();
 			targetObject->SetParent(targetObjects_[i].lock());
-			targetObject->GetWorldTransform().inheritScale = false;
-			targetObject->GetWorldTransform().inheritTranslate = false;
+			targetObject->SetTargetObject(targetObjects_[i].lock().get());
+			targetObject->Initialize();
 			predictionCircles_[i] = (targetObject);
 		}
 	}

@@ -2,6 +2,12 @@
 
 #include "Engine\Objects\3D\Actor\BaseGameObject.h"
 
+// 前方宣言
+class DroolRainObject;
+
+/// <summary>
+/// 予測円のオブジェクトクラス
+/// </summary>
 class PredictionCircle : public BaseGameObject {
 
 public:
@@ -17,9 +23,12 @@ public:
 
 	std::string_view GetObjectClassName() const override { return "PredictionCircle"; }
 
+	void SetTargetObject(DroolRainObject* target);
+
 private:
 
-
-
+	// よだれのオブジェクト
+	DroolRainObject* target_;
+	float targetObjectY_ = 0.0f;
 
 };
