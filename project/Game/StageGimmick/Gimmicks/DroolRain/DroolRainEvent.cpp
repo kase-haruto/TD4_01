@@ -29,7 +29,7 @@ void DroolRainEvent::OnCollisionExit(Collider* other) {
 	// プレイヤーがイベント内から出たら降らせるのをやめる
 	for(auto& target : targetObjects_) {
 		if(auto lockedTarget = target.lock()) {
-			lockedTarget->SetIsRaining(false);
+			//lockedTarget->SetIsRaining(false);
 		}
 	}
 }
