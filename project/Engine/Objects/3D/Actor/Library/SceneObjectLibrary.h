@@ -138,6 +138,8 @@ private:
 	bool suppressDestroySync_ = false;
 
     static uint32_t nextPickingID_;
+
+	void CompactNumberedNames(const std::string& baseName);
 };
 
 // =====================================================

@@ -8,14 +8,29 @@
 #include <memory>
 #include <utility>
 
+#include <Engine/Objects/3D/Actor/BaseGameObject.h>
 #include <Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorEvent.h>
 #include <Engine/Objects/Event/Camera/CameraEventObject.h>
 #include <Game/StageGimmick/Gimmicks/DroolRain/DroolRainEvent.h>
 #include <Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeEvent.h>
 #include <Game/StageGimmick/Gimmicks/Projectile/ProjectileFireEvent.h>
+#include <Engine/Objects/3D/Actor/SplineDeformObject.h>
 
 namespace CalyxEngine {
 	void RegisterGeneratedSceneObjects() {
+		{
+			SceneObjectClassDesc desc;
+			desc.typeName = "BaseGameObject";
+			desc.displayName = "Mesh Object";
+			desc.objectType = ObjectType::GameObject;
+			desc.iconPath = "UI/Tool/cube.dds";
+			desc.placeable = true;
+			desc.prefabEditable = true;
+			desc.prefabRoot = true;
+			desc.ctor = std::make_unique<SceneCtor<BaseGameObject>>();
+			SceneObjectRegistry::Get().Register(std::move(desc));
+		}
+
 		{
 			SceneObjectClassDesc desc;
 			desc.typeName = "BreakableFloorEvent";
@@ -23,6 +38,8 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::Event;
 			desc.iconPath = "UI/Tool/event.png";
 			desc.placeable = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<BreakableFloorEvent>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
@@ -34,6 +51,8 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::Event;
 			desc.iconPath = "UI/Tool/event.png";
 			desc.placeable = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<CameraEventObject>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
@@ -45,6 +64,8 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::Event;
 			desc.iconPath = "UI/Tool/event.png";
 			desc.placeable = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<DroolRainEvent>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
@@ -56,6 +77,8 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::Event;
 			desc.iconPath = "UI/Tool/event.png";
 			desc.placeable = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<GroundSpikeEvent>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
@@ -67,7 +90,22 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::Event;
 			desc.iconPath = "UI/Tool/event.png";
 			desc.placeable = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<ProjectileFireEvent>>();
+			SceneObjectRegistry::Get().Register(std::move(desc));
+		}
+
+		{
+			SceneObjectClassDesc desc;
+			desc.typeName = "SplineDeformObject";
+			desc.displayName = "Spline Wall Deform";
+			desc.objectType = ObjectType::GameObject;
+			desc.iconPath = "UI/Tool/cylinder.dds";
+			desc.placeable = true;
+			desc.prefabEditable = true;
+			desc.prefabRoot = true;
+			desc.ctor = std::make_unique<SceneCtor<SplineDeformObject>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
 	}

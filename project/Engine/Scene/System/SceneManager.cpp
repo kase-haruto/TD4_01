@@ -2,6 +2,7 @@
 
 // engine
 #include <Engine/Application/System/PlaySession.h>
+#include <Engine/Graphics/Camera/3d/Camera3d.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <Engine/Graphics/Device/DxCore.h>
@@ -10,7 +11,10 @@
 #include <Engine/Scene/Base/IScene.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
+#include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/Event/BaseEventObject.h>
 #include <Engine/Renderer/Grid/GridRenderer.h>
+#include <Engine/Renderer/Model/ModelRenderer.h>
 
 // scene
 #include "Engine/Scene/Test/TestScene.h"
@@ -53,6 +57,7 @@ namespace CalyxEngine {
 		pickingPass_->Initialize(1280, 720);
 		editorGridRenderer_ = std::make_unique<CalyxEngine::GridRenderer>();
 		editorGridRenderer_->Initialize();
+		editorPreviewModelRenderer_ = std::make_unique<ModelRenderer>();
 #endif
 	}
 
@@ -254,6 +259,42 @@ namespace CalyxEngine {
 				editorGridRenderer_->Render(cmd, pso, cam);
 			}
 		}
+
+		if(editorPreviewModelRenderer_) {
+			editorPreviewModelRenderer_->BeginFrame();
+
+			for(auto* object : editorPreviewCtx_->GetObjectLibrary()->GetAllObjectsRaw()) {
+				if(auto* go = dynamic_cast<BaseGameObject*>(object)) {
+					switch(go->GetModelType()) {
+					case ObjectModelType::ModelType_Static:
+						if(auto* model = go->GetStaticModel()) {
+							editorPreviewModelRenderer_->RegisterStatic(model, go->GetWorldTransform(), go->GetBillboardMode(), go);
+						}
+						break;
+					case ObjectModelType::ModelType_Animation:
+						if(auto* model = go->AnimationModel()) {
+							editorPreviewModelRenderer_->RegisterSkinned(model, go->GetWorldTransform(), go);
+						}
+						break;
+					}
+				} else if(auto* eventObject = dynamic_cast<BaseEventObject*>(object)) {
+					if(auto* model = eventObject->GetModel()) {
+						editorPreviewModelRenderer_->RegisterStatic(model, eventObject->GetWorldTransform(), BillboardMode::None, eventObject);
+					}
+				}
+			}
+
+			if(auto* camera = dynamic_cast<Camera3d*>(CameraManager::GetActive())) {
+				editorPreviewModelRenderer_->PreCullAndBatch(camera);
+			}
+			editorPreviewModelRenderer_->DrawAll(cmd,
+												 GraphicsGroup::GetInstance()->GetDevice().Get(),
+												 rt,
+												 pso,
+												 editorPreviewCtx_->GetLightLibrary(),
+												 nullptr);
+		}
+
 		editorPreviewCtx_->GetFxSystem()->Render(pso, cmd);
 	}
 

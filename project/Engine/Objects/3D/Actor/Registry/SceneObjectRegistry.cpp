@@ -33,6 +33,8 @@ void SceneObjectRegistry::Register(SceneObjectClassDesc&& desc){
 	current.objectType	= desc.objectType;
 	current.iconPath	= std::move(desc.iconPath);
 	current.placeable	= desc.placeable;
+	current.prefabEditable = desc.prefabEditable;
+	current.prefabRoot = desc.prefabRoot;
 	if(desc.ctor) {
 		current.ctor = std::move(desc.ctor);
 	}
@@ -53,6 +55,26 @@ std::vector<SceneObjectClassDesc const*> SceneObjectRegistry::ListPlaceableTypes
 	std::vector<SceneObjectClassDesc const*> out;
 	for(const auto& [_, desc] : table_) {
 		if(desc.placeable && desc.ctor) {
+			out.push_back(&desc);
+		}
+	}
+	return out;
+}
+
+std::vector<SceneObjectClassDesc const*> SceneObjectRegistry::ListPrefabEditableTypes() const{
+	std::vector<SceneObjectClassDesc const*> out;
+	for(const auto& [_, desc] : table_) {
+		if(desc.prefabEditable && desc.ctor) {
+			out.push_back(&desc);
+		}
+	}
+	return out;
+}
+
+std::vector<SceneObjectClassDesc const*> SceneObjectRegistry::ListPrefabRootTypes() const{
+	std::vector<SceneObjectClassDesc const*> out;
+	for(const auto& [_, desc] : table_) {
+		if(desc.prefabRoot && desc.ctor) {
 			out.push_back(&desc);
 		}
 	}

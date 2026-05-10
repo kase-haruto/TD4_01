@@ -39,7 +39,7 @@ function Get-RelativePathCompat([string]$basePath, [string]$targetPath) {
 }
 
 $objectRegex = [regex]::new(
-    'CALYX_OBJECT\s*\((?<meta>.*?)\)\s*class\s+(?<class>[A-Za-z_][A-Za-z0-9_]*)\s*:',
+    'CALYX_OBJECT\s*\((?<meta>.*?)\)\s*class\s+(?<class>[A-Za-z_][A-Za-z0-9_]*)(?:\s+(?:final|abstract))*\s*:',
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 )
 
@@ -69,6 +69,8 @@ foreach ($scanRoot in $scanRoots) {
             $category = if ($meta.ContainsKey("Category")) { $meta["Category"] } else { "None" }
             $icon = if ($meta.ContainsKey("Icon")) { $meta["Icon"] } else { "UI/Tool/event.png" }
             $placeable = if ($meta.ContainsKey("Placeable")) { $meta["Placeable"].ToLower() -ne "false" } else { $true }
+            $prefabEditable = if ($meta.ContainsKey("PrefabEditable")) { $meta["PrefabEditable"].ToLower() -eq "true" } else { $false }
+            $prefabRoot = if ($meta.ContainsKey("PrefabRoot")) { $meta["PrefabRoot"].ToLower() -eq "true" } else { $false }
             $include = (Get-RelativePathCompat $Root $path).Replace('\', '/')
 
             $entries.Add([pscustomobject]@{
@@ -78,6 +80,8 @@ foreach ($scanRoot in $scanRoots) {
                 Category = $category
                 Icon = $icon
                 Placeable = if ($placeable) { "true" } else { "false" }
+                PrefabEditable = if ($prefabEditable) { "true" } else { "false" }
+                PrefabRoot = if ($prefabRoot) { "true" } else { "false" }
                 Include = $include
             })
         }
@@ -107,6 +111,8 @@ $registrationBlocks = ($entries | ForEach-Object {
 			desc.objectType = ObjectType::$($_.Category);
 			desc.iconPath = "$icon";
 			desc.placeable = $($_.Placeable);
+			desc.prefabEditable = $($_.PrefabEditable);
+			desc.prefabRoot = $($_.PrefabRoot);
 			desc.ctor = std::make_unique<SceneCtor<$($_.ClassName)>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}

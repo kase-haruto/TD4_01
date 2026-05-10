@@ -9,6 +9,7 @@
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Application/UI/EngineUI/Context/EditorContext.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
+#include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Editor/PickingPass.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
 #include <Engine/Foundation/Input/Input.h>
@@ -546,6 +547,49 @@ namespace CalyxEngine {
 					},
 					true});
 
+		menu_->Add(MenuCategory::File,
+				   {"New Prefab",
+					"",
+					[this] {
+						ApplyEditToolMode(EngineEdit::EditToolMode::Prefab, true);
+						showPrefabRootTypePopup_ = true;
+					},
+					true});
+
+		menu_->Add(MenuCategory::File,
+				   {"Open Prefab",
+					"",
+					[] {
+						IGFD::FileDialogConfig config;
+						config.path = "Resources/Assets/";
+						ImGuiFileDialog::Instance()->OpenDialog(
+							"PrefabOpenDialog",
+							"open prefab",
+							".prefab",
+							config);
+					},
+					true});
+
+		menu_->Add(MenuCategory::File,
+				   {"Save Prefab",
+					"",
+					[this] { SavePrefabEdit(); },
+					true});
+
+		menu_->Add(MenuCategory::File,
+				   {"Save Prefab As",
+					"",
+					[] {
+						IGFD::FileDialogConfig config;
+						config.path = "Resources/Assets/Prefabs/";
+						ImGuiFileDialog::Instance()->OpenDialog(
+							"PrefabSaveAsDialog",
+							"save prefab file",
+							".prefab",
+							config);
+					},
+					true});
+
 		// View: Game Mode トグル
 		if(mode_ == EditorMode::Edit) {
 			menu_->Add(MenuCategory::View,
@@ -667,7 +711,14 @@ namespace CalyxEngine {
 			if(particlePreviewContext_) {
 				particlePreviewContext_->MakeCurrent();
 			}
+		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab) {
+			UpdatePrefabEditContext(ClockManager::GetInstance()->GetDeltaTime());
+			if(prefabEditContext_) {
+				prefabEditContext_->MakeCurrent();
+			}
 		}
+
+		DrawPrefabRootTypePopup();
 
 		SceneContext* ctx = SceneContext::Current();
 
@@ -722,6 +773,22 @@ namespace CalyxEngine {
 			ImGuiFileDialog::Instance()->Close();
 		}
 
+		if(ImGuiFileDialog::Instance()->Display("PrefabOpenDialog")) {
+			if(ImGuiFileDialog::Instance()->IsOk()) {
+				std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+				OpenPrefabForEdit(filePath);
+			}
+			ImGuiFileDialog::Instance()->Close();
+		}
+
+		if(ImGuiFileDialog::Instance()->Display("PrefabSaveAsDialog")) {
+			if(ImGuiFileDialog::Instance()->IsOk()) {
+				std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+				SavePrefabEditAs(filePath);
+			}
+			ImGuiFileDialog::Instance()->Close();
+		}
+
 		// シーンコンテキスト切り替え検出
 		NotifySceneContextChanged();
 		prevCtx_ = SceneContext::Current();
@@ -730,6 +797,8 @@ namespace CalyxEngine {
 				particlePreviewContext_->MakeCurrent();
 			}
 			SetSelectedObject(particlePreviewFx_);
+		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab && prefabEditContext_) {
+			prefabEditContext_->MakeCurrent();
 		}
 
 		// PlaySession 状態と EditorMode の同期 ------------------------------
@@ -760,6 +829,9 @@ namespace CalyxEngine {
 		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect && particlePreviewContext_) {
 			previousContext = SceneContext::Current();
 			particlePreviewContext_->MakeCurrent();
+		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab && prefabEditContext_) {
+			previousContext = SceneContext::Current();
+			prefabEditContext_->MakeCurrent();
 		}
 
 		// 各パネル描画
@@ -789,7 +861,7 @@ namespace CalyxEngine {
 			sceneEditor_->Update();
 		}
 
-		if(previousContext && previousContext != particlePreviewContext_.get()) {
+		if(previousContext && previousContext != SceneContext::Current()) {
 			previousContext->MakeCurrent();
 		}
 	}
@@ -834,6 +906,7 @@ namespace CalyxEngine {
 			}
 
 			const EngineEdit::EditToolMode modes[] = {
+				EngineEdit::EditToolMode::Prefab,
 				EngineEdit::EditToolMode::ParticleEffect,
 				EngineEdit::EditToolMode::PostEffect,
 				EngineEdit::EditToolMode::Material,
@@ -855,6 +928,8 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			return "Object";
+		case EngineEdit::EditToolMode::Prefab:
+			return "Prefab";
 		case EngineEdit::EditToolMode::ParticleEffect:
 			return "Particle";
 		case EngineEdit::EditToolMode::PostEffect:
@@ -874,6 +949,8 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			return layoutDir + "ObjectEdit.ini";
+		case EngineEdit::EditToolMode::Prefab:
+			return layoutDir + "PrefabEdit.ini";
 		case EngineEdit::EditToolMode::ParticleEffect:
 			return layoutDir + "ParticleEffectEdit.ini";
 		case EngineEdit::EditToolMode::PostEffect:
@@ -946,9 +1023,194 @@ namespace CalyxEngine {
 		}
 	}
 
+	void LevelEditor::EnsurePrefabEditContext() {
+		if(prefabEditContext_) return;
+
+		SceneContext* previous = SceneContext::Current();
+
+		prefabEditContext_ = std::make_unique<SceneContext>();
+		prefabEditContext_->Initialize(false);
+		prefabEditContext_->SetSceneName("PrefabEdit");
+
+		if(auto* debugCamera = prefabEditContext_->GetCameraMgr()->GetDebug()) {
+			debugCamera->GetWorldTransform().translation = {0.0f, 4.0f, -10.0f};
+			debugCamera->GetWorldTransform().Update();
+		}
+
+		prefabEditContext_->AddOnObjectAddedListener([this](SceneObject*) {
+			prefabEditDirty_ = true;
+		});
+		prefabEditContext_->AddOnObjectRemovedListener([this](SceneObject*) {
+			prefabEditDirty_ = true;
+		});
+
+		if(previous) {
+			previous->MakeCurrent();
+		}
+	}
+
+	void LevelEditor::NewPrefabEditContext(const std::string& rootTypeName) {
+		prefabEditContext_.reset();
+		prefabEditPath_.clear();
+		prefabEditDirty_ = false;
+		EnsurePrefabEditContext();
+
+		if(sceneManager_) sceneManager_->SetEditorPreviewContext(prefabEditContext_.get());
+		if(prefabEditContext_) {
+			prefabEditContext_->MakeCurrent();
+			std::shared_ptr<SceneObject> root;
+			if(!rootTypeName.empty()) {
+				root = SceneObjectRegistry::Get().Create(rootTypeName);
+				prefabEditContext_->AddObject(root);
+			} else {
+				root = prefabEditContext_->Instantiate<SceneObject>();
+			}
+			if(root) {
+				root->SetName("NewPrefab", root->GetObjectType());
+				root->Initialize();
+			}
+			SetSelectedObject(root);
+		}
+		NotifySceneContextChanged();
+	}
+
+	void LevelEditor::DrawPrefabRootTypePopup() {
+		if(showPrefabRootTypePopup_) {
+			ApplyEditToolMode(EngineEdit::EditToolMode::Prefab, false);
+			ImGui::OpenPopup("New Prefab Root Type");
+			showPrefabRootTypePopup_ = false;
+		}
+
+		const auto rootTypes = SceneObjectRegistry::Get().ListPrefabRootTypes();
+		const bool hasRootTypes = !rootTypes.empty();
+
+		if(ImGui::BeginPopupModal("New Prefab Root Type", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::TextUnformatted("Root Type");
+			ImGui::Separator();
+
+			if(hasRootTypes) {
+				for(const auto* desc : rootTypes) {
+					if(!desc) continue;
+					const std::string label = desc->displayName.empty() ? desc->typeName : desc->displayName;
+					if(ImGui::Selectable(label.c_str())) {
+						NewPrefabEditContext(desc->typeName);
+						ImGui::CloseCurrentPopup();
+					}
+				}
+			} else {
+				ImGui::TextDisabled("No PrefabRoot types registered.");
+				if(ImGui::Button("Create Empty")) {
+					NewPrefabEditContext();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			ImGui::Separator();
+			if(ImGui::Button("Cancel", ImVec2(96.0f, 0.0f))) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	void LevelEditor::OpenPrefabForEdit(const std::string& path) {
+		prefabEditContext_.reset();
+		prefabEditPath_ = path;
+		prefabEditDirty_ = false;
+		EnsurePrefabEditContext();
+
+		prefabEditContext_->MakeCurrent();
+
+		auto objects = PrefabSerializer::Load(path);
+		for(auto& object : objects) {
+			if(object) {
+				prefabEditContext_->AddObject(object);
+			}
+		}
+
+		prefabEditContext_->SetSceneName(std::filesystem::path(path).stem().string());
+		if(sceneManager_) sceneManager_->SetEditorPreviewContext(prefabEditContext_.get());
+		ApplyEditToolMode(EngineEdit::EditToolMode::Prefab, true);
+		prefabEditContext_->MakeCurrent();
+
+		auto roots = GetPrefabEditRoots();
+		if(!roots.empty()) {
+			if(auto root = prefabEditContext_->FindSharedObject(roots.front())) {
+				SetSelectedObject(root);
+			}
+		}
+		if(hierarchy_) hierarchy_->RefreshCache();
+		prefabEditDirty_ = false;
+
+		NotifySceneContextChanged();
+	}
+
+	std::vector<SceneObject*> LevelEditor::GetPrefabEditRoots() const {
+		std::vector<SceneObject*> roots;
+		if(!prefabEditContext_ || !prefabEditContext_->GetObjectLibrary()) return roots;
+
+		for(auto* object : prefabEditContext_->GetObjectLibrary()->GetAllObjectsRaw()) {
+			if(!object || !object->IsSerializable()) continue;
+			if(object->GetParent()) continue;
+			roots.push_back(object);
+		}
+		return roots;
+	}
+
+	void LevelEditor::SavePrefabEdit() {
+		if(editToolMode_ != EngineEdit::EditToolMode::Prefab || !prefabEditContext_) return;
+		if(prefabEditPath_.empty()) {
+			IGFD::FileDialogConfig config;
+			config.path = "Resources/Assets/Prefabs/";
+			ImGuiFileDialog::Instance()->OpenDialog(
+				"PrefabSaveAsDialog",
+				"save prefab file",
+				".prefab",
+				config);
+			return;
+		}
+
+		SavePrefabEditAs(prefabEditPath_);
+	}
+
+	void LevelEditor::SavePrefabEditAs(const std::string& path) {
+		if(editToolMode_ != EngineEdit::EditToolMode::Prefab || !prefabEditContext_) return;
+
+		const auto roots = GetPrefabEditRoots();
+		if(roots.empty()) return;
+
+		const std::filesystem::path savePath(path);
+		if(savePath.has_parent_path()) {
+			std::error_code ec;
+			std::filesystem::create_directories(savePath.parent_path(), ec);
+		}
+
+		if(PrefabSerializer::Save(roots, path)) {
+			prefabEditPath_ = path;
+			prefabEditDirty_ = false;
+			if(auto* db = AssetDatabase::GetInstance()) {
+				db->Scan();
+			}
+		}
+	}
+
+	void LevelEditor::UpdatePrefabEditContext(float dt) {
+		if(!prefabEditContext_) return;
+
+		SceneContext* previous = SceneContext::Current();
+		prefabEditContext_->MakeCurrent();
+		prefabEditContext_->Update(dt, dt, false);
+
+		if(previous && previous != prefabEditContext_.get()) {
+			previous->MakeCurrent();
+		}
+	}
+
 	void LevelEditor::ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout) {
 		editToolMode_ = mode;
-		if(mode != EngineEdit::EditToolMode::ParticleEffect && sceneManager_) {
+		if(mode != EngineEdit::EditToolMode::ParticleEffect &&
+		   mode != EngineEdit::EditToolMode::Prefab &&
+		   sceneManager_) {
 			if(auto* active = sceneManager_->ActiveCtx()) {
 				active->MakeCurrent();
 			}
@@ -967,6 +1229,22 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
+			setShow(hierarchy_.get(), true);
+			setShow(editor_.get(), true);
+			setShow(inspector_.get(), true);
+			setShow(placeToolPanel_.get(), true);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			break;
+		case EngineEdit::EditToolMode::Prefab:
+			EnsurePrefabEditContext();
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(prefabEditContext_.get());
+			if(prefabEditContext_) prefabEditContext_->MakeCurrent();
+			if(mainViewport_) mainViewport_->SetShow(false);
+			if(debugViewport_) debugViewport_->SetShow(true);
+			if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(true);
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);

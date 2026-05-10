@@ -31,6 +31,8 @@ struct SceneObjectClassDesc {
 	ObjectType	 objectType = ObjectType::None;
 	std::string iconPath;
 	bool		 placeable = false;
+	bool		 prefabEditable = false;
+	bool		 prefabRoot = false;
 	std::unique_ptr<ISceneCtor> ctor;
 };
 
@@ -63,6 +65,8 @@ public:
 	/// <returns></returns>
 	std::vector<std::string> ListTypes() const;
 	std::vector<SceneObjectClassDesc const*> ListPlaceableTypes() const;
+	std::vector<SceneObjectClassDesc const*> ListPrefabEditableTypes() const;
+	std::vector<SceneObjectClassDesc const*> ListPrefabRootTypes() const;
 	const SceneObjectClassDesc* Find(std::string_view typeName) const;
 
 private:

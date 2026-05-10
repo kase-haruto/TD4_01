@@ -13,7 +13,7 @@ OUT_SOURCE = GENERATED_DIR / "CalyxObjectRegistry.generated.cpp"
 
 OBJECT_RE = re.compile(
     r"CALYX_OBJECT\s*\((?P<meta>.*?)\)\s*"
-    r"class\s+(?P<class>[A-Za-z_][A-Za-z0-9_]*)\s*:",
+    r"class\s+(?P<class>[A-Za-z_][A-Za-z0-9_]*)(?:\s+(?:final|abstract))*\s*:",
     re.DOTALL,
 )
 
@@ -50,6 +50,8 @@ def discover() -> list[dict[str, str]]:
                 category = meta.get("Category", "None")
                 icon = meta.get("Icon", "UI/Tool/event.png")
                 placeable = meta.get("Placeable", "true").lower() != "false"
+                prefab_editable = meta.get("PrefabEditable", "false").lower() == "true"
+                prefab_root = meta.get("PrefabRoot", "false").lower() == "true"
                 entries.append(
                     {
                         "class": match.group("class"),
@@ -58,6 +60,8 @@ def discover() -> list[dict[str, str]]:
                         "category": category,
                         "icon": icon,
                         "placeable": "true" if placeable else "false",
+                        "prefab_editable": "true" if prefab_editable else "false",
+                        "prefab_root": "true" if prefab_root else "false",
                         "include": rel_include(path),
                     }
                 )
@@ -90,6 +94,8 @@ namespace CalyxEngine {
 \t\t\tdesc.objectType = ObjectType::{entry["category"]};
 \t\t\tdesc.iconPath = "{cpp_string(entry["icon"])}";
 \t\t\tdesc.placeable = {entry["placeable"]};
+\t\t\tdesc.prefabEditable = {entry["prefab_editable"]};
+\t\t\tdesc.prefabRoot = {entry["prefab_root"]};
 \t\t\tdesc.ctor = std::make_unique<SceneCtor<{entry["class"]}>>();
 \t\t\tSceneObjectRegistry::Get().Register(std::move(desc));
 \t\t}}"""

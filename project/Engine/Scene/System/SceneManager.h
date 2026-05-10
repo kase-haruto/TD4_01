@@ -21,6 +21,8 @@ namespace CalyxEngine {
 	class GridRenderer;
 } // namespace CalyxEngine
 
+class ModelRenderer;
+
 namespace CalyxEngine {
 
 	/*-----------------------------------------------------------------------------------------
@@ -128,6 +130,7 @@ namespace CalyxEngine {
 
 		std::unique_ptr<CalyxEngine::PickingPass> pickingPass_;
 		std::unique_ptr<CalyxEngine::GridRenderer> editorGridRenderer_;
+		std::unique_ptr<ModelRenderer> editorPreviewModelRenderer_;
 	};
 
 } // namespace CalyxEngine

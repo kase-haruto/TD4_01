@@ -33,6 +33,7 @@ namespace EngineEdit {
 
 	enum class EditToolMode {
 		Object,
+		Prefab,
 		ParticleEffect,
 		PostEffect,
 		Material,
@@ -136,6 +137,14 @@ namespace CalyxEngine {
 		std::string GetEditToolModeLoadLayoutPath(EngineEdit::EditToolMode mode) const;
 		void EnsureParticlePreviewContext();
 		void UpdateParticlePreviewContext(float dt);
+		void EnsurePrefabEditContext();
+		void NewPrefabEditContext(const std::string& rootTypeName = {});
+		void OpenPrefabForEdit(const std::string& path);
+		void SavePrefabEdit();
+		void SavePrefabEditAs(const std::string& path);
+		std::vector<SceneObject*> GetPrefabEditRoots() const;
+		void UpdatePrefabEditContext(float dt);
+		void DrawPrefabRootTypePopup();
 
 		void TogglePanel(IEngineUI* p) {
 			if(p) p->SetShow(!p->IsShow());
@@ -173,6 +182,10 @@ namespace CalyxEngine {
 		std::unique_ptr<SceneContext>		particlePreviewContext_;
 		std::shared_ptr<CalyxEngine::FxObject> particlePreviewFx_;
 		uint64_t							particlePreviewPlayedEmitterRevision_ = 0;
+		std::unique_ptr<SceneContext>		prefabEditContext_;
+		std::string							prefabEditPath_;
+		bool								prefabEditDirty_ = false;
+		bool								showPrefabRootTypePopup_ = false;
 
 		// 状態
 		bool		  lastPlaying_	  = false;

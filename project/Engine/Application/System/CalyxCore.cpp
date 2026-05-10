@@ -164,12 +164,7 @@ namespace CalyxEngine {
 				if(auto* pickingPass = sceneMgr->GetPickingPass()) {
 					auto* pickingColor = pickingPass->GetColor();
 					if(pickingColor) {
-						D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-							pickingColor,
-							D3D12_RESOURCE_STATE_RENDER_TARGET,
-							D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-						cmd->ResourceBarrier(1, &barrier);
-
+						pickingPass->TransitionColorTo(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 						pEngineUICore_->SetPickingViewportTexture(pickingPass->GetSrv().ptr);
 					}
 				}

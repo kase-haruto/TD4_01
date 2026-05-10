@@ -5,6 +5,7 @@
 #include <Engine/System/Event/EventBus.h>
 #include <cctype>
 #include <iostream>
+#include <limits>
 
 uint32_t SceneObjectLibrary::nextPickingID_ = 1;
 
@@ -47,6 +48,34 @@ namespace {
 		return TrimName(name.substr(0, open));
 	}
 
+	bool TryParseNumberedName(const std::string& name,
+							  const std::string& expectedBaseName,
+							  uint32_t& outIndex) {
+		if(name.size() < expectedBaseName.size() + 3 || name.back() != ')') return false;
+
+		const auto open = name.find_last_of('(');
+		if(open == std::string::npos || open + 1 >= name.size() - 1) return false;
+
+		const std::string baseName = TrimName(name.substr(0, open));
+		if(baseName != expectedBaseName) return false;
+
+		uint64_t parsed = 0;
+		for(size_t i = open + 1; i < name.size() - 1; ++i) {
+			if(!std::isdigit(static_cast<unsigned char>(name[i]))) {
+				return false;
+			}
+
+			parsed = parsed * 10 + static_cast<uint64_t>(name[i] - '0');
+			if(parsed > (std::numeric_limits<uint32_t>::max)()) {
+				return false;
+			}
+		}
+
+		if(parsed == 0) return false;
+		outIndex = static_cast<uint32_t>(parsed);
+		return true;
+	}
+
 	bool IsNameUsed(const std::unordered_map<Guid, std::shared_ptr<SceneObject>>& objects,
 					const std::string&											 name,
 					const SceneObject*											 ignore) {
@@ -58,6 +87,48 @@ namespace {
 		return false;
 	}
 } // namespace
+
+void SceneObjectLibrary::CompactNumberedNames(const std::string& baseName) {
+	const std::string trimmedBaseName = TrimName(baseName);
+	if(trimmedBaseName.empty()) return;
+
+	struct NumberedObject {
+		uint32_t						currentIndex = 0;
+		std::shared_ptr<SceneObject>	object;
+	};
+
+	std::vector<NumberedObject> numberedObjects;
+	numberedObjects.reserve(objects_.size());
+
+	for(const auto& [id, sp] : objects_) {
+		(void)id;
+		if(!sp) continue;
+
+		uint32_t currentIndex = 0;
+		if(TryParseNumberedName(sp->GetName(), trimmedBaseName, currentIndex)) {
+			numberedObjects.push_back({currentIndex, sp});
+		}
+	}
+
+	if(numberedObjects.empty()) return;
+
+	std::sort(numberedObjects.begin(), numberedObjects.end(),
+			  [](const NumberedObject& lhs, const NumberedObject& rhs) {
+				  if(lhs.currentIndex != rhs.currentIndex) return lhs.currentIndex < rhs.currentIndex;
+				  return lhs.object->GetGuid().ToString() < rhs.object->GetGuid().ToString();
+			  });
+
+	for(size_t i = 0; i < numberedObjects.size(); ++i) {
+		SceneObject* object = numberedObjects[i].object.get();
+		if(!object) continue;
+
+		const uint32_t	newIndex = static_cast<uint32_t>(i + 1);
+		const std::string newName = trimmedBaseName + "(" + std::to_string(newIndex) + ")";
+		if(object->GetName() != newName) {
+			object->SetName(newName, object->GetObjectType());
+		}
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 ///     オブジェクトの追加
@@ -134,6 +205,7 @@ std::string SceneObjectLibrary::MakeUniqueName(const std::string& requestedName,
 bool SceneObjectLibrary::RemoveObject(const std::shared_ptr<SceneObject>& object) {
 	if(!object) return false;
 	Guid id = object->GetGuid();
+	const std::string removedBaseName = RemoveTrailingNumberSuffix(object->GetName());
 	std::cout << "[REMOVE] " << object->GetName()
 			  << " GUID=" << id.ToString()
 			  << " use_count=" << object.use_count() << std::endl;
@@ -156,6 +228,7 @@ bool SceneObjectLibrary::RemoveObject(const std::shared_ptr<SceneObject>& object
 
 	// 最後にライブラリから除外
 	objects_.erase(id);
+	CompactNumberedNames(removedBaseName);
 	std::cout << "[AFTER ERASE]"
 			  << " use_count=" << object.use_count()
 			  << std::endl;
@@ -169,7 +242,10 @@ bool SceneObjectLibrary::RemoveObject(Guid id) {
 	auto it = objects_.find(id);
 	if(it == objects_.end()) return false;
 
+	std::string removedBaseName;
 	if(auto sp = it->second) {
+		removedBaseName = RemoveTrailingNumberSuffix(sp->GetName());
+
 		// 子リストをコピーしてから再帰削除
 		auto children = sp->GetChildren();
 		for(auto& child : children) {
@@ -185,6 +261,7 @@ bool SceneObjectLibrary::RemoveObject(Guid id) {
 	}
 
 	objects_.erase(it);
+	CompactNumberedNames(removedBaseName);
 	return true;
 }
 

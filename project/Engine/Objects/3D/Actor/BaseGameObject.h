@@ -6,6 +6,7 @@
 #include <Data/Engine/Configs/Scene/Objects/BaseGameObject/BaseGameObjectConfig.h>
 #include <Engine/Assets/Animation/AnimationModel.h>
 #include <Engine/Assets/Model/Model.h>
+#include <Engine/Foundation/Reflection/CalyxReflection.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 #include <Engine/Objects/3D/Details/BillboardParams.h>
 #include <Engine/objects/Collider/Collider.h>
@@ -20,6 +21,7 @@
  * - ゲームオブジェクト基底クラス
  * - 3Dモデル、コライダー、ビルボードの設定などを統合管理する基底クラス
  *---------------------------------------------------------------------------------------*/
+CALYX_OBJECT(Category = GameObject, DisplayName = "Mesh Object", Icon = "UI/Tool/cube.dds", PrefabEditable = true, PrefabRoot = true)
 class BaseGameObject
 	: public SceneObject,
 	  public IConfigurable {
