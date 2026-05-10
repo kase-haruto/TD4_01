@@ -69,6 +69,8 @@ namespace CalyxEngine {
 		void Update();
 		void Render();
 		void RenderMenu();
+		void RenderSettingsWindow();
+		void RenderRuntimeFullscreenViewport(const ImTextureID& tex);
 		void ClearSelection();
 		~LevelEditor();
 		CalyxEngine::SceneManager* GetSceneManager() const { return sceneManager_; }
@@ -100,6 +102,8 @@ namespace CalyxEngine {
 
 		EngineEdit::EditorMode GetMode() const { return mode_; }
 		void				   SetPlaySession(PlaySession* session) { pPlaySesseion_ = session; }
+		bool				   ShouldRenderRuntimeFullscreen() const;
+		bool				   ShouldHideEditorUiInGameMode() const;
 
 	private:
 		// マウスピッキング関連 ----------------------------------------------------
