@@ -1,7 +1,10 @@
 #pragma once
 
+#include <Engine/Application/Effects/EffectAsset.h>
+#include <Engine/Application/Effects/EffectPlayer.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
+#include <filesystem>
 #include <memory>
 
 namespace SceneAPI{
@@ -10,6 +13,39 @@ namespace SceneAPI{
 		auto ctx = SceneContext::Current();
 		assert(ctx && "No active SceneContext!");
 		return ctx->Instantiate<T>(std::forward<Args>(args)...);
+	}
+}
+
+namespace EffectAPI {
+	inline CalyxEngine::EffectPlayer* Player() {
+		auto ctx = SceneContext::Current();
+		assert(ctx && "No active SceneContext!");
+		return ctx->GetEffectPlayer();
+	}
+
+	inline CalyxEngine::EffectHandle Play(const CalyxEngine::EffectAsset& asset,
+										  const CalyxEngine::Vector3& position,
+										  const CalyxEngine::Quaternion& rotation = CalyxEngine::Quaternion::MakeIdentity(),
+										  const CalyxEngine::Vector3& scale = {1.0f, 1.0f, 1.0f}) {
+		return Player()->Play(asset, position, rotation, scale);
+	}
+
+	inline CalyxEngine::EffectHandle Play(const CalyxEngine::EffectAssetData& data,
+										  const CalyxEngine::Vector3& position,
+										  const CalyxEngine::Quaternion& rotation = CalyxEngine::Quaternion::MakeIdentity(),
+										  const CalyxEngine::Vector3& scale = {1.0f, 1.0f, 1.0f}) {
+		return Player()->Play(data, position, rotation, scale);
+	}
+
+	inline CalyxEngine::EffectHandle PlayFromPath(const std::filesystem::path& path,
+												  const CalyxEngine::Vector3& position,
+												  const CalyxEngine::Quaternion& rotation = CalyxEngine::Quaternion::MakeIdentity(),
+												  const CalyxEngine::Vector3& scale = {1.0f, 1.0f, 1.0f}) {
+		return Player()->PlayFromPath(path, position, rotation, scale);
+	}
+
+	inline void Stop(CalyxEngine::EffectHandle handle) {
+		Player()->Stop(handle);
 	}
 }
 

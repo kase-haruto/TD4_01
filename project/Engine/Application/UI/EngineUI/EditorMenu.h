@@ -15,7 +15,8 @@ namespace CalyxEngine {
 		File,
 		Edit,
 		View,
-		Tools
+		Tools,
+		Settings
 	};
 
 	/* ========================================================================

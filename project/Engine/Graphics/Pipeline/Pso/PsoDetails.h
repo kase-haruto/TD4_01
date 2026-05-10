@@ -35,6 +35,7 @@ namespace PipelineTag {
 		Object2d,
 		Particle,
 		GpuParticle,
+		EditorInfiniteGrid,
 		Line,
 		Effect,
 		Skybox,

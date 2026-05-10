@@ -155,10 +155,10 @@ namespace CalyxEngine {
 		PostEffectManager::Get()->Execute(cmd, offscreenRes, postOutput, dxCore_.get());
 
 		postOutput->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		pEngineUICore_->SetMainViewportTexture(postOutput->GetSRV().ptr);
 
 		debugRT->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		pEngineUICore_->SetDebugViewportTexture(debugRT->GetSRV().ptr);
+		pEngineUICore_->SetMainViewportTexture(postOutput->GetSRV().ptr);
 		if(pEngineUICore_ && pEngineUICore_->GetLevelEditor()) {
 			if(auto* sceneMgr = pEngineUICore_->GetLevelEditor()->GetSceneManager()) {
 				if(auto* pickingPass = sceneMgr->GetPickingPass()) {

@@ -9,6 +9,8 @@
 #include <Engine/Renderer/Primitive/PrimitiveDrawer.h>
 #include <Engine/Scene/Base/IScene.h>
 #include <Engine/Scene/Context/SceneContext.h>
+#include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
+#include <Engine/Renderer/Grid/GridRenderer.h>
 
 // scene
 #include "Engine/Scene/Test/TestScene.h"
@@ -49,6 +51,8 @@ namespace CalyxEngine {
 #if defined(_DEBUG) || defined(DEVELOP)
 		pickingPass_ = std::make_unique<CalyxEngine::PickingPass>();
 		pickingPass_->Initialize(1280, 720);
+		editorGridRenderer_ = std::make_unique<CalyxEngine::GridRenderer>();
+		editorGridRenderer_->Initialize();
 #endif
 	}
 
@@ -180,6 +184,11 @@ namespace CalyxEngine {
 	void SceneManager::PostUpdate(ID3D12GraphicsCommandList* cmd, PipelineService* pso) {
 		if(slots_.empty()) return;
 
+		if(editorPreviewCtx_) {
+			editorPreviewCtx_->MakeCurrent();
+			editorPreviewCtx_->PostUpdate(pso, cmd);
+		}
+
 		RebindIfContextChanged();
 		if(auto* ctx = ActiveCtx()) {
 			ctx->MakeCurrent();
@@ -199,28 +208,53 @@ namespace CalyxEngine {
 		DrawForRenderTarget(offscreen, cmd, pso);
 
 #if defined(_DEBUG) || defined(DEVELOP)
-		if(auto* ctx = ActiveCtx()) ctx->MakeCurrent();
-		CameraManager::SetTypeStatic(CameraType::Debug);
 		auto* debugRT = dx_->GetRenderTargetCollection().Get("DebugView");
-		DrawForRenderTarget(debugRT, cmd, pso);
+		if(editorPreviewCtx_) {
+			DrawEditorPreview(debugRT, cmd, pso);
+		} else {
+			if(auto* ctx = ActiveCtx()) ctx->MakeCurrent();
+			CameraManager::SetTypeStatic(CameraType::Debug);
+			DrawForRenderTarget(debugRT, cmd, pso);
 
-		if(pickingPass_ && debugRT) {
-			auto vp = debugRT->GetViewport();
-			pickingPass_->Resize(static_cast<int32_t>(vp.Width), static_cast<int32_t>(vp.Height));
-			if(auto* renderer = slots_[currentIdx_].scene->GetModelRenderer()) {
-				pickingPass_->Render(cmd, renderer, pso);
+			if(pickingPass_ && debugRT) {
+				auto vp = debugRT->GetViewport();
+				pickingPass_->Resize(static_cast<int32_t>(vp.Width), static_cast<int32_t>(vp.Height));
+				if(auto* renderer = slots_[currentIdx_].scene->GetModelRenderer()) {
+					pickingPass_->Render(cmd, renderer, pso);
+				}
+				debugRT->SetRenderTarget(cmd);
 			}
-			debugRT->SetRenderTarget(cmd);
 		}
 
 #endif
 
-		if(auto* cam = CameraManager::GetActive()) {
-			GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
-			cam->SetCommand(cmd, PipelineType::Line);
-			PrimitiveDrawer::GetInstance()->Render();
+		if(!editorPreviewCtx_) {
+			if(auto* cam = CameraManager::GetActive()) {
+				GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
+				cam->SetCommand(cmd, PipelineType::Line);
+				PrimitiveDrawer::GetInstance()->Render();
+			}
 		}
 		PrimitiveDrawer::GetInstance()->ClearMesh();
+	}
+
+	void SceneManager::DrawEditorPreview(IRenderTarget* rt,
+										 ID3D12GraphicsCommandList* cmd,
+										 PipelineService* pso) {
+		if(!rt || !editorPreviewCtx_) return;
+
+		editorPreviewCtx_->MakeCurrent();
+		CameraManager::SetTypeStatic(CameraType::Debug);
+
+		rt->SetRenderTarget(cmd);
+		rt->Clear(cmd);
+
+		if(auto* cam = CameraManager::GetActive()) {
+			if(editorGridRenderer_) {
+				editorGridRenderer_->Render(cmd, pso, cam);
+			}
+		}
+		editorPreviewCtx_->GetFxSystem()->Render(pso, cmd);
 	}
 
 	//------------------------------------------------------------

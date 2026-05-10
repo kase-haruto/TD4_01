@@ -13,6 +13,7 @@
 #include <vector>
 
 class SceneObject;
+class SceneContext;
 
 /*-----------------------------------------------------------------------------------------
  * SceneObjectLibrary
@@ -26,6 +27,8 @@ public:
     //====================================================================*//
     SceneObjectLibrary();
     ~SceneObjectLibrary();
+
+	void SetOwner(SceneContext* owner) { owner_ = owner; }
 
     /**
      * @brief オブジェクト追加
@@ -130,6 +133,7 @@ private:
     //      private variables
     //====================================================================*//
     std::unordered_map<Guid, std::shared_ptr<SceneObject>> objects_;
+	SceneContext* owner_ = nullptr;
 	EventBus::Connection connDestroy_;
 	bool suppressDestroySync_ = false;
 

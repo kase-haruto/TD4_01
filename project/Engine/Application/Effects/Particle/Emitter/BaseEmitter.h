@@ -69,6 +69,7 @@ namespace CalyxEngine {
 
 		virtual void SetAlphaMultiplier(float a) { alphaMultiplier_ = a; }
 		virtual void SetCameraFade(float, float) {}
+		virtual void SetCameraFadeEnabled(bool) {}
 
 		/**
 		 * \brief GUIDを用いてモデルデータをロード

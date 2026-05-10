@@ -234,9 +234,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Data\Engine\Configs\Scene\Objects\Particle\Module\ModuleConfig.cpp">
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
+    <ClCompile Include="Engine\Application\Effects\EffectAsset.cpp" />
+    <ClCompile Include="Engine\Application\Effects\EffectPlayer.cpp" />
     <ClCompile Include="Engine\Application\Effects\FxGuiHelpers.cpp" />
     <ClCompile Include="Engine\Application\Effects\FxObject.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Module\OverLifetime\OverLifetimeModule.cpp" />
+    <ClCompile Include="Engine\Application\Settings\EngineSettings.cpp" />
     <ClCompile Include="Engine\Application\UI\EngineUI\DebugOverlay.cpp" />
     <ClCompile Include="Engine\Application\UI\EngineUI\DebugTextOverlay.cpp" />
     <ClCompile Include="Engine\Application\UI\GUI\ImGuiJapaneaseFonts.cpp" />
@@ -289,6 +292,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Objects\Event\Camera\CameraEventObject.cpp" />
     <ClCompile Include="Engine\PostProcess\Blend\BlendEffect.cpp" />
     <ClCompile Include="Engine\PostProcess\Manager\PostEffectManager.cpp" />
+    <ClCompile Include="Engine\Renderer\Grid\GridRenderer.cpp" />
     <ClCompile Include="Game\DemoPlayer\DemoPlayer.cpp" />
     <ClCompile Include="Game\DemoHammer\DemoHammer.cpp" />
     <ClCompile Include="Game\DemoShockwave\Shockwave.cpp" />
@@ -306,6 +310,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\NodeEditor\NodeGraph.cpp" />
     <ClCompile Include="Engine\Objects\3D\Geometory\Spline\SplineData.cpp" />
     <ClCompile Include="Engine\Objects\3D\Geometory\Spline\SplineJson.cpp" />
+    <ClCompile Include="Engine\Objects\3D\Geometory\Spline\SplineRegistry.cpp" />
     <ClCompile Include="Engine\System\Command\EditorCommand\LevelEditorCommand\CreateObjectCommand\CreateObjectCommand.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Emitter\BaseEmitter.cpp" />
     <ClCompile Include="Engine\Graphics\Descriptor\DescriptorAllocator.cpp" />
@@ -359,6 +364,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Objects\Collider\Collider.cpp" />
     <ClCompile Include="Engine\Objects\3D\Geometory\Shape.cpp" />
     <ClCompile Include="Engine\Objects\3D\Actor\BaseGameObject.cpp" />
+    <ClCompile Include="Engine\Objects\3D\Actor\SplineDeformObject.cpp" />
     <ClCompile Include="Engine\Objects\Particle\DemoParticle.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -386,6 +392,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Pipeline\Shader\ShaderCompiler.cpp" />
     <ClCompile Include="Game\3d\Camera\RailCamera.cpp" />
     <ClCompile Include="Engine\Assets\Model\Model.cpp" />
+    <ClCompile Include="Engine\Assets\Model\SplineDeformedModel.cpp" />
     <ClCompile Include="Engine\Assets\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Renderer\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Assets\Texture\Texture.cpp" />
@@ -503,9 +510,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Event\EventConfig.h" />
     <ClInclude Include="Data\Engine\Configs\Scene\Objects\Particle\EffectConfig.h" />
     <ClInclude Include="Engine\Application\Effects\FxGuiHelpers.h" />
+    <ClInclude Include="Engine\Application\Effects\EffectAsset.h" />
+    <ClInclude Include="Engine\Application\Effects\EffectPlayer.h" />
     <ClInclude Include="Engine\Application\Effects\FxObject.h" />
     <ClInclude Include="Engine\Application\Effects\Particle\Emitter\EmitterDetails.h" />
     <ClInclude Include="Engine\Application\Effects\Particle\Module\OverLifetime\OverLifetimeModule.h" />
+    <ClInclude Include="Engine\Application\Settings\EngineSettings.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\DebugOverlay.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\DebugTextManager.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\DebugTextOverlay.h" />
@@ -589,6 +599,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Assets\System\AssetType.h" />
     <ClInclude Include="Engine\Objects\3D\Geometory\Spline\SplineData.h" />
     <ClInclude Include="Engine\Objects\3D\Geometory\Spline\SplineJson.h" />
+    <ClInclude Include="Engine\Objects\3D\Geometory\Spline\SplineRegistry.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\BaseLevelEditorCommand.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\ValueEditCommand.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\LevelEditorCommand\CreateObjectCommand\CreateObjectCommand.h" />
@@ -681,6 +692,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Objects\Collider\Collider.h" />
     <ClInclude Include="Engine\Objects\3D\Geometory\Shape.h" />
     <ClInclude Include="Engine\Objects\3D\Actor\BaseGameObject.h" />
+    <ClInclude Include="Engine\Objects\3D\Actor\SplineDeformObject.h" />
     <ClInclude Include="Engine\Objects\Particle\DemoParticle.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -718,6 +730,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Pipeline\Shader\ShaderCompiler.h" />
     <ClInclude Include="Engine\Renderer\Mesh\VertexData.h" />
     <ClInclude Include="Engine\Assets\Model\Model.h" />
+    <ClInclude Include="Engine\Assets\Model\SplineDeformedModel.h" />
     <ClInclude Include="Engine\Assets\Model\ModelData.h" />
     <ClInclude Include="Engine\Assets\Model\ModelManager.h" />
     <ClInclude Include="Engine\Renderer\Sprite\Sprite.h" />
@@ -754,6 +767,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\RenderTarget\Interface\IRenderTarget.h" />
     <ClInclude Include="Engine\PostProcess\Interface\IPostEffectPass.h" />
     <ClInclude Include="Engine\PostProcess\GrayScale\GrayScale.h" />
+    <ClInclude Include="Engine\Renderer\Grid\GridRenderer.h" />
     <ClInclude Include="Engine\Application\UI\GUI\ImGuiManager.h" />
     <ClInclude Include="Engine\Foundation\Utility\Func\DxFunc.h" />
     <ClInclude Include="Engine\Foundation\Utility\Func\MyFunc.h" />

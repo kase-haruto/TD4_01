@@ -17,7 +17,7 @@ SceneObjectLibrary::SceneObjectLibrary() {
 			auto	   it = objects_.find(id);
 			if(it == objects_.end()) return;
 
-			EventBus::Publish(ObjectRemoved{ev.object});
+			EventBus::Publish(ObjectRemoved{ev.object, owner_});
 			objects_.erase(it);
 		});
 }
@@ -80,7 +80,7 @@ void SceneObjectLibrary::AddObject(const std::shared_ptr<SceneObject>& object) {
 	objects_[id] = object;
 
 	// イベント発火
-	EventBus::Publish(ObjectAdded{object});
+	EventBus::Publish(ObjectAdded{object, owner_});
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ bool SceneObjectLibrary::RemoveObject(const std::shared_ptr<SceneObject>& object
 	}
 
 	// 先に削除イベントを発火（FxSystem が emitter を消す）
-	EventBus::Publish(ObjectRemoved{object});
+	EventBus::Publish(ObjectRemoved{object, owner_});
 
 	// DestroyRecursive で階層を断つ
 	suppressDestroySync_ = true;
@@ -181,7 +181,7 @@ bool SceneObjectLibrary::RemoveObject(Guid id) {
 		suppressDestroySync_ = true;
 		sp->Destroy();
 		suppressDestroySync_ = false;
-		EventBus::Publish(ObjectRemoved{sp});
+		EventBus::Publish(ObjectRemoved{sp, owner_});
 	}
 
 	objects_.erase(it);
@@ -198,7 +198,7 @@ void SceneObjectLibrary::Clear() {
 		suppressDestroySync_ = true;
 		sp->Destroy();
 		suppressDestroySync_ = false;
-		EventBus::Publish(ObjectRemoved{sp});
+		EventBus::Publish(ObjectRemoved{sp, owner_});
 	}
 
 	objects_.clear();

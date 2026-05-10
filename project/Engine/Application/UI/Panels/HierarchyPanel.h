@@ -29,7 +29,7 @@ namespace CalyxEngine {
 	class HierarchyPanel
 		: public IEngineUI {
 	private:
-		using SelectCB = std::function<void(std::shared_ptr<SceneObject>)>;
+		using SelectCB = std::function<void(std::shared_ptr<SceneObject>, bool toggle)>;
 		using DeleteCB = std::function<void(std::shared_ptr<SceneObject>)>;
 		using CreateCB = std::function<void(std::shared_ptr<SceneObject>)>;
 		using RenameCB = std::function<void(std::shared_ptr<SceneObject>, const std::string& newName)>;
@@ -53,11 +53,21 @@ namespace CalyxEngine {
 		void SetOnObjectCreate(CreateCB cb) { onCreate_ = std::move(cb); }
 		void SetOnObjectRename(RenameCB cb) { onRename_ = std::move(cb); }
 
-		void SetSelectedObject(std::weak_ptr<SceneObject> wp) { selected_ = wp; }
+		void SetSelectedObject(std::weak_ptr<SceneObject> wp) {
+			selected_ = wp;
+			selectedObjects_.clear();
+			if(auto sp = wp.lock()) {
+				selectedObjects_.push_back(sp);
+			}
+		}
+		void SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects);
 
 		const SceneObjectLibrary*  GetSceneObjectLibrary() const { return lib_; }
 		std::weak_ptr<SceneObject> GetSelectedObject() const {
 			return selected_;
+		}
+		std::vector<std::weak_ptr<SceneObject>> GetSelectedObjects() const {
+			return selectedObjects_;
 		}
 
 	private:
@@ -68,6 +78,7 @@ namespace CalyxEngine {
 		// render helper
 		bool DrawNode(SceneObject* obj);
 		bool PassFilterRecursive(SceneObject* obj) const;
+		bool IsSelected(SceneObject* obj) const;
 
 	private:
 		// runtime state
@@ -79,6 +90,7 @@ namespace CalyxEngine {
 		bool																			  cacheDirty_ = true;
 
 		std::weak_ptr<SceneObject> selected_;
+		std::vector<std::weak_ptr<SceneObject>> selectedObjects_;
 		std::weak_ptr<SceneObject> renameTarget_;
 
 		SelectCB onSelect_;

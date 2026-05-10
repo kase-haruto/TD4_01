@@ -56,6 +56,8 @@ private:
 
 		float damageFlashDuration = 1.0f;
 
+		float variableJumpMultiplier = 2.0f;
+
 		CalyxEngine::Vector3 colliderOffset = {0.0f, 0.4f, 0.0f};
 		CalyxEngine::Vector3 colliderSize = {0.8f, 1.6f, 0.5f};
 

@@ -4,6 +4,7 @@
 /* ===================================================================== */
 
 // engine
+#include <Engine/Application/Effects/EffectPlayer.h>
 #include <Engine/Application/Effects/FxSystem.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Lighting/LightLibrary.h>
@@ -72,15 +73,25 @@ public:
 	SceneObjectLibrary*	   GetObjectLibrary() const { return objectLibrary_.get(); }
 	LightLibrary*		   GetLightLibrary() const { return lightLibrary_.get(); }
 	CalyxEngine::FxSystem* GetFxSystem() const { return fxSystem_.get(); }
+	CalyxEngine::EffectPlayer* GetEffectPlayer() const { return effectPlayer_.get(); }
 	std::string			   GetSceneName() const { return sceneName_; }
 	bool				   IsRuntime() const { return isRuntime_; }
 	CameraManager*		   GetCameraMgr() { return cameraMgr_.get(); }
 	SceneObject*		   GetDebugSelectedObject() const { return debugSelectedObject_; }
+	const std::vector<SceneObject*>& GetDebugSelectedObjects() const { return debugSelectedObjects_; }
 
 	// setter
 	void SetSceneName(const std::string& n) { sceneName_ = n; }
 	void SetRuntime(bool f) { isRuntime_ = f; }
-	void SetDebugSelectedObject(SceneObject* obj) { debugSelectedObject_ = obj; }
+	void SetDebugSelectedObject(SceneObject* obj) {
+		debugSelectedObject_ = obj;
+		debugSelectedObjects_.clear();
+		if(obj) debugSelectedObjects_.push_back(obj);
+	}
+	void SetDebugSelectedObjects(std::vector<SceneObject*> objects) {
+		debugSelectedObjects_ = std::move(objects);
+		debugSelectedObject_ = debugSelectedObjects_.empty() ? nullptr : debugSelectedObjects_.back();
+	}
 
 	/* ---------- callbacks ----------- */
 	/// 個別削除時に飛ぶコールバック
@@ -110,6 +121,7 @@ private:
 	std::unique_ptr<SceneObjectLibrary>	   objectLibrary_;
 	std::unique_ptr<LightLibrary>		   lightLibrary_;
 	std::unique_ptr<CalyxEngine::FxSystem> fxSystem_;
+	std::unique_ptr<CalyxEngine::EffectPlayer> effectPlayer_;
 	std::unique_ptr<CameraManager>		   cameraMgr_;
 
 	ObjectRemovedCallback			   onEditorObjectRemoved_;
@@ -119,7 +131,8 @@ private:
 	std::string sceneName_ = "scene";
 	bool		isRuntime_ = false;
 
-	SceneObject* debugSelectedObject_ = nullptr;
+	SceneObject*			   debugSelectedObject_ = nullptr;
+	std::vector<SceneObject*> debugSelectedObjects_;
 
 	EventBus::Connection connObjectAdded_;
 	EventBus::Connection connObjectRemoved_;

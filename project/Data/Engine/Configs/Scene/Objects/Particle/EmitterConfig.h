@@ -32,9 +32,12 @@ namespace CalyxEngine {
 		bool		  followOneShot	 = false;
 		bool		  isComplement	 = true;
 		bool		  randomSpinEmit = false;
+		bool          cameraDitherEnabled = false;
 		BillboardMode billboardMode	 = BillboardMode::Full;
 		BlendMode	  blendMode		 = BlendMode::ADD;
 		EmitterShape emitterShape	 = EmitterShape::Point;
+		float         cameraDitherNear = 0.0f;
+		float         cameraDitherFar  = 20.0f;
 		// 既存データ互換: キー未定義時は BaseEmitter と同じ既定値を使う
 		CalyxEngine::Vector3 shapeSize{1.0f, 1.0f, 1.0f};
 		float shapeRadius = 1.0f;
@@ -66,6 +69,9 @@ namespace CalyxEngine {
 		isComplement   = j.value("isComplement", true);
 		randomSpinEmit = j.value("randomSpinEmit", false);
 		followOneShot  = j.value("followOneShot", false);
+		cameraDitherEnabled = j.value("cameraDitherEnabled", false);
+		cameraDitherNear = j.value("cameraDitherNear", 0.0f);
+		cameraDitherFar = j.value("cameraDitherFar", 20.0f);
 		emitterShape   = j.value("emitterShape", EmitterShape::Point);
 		shapeSize      = j.value("shapeSize", CalyxEngine::Vector3{1.0f, 1.0f, 1.0f});
 		shapeRadius    = j.value("shapeRadius", 1.0f);
@@ -122,6 +128,9 @@ namespace CalyxEngine {
 		j["isComplement"]	= isComplement;
 		j["randomSpinEmit"] = randomSpinEmit;
 		j["followOneShot"]	= followOneShot;
+		j["cameraDitherEnabled"] = cameraDitherEnabled;
+		j["cameraDitherNear"] = cameraDitherNear;
+		j["cameraDitherFar"] = cameraDitherFar;
 		j["blendMode"]		= blendMode;
 		j["emitterShape"]  = emitterShape;
 		j["shapeSize"]     = shapeSize;
