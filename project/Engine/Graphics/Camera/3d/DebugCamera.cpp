@@ -53,6 +53,7 @@ void DebugCamera::AlwaysUpdate(float dt){
 
 		// カメラの回転は (Pitch, Yaw, 0)
 		worldTransform_.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
+		worldTransform_.rotationSource = RotationSource::Euler;
 	}
 
 	// BaseCameraの更新処理を呼び出す

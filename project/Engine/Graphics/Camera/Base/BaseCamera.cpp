@@ -125,6 +125,7 @@ void BaseCamera::ApplyConfig() {
 	name_	  = cfg.name;
 	id_		  = cfg.guid;
 	parentId_ = cfg.parentGuid;
+	worldTransform_.ApplyConfig(cfg.transform);
 }
 
 void BaseCamera::ExtractConfig() {
@@ -133,6 +134,7 @@ void BaseCamera::ExtractConfig() {
 	cfg.name	   = name_;
 	cfg.guid	   = id_;
 	cfg.parentGuid = parentId_;
+	cfg.transform  = worldTransform_.ExtractConfig();
 }
 
 void BaseCamera::ApplyConfigFromJson([[maybe_unused]] const nlohmann::json& j) {

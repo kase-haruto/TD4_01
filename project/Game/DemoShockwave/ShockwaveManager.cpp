@@ -14,7 +14,7 @@ void ShockwaveManager::Initialize(int poolSize) {
 	pool_.clear();
 	pool_.reserve(poolSize);// メモリ確保
 	for (int i = 0; i < poolSize; ++i) {
-		auto sw = SceneAPI::Instantiate<Shockwave>("shockwave.obj", "Shockwave");
+		auto sw = SceneAPI::Instantiate<Shockwave>("Torus.obj", "Shockwave");
 		sw->Initialize();
 		sw->Deactivate();
 		sw->SetTexture("Textures/shockwave/shockwave.png");

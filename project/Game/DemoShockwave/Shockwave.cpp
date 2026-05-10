@@ -45,7 +45,8 @@ void Shockwave::Update(float dt) {
 		}
  		collider_->Update(worldTransform_.translation, worldTransform_.rotation);
 	}
-	worldTransform_.scale = {currentScale, currentScale*0.25f, currentScale};
+	//worldTransform_.scale = {currentScale, currentScale * 0.25f, currentScale};
+	worldTransform_.scale = {currentScale, currentScale, currentScale};
 	
 }
 

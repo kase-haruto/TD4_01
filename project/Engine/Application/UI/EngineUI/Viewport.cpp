@@ -4,6 +4,7 @@
 #include "Viewport.h"
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Application/Effects/FxSystem.h>
+#include <Engine/Application/Effects/Particle/Emitter/FxEmitter.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
@@ -17,11 +18,13 @@
 #include <Engine/Graphics/Camera/Base/BaseCamera.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/3D/Actor/Library/SceneObjectLibrary.h>
 #include <Engine/Physics/Ray/RayDetail.h>
 #include <Engine/Physics/Ray/Raycastor.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/System/Command/EditorCommand/LevelEditorCommand/CreateObjectCommand/CreateObjectCommand.h>
+#include <Engine/System/Command/EditorCommand/ValueEditCommand.h>
 #include <Engine/System/Command/Manager/CommandManager.h>
 #include <externals/imgui/ImGuizmo.h>
 #include <externals/imgui/imgui.h>
@@ -121,12 +124,6 @@ namespace {
             }
 
             ctx->AddObject(sp);
-
-            if(auto fxObj = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(sp)) {
-                if(auto* fxSys = ctx->GetFxSystem()) {
-                    fxSys->AddEmitter(fxObj->GetEmitter(), fxObj->GetGuid());
-                }
-            }
         }
     }
 }
@@ -179,6 +176,104 @@ CalyxEngine::Vector3 Viewport::CalculateSpawnPosForPlace(const ImVec2& imagePos)
     }
 
     return spawnPos;
+}
+
+std::shared_ptr<SceneObject> Viewport::PickObjectAtLocalPoint(const CalyxEngine::Vector2& localPoint) const {
+    SceneContext* ctx = SceneContext::Current();
+    if(!ctx || !camera_ || !IsPointInRect(localPoint, size_)) return nullptr;
+
+    if(pickingPass_) {
+        const float scaleX = static_cast<float>(pickingPass_->GetWidth()) / size_.x;
+        const float scaleY = static_cast<float>(pickingPass_->GetHeight()) / size_.y;
+
+        const int32_t px = static_cast<int32_t>(localPoint.x * scaleX);
+        const int32_t py = static_cast<int32_t>(localPoint.y * scaleY);
+
+        const uint32_t objID = pickingPass_->GetObjectID(px, py);
+        if(objID > 0) {
+            if(auto* library = ctx->GetObjectLibrary()) {
+                if(auto sp = library->FindSharedByPickingID(objID)) {
+                    return sp;
+                }
+            }
+        }
+    }
+
+    auto* library = ctx->GetObjectLibrary();
+    if(!library) return nullptr;
+
+    const ::Ray ray = ::Raycastor::ConvertMouseToRay(
+        localPoint,
+        camera_->GetViewMatrix(),
+        camera_->GetProjectionMatrix(),
+        size_);
+
+    auto hit = ::Raycastor::Raycast(ray, library->GetAllObjectsRaw());
+    if(!hit) return nullptr;
+
+    return ctx->FindSharedObject(static_cast<SceneObject*>(hit->hitObject));
+}
+
+bool Viewport::ApplyAssetToObjectAtLocalPoint(const AssetDragPayload& payload, const CalyxEngine::Vector2& localPoint) {
+    auto target = PickObjectAtLocalPoint(localPoint);
+    if(!target) return false;
+
+    if(payload.type == AssetType::Material) {
+        auto gameObject = std::dynamic_pointer_cast<BaseGameObject>(target);
+        if(!gameObject || !gameObject->GetModel()) return false;
+
+        const Guid before = gameObject->GetModel()->GetMaterialGuid();
+        const Guid after = payload.guid;
+        if(before == after) return false;
+
+        auto apply = [gameObject](const Guid& guid) {
+            if(gameObject && gameObject->GetModel()) {
+                gameObject->GetModel()->SetMaterialGuid(guid);
+            }
+        };
+        CommandManager::GetInstance()->Execute(
+            std::make_unique<ValueEditCommand<Guid>>("Apply Material Asset", before, after, apply));
+        return true;
+    }
+
+    if(payload.type == AssetType::Texture) {
+        if(auto gameObject = std::dynamic_pointer_cast<BaseGameObject>(target)) {
+            if(!gameObject->GetModel()) return false;
+
+            const Guid before = gameObject->GetModel()->GetTextureGuid();
+            const Guid after = payload.guid;
+            if(before == after) return false;
+
+            auto apply = [gameObject](const Guid& guid) {
+                if(gameObject && gameObject->GetModel()) {
+                    gameObject->GetModel()->SetTextureGuid(guid);
+                }
+            };
+            CommandManager::GetInstance()->Execute(
+                std::make_unique<ValueEditCommand<Guid>>("Apply Texture Asset", before, after, apply));
+            return true;
+        }
+
+        if(auto particleObject = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(target)) {
+            auto emitter = particleObject->GetEmitter();
+            if(!emitter) return false;
+
+            const Guid before = emitter->GetTextureGuid();
+            const Guid after = payload.guid;
+            if(before == after) return false;
+
+            auto apply = [emitter](const Guid& guid) {
+                if(emitter) {
+                    emitter->SetTextureGuid(guid);
+                }
+            };
+            CommandManager::GetInstance()->Execute(
+                std::make_unique<ValueEditCommand<Guid>>("Apply Particle Texture Asset", before, after, apply));
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Viewport::Render(const ImTextureID& tex) {
@@ -241,7 +336,7 @@ void Viewport::Render(const ImTextureID& tex) {
         if(ImGui::BeginDragDropTarget()) {
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_PLACE_ITEM")) {
                 const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(payload);
-                if(item && hoverImageRect) {
+                if(item && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     item->createFunc(spawnPos);
 
@@ -254,8 +349,16 @@ void Viewport::Render(const ImTextureID& tex) {
                 }
             }
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
+                const AssetDragPayload* assetPayload = ReadAssetPayload(payload);
+                if(assetPayload && hoverImageRect && payload->IsDelivery() &&
+                   (assetPayload->type == AssetType::Material || assetPayload->type == AssetType::Texture)) {
+                    const ImVec2 mousePos = ImGui::GetMousePos();
+                    const CalyxEngine::Vector2 localMouse(mousePos.x - imagePos.x, mousePos.y - imagePos.y);
+                    ApplyAssetToObjectAtLocalPoint(*assetPayload, localMouse);
+                }
+
                 const AssetRecord* record = GetDraggedModelRecord(payload);
-                if(record && hoverImageRect) {
+                if(record && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     const AssetGUID guid = record->guid;
 
@@ -280,7 +383,7 @@ void Viewport::Render(const ImTextureID& tex) {
                 }
 
                 const AssetRecord* prefabRecord = GetDraggedPrefabRecord(payload);
-                if(prefabRecord && hoverImageRect) {
+                if(prefabRecord && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     auto objects = PrefabSerializer::Load(prefabRecord->sourcePath.string());
                     AddPrefabObjectsToCurrentScene(objects, spawnPos);

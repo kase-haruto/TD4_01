@@ -14,6 +14,8 @@
 #include <Engine\Graphics\MaterialGraph\ShaderGraphValidator.h>
 #include <Engine\Graphics\Pipeline\Factory\PsoFactory.h>
 #include <Engine\Graphics\Pipeline\Shader\ShaderCompiler.h>
+#include <Engine\System\Command\EditorCommand\ValueEditCommand.h>
+#include <Engine\System\Command\Manager\CommandManager.h>
 #include <externals\imgui\imgui.h>
 
 #include <algorithm>
@@ -402,11 +404,48 @@ namespace CalyxEngine {
 				}
 				EnsureOutputNode(*material);
 				DrawToolbar(*material);
+				bool pendingGraphCommand = false;
+				std::string pendingGraphCommandName;
+				NodeGraph pendingGraphBefore;
+				NodeGraph pendingGraphAfter;
 				if(canvas_.Draw(
 					   material->graph,
-					   [this, material](Node& node) { return DrawNodeBody(*material, node); },
-					   [this, material](const NodeEditorCanvas::ContextMenu& menu) { return DrawContextMenu(*material, menu); })) {
+					   [this, material, &pendingGraphCommand, &pendingGraphCommandName, &pendingGraphBefore, &pendingGraphAfter](Node& node) {
+						   const NodeGraph before = material->graph;
+						   const bool changed = DrawNodeBody(*material, node);
+						   if(changed) {
+							   if(ImGui::IsAnyItemActive()) {
+								   if(!nodeEditCommandActive_) {
+									   nodeEditCommandActive_ = true;
+									   nodeEditMaterial_ = material->GetGuid();
+									   nodeEditBefore_ = before;
+								   }
+							   } else {
+								   pendingGraphCommand = true;
+								   pendingGraphCommandName = "Edit Material Node";
+								   pendingGraphBefore = before;
+								   pendingGraphAfter = material->graph;
+							   }
+						   }
+						   return changed;
+					   },
+					   [this, material](const NodeEditorCanvas::ContextMenu& menu) { return DrawContextMenu(*material, menu); },
+					   [&pendingGraphCommand, &pendingGraphCommandName, &pendingGraphBefore, &pendingGraphAfter](const char* name, const NodeGraph& before, const NodeGraph& after) {
+						   pendingGraphCommand = true;
+						   pendingGraphCommandName = name;
+						   pendingGraphBefore = before;
+						   pendingGraphAfter = after;
+					   })) {
 					Evaluate(*material);
+				}
+				if(nodeEditCommandActive_ && !ImGui::IsAnyItemActive()) {
+					if(nodeEditMaterial_ == material->GetGuid()) {
+						ExecuteGraphCommand(*material, "Edit Material Node", nodeEditBefore_, material->graph);
+					}
+					nodeEditCommandActive_ = false;
+				}
+				if(pendingGraphCommand) {
+					ExecuteGraphCommand(*material, pendingGraphCommandName.c_str(), pendingGraphBefore, pendingGraphAfter);
 				}
 				if(DrawLightingModePopup(*material)) {
 					Evaluate(*material);
@@ -642,6 +681,7 @@ namespace CalyxEngine {
 	}
 
 	bool MaterialNodeEditorPanel::DrawAddNodeMenu(MaterialAsset& material, Vector2 position) {
+		const NodeGraph before = material.graph;
 		bool changed = false;
 		if(ImGui::BeginMenu("Material Parameters")) {
 			if(ImGui::MenuItem("Color")) {
@@ -848,7 +888,22 @@ namespace CalyxEngine {
 			AddTextureSampleNode(material, position);
 			changed = true;
 		}
+		if(changed) {
+			ExecuteGraphCommand(material, "Add Material Node", before, material.graph);
+		}
 		return changed;
+	}
+
+	void MaterialNodeEditorPanel::ExecuteGraphCommand(MaterialAsset& material, const char* name, const NodeGraph& before, const NodeGraph& after) {
+		auto apply = [this, materialGuid = material.GetGuid()](const NodeGraph& graph) {
+			auto material = AssetManager::GetInstance()->GetDataAssetManager()->GetAsset<MaterialAsset>(materialGuid);
+			if(!material) return;
+			material->graph = graph;
+			material->graph.EnsureNextId();
+			Evaluate(*material);
+		};
+		CommandManager::GetInstance()->Execute(
+			std::make_unique<ValueEditCommand<NodeGraph>>(name, before, after, apply));
 	}
 
 	bool MaterialNodeEditorPanel::DrawContextMenu(MaterialAsset& material, const NodeEditorCanvas::ContextMenu& menu) {

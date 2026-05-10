@@ -493,6 +493,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Manager\StageGimmickManager.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\StageGimmick\Gimmicks\DroolRain\DroolRainEvent.h" />
@@ -589,6 +590,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Objects\3D\Geometory\Spline\SplineData.h" />
     <ClInclude Include="Engine\Objects\3D\Geometory\Spline\SplineJson.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\BaseLevelEditorCommand.h" />
+    <ClInclude Include="Engine\System\Command\EditorCommand\ValueEditCommand.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\LevelEditorCommand\CreateObjectCommand\CreateObjectCommand.h" />
     <ClInclude Include="Engine\Application\Effects\Particle\Emitter\BaseEmitter.h" />
     <ClInclude Include="Engine\Application\System\EngineMode.h" />
@@ -821,9 +823,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Application\System\PlaySession.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h" />
+    <ClInclude Include="Game\StageGimmick\Parameters\StageGimmickParam.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h" />
     <ClInclude Include="Game\Stage\Stage.h" />
+    <ClInclude Include="Game\StageGimmick\Prediction\PredictionCircle.h" />
     <ClInclude Include="Resources\shaders\CRT.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -842,7 +846,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
   </ItemGroup>
-  
   <ItemGroup>
     <Content Include="Data\Game\Config\Event\CameraTurnAroundEventConfig.h" />
     <Content Include="Engine\Foundation\Serialization\ParamStore.h" />

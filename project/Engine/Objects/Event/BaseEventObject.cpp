@@ -87,6 +87,9 @@ void BaseEventObject::Initialize() {
 #else
 	isDrawEnable_ = false;
 #endif
+
+	//イベントオブジェクトはアウトラインをかけない
+	SceneObject::SetOutlineEnabled(false);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

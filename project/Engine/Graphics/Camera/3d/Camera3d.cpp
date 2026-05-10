@@ -87,7 +87,6 @@ Camera3d::Camera3d() : BaseCamera() {
 Camera3d::Camera3d(const std::string& name) { SceneObject::SetName(name,ObjectType::Camera); }
 
 void Camera3d::Initialize() {
-	worldTransform_.translation = {0.0f, 2.0f, -3.0f};
 	follow_.LoadParams();
 }
 

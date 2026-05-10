@@ -98,6 +98,18 @@ namespace CalyxEngine {
 		hierarchy_->SetOnObjectCreate(
 			[this](std::shared_ptr<SceneObject> sp) { CreateObject(std::move(sp)); });
 
+		hierarchy_->SetOnObjectRename(
+			[](std::shared_ptr<SceneObject> sp, const std::string& newName) {
+				if(!sp) return;
+				if(auto* ctx = SceneContext::Current()) {
+					if(auto* lib = ctx->GetObjectLibrary()) {
+						lib->RenameObject(sp, newName);
+						return;
+					}
+				}
+				sp->SetName(newName, sp->GetObjectType());
+			});
+
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
 
 		// ビューポートの初期化 ------------------------------------------------
@@ -631,15 +643,6 @@ namespace CalyxEngine {
 
 		// SceneContext 経由で登録（内部で SceneObjectLibrary::AddObject を呼ぶ）
 		ctx->AddObject(obj);
-
-		// パーティクルなら FxSystem 側にも登録
-		if(obj->GetObjectType() == ObjectType::Effect) {
-			if(auto fxObj = std::dynamic_pointer_cast<CalyxEngine::ParticleSystemObject>(obj)) {
-				if(auto* fxSys = ctx->GetFxSystem()) {
-					fxSys->AddEmitter(fxObj->GetEmitter(), fxObj->GetGuid());
-				}
-			}
-		}
 
 		if(hierarchy_) hierarchy_->RefreshCache();
 	}

@@ -40,6 +40,7 @@ private:
 	bool isHoming_ = false;
 
 	// 調整するパラメーター
+	CalyxEngine::Vector3 velocity_;
 	float speed_ = 5.0f;
 
 

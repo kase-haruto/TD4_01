@@ -1,6 +1,7 @@
 #include "DroolRainObject.h"
 
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include <Engine\Foundation\Utility\Ease\CxEase.h>
 
 REGISTER_SCENE_OBJECT(DroolRainObject)
 
@@ -14,6 +15,14 @@ void DroolRainObject::ObjectInitialize() {
 
 	// コライダーの初期化
 	BaseGameObject::InitializeCollider(ColliderKind::Sphere);
+	if(collider_) {
+		collider_->SetType(ColliderType::Type_StageGimmick);
+		collider_->SetTargetType(ColliderType::Type_Player);
+		collider_->SetOwner(this);
+		collider_->SetCollisionEnabled(true);
+	}
+
+	defaultScale_ = worldTransform_.scale;
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {
@@ -22,12 +31,38 @@ void DroolRainObject::ObjectUpdate(float dt) {
 		offsetY_ = worldTransform_.translation.y;
 		return;
 	}
+	// 落下中の処理
+	if(worldTransform_.GetWorldPosition().y >= 0.0f) {
 
-	float y = worldTransform_.translation.y;
-	y -= 2.0f * dt;
-	worldTransform_.translation.y = y;
+		// よだれの落下処理
+		float y = worldTransform_.translation.y;
+		runtimeParam_.velocityY_ += runtimeParam_.accelerationY_ * dt;
+		y += runtimeParam_.velocityY_ * dt;
+		worldTransform_.translation.y = y;
+		// よだれのスケール処理
+		float scaleY = worldTransform_.scale.y;
+		scaleY += runtimeParam_.airScaleSpeed_ * dt;
+		worldTransform_.scale.y = scaleY;
 
-	if(worldTransform_.translation.y < 0.0f) {
-		worldTransform_.translation.y = offsetY_;
+	// 落下終了後の処理
+	} else {
+		// 地面についてから時間を測る
+		runtimeParam_.groundLifeTime_ -= dt;
+		float t = runtimeParam_.groundLifeTime_;
+		if(t >= 0.0f) {
+
+			// よだれの落下処理
+			float y = worldTransform_.translation.y;
+			y += runtimeParam_.groundVelocityY_ * dt;
+			worldTransform_.translation.y = y;
+			// よだれのスケール処理
+			worldTransform_.scale += runtimeParam_.groundScaleSpeed_ * dt;
+			worldTransform_.scale.y = t;
+
+		} else {
+			worldTransform_.translation.y = offsetY_;
+			worldTransform_.scale = defaultScale_;
+			runtimeParam_ = param_;
+		}
 	}
 }
