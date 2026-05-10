@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
+#include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
 /// <summary>
 /// よだれ雨オブジェクト
@@ -22,6 +23,11 @@ public:
 		isRaining_ = isRaining;
 	}
 
+	void SetParam(const DroolRainParam& param) {
+		param_ = param;
+		runtimeParam_ = param;
+	}
+
 protected:
 
 	// 初期化
@@ -32,7 +38,12 @@ protected:
 
 private:
 
+	// パラメータ
+	DroolRainParam param_;
+	// 実行中に変更されるパラメータ
+	DroolRainParam runtimeParam_;
 	float offsetY_ = 0.0f;
+	CalyxEngine::Vector3 defaultScale_;
 
 	// 雨が降っているか
 	bool isRaining_ = false;
