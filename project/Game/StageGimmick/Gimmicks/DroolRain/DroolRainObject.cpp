@@ -27,8 +27,9 @@ void DroolRainObject::ObjectInitialize() {
 
 void DroolRainObject::ObjectUpdate(float dt) {
 
-	if(!isRaining_) {
+	if(isOnceSet_) {
 		offsetY_ = worldTransform_.translation.y;
+		isOnceSet_ = false;
 		return;
 	}
 	// 落下中の処理
