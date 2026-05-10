@@ -57,7 +57,7 @@ void DroolRainObject::ObjectUpdate(float dt) {
 			worldTransform_.translation.y = y;
 			// よだれのスケール処理
 			worldTransform_.scale += runtimeParam_.groundScaleSpeed_ * dt;
-			worldTransform_.scale.y = t;
+			worldTransform_.scale.y = defaultScale_.y * t;
 
 		} else {
 			worldTransform_.translation.y = offsetY_;
