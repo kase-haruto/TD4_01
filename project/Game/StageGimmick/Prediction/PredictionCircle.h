@@ -2,6 +2,12 @@
 
 #include "Engine\Objects\3D\Actor\BaseGameObject.h"
 
+// 前方宣言
+class DroolRainObject;
+
+/// <summary>
+/// 予測円のオブジェクトクラス
+/// </summary>
 class PredictionCircle : public BaseGameObject {
 
 public:
@@ -19,7 +25,7 @@ public:
 
 private:
 
-
-
+	// よだれのオブジェクト
+	float targetObjectY_ = 0.0f;
 
 };

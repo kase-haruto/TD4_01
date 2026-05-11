@@ -435,6 +435,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\LevelEditor.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Module\Velocity\GravityModule.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Emitter\GpuFxEmitter.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.cpp" />
     <ClCompile Include="Game\Stage\Stage.cpp" />
@@ -835,6 +837,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\PostProcess\Vignette\Vignette.h" />
     <ClInclude Include="Engine\Application\Effects\Particle\Emitter\GpuFxEmitter.h" />
     <ClInclude Include="Engine\Application\System\PlaySession.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadObject.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h" />
     <ClInclude Include="Game\StageGimmick\Parameters\StageGimmickParam.h" />

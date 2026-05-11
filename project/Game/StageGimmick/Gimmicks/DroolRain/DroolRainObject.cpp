@@ -9,6 +9,8 @@ DroolRainObject::DroolRainObject(
 	const std::string& modelName,
 	std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
+
+	worldTransform_.translation.y += 2.5f;
 }
 
 void DroolRainObject::ObjectInitialize() {
@@ -16,19 +18,21 @@ void DroolRainObject::ObjectInitialize() {
 	// コライダーの初期化
 	BaseGameObject::InitializeCollider(ColliderKind::Sphere);
 	if(collider_) {
-		collider_->SetType(ColliderType::Type_StageGimmick);
+		collider_->SetType(ColliderType::Type_EnemyAttack);
 		collider_->SetTargetType(ColliderType::Type_Player);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
 	}
 
 	defaultScale_ = worldTransform_.scale;
+	worldTransform_.inheritScale = false;
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {
 
-	if(!isRaining_) {
+	if(isOnceSet_) {
 		offsetY_ = worldTransform_.translation.y;
+		isOnceSet_ = false;
 		return;
 	}
 	// 落下中の処理
