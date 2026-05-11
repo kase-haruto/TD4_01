@@ -41,6 +41,11 @@ public:
 	void CleanUp()override;
 	void LoadAssets()override;
 private:
+
+	void CheckStageState(float dt);
+	void PauseUpdate(float dt);
+
+private:
 	/* graphics =====================================================*/
 	std::unique_ptr<FogEffect>fog_ = nullptr;
 

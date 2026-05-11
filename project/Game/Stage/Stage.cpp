@@ -21,7 +21,13 @@ void Stage::Initialize(float hp, float limitTime) {
 }
 
 void Stage::Update(float dt) {
-	timer_ -= dt;
+	if(timer_ > 0.0f) {
+		timer_ -= dt;
+	} else {
+		timer_ = 0.0f;
+		//isGameOver_ = true;
+	}
+	
 	if(numbersSprite_) {
 		numbersSprite_->SetValue(int(timer_));
 		numbersSprite_->Update();
@@ -44,6 +50,7 @@ void Stage::TakeDamage(float damage) {
 	stageHP_ -= damage;
 	if(stageHP_ < 0.0f) {
 		stageHP_ = 0.0f;
+		isClear_ = true;
 	}
 
 	float rate = stageHP_ / maxHP_;

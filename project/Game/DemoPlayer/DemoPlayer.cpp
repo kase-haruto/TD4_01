@@ -117,9 +117,9 @@ void DemoPlayer::DerivativeGui() {
 }
 
 void DemoPlayer::OnCollisionEnter(Collider* other) {
-	/*if(other->GetType() == ColliderType::Type_StageGimmick) {
+	if(other->GetType() == ColliderType::Type_Enemy || other->GetType() == ColliderType::Type_EnemyAttack) {
 		TakeDamage(1);
-	}*/
+	}
 
 	BaseGameObject* otherObj = other->GetOwner();
 	if(!otherObj) {
