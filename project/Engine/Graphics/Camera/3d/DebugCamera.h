@@ -15,6 +15,17 @@ struct CalyxEngine::Vector2;
 class DebugCamera
 	: public Camera3d {
 public:
+	struct State {
+		CalyxEngine::Vector3 target{0.0f, 0.0f, 0.0f};
+		float distance = 10.0f;
+		CalyxEngine::Vector2 orbitAngle{0.0f, 0.0f};
+		float rotateSpeed = 0.005f;
+		float panSpeed = 0.1f;
+		float zoomSpeed = 0.1f;
+		CalyxEngine::Vector3 translation{0.0f, 4.0f, -10.0f};
+		CalyxEngine::Vector3 eulerRotation{0.0f, 0.0f, 0.0f};
+	};
+
 	//===================================================================//
 	//							public メソッド
 	//===================================================================//
@@ -34,6 +45,9 @@ public:
 	//* カメラとターゲットとの初期距離を設定
 	void SetDistance(float dist) { distance_ = dist; }
 	void SetInputEnabled(bool enable) { isInputEnabled_ = enable; }
+	void CopyStateFrom(const DebugCamera& other);
+	State CaptureState() const;
+	void ApplyState(const State& state);
 
 	std::string_view GetObjectClassName() const override { return "DebugCamera"; }
 
@@ -44,6 +58,11 @@ private:
 	void Move();   //< パン処理
 	void Rotate(); //< 回転処理(Orbit)
 	void Zoom();   //< ズーム処理
+	CalyxEngine::Vector3 CalcOrbitOffset() const;
+	void SyncOrbitFromTransform();
+	void ApplyOrbitToTransform();
+	bool IsTransformChangedExternally() const;
+	void StoreAppliedTransform();
 
 	//===================================================================//
 	//							private 変数
@@ -65,4 +84,7 @@ private:
 	CalyxEngine::Vector2 lastMousePosMove_{0.0f,0.0f}; //* Move用の前フレームのマウス位置
 	bool    isDraggingMove_{false};       //* Moveがドラッグ中かどうか
 	bool	isInputEnabled_{true};
+	CalyxEngine::Vector3 lastAppliedTranslation_{0.0f,0.0f,0.0f};
+	CalyxEngine::Vector3 lastAppliedEulerRotation_{0.0f,0.0f,0.0f};
+	bool	hasAppliedTransform_{false};
 };

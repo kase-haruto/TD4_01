@@ -14,12 +14,26 @@
 #include "Engine/Foundation/Math/MathUtil.h"
 
 #include <algorithm>
+#include <cmath>
 #include <numbers>
+
+namespace {
+bool NearlyEqual(float a, float b) {
+	return std::abs(a - b) < 0.0001f;
+}
+
+bool NearlyEqual(const CalyxEngine::Vector3& a, const CalyxEngine::Vector3& b) {
+	return NearlyEqual(a.x, b.x) && NearlyEqual(a.y, b.y) && NearlyEqual(a.z, b.z);
+}
+}
 
 DebugCamera::DebugCamera(const std::string& name){
 	BaseCamera::SetName(name);
 	fovAngleY_ = static_cast< float >(std::numbers::pi) * 0.25f; // 45度
 	worldTransform_.translation = {0.0f, 4.0f, -10.0f};
+	worldTransform_.eulerRotation = {0.0f, 0.0f, 0.0f};
+	worldTransform_.rotationSource = RotationSource::Euler;
+	SyncOrbitFromTransform();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -35,29 +49,45 @@ void DebugCamera::AlwaysUpdate(float dt){
 		Zoom();
 	}
 
-	// カメラの姿勢・行列を更新
-	{
-		// orbitAngle_.x = 水平方向(Yaw)
-		// orbitAngle_.y = 垂直方向(Pitch)
-		// 距離と角度からカメラの相対座標を計算
-		CalyxEngine::Matrix4x4 matRotYaw =CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
-		CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
-		CalyxEngine::Matrix4x4 matRot = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
-
-		// Z方向に距離分だけオフセットし、回転行列を適用
-		CalyxEngine::Vector3 offset(0.0f, 0.0f, -distance_);
-		offset = CalyxEngine::TransformNormal(offset, matRot);
-
-		// カメラの位置 = ターゲット + オフセット
-		worldTransform_.translation = target_ + offset;
-
-		// カメラの回転は (Pitch, Yaw, 0)
-		worldTransform_.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
-		worldTransform_.rotationSource = RotationSource::Euler;
+	if(IsTransformChangedExternally()) {
+		SyncOrbitFromTransform();
 	}
+	ApplyOrbitToTransform();
 
 	// BaseCameraの更新処理を呼び出す
 	BaseCamera::AlwaysUpdate(dt);
+}
+
+void DebugCamera::CopyStateFrom(const DebugCamera& other) {
+	ApplyState(other.CaptureState());
+}
+
+DebugCamera::State DebugCamera::CaptureState() const {
+	State state;
+	state.target = target_;
+	state.distance = distance_;
+	state.orbitAngle = orbitAngle_;
+	state.rotateSpeed = rotateSpeed_;
+	state.panSpeed = panSpeed_;
+	state.zoomSpeed = zoomSpeed_;
+	state.translation = worldTransform_.translation;
+	state.eulerRotation = worldTransform_.eulerRotation;
+	return state;
+}
+
+void DebugCamera::ApplyState(const State& state) {
+	target_ = state.target;
+	distance_ = state.distance;
+	orbitAngle_ = state.orbitAngle;
+	rotateSpeed_ = state.rotateSpeed;
+	panSpeed_ = state.panSpeed;
+	zoomSpeed_ = state.zoomSpeed;
+	worldTransform_.translation = state.translation;
+	worldTransform_.eulerRotation = state.eulerRotation;
+	worldTransform_.rotationSource = RotationSource::Euler;
+	isDraggingRotate_ = false;
+	isDraggingMove_ = false;
+	StoreAppliedTransform();
 }
 
 void DebugCamera::ShowGui(){
@@ -70,6 +100,45 @@ void DebugCamera::ShowGui(){
 
 	GuiCmd::DragFloat("panSpeed", panSpeed_);
 	GuiCmd::DragFloat("zoomSpeed", zoomSpeed_);
+}
+
+CalyxEngine::Vector3 DebugCamera::CalcOrbitOffset() const {
+	CalyxEngine::Matrix4x4 matRotYaw = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
+	CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
+	CalyxEngine::Matrix4x4 matRot = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+
+	CalyxEngine::Vector3 offset(0.0f, 0.0f, -distance_);
+	return CalyxEngine::TransformNormal(offset, matRot);
+}
+
+void DebugCamera::SyncOrbitFromTransform() {
+	orbitAngle_.x = worldTransform_.eulerRotation.y;
+	orbitAngle_.y = worldTransform_.eulerRotation.x;
+
+	const float limit = static_cast<float>(std::numbers::pi) * 0.5f - 0.01f;
+	orbitAngle_.y = std::clamp(orbitAngle_.y, -limit, limit);
+	target_ = worldTransform_.translation - CalcOrbitOffset();
+	worldTransform_.rotationSource = RotationSource::Euler;
+	StoreAppliedTransform();
+}
+
+void DebugCamera::ApplyOrbitToTransform() {
+	worldTransform_.translation = target_ + CalcOrbitOffset();
+	worldTransform_.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
+	worldTransform_.rotationSource = RotationSource::Euler;
+	StoreAppliedTransform();
+}
+
+bool DebugCamera::IsTransformChangedExternally() const {
+	return !hasAppliedTransform_ ||
+		   (!NearlyEqual(worldTransform_.translation, lastAppliedTranslation_) ||
+			!NearlyEqual(worldTransform_.eulerRotation, lastAppliedEulerRotation_));
+}
+
+void DebugCamera::StoreAppliedTransform() {
+	lastAppliedTranslation_ = worldTransform_.translation;
+	lastAppliedEulerRotation_ = worldTransform_.eulerRotation;
+	hasAppliedTransform_ = true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
