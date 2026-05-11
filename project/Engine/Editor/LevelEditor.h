@@ -8,7 +8,7 @@
 #include <Engine/Application/UI/EngineUI/Viewport.h>
 #include <Engine/Application/UI/Panels/AssetPanel.h>
 #include <Engine/Application/UI/Panels/EditorPanel.h>
-#include <Engine/Application/UI/Panels/HierarchyPanel.h>
+#include <Engine/Application/UI/Panels/Hierarchy/HierarchyPanel.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
 #include <Engine/Application/UI/Panels/LivePPPanel.h>
 #include <Engine/Application/UI/Panels/MaterialNodeEditorPanel.h>

@@ -9,7 +9,7 @@
 // uiPanel
 #include <Engine/Application/UI/Panels/ConsolePanel.h>
 #include <Engine/Application/UI/Panels/EditorPanel.h>
-#include <Engine/Application/UI/Panels/HierarchyPanel.h>
+#include <Engine/Application/UI/Panels/Hierarchy/HierarchyPanel.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
 
