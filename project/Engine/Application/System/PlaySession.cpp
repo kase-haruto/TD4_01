@@ -6,6 +6,16 @@
 #include <Engine/Scene/Serializer/SceneSerializer.h>
 
 namespace CalyxEngine {
+	namespace {
+		std::optional<DebugCamera::State> CaptureDebugCameraState(SceneContext* context) {
+			if(!context || !context->GetCameraMgr()) return std::nullopt;
+
+			if(auto* debug = context->GetCameraMgr()->DebugCam()) {
+				return debug->CaptureState();
+			}
+			return std::nullopt;
+		}
+	}
 
 	void PlaySession::Initialize(SceneContext* editorContext) {
 		editorContext_ = editorContext;
@@ -132,6 +142,7 @@ namespace CalyxEngine {
 	void PlaySession::Enter() {
 		if(mode_ != EngineMode::Editor || !editorContext_) return;
 
+		pendingDebugCameraState_ = CaptureDebugCameraState(editorContext_);
 		auto json		= SceneSerializer::DumpJson(*editorContext_);
 		runtimeContext_ = std::make_unique<SceneContext>();
 		runtimeContext_->Initialize(false);
@@ -145,6 +156,7 @@ namespace CalyxEngine {
 
 	void PlaySession::Restart() {
 		if(mode_ == EngineMode::Playing || mode_ == EngineMode::Paused || mode_ == EngineMode::Step) {
+			pendingDebugCameraState_ = CaptureDebugCameraState(runtimeContext_.get());
 			auto json		= SceneSerializer::DumpJson(*editorContext_);
 			runtimeContext_ = std::make_unique<SceneContext>();
 			runtimeContext_->Initialize(false);
@@ -163,6 +175,7 @@ namespace CalyxEngine {
 	}
 
 	void PlaySession::RebuildRuntimeFromEditor(SceneContext* newEditorCtx) {
+		pendingDebugCameraState_ = CaptureDebugCameraState(GetContext());
 		BindEditorContext(newEditorCtx);
 		if(!IsRuntime()) return;
 
@@ -178,6 +191,8 @@ namespace CalyxEngine {
 	bool PlaySession::ExitRequested() const { return exitRequested_; }
 
 	void PlaySession::FinalizeExitCleanup() {
+		pendingDebugCameraState_ = CaptureDebugCameraState(runtimeContext_.get());
+
 		// Editor側をアクティブに戻す（MakeCurrentは保険）
 		if(editorContext_) {
 			editorContext_->MakeCurrent();
@@ -187,6 +202,15 @@ namespace CalyxEngine {
 		runtimeContext_.reset();
 		exitRequested_ = false;
 		mode_		   = EngineMode::Editor;
+	}
+
+	void PlaySession::ApplyPendingDebugCameraState(SceneContext* context) {
+		if(!pendingDebugCameraState_ || !context || !context->GetCameraMgr()) return;
+
+		if(auto* debug = context->GetCameraMgr()->DebugCam()) {
+			debug->ApplyState(*pendingDebugCameraState_);
+			pendingDebugCameraState_.reset();
+		}
 	}
 
 	void PlaySession::TogglePause() {

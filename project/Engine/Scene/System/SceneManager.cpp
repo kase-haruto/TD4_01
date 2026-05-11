@@ -152,6 +152,9 @@ namespace CalyxEngine {
 			// 毎回初期化
 			slot.scene->Initialize();
 			slot.scene->OnEnter();
+			if(pPlaySession_) {
+				pPlaySession_->ApplyPendingDebugCameraState(ctx);
+			}
 
 			lastBoundCtx_	= ctx;
 			lastRuntimeGen_ = gen;
