@@ -10,6 +10,43 @@
 #include <functional>
 #include <unordered_map>
 
+namespace {
+
+	void WriteSceneObjectMetadata(SceneObject& obj, nlohmann::json& j) {
+		j["type"] = obj.GetObjectClassName();
+		j["guid"] = obj.GetGuid();
+		j["name"] = obj.GetName();
+		j["objectType"] = static_cast<int>(obj.GetObjectType());
+		j["drawEnable"] = obj.IsDrawEnable();
+		j["castShadow"] = obj.IsCastShadow();
+		j["outlineEnabled"] = obj.IsOutlineEnabled();
+		j["outlineThickness"] = obj.GetOutlineSettings().thickness;
+		j["outlineColor"] = obj.GetOutlineSettings().color;
+		j["worldTransform"] = obj.GetWorldTransform().ExtractConfig();
+		if(auto parent = obj.GetParent()) {
+			j["parentGuid"] = parent->GetGuid();
+		} else {
+			j["parentGuid"] = Guid::Empty();
+		}
+	}
+
+	void ApplySceneObjectMetadata(SceneObject& obj, const nlohmann::json& j) {
+		const int objectType = j.value("objectType", static_cast<int>(obj.GetObjectType()));
+		obj.SetName(j.value("name", obj.GetName()), static_cast<ObjectType>(objectType));
+		if(obj.GetObjectClassName() == std::string_view("SceneObject")) {
+			obj.SetDrawEnable(j.value("drawEnable", obj.IsDrawEnable()));
+		}
+		obj.SetCastShadow(j.value("castShadow", obj.IsCastShadow()));
+		obj.SetOutlineEnabled(j.value("outlineEnabled", obj.IsOutlineEnabled()));
+		obj.SetOutlineThickness(j.value("outlineThickness", obj.GetOutlineSettings().thickness));
+		obj.SetOutlineColor(j.value("outlineColor", obj.GetOutlineSettings().color));
+		if(j.contains("worldTransform")) {
+			obj.GetWorldTransform().ApplyConfig(j.at("worldTransform").get<WorldTransformConfig>());
+		}
+	}
+
+} // namespace
+
 bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 							const std::string& path){
 	nlohmann::json jArray = nlohmann::json::array();
@@ -18,18 +55,13 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 	serializeRec = [&] (SceneObject* obj){
 		if (!obj || !obj->IsSerializable()) return;
 
+		nlohmann::json j;
 		if (auto* cfg = dynamic_cast< IConfigurable* >(obj)){
-			nlohmann::json j;
 			cfg->ExtractConfigToJson(j);
-			j["type"] = obj->GetObjectClassName();  // 型名を保存
-			j["guid"] = obj->GetGuid();
-			if (auto parent = obj->GetParent()){
-				j["parentGuid"] = parent->GetGuid();
-			} else {
-				j["parentGuid"] = Guid::Empty();
-			}
-			jArray.push_back(std::move(j));
 		}
+		WriteSceneObjectMetadata(*obj, j);
+		jArray.push_back(std::move(j));
+
 		for (auto& childSp : obj->GetChildren()){
 			if (childSp) serializeRec(childSp.get());
 		}
@@ -41,6 +73,11 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 }
 
 std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::string& path) {
+	return Load(path, LoadOptions{});
+}
+
+std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::string& path,
+																 const LoadOptions& options) {
 	nlohmann::json jArray;
 	if (!CalyxEngine::JsonUtils::Load(path, jArray)) return {};
 
@@ -59,10 +96,19 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 		if (auto* cfg = dynamic_cast<IConfigurable*>(sp.get())) {
 			cfg->ApplyConfigFromJson(j);
 		}
+		ApplySceneObjectMetadata(*sp, j);
 
 		Guid oldGuid = j.value("guid", Guid{});
-		Guid newGuid = Guid::New();
+		Guid newGuid = options.preserveGuids ? oldGuid : Guid::New();
+		if(!newGuid.isValid()) {
+			newGuid = Guid::New();
+		}
 		sp->SetGuid(newGuid);
+		if(options.prefabAssetGuid.isValid() && oldGuid.isValid()) {
+			sp->SetPrefabLink(options.prefabAssetGuid, oldGuid);
+		} else if(options.preserveGuids) {
+			sp->ClearPrefabLink();
+		}
 		sp->Initialize();
 
 		oldToNewGuid[oldGuid] = newGuid;

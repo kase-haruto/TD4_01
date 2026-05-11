@@ -80,6 +80,14 @@ namespace CalyxEngine {
 			return record;
 		}
 
+		void SetPrefabLinkRecursive(SceneObject* object, const Guid& prefabGuid) {
+			if(!object || !prefabGuid.isValid()) return;
+			object->SetPrefabLink(prefabGuid, object->GetGuid());
+			for(const auto& child : object->GetChildren()) {
+				SetPrefabLinkRecursive(child.get(), prefabGuid);
+			}
+		}
+
 	} // namespace
 
 	/* ========================================================================
@@ -223,7 +231,9 @@ namespace CalyxEngine {
 			if(ImGui::BeginDragDropTarget()) {
 				if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
 					if(const AssetRecord* record = GetDraggedPrefabRecord(payload)) {
-						auto objects = PrefabSerializer::Load(record->sourcePath.string());
+						auto objects = PrefabSerializer::Load(
+							record->sourcePath.string(),
+							PrefabSerializer::LoadOptions{false, record->guid});
 						for(auto& sp : objects) {
 							if(onCreate_) onCreate_(sp);
 						}
@@ -278,7 +288,8 @@ namespace CalyxEngine {
 			if(ImGuiFileDialog::Instance()->IsOk() && prefabSaveTarget_) {
 				const std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
 				if(PrefabSerializer::Save({prefabSaveTarget_}, path)) {
-					AssetDatabase::GetInstance()->RegisterOrUpdate(path, AssetType::Prefab);
+					const Guid prefabGuid = AssetDatabase::GetInstance()->RegisterOrUpdate(path, AssetType::Prefab);
+					SetPrefabLinkRecursive(prefabSaveTarget_, prefabGuid);
 					AssetDatabase::GetInstance()->Scan();
 				}
 			}
@@ -289,8 +300,11 @@ namespace CalyxEngine {
 		// Load
 		if(ImGuiFileDialog::Instance()->Display("LoadPrefabDlg")) {
 			if(ImGuiFileDialog::Instance()->IsOk()) {
+				const std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
+				const Guid prefabGuid = AssetDatabase::GetInstance()->RegisterOrUpdate(path, AssetType::Prefab);
 				auto vec = PrefabSerializer::Load(
-					ImGuiFileDialog::Instance()->GetFilePathName());
+					path,
+					PrefabSerializer::LoadOptions{false, prefabGuid});
 
 				for(auto& sp : vec) {
 					if(lib_ && onCreate_) {
@@ -470,7 +484,9 @@ namespace CalyxEngine {
 				}
 				if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
 					if(const AssetRecord* record = GetDraggedPrefabRecord(payload)) {
-						auto objects = PrefabSerializer::Load(record->sourcePath.string());
+						auto objects = PrefabSerializer::Load(
+							record->sourcePath.string(),
+							PrefabSerializer::LoadOptions{false, record->guid});
 
 						std::unordered_set<SceneObject*> loaded;
 						loaded.reserve(objects.size());

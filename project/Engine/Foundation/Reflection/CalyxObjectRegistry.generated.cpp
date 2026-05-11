@@ -25,8 +25,8 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::GameObject;
 			desc.iconPath = "UI/Tool/cube.dds";
 			desc.placeable = true;
-			desc.prefabEditable = true;
-			desc.prefabRoot = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<BaseGameObject>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}
@@ -103,8 +103,8 @@ namespace CalyxEngine {
 			desc.objectType = ObjectType::GameObject;
 			desc.iconPath = "UI/Tool/cylinder.dds";
 			desc.placeable = true;
-			desc.prefabEditable = true;
-			desc.prefabRoot = true;
+			desc.prefabEditable = false;
+			desc.prefabRoot = false;
 			desc.ctor = std::make_unique<SceneCtor<SplineDeformObject>>();
 			SceneObjectRegistry::Get().Register(std::move(desc));
 		}

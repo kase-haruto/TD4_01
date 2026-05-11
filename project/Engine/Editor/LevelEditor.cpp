@@ -9,6 +9,7 @@
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Application/UI/EngineUI/Context/EditorContext.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
+#include <Engine/Assets/System/AssetType.h>
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Editor/PickingPass.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
@@ -552,7 +553,7 @@ namespace CalyxEngine {
 					"",
 					[this] {
 						ApplyEditToolMode(EngineEdit::EditToolMode::Prefab, true);
-						showPrefabRootTypePopup_ = true;
+						NewPrefabEditContext();
 					},
 					true});
 
@@ -717,8 +718,6 @@ namespace CalyxEngine {
 				prefabEditContext_->MakeCurrent();
 			}
 		}
-
-		DrawPrefabRootTypePopup();
 
 		SceneContext* ctx = SceneContext::Current();
 
@@ -1074,45 +1073,6 @@ namespace CalyxEngine {
 		NotifySceneContextChanged();
 	}
 
-	void LevelEditor::DrawPrefabRootTypePopup() {
-		if(showPrefabRootTypePopup_) {
-			ApplyEditToolMode(EngineEdit::EditToolMode::Prefab, false);
-			ImGui::OpenPopup("New Prefab Root Type");
-			showPrefabRootTypePopup_ = false;
-		}
-
-		const auto rootTypes = SceneObjectRegistry::Get().ListPrefabRootTypes();
-		const bool hasRootTypes = !rootTypes.empty();
-
-		if(ImGui::BeginPopupModal("New Prefab Root Type", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::TextUnformatted("Root Type");
-			ImGui::Separator();
-
-			if(hasRootTypes) {
-				for(const auto* desc : rootTypes) {
-					if(!desc) continue;
-					const std::string label = desc->displayName.empty() ? desc->typeName : desc->displayName;
-					if(ImGui::Selectable(label.c_str())) {
-						NewPrefabEditContext(desc->typeName);
-						ImGui::CloseCurrentPopup();
-					}
-				}
-			} else {
-				ImGui::TextDisabled("No PrefabRoot types registered.");
-				if(ImGui::Button("Create Empty")) {
-					NewPrefabEditContext();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			ImGui::Separator();
-			if(ImGui::Button("Cancel", ImVec2(96.0f, 0.0f))) {
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
-		}
-	}
-
 	void LevelEditor::OpenPrefabForEdit(const std::string& path) {
 		prefabEditContext_.reset();
 		prefabEditPath_ = path;
@@ -1121,7 +1081,7 @@ namespace CalyxEngine {
 
 		prefabEditContext_->MakeCurrent();
 
-		auto objects = PrefabSerializer::Load(path);
+		auto objects = PrefabSerializer::Load(path, PrefabSerializer::LoadOptions{true, Guid::Empty()});
 		for(auto& object : objects) {
 			if(object) {
 				prefabEditContext_->AddObject(object);
@@ -1189,9 +1149,92 @@ namespace CalyxEngine {
 			prefabEditPath_ = path;
 			prefabEditDirty_ = false;
 			if(auto* db = AssetDatabase::GetInstance()) {
+				const Guid prefabGuid = db->RegisterOrUpdate(path, AssetType::Prefab);
 				db->Scan();
+				if(prefabGuid.isValid()) {
+					SyncPrefabInstancesInCurrentScene(prefabGuid, path);
+				}
 			}
 		}
+	}
+
+	void LevelEditor::SyncPrefabInstancesInCurrentScene(const Guid& prefabAssetGuid,
+														const std::string& prefabPath) {
+		if(!prefabAssetGuid.isValid() || prefabPath.empty() || !sceneManager_) return;
+
+		SceneContext* sceneCtx = sceneManager_->GetCurrentSceneContext();
+		if(!sceneCtx || sceneCtx == prefabEditContext_.get()) return;
+		auto* sceneLib = sceneCtx->GetObjectLibrary();
+		if(!sceneLib) return;
+
+		std::vector<std::shared_ptr<SceneObject>> instanceRoots;
+		for(auto& object : sceneLib->GetAllObjectsShared()) {
+			if(!object || object->GetPrefabAssetGuid() != prefabAssetGuid) continue;
+
+			auto parent = object->GetParent();
+			if(parent && parent->GetPrefabAssetGuid() == prefabAssetGuid) continue;
+			instanceRoots.push_back(object);
+		}
+
+		if(instanceRoots.empty()) return;
+
+		SceneContext* previous = SceneContext::Current();
+		sceneCtx->MakeCurrent();
+
+		for(auto& oldRoot : instanceRoots) {
+			if(!oldRoot || !sceneLib->Contains(oldRoot)) continue;
+
+			const Guid oldRootGuid = oldRoot->GetGuid();
+			const Guid oldSourceGuid = oldRoot->GetPrefabSourceGuid();
+			const std::string oldName = oldRoot->GetName();
+			const WorldTransform oldTransform = oldRoot->GetWorldTransform();
+			auto oldParent = oldRoot->GetParent();
+			const bool inheritScale = oldRoot->GetWorldTransform().inheritScale;
+
+			auto loadedObjects = PrefabSerializer::Load(
+				prefabPath,
+				PrefabSerializer::LoadOptions{false, prefabAssetGuid});
+
+			std::shared_ptr<SceneObject> newRoot;
+			for(auto& candidate : loadedObjects) {
+				if(!candidate) continue;
+				if(candidate->GetPrefabSourceGuid() == oldSourceGuid) {
+					newRoot = candidate;
+					break;
+				}
+			}
+			if(!newRoot) {
+				for(auto& candidate : loadedObjects) {
+					if(candidate && !candidate->GetParent()) {
+						newRoot = candidate;
+						break;
+					}
+				}
+			}
+			if(!newRoot) continue;
+
+			sceneCtx->RemoveObject(oldRoot);
+
+			newRoot->SetGuid(oldRootGuid);
+			newRoot->SetName(oldName, newRoot->GetObjectType());
+			newRoot->GetWorldTransform() = oldTransform;
+			newRoot->GetWorldTransform().parent = nullptr;
+			newRoot->GetWorldTransform().Update();
+
+			for(auto& object : loadedObjects) {
+				if(object) {
+					sceneCtx->AddObject(object);
+				}
+			}
+			if(oldParent && sceneLib->Contains(oldParent)) {
+				newRoot->SetParent(oldParent, inheritScale);
+			}
+		}
+
+		if(previous && previous != sceneCtx) {
+			previous->MakeCurrent();
+		}
+		if(hierarchy_) hierarchy_->RefreshCache();
 	}
 
 	void LevelEditor::UpdatePrefabEditContext(float dt) {
@@ -1521,6 +1564,20 @@ namespace CalyxEngine {
 	// Viewport
 	//=============================================================================
 	void LevelEditor::RenderViewport(ViewportType type, const ImTextureID& tex) {
+		SceneContext* previousContext = nullptr;
+		if(type == ViewportType::VIEWPORT_DEBUG &&
+		   editToolMode_ == EngineEdit::EditToolMode::Prefab &&
+		   prefabEditContext_) {
+			previousContext = SceneContext::Current();
+			prefabEditContext_->MakeCurrent();
+		}
+
+		auto restoreContext = [&]() {
+			if(previousContext && previousContext != SceneContext::Current()) {
+				previousContext->MakeCurrent();
+			}
+		};
+
 		if(type == ViewportType::VIEWPORT_MAIN) {
 			if(mainViewport_ && mainViewport_->IsShow()) {
 				mainViewport_->Render(tex);
@@ -1546,6 +1603,8 @@ namespace CalyxEngine {
 		// 		pickingViewport_->Render(tex);
 		// 	}
 		// }
+
+		restoreContext();
 	}
 
 	void LevelEditor::RenderRuntimeFullscreenViewport(const ImTextureID& tex) {

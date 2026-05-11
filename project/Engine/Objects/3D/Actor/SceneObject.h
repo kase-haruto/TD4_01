@@ -132,8 +132,19 @@ public:
 	bool											 IsOutlineEnabled() const { return outlineSettings_.enabled; }
 	const OutlineSettings&							 GetOutlineSettings() const { return outlineSettings_; }
 	uint32_t										 GetPickingID() const { return pickingID_; }
+	const Guid&										 GetPrefabAssetGuid() const { return prefabAssetGuid_; }
+	const Guid&										 GetPrefabSourceGuid() const { return prefabSourceGuid_; }
+	bool											 IsPrefabInstanceObject() const { return prefabAssetGuid_.isValid() && prefabSourceGuid_.isValid(); }
 
 	void		 SetGuid(const Guid& g) { id_ = g; }
+	void		 SetPrefabLink(const Guid& assetGuid, const Guid& sourceGuid) {
+		prefabAssetGuid_ = assetGuid;
+		prefabSourceGuid_ = sourceGuid;
+	}
+	void		 ClearPrefabLink() {
+		prefabAssetGuid_ = Guid{};
+		prefabSourceGuid_ = Guid{};
+	}
 	virtual void SetDrawEnable(bool enable) { isDrawEnable_ = enable; }
 	void		 SetEnablePicking(bool enable) { isEnablePicking_ = enable; }
 	void		 SetTransient(bool enable) { isTransient_ = enable; }
@@ -161,6 +172,8 @@ protected:
 	std::optional<std::string> configPath_ = std::nullopt; //< コンフィグファイルパス
 	Guid					   id_;						   //< 識別子
 	Guid					   parentId_;				   //< 親識別子
+	Guid					   prefabAssetGuid_;		   //< 元PrefabアセットのGUID
+	Guid					   prefabSourceGuid_;		   //< Prefab内の元オブジェクトGUID
 	ObjectType				   objectType_ = ObjectType::None;
 
 	// =======================

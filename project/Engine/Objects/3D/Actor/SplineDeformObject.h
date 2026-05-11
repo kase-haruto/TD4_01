@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string>
 
-CALYX_OBJECT(Category = GameObject, DisplayName = "Spline Wall Deform", Icon = "UI/Tool/cylinder.dds", PrefabEditable = true, PrefabRoot = true)
+CALYX_OBJECT(Category = GameObject, DisplayName = "Spline Wall Deform", Icon = "UI/Tool/cylinder.dds")
 class SplineDeformObject final : public BaseGameObject {
 public:
 	SplineDeformObject();

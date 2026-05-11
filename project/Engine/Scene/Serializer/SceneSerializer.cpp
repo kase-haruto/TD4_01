@@ -53,6 +53,12 @@ nlohmann::json SceneSerializer::DumpJson(const SceneContext& context) {
 			// ---- 基本メタ ----
 			jOne["type"] = sp->GetObjectClassName();
 			jOne["guid"] = sp->GetGuid();
+			if(sp->GetPrefabAssetGuid().isValid()) {
+				jOne["prefabAssetGuid"] = sp->GetPrefabAssetGuid();
+			}
+			if(sp->GetPrefabSourceGuid().isValid()) {
+				jOne["prefabSourceGuid"] = sp->GetPrefabSourceGuid();
+			}
 			if(auto parent = sp->GetParent()) {
 				jOne["parentGuid"] = parent->GetGuid();
 			}
@@ -148,6 +154,12 @@ bool SceneSerializer::LoadJson(SceneContext&		 context,
 		// ライブラリへ登録
 		context.GetObjectLibrary()->AddObject(sp);
 		sp->Initialize();
+
+		const Guid prefabAssetGuid = j.value("prefabAssetGuid", Guid{});
+		const Guid prefabSourceGuid = j.value("prefabSourceGuid", Guid{});
+		if(prefabAssetGuid.isValid() && prefabSourceGuid.isValid()) {
+			sp->SetPrefabLink(prefabAssetGuid, prefabSourceGuid);
+		}
 
 		// サブシステムへ橋渡し
 		if(auto dir = std::dynamic_pointer_cast<DirectionalLight>(sp)) {

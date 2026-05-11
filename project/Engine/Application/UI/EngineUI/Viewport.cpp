@@ -104,6 +104,7 @@ namespace {
 
     void AddPrefabObjectsToCurrentScene(
         const std::vector<std::shared_ptr<SceneObject>>& objects,
+        const Guid& prefabAssetGuid,
         const CalyxEngine::Vector3& spawnOffset) {
         SceneContext* ctx = SceneContext::Current();
         if(!ctx) return;
@@ -116,6 +117,9 @@ namespace {
 
         for(const auto& sp : objects) {
             if(!sp) continue;
+            if(prefabAssetGuid.isValid() && !sp->GetPrefabAssetGuid().isValid()) {
+                sp->SetPrefabLink(prefabAssetGuid, sp->GetGuid());
+            }
 
             auto parent = sp->GetParent();
             if(!parent || !loaded.contains(parent.get())) {
@@ -385,8 +389,10 @@ void Viewport::Render(const ImTextureID& tex) {
                 const AssetRecord* prefabRecord = GetDraggedPrefabRecord(payload);
                 if(prefabRecord && hoverImageRect && payload->IsDelivery()) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
-                    auto objects = PrefabSerializer::Load(prefabRecord->sourcePath.string());
-                    AddPrefabObjectsToCurrentScene(objects, spawnPos);
+                    auto objects = PrefabSerializer::Load(
+                        prefabRecord->sourcePath.string(),
+                        PrefabSerializer::LoadOptions{false, prefabRecord->guid});
+                    AddPrefabObjectsToCurrentScene(objects, prefabRecord->guid, spawnPos);
 
                     if(ghost_) {
                         SceneContext::Current()->RemoveObject(ghost_);

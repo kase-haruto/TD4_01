@@ -144,7 +144,8 @@ namespace CalyxEngine {
 		void SavePrefabEditAs(const std::string& path);
 		std::vector<SceneObject*> GetPrefabEditRoots() const;
 		void UpdatePrefabEditContext(float dt);
-		void DrawPrefabRootTypePopup();
+		void SyncPrefabInstancesInCurrentScene(const Guid& prefabAssetGuid,
+											   const std::string& prefabPath);
 
 		void TogglePanel(IEngineUI* p) {
 			if(p) p->SetShow(!p->IsShow());
@@ -185,7 +186,6 @@ namespace CalyxEngine {
 		std::unique_ptr<SceneContext>		prefabEditContext_;
 		std::string							prefabEditPath_;
 		bool								prefabEditDirty_ = false;
-		bool								showPrefabRootTypePopup_ = false;
 
 		// 状態
 		bool		  lastPlaying_	  = false;

@@ -21,8 +21,8 @@ namespace CalyxEngine {
 			float fadeStart	= 40.0f;
 			float fadeEnd = 180.0f;
 			float horizonFade = 0.08f;
-			Vector4 minorColor{0.36f, 0.38f, 0.42f, 0.35f};
-			Vector4 majorColor{0.58f, 0.60f, 0.66f, 0.55f};
+			Vector4 minorColor{0.5f, 0.5f, 0.5f, 0.5f};
+			Vector4 majorColor{0.7f, 0.7f, 0.7f, 0.7f};
 			Vector4 xAxisColor{1.00f, 0.18f, 0.16f, 0.95f};
 			Vector4 yAxisColor{0.18f, 0.32f, 1.00f, 0.85f};
 			Vector4 zAxisColor{0.20f, 0.90f, 0.30f, 0.95f};

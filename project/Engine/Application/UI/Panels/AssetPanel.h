@@ -15,6 +15,7 @@
 #include <optional>
 #include <vector>
 
+class SceneObject;
 
 namespace CalyxEngine {
 
@@ -51,6 +52,8 @@ namespace CalyxEngine {
 		void DrawLeftTree();
 		void DrawRightView();
 		void CreateMaterialAssetInCurrentFolder();
+		void CreatePrefabFromSceneObject(SceneObject* object, const std::filesystem::path& folder);
+		bool AcceptSceneObjectPrefabDrop(const std::filesystem::path& folder);
 
 		void DrawFavorites();
 		void DrawDirNode(DirNode* node);

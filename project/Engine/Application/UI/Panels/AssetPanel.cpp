@@ -2,19 +2,58 @@
 
 #include "Engine/Assets/Manager/AssetManager.h"
 
+#include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/DataAsset/MaterialAsset.h>
+#include <Engine/Objects/3D/Actor/SceneObject.h>
 
 #include <externals/imgui/ImGuiFileDialog.h>
 #include <externals/imgui/imgui.h>
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <fstream>
 #include <system_error>
 #include <vector>
 
 namespace CalyxEngine {
+	namespace {
+
+		std::string SanitizeAssetFileStem(std::string name) {
+			if(name.empty()) name = "NewPrefab";
+			for(char& c : name) {
+				const unsigned char uc = static_cast<unsigned char>(c);
+				if(c == '<' || c == '>' || c == ':' || c == '"' || c == '/' || c == '\\' ||
+				   c == '|' || c == '?' || c == '*' || std::iscntrl(uc)) {
+					c = '_';
+				}
+			}
+			while(!name.empty() && (name.back() == ' ' || name.back() == '.')) {
+				name.pop_back();
+			}
+			return name.empty() ? "NewPrefab" : name;
+		}
+
+		std::filesystem::path MakeUniquePrefabPath(const std::filesystem::path& folder,
+												   const std::string& preferredStem) {
+			const std::string stem = SanitizeAssetFileStem(preferredStem);
+			std::filesystem::path path = folder / (stem + ".prefab");
+			for(int i = 1; std::filesystem::exists(path); ++i) {
+				path = folder / (stem + " " + std::to_string(i) + ".prefab");
+			}
+			return path;
+		}
+
+		void SetPrefabLinkRecursive(SceneObject* object, const Guid& prefabGuid) {
+			if(!object || !prefabGuid.isValid()) return;
+			object->SetPrefabLink(prefabGuid, object->GetGuid());
+			for(const auto& child : object->GetChildren()) {
+				SetPrefabLinkRecursive(child.get(), prefabGuid);
+			}
+		}
+
+	} // namespace
 
 	void AssetPanel::Initialize(const std::filesystem::path& assetsRoot) {
 		assetsRootAbs_	  = std::filesystem::weakly_canonical(assetsRoot);
@@ -176,6 +215,43 @@ namespace CalyxEngine {
 		needsRebuildTree_ = true;
 	}
 
+	void AssetPanel::CreatePrefabFromSceneObject(SceneObject* object,
+												 const std::filesystem::path& folder) {
+		if(!object) return;
+
+		std::error_code ec;
+		std::filesystem::create_directories(folder, ec);
+		if(ec) return;
+
+		const std::filesystem::path path = MakeUniquePrefabPath(folder, object->GetName());
+		if(!PrefabSerializer::Save({object}, path.string())) return;
+
+		auto* db = AssetDatabase::GetInstance();
+		const Guid prefabGuid = db->RegisterOrUpdate(path, AssetType::Prefab);
+		if(prefabGuid.isValid()) {
+			SetPrefabLinkRecursive(object, prefabGuid);
+		}
+		db->Scan();
+
+		cacheValid_ = false;
+		needsRebuildTree_ = true;
+	}
+
+	bool AssetPanel::AcceptSceneObjectPrefabDrop(const std::filesystem::path& folder) {
+		bool accepted = false;
+		if(ImGui::BeginDragDropTarget()) {
+			if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneObjectPtr")) {
+				if(payload->Data && payload->DataSize == sizeof(SceneObject*)) {
+					SceneObject* object = *reinterpret_cast<SceneObject**>(payload->Data);
+					CreatePrefabFromSceneObject(object, folder);
+					accepted = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return accepted;
+	}
+
 	/* ===================== 右ペイン ===================== */
 	static inline void toLowerInplace(std::string& s) {
 		std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return (char)std::tolower(c); });
@@ -279,6 +355,7 @@ namespace CalyxEngine {
 			for(auto& dir : cacheSubDirs_) {
 				ImGui::BeginGroup();
 				ImGui::Image(iconFolder_ ? iconFolder_ : iconGeneric_, ImVec2(thumbSize_, thumbSize_));
+				AcceptSceneObjectPrefabDrop(dir);
 				ImGui::TextWrapped("%s", dir.filename().string().c_str());
 				if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
 					currentFolderAbs_ = dir;
@@ -334,6 +411,9 @@ namespace CalyxEngine {
 					ImGui::PopID();
 				}
 			}
+			const float dropHeight = (std::max)(48.0f, ImGui::GetContentRegionAvail().y);
+			ImGui::InvisibleButton("##PrefabDropTargetList", ImVec2(ImGui::GetContentRegionAvail().x, dropHeight));
+			AcceptSceneObjectPrefabDrop(currentFolderAbs_);
 			return;
 		}
 
@@ -395,6 +475,9 @@ namespace CalyxEngine {
 		}
 
 		ImGui::Columns(1);
+		const float dropHeight = (std::max)(48.0f, ImGui::GetContentRegionAvail().y);
+		ImGui::InvisibleButton("##PrefabDropTargetGrid", ImVec2(ImGui::GetContentRegionAvail().x, dropHeight));
+		AcceptSceneObjectPrefabDrop(currentFolderAbs_);
 	}
 
 	void AssetPanel::DrawFavorites() {
@@ -489,6 +572,7 @@ namespace CalyxEngine {
 			scope_			  = Scope::SelectedFolder;
 			typeFilter_.reset();
 		}
+		AcceptSceneObjectPrefabDrop(node->absPath);
 
 		if(open) {
 			// 未スキャンならここでスキャン
