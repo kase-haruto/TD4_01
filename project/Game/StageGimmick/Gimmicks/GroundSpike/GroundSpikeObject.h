@@ -2,6 +2,8 @@
 
 #include "Game/StageGimmick/Base/StageGimmickObjectBase.h"
 
+#include "Game\StageGimmick\Parameters\StageGimmickParam.h"
+
 /// <summary>
 /// 地面から生えてくる歯のオブジェクトクラス
 /// </summary>
@@ -25,6 +27,10 @@ public:
 
 	void OnCollisionEnter(Collider* other) override;
 
+	void SetParam(const GroundSpikeParam& param) {
+		param_ = param;
+	}
+
 protected:
 
 	// 初期化
@@ -44,5 +50,7 @@ private:
 	// 調整するパラメーター
 	float spikeTime_ = 1.0f;
 	float spikeAimY_ = 0.5f;
+
+	GroundSpikeParam param_;
 
 };

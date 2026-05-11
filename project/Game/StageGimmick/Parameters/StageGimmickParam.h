@@ -25,6 +25,20 @@ struct DroolRainParam {
 };
 
 /// <summary>
+/// 地面から生えてくる歯のパラメータ
+/// </summary>
+struct GroundSpikeParam {
+
+	/// 飛び出す速度
+	float popUpSpeed = 15.0f;
+
+	/// 飛び出す高さ
+	float popUpHeight = 3.0f;
+
+};
+};
+
+/// <summary>
 /// 炎のパラメーター
 /// </summary>
 struct FireLoadParam {
