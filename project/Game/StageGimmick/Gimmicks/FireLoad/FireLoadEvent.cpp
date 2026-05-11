@@ -17,7 +17,7 @@ void FireLoadEvent::OnCollisionEnter(Collider* other) {
 	// プレイヤーがイベント内に入ったら燃える
 	for(auto& target : targetObjects_) {
 		if(auto lockedTarget = target.lock()) {
-			lockedTarget->SetIsBurn(true);
+			lockedTarget->BurnActive();
 		}
 	}
 }
@@ -38,8 +38,8 @@ void FireLoadEvent::EventInitialize() {
 
 	eventParam_.LoadParams();
 
-	worldTransform_.scale.x = worldTransform_.scale.x * 8.0f;
-	worldTransform_.scale.y = worldTransform_.scale.y * 4.0f;
+	worldTransform_.scale.x = 20.0f;
+	worldTransform_.scale.y = 6.0f;
 
 	// 列の数(奥行き)と幅に基づいてオブジェクト数を計算する
 	const int width = (std::max)(1, eventParam_.param_.width);

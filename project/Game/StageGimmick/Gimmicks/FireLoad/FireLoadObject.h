@@ -21,6 +21,12 @@ public:
 		isBurn_ = isBurn;
 	}
 
+	void SetIsIgnition(bool isIgnition) {
+		isIgnition_ = isIgnition;
+	}
+
+	void BurnActive();
+
 	void SetParam(const FireLoadParam& param) {
 		param_		  = param;
 		runtimeParam_ = param;
@@ -35,6 +41,8 @@ protected:
 	// 更新
 	void ObjectUpdate(float dt) override;
 
+	void IgnitionUpdate(float dt);
+
 private:
 	// パラメータ
 	FireLoadParam param_;
@@ -42,5 +50,8 @@ private:
 	FireLoadParam	 runtimeParam_;
 	CalyxEngine::Vector3 defaultScale_;
 
+	float ignitionTime_ = 0.0f;
+
 	bool isBurn_ = false;
+	bool isIgnition_ = false;
 };
