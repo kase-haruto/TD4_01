@@ -36,7 +36,6 @@ struct GroundSpikeParam {
 	float popUpHeight = 3.0f;
 
 };
-};
 
 /// <summary>
 /// 炎のパラメーター
