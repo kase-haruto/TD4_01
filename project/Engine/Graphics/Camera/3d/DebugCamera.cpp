@@ -12,6 +12,7 @@
 
 // C++
 #include "Engine/Foundation/Math/MathUtil.h"
+#include "Engine/Scene/Context/SceneContext.h"
 
 #include <algorithm>
 #include <numbers>
@@ -26,17 +27,31 @@ DebugCamera::DebugCamera(const std::string& name){
 //							メイン処理
 //////////////////////////////////////////////////////////////////////////////
 void DebugCamera::AlwaysUpdate(float dt){
-	if (!isActive_){ return; }
+	// エディタモードであれば isActive_ をチェック、
+	// ランタイムモードであればカメラ操作を許可する
+	bool isRuntime = SceneContext::Current() && SceneContext::Current()->IsRuntime();
+	if (!isActive_ && !isRuntime){ return; }
 
 	// 入力に基づいてカメラ操作
+	bool inputProcessed = false;
 	if (isInputEnabled_ || isDraggingRotate_ || isDraggingMove_) {
+		CalyxEngine::Vector2 oldAngle = orbitAngle_;
+		CalyxEngine::Vector3 oldTarget = target_;
+		float oldDist = distance_;
+
 		Rotate();
 		Move();
 		Zoom();
+
+		if (orbitAngle_.x != oldAngle.x || orbitAngle_.y != oldAngle.y ||
+			target_.x != oldTarget.x || target_.y != oldTarget.y || target_.z != oldTarget.z ||
+			distance_ != oldDist) {
+			inputProcessed = true;
+		}
 	}
 
-	// カメラの姿勢・行列を更新
-	{
+	// カメラの姿勢・行列を更新（入力があった場合のみ）
+	if (inputProcessed) {
 		// orbitAngle_.x = 水平方向(Yaw)
 		// orbitAngle_.y = 垂直方向(Pitch)
 		// 距離と角度からカメラの相対座標を計算
