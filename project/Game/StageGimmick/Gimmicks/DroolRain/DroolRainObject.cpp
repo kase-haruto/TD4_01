@@ -9,6 +9,8 @@ DroolRainObject::DroolRainObject(
 	const std::string& modelName,
 	std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
+
+	worldTransform_.translation.y += 2.5f;
 }
 
 void DroolRainObject::ObjectInitialize() {
@@ -23,7 +25,6 @@ void DroolRainObject::ObjectInitialize() {
 	}
 
 	defaultScale_ = worldTransform_.scale;
-	worldTransform_.translation.y += 2.5f;
 	worldTransform_.inheritScale = false;
 }
 

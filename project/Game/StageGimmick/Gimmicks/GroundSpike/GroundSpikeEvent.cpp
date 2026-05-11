@@ -48,21 +48,25 @@ void GroundSpikeEvent::EventInitialize() {
 	auto object = SceneContext::Current()->FindObjectByName<GroundSpikeObject>(targetName);
 	if(object) {
 		targetObject_ = object;
+		object->SetParam(eventParam_.param_);
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<GroundSpikeObject>("teeth.obj", targetName);
+	targetObject_ = SceneAPI::Instantiate<GroundSpikeObject>("backTeeth.obj", targetName);
 	targetObject_.lock()->SetParent(shared_from_this());
+	targetObject_.lock()->SetParam(eventParam_.param_);
 	targetObject_.lock()->Initialize();
-	targetObject_.lock()->GetWorldTransform().translation.y -= 5.0f;
-	targetObject_.lock()->GetWorldTransform().inheritScale = false;
 }
 
-void GroundSpikeEvent::EventUpdate(float dt) {
+void GroundSpikeEvent::EventUpdate(float) {
 
 	if(!targetObject_.lock()) {
+		eventParam_.LoadParams();
 		EventInitialize();
 	}
+}
 
-	dt;
+void GroundSpikeEvent::DerivativeGui() {
+
+	eventParam_.ShowGui();
 }

@@ -23,3 +23,16 @@ struct DroolRainParam {
 	// 地面に付いた後の速度
 	float groundVelocityY_ = 0.0f;
 };
+
+/// <summary>
+/// 地面から生えてくる歯のパラメータ
+/// </summary>
+struct GroundSpikeParam {
+
+	/// 飛び出す速度
+	float popUpSpeed = 15.0f;
+
+	/// 飛び出す高さ
+	float popUpHeight = 3.0f;
+
+};

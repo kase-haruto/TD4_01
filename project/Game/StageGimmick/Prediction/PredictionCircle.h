@@ -23,12 +23,9 @@ public:
 
 	std::string_view GetObjectClassName() const override { return "PredictionCircle"; }
 
-	void SetTargetObject(DroolRainObject* target);
-
 private:
 
 	// よだれのオブジェクト
-	DroolRainObject* target_;
 	float targetObjectY_ = 0.0f;
 
 };

@@ -47,11 +47,12 @@ protected:
 private:
 
 	/// <summary>
-	/// よだれのイベントのパラメータ
+	/// よだれのイベント全体のパラメータ
 	/// </summary>
 	struct DroolRainEventParam : public CalyxEngine::SerializableObject {
 
 		DroolRainParam param_;
+		std::string	   name_;
 
 		DroolRainEventParam() {
 			AddField("VelocityY", param_.velocityY_).Category("DroolRainEvent");
@@ -66,6 +67,29 @@ private:
 			return {CalyxEngine::ParamDomain::Game, "DroolRainEvent", "StageGimmick"};
 		}
 	};
+	/// <summary>
+	/// よだれのイベント個々のパラメータ
+	/// </summary>
+	struct AllDroolRainEventData : public CalyxEngine::SerializableObject {
+
+		int objectCount = 1;
+		std::string name_;
+
+		AllDroolRainEventData() {
+			AddField("ObjectCount", objectCount).ReadOnly();
+		}
+
+		void SetEventName(const std::string& name) {
+			name_ = name;
+		}
+
+		CalyxEngine::ParamPath GetParamPath() const override {
+			return {CalyxEngine::ParamDomain::Game, name_ + "ObjectCount", "StageGimmick"};
+		}
+	};
+
+	// 削除用関数
+	void DeleteDroolObject();
 
 private:
 
@@ -74,5 +98,5 @@ private:
 	std::vector<std::weak_ptr<PredictionCircle>> predictionCircles_;
 
 	DroolRainEventParam eventParam_;
-
+	AllDroolRainEventData eventData_;
 };

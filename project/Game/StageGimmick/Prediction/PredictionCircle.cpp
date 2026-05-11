@@ -13,31 +13,29 @@ PredictionCircle::PredictionCircle(
 
 void PredictionCircle::Initialize() {
 
+	BaseGameObject::Initialize();
+
 	worldTransform_.translation.y = 0.01f;
 	worldTransform_.inheritScale = false;
 	worldTransform_.inheritTranslate = false;
-	BaseGameObject::Initialize();
 
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
 	}
 
-	if(target_) {
-		targetObjectY_ = target_->GetWorldPosition().y;
-	}
+	SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 }
 
-void PredictionCircle::Update(float dt) {
+void PredictionCircle::Update(float) {
+
+	if(targetObjectY_ == 0.0f && worldTransform_.parent) {
+		targetObjectY_ = worldTransform_.parent->GetWorldPosition().y;
+	}
 
 	// 高さによってスケールを変化させる
-	if(target_) {
-		float scale			  = target_->GetWorldPosition().y / targetObjectY_;
+	const auto& parent = worldTransform_.parent;
+	if(parent) {
+		float scale = parent->GetWorldPosition().y / targetObjectY_;
 		worldTransform_.scale = CalyxEngine::Vector3::One() * scale;
 	}
-	dt;
-}
-
-void PredictionCircle::SetTargetObject(DroolRainObject* target) {
-	target_		   = target;
-	targetObjectY_ = target_->GetWorldPosition().y;
 }
