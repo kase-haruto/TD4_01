@@ -42,9 +42,9 @@ struct GroundSpikeParam {
 /// </summary>
 struct FireLoadParam {
 	// 出現時の大きな燃え上がり時間
-	float time = 0.5f;
+	float time = 0.75f;
 	// 出現時の燃え上がる高さ
-	float burnHeight = 2.0f;
+	float burnHeight = 5.0f;
 	// 幅の数 (横方向)
 	int width = 8;
 	// 列の数 (奥行き)
