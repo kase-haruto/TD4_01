@@ -131,8 +131,23 @@ void DemoPlayer::Move(float dt) {
 	// 水平移動の入力
 	CalyxEngine::Vector3 horizonVelocity = {0.0f, 0.0f, 0.0f};
 
+	// キーボード入力
 	if(CalyxFoundation::Input::PushKey(DIK_A)) {horizonVelocity.x -= 1.0f;}
 	if(CalyxFoundation::Input::PushKey(DIK_D)) {horizonVelocity.x += 1.0f;}
+
+	// ゲームパッド：スティック入力
+	CalyxEngine::Vector2 leftStick = CalyxFoundation::Input::GetInstance()->GetLeftStick();
+	horizonVelocity.x += leftStick.x;
+
+	// ゲームパッド：十字ボタン入力
+	if(CalyxFoundation::Input::PushGamepadButton(CalyxFoundation::PadButton::DPAD_LEFT)) {horizonVelocity.x -= 1.0f;}
+	if(CalyxFoundation::Input::PushGamepadButton(CalyxFoundation::PadButton::DPAD_RIGHT)) {horizonVelocity.x += 1.0f;}
+
+	// 斜め移動などで速くならないように最大1.0に制限
+	if(horizonVelocity.Length() > 1.0f) {
+		horizonVelocity.Normalize();
+	}
+
 #ifdef DEVELOP
 	if(CalyxFoundation::Input::PushKey(DIK_L)) {
 		worldTransform_.translation = {0.0f, worldTransform_.translation.y, 0.0f};
@@ -141,9 +156,6 @@ void DemoPlayer::Move(float dt) {
 		TakeDamage(1);
 	}
 #endif
-
-	CalyxEngine::Vector2 leftStick = CalyxFoundation::Input::GetInstance()->GetLeftStick();
-	horizonVelocity.x += leftStick.x;
 
 	CalyxEngine::Vector3 horizonRotateV = horizonVelocity;
 	horizonRotateV.z += 1.0f;
