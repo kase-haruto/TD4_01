@@ -8,6 +8,7 @@ namespace CalyxEngine{
 	struct EditorSettings {
 		bool fullscreenGameViewOnPlay = false;
 		bool DebugCameraRotateInverse = false;
+		bool showGrid = true;
 	};
 	
 	/////////////////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 
 // engine
+#include <Engine/Application/Settings/EngineSettings.h>
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Graphics/Camera/3d/Camera3d.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
@@ -240,6 +241,12 @@ namespace CalyxEngine {
 				}
 				debugRT->SetRenderTarget(cmd);
 			}
+
+			if(editorGridRenderer_ && EngineSettings::GetInstance().GetData().editor.showGrid) {
+				if(auto* cam = CameraManager::GetActive()) {
+					editorGridRenderer_->Render(cmd, pso, cam);
+				}
+			}
 		}
 
 #endif
@@ -266,7 +273,7 @@ namespace CalyxEngine {
 		rt->Clear(cmd);
 
 		if(auto* cam = CameraManager::GetActive()) {
-			if(editorGridRenderer_) {
+			if(editorGridRenderer_ && EngineSettings::GetInstance().GetData().editor.showGrid) {
 				editorGridRenderer_->Render(cmd, pso, cam);
 			}
 		}
