@@ -248,7 +248,23 @@ void DebugCamera::Zoom() {
 	float wheel = CalyxFoundation::Input::GetMouseWheel(); // 1フレーム当たりのホイール回転量
 	if(wheel != 0.0f) {
 		distance_ -= wheel * (zoomSpeed_ * 5.0f);
-		distance_ = (std::max)(0.01f, distance_);
+
+		// ターゲットに近づきすぎた場合、ターゲット位置を十分前方に押し出して距離を保つ
+		const float kMinDistance = 10.0f;
+		if(distance_ < kMinDistance) {
+			float excess = kMinDistance - distance_;
+			distance_ = kMinDistance;
+
+			// カメラの正面方向ベクトルを計算
+			CalyxEngine::Matrix4x4 matRotYaw   = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
+			CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
+			CalyxEngine::Matrix4x4 matRot	   = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+			
+			CalyxEngine::Vector3 forward = CalyxEngine::TransformNormal(CalyxEngine::Vector3(0.0f, 0.0f, 1.0f), matRot);
+			target_.x += forward.x * excess;
+			target_.y += forward.y * excess;
+			target_.z += forward.z * excess;
+		}
 	}
 }
 REGISTER_SCENE_OBJECT(DebugCamera)
