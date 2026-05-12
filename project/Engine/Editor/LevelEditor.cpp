@@ -514,6 +514,10 @@ namespace CalyxEngine {
 		if(auto* db = AssetDatabase::GetInstance()) {
 			assetPanel_->Initialize(db->GetRoot());
 		}
+		assetPanel_->SetOnPrefabEditRequested(
+			[this](const std::filesystem::path& path) {
+				OpenPrefabForEdit(path.string());
+			});
 
 		// Panel に LevelEditor 自体を渡す（コールバック通知や setter） ----------
 		editor_->SetOnEditorSelected(
@@ -546,6 +550,10 @@ namespace CalyxEngine {
 					}
 				}
 				sp->SetName(newName, sp->GetObjectType());
+			});
+		hierarchy_->SetOnApplyPrefabOverrides(
+			[this](std::shared_ptr<SceneObject> sp) {
+				ApplyPrefabOverridesFromInstance(sp);
 			});
 
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
@@ -1118,8 +1126,26 @@ namespace CalyxEngine {
 		prefabEditContext_->SetSceneName("PrefabEdit");
 
 		if(auto* debugCamera = prefabEditContext_->GetCameraMgr()->GetDebug()) {
+			debugCamera->SetTransient(true);
 			debugCamera->GetWorldTransform().translation = {0.0f, 4.0f, -10.0f};
 			debugCamera->GetWorldTransform().Update();
+		}
+		if(auto* mainCamera = prefabEditContext_->GetCameraMgr()->GetMain3d()) {
+			mainCamera->SetTransient(true);
+		}
+		auto previewDirectionalLight = prefabEditContext_->Instantiate<DirectionalLight>("PrefabPreviewDirectionalLight");
+		if(previewDirectionalLight) {
+			previewDirectionalLight->SetTransient(true);
+			previewDirectionalLight->SetEnableRaycast(false);
+			prefabEditContext_->GetLightLibrary()->SetDirectionalLight(previewDirectionalLight);
+		}
+		auto previewPointLight = prefabEditContext_->Instantiate<PointLight>("PrefabPreviewPointLight");
+		if(previewPointLight) {
+			previewPointLight->SetTransient(true);
+			previewPointLight->SetEnableRaycast(false);
+			previewPointLight->GetWorldTransform().translation = {0.0f, 4.0f, -4.0f};
+			previewPointLight->GetWorldTransform().Update();
+			prefabEditContext_->GetLightLibrary()->SetPointLight(previewPointLight);
 		}
 
 		prefabEditContext_->AddOnObjectAddedListener([this](SceneObject*) {
@@ -1152,6 +1178,7 @@ namespace CalyxEngine {
 			}
 			if(root) {
 				root->SetName("NewPrefab", root->GetObjectType());
+				root->SetEnableRaycast(true);
 				root->Initialize();
 			}
 			SetSelectedObject(root);
@@ -1170,9 +1197,12 @@ namespace CalyxEngine {
 		auto objects = PrefabSerializer::Load(path, PrefabSerializer::LoadOptions{true, Guid::Empty()});
 		for(auto& object : objects) {
 			if(object) {
+				object->SetEnableRaycast(true);
 				prefabEditContext_->AddObject(object);
 			}
 		}
+		MarkPrefabEditorUtilityObjects();
+		NormalizePrefabEditRoots();
 
 		prefabEditContext_->SetSceneName(std::filesystem::path(path).stem().string());
 		if(sceneManager_) sceneManager_->SetEditorPreviewContext(prefabEditContext_.get());
@@ -1203,6 +1233,59 @@ namespace CalyxEngine {
 		return roots;
 	}
 
+	void LevelEditor::MarkPrefabEditorUtilityObjects() {
+		if(!prefabEditContext_ || !prefabEditContext_->GetObjectLibrary()) return;
+
+		for(auto* object : prefabEditContext_->GetObjectLibrary()->GetAllObjectsRaw()) {
+			if(!object) continue;
+
+			const std::string_view className = object->GetObjectClassName();
+			const std::string& name = object->GetName();
+			if(className == "Camera3d" || className == "DebugCamera" || className == "BaseCamera" ||
+			   name == "MainCamera" || name == "DebugCamera" ||
+			   name == "PrefabPreviewDirectionalLight" || name == "PrefabPreviewPointLight") {
+				object->SetTransient(true);
+				object->SetEnableRaycast(false);
+			}
+		}
+	}
+
+	void LevelEditor::NormalizePrefabEditRoots() {
+		MarkPrefabEditorUtilityObjects();
+		for(auto* root : GetPrefabEditRoots()) {
+			if(!root) continue;
+			auto& transform = root->GetWorldTransform();
+			transform.translation = CalyxEngine::Vector3::Zero();
+			transform.Update();
+		}
+	}
+
+	void LevelEditor::ApplyPrefabOverridesFromInstance(const std::shared_ptr<SceneObject>& object) {
+		if(!object || !object->IsPrefabInstanceObject()) return;
+
+		const Guid prefabGuid = object->GetPrefabAssetGuid();
+		auto prefabRoot = object;
+		while(auto parent = prefabRoot->GetParent()) {
+			if(parent->GetPrefabAssetGuid() != prefabGuid) break;
+			prefabRoot = parent;
+		}
+
+		auto* db = AssetDatabase::GetInstance();
+		if(!db) return;
+		const AssetRecord* record = db->Get(prefabGuid);
+		if(!record || record->type != AssetType::Prefab) return;
+
+		const std::string path = record->sourcePath.string();
+		PrefabSerializer::SaveOptions saveOptions;
+		saveOptions.resetRootTransform = true;
+		saveOptions.usePrefabSourceGuids = true;
+		if(PrefabSerializer::Save({prefabRoot.get()}, path, saveOptions)) {
+			const Guid registeredGuid = db->RegisterOrUpdate(path, AssetType::Prefab);
+			db->Scan();
+			SyncPrefabInstancesInCurrentScene(registeredGuid.isValid() ? registeredGuid : prefabGuid, path);
+		}
+	}
+
 	void LevelEditor::SavePrefabEdit() {
 		if(editToolMode_ != EngineEdit::EditToolMode::Prefab || !prefabEditContext_) return;
 		if(prefabEditPath_.empty()) {
@@ -1224,6 +1307,7 @@ namespace CalyxEngine {
 
 		const auto roots = GetPrefabEditRoots();
 		if(roots.empty()) return;
+		NormalizePrefabEditRoots();
 
 		const std::filesystem::path savePath(path);
 		if(savePath.has_parent_path()) {
@@ -1231,7 +1315,7 @@ namespace CalyxEngine {
 			std::filesystem::create_directories(savePath.parent_path(), ec);
 		}
 
-		if(PrefabSerializer::Save(roots, path)) {
+		if(PrefabSerializer::Save(roots, path, PrefabSerializer::SaveOptions{true})) {
 			prefabEditPath_ = path;
 			prefabEditDirty_ = false;
 			if(auto* db = AssetDatabase::GetInstance()) {
@@ -1328,6 +1412,7 @@ namespace CalyxEngine {
 
 		SceneContext* previous = SceneContext::Current();
 		prefabEditContext_->MakeCurrent();
+		NormalizePrefabEditRoots();
 		prefabEditContext_->Update(dt, dt, false);
 
 		if(previous && previous != prefabEditContext_.get()) {

@@ -201,6 +201,38 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 	BuildSkinnedBatches();
 }
 
+void ModelRenderer::BuildAllVisibleBatches() {
+	staticVisibleForShadow_.clear();
+	skinnedVisibleForShadow_.clear();
+	raytracingScene_.Clear();
+	hasSceneBounds_ = false;
+
+	for(auto& [model, insts] : staticModels_) {
+		if(!model || !model->GetModelData() || !model->GetIsDrawEnable()) continue;
+		for(auto& inst : insts) {
+			inst.visible = true;
+			if(inst.dirty) {
+				inst.worldAABB = model->GetModelData()->localAABB.Transform(inst.tf.matrix.world);
+				inst.dirty = false;
+			}
+		}
+	}
+
+	for(auto& [model, insts] : skinnedModels_) {
+		if(!model || !model->GetModelData()) continue;
+		for(auto& inst : insts) {
+			inst.visible = true;
+			if(inst.dirty) {
+				inst.worldAABB = model->GetModelData()->localAABB.Transform(inst.tf.matrix.world);
+				inst.dirty = false;
+			}
+		}
+	}
+
+	BuildStaticBatches();
+	BuildSkinnedBatches();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //		静的モデル・バッチ作成（BillboardParams も可視分だけ詰める）
 /////////////////////////////////////////////////////////////////////////////////////////

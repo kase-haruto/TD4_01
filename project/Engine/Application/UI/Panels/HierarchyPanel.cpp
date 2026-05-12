@@ -289,7 +289,10 @@ namespace CalyxEngine {
 		if(ImGuiFileDialog::Instance()->Display("SavePrefabDlg")) {
 			if(ImGuiFileDialog::Instance()->IsOk() && prefabSaveTarget_) {
 				const std::string path = ImGuiFileDialog::Instance()->GetFilePathName();
-				if(PrefabSerializer::Save({prefabSaveTarget_}, path)) {
+				if(PrefabSerializer::Save(
+					   {prefabSaveTarget_},
+					   path,
+					   PrefabSerializer::SaveOptions{true})) {
 					const Guid prefabGuid = AssetDatabase::GetInstance()->RegisterOrUpdate(path, AssetType::Prefab);
 					SetPrefabLinkRecursive(prefabSaveTarget_, prefabGuid);
 					AssetDatabase::GetInstance()->Scan();
@@ -502,6 +505,11 @@ namespace CalyxEngine {
 					prefabSaveTarget_  = obj;
 					showSavePrefabDlg_ = true;
 				}
+				if(obj->IsPrefabInstanceObject() && onApplyPrefab_) {
+					if(ImGui::MenuItem("Apply Prefab Overrides")) {
+						if(auto sp = obj->shared_from_this()) onApplyPrefab_(sp);
+					}
+				}
 				ImGui::EndPopup();
 			}
 
@@ -512,11 +520,18 @@ namespace CalyxEngine {
 
 			// ノード上にアイコンとテキストを描画
 			ImGui::SameLine();
+			const bool prefabInstance = obj->IsPrefabInstanceObject();
+			if(prefabInstance) {
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.35f, 0.62f, 1.0f, 1.0f));
+			}
 			if(typeTex) {
 				ImGui::Image(typeTex, ImVec2(iconSize, iconSize));
 				ImGui::SameLine();
 			}
 			ImGui::TextUnformatted(obj->GetName().c_str());
+			if(prefabInstance) {
+				ImGui::PopStyleColor();
+			}
 		}
 
 		// ---------------------------------------------------------------------
@@ -538,7 +553,11 @@ namespace CalyxEngine {
 		// カラム 2: タイプ情報
 		// ---------------------------------------------------------------------
 		ImGui::TableSetColumnIndex(2);
-		ImGui::TextDisabled("%s", GetTypeLabel(obj->GetObjectType()));
+		if(obj->IsPrefabInstanceObject()) {
+			ImGui::TextColored(ImVec4(0.35f, 0.62f, 1.0f, 1.0f), "%s", GetTypeLabel(obj->GetObjectType()));
+		} else {
+			ImGui::TextDisabled("%s", GetTypeLabel(obj->GetObjectType()));
+		}
 
 		return open;
 	}

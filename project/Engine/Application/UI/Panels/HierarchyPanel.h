@@ -34,6 +34,7 @@ namespace CalyxEngine {
 		using DeleteCB = std::function<void(std::shared_ptr<SceneObject>)>;
 		using CreateCB = std::function<void(std::shared_ptr<SceneObject>)>;
 		using RenameCB = std::function<void(std::shared_ptr<SceneObject>, const std::string& newName)>;
+		using ApplyPrefabCB = std::function<void(std::shared_ptr<SceneObject>)>;
 
 	public:
 		HierarchyPanel();
@@ -53,6 +54,7 @@ namespace CalyxEngine {
 		void SetOnObjectDelete(DeleteCB cb) { onDelete_ = std::move(cb); }
 		void SetOnObjectCreate(CreateCB cb) { onCreate_ = std::move(cb); }
 		void SetOnObjectRename(RenameCB cb) { onRename_ = std::move(cb); }
+		void SetOnApplyPrefabOverrides(ApplyPrefabCB cb) { onApplyPrefab_ = std::move(cb); }
 
 		void SetSelectedObject(std::weak_ptr<SceneObject> wp) {
 			selected_ = wp;
@@ -101,6 +103,7 @@ namespace CalyxEngine {
 		DeleteCB onDelete_;
 		CreateCB onCreate_;
 		RenameCB onRename_;
+		ApplyPrefabCB onApplyPrefab_;
 
 		// prefab dialog
 		bool		 showSavePrefabDlg_ = false;

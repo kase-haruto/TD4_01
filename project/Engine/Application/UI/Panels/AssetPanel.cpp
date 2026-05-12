@@ -224,7 +224,10 @@ namespace CalyxEngine {
 		if(ec) return;
 
 		const std::filesystem::path path = MakeUniquePrefabPath(folder, object->GetName());
-		if(!PrefabSerializer::Save({object}, path.string())) return;
+		if(!PrefabSerializer::Save(
+			   {object},
+			   path.string(),
+			   PrefabSerializer::SaveOptions{true})) return;
 
 		auto* db = AssetDatabase::GetInstance();
 		const Guid prefabGuid = db->RegisterOrUpdate(path, AssetType::Prefab);
@@ -233,6 +236,55 @@ namespace CalyxEngine {
 		}
 		db->Scan();
 
+		cacheValid_ = false;
+		needsRebuildTree_ = true;
+	}
+
+	void AssetPanel::BeginRenameAsset(const std::filesystem::path& path) {
+		renamingAsset_ = true;
+		renameAssetPath_ = path;
+		const std::string stem = path.stem().string();
+		snprintf(renameAssetBuf_, sizeof(renameAssetBuf_), "%s", stem.c_str());
+	}
+
+	void AssetPanel::CommitRenameAsset() {
+		if(!renamingAsset_ || renameAssetPath_.empty()) return;
+
+		std::string newStem = renameAssetBuf_;
+		const auto first = newStem.find_first_not_of(" \t\r\n");
+		if(first == std::string::npos) {
+			newStem.clear();
+		} else {
+			const auto last = newStem.find_last_not_of(" \t\r\n");
+			newStem = newStem.substr(first, last - first + 1);
+		}
+		if(newStem.empty()) {
+			renamingAsset_ = false;
+			renameAssetPath_.clear();
+			return;
+		}
+
+		const std::filesystem::path oldPath = renameAssetPath_;
+		std::filesystem::path newPath = oldPath.parent_path() / (newStem + oldPath.extension().string());
+		if(newPath != oldPath && !std::filesystem::exists(newPath)) {
+			std::error_code ec;
+			std::filesystem::rename(oldPath, newPath, ec);
+			if(!ec) {
+				std::filesystem::path oldMeta = oldPath;
+				oldMeta += ".meta";
+				std::filesystem::path newMeta = newPath;
+				newMeta += ".meta";
+				if(std::filesystem::exists(oldMeta) && !std::filesystem::exists(newMeta)) {
+					std::filesystem::rename(oldMeta, newMeta, ec);
+				}
+			}
+		}
+
+		renamingAsset_ = false;
+		renameAssetPath_.clear();
+		if(auto* db = AssetDatabase::GetInstance()) {
+			db->Scan();
+		}
 		cacheValid_ = false;
 		needsRebuildTree_ = true;
 	}
@@ -390,6 +442,7 @@ namespace CalyxEngine {
 						ImGui::ImageButton("##thumb", thumb, ImVec2(20, 20));
 					else
 						ImGui::Button("No Preview", ImVec2(20, 20));
+					AcceptSceneObjectPrefabDrop(currentFolderAbs_);
 
 					if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 						AssetDragPayload payload{rec->type, rec->guid};
@@ -399,12 +452,41 @@ namespace CalyxEngine {
 					}
 
 					ImGui::SameLine();
-					ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
+					if(renamingAsset_ && renameAssetPath_ == rec->sourcePath) {
+						ImGui::SetKeyboardFocusHere();
+						ImGui::SetNextItemWidth((std::max)(120.0f, ImGui::GetContentRegionAvail().x));
+						if(ImGui::InputText("##RenameAsset", renameAssetBuf_, sizeof(renameAssetBuf_),
+											ImGuiInputTextFlags_EnterReturnsTrue |
+												ImGuiInputTextFlags_AutoSelectAll)) {
+							CommitRenameAsset();
+						}
+						if(ImGui::IsItemDeactivatedAfterEdit()) {
+							CommitRenameAsset();
+						}
+						if(ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+							renamingAsset_ = false;
+							renameAssetPath_.clear();
+						}
+					} else {
+						ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
+					}
 					if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 						AssetDragPayload payload{rec->type, rec->guid};
 						ImGui::SetDragDropPayload("CALYX_ASSET", &payload, sizeof(payload));
 						ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
 						ImGui::EndDragDropSource();
+					}
+					if(rec->type == AssetType::Prefab && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+						if(onPrefabEditRequested_) onPrefabEditRequested_(rec->sourcePath);
+					}
+					if(ImGui::BeginPopupContextItem("AssetContext")) {
+						if(rec->type == AssetType::Prefab && ImGui::MenuItem("Edit Prefab")) {
+							if(onPrefabEditRequested_) onPrefabEditRequested_(rec->sourcePath);
+						}
+						if(ImGui::MenuItem("Rename")) {
+							BeginRenameAsset(rec->sourcePath);
+						}
+						ImGui::EndPopup();
 					}
 
 					ImGui::EndGroup();
@@ -447,6 +529,7 @@ namespace CalyxEngine {
 					ImGui::ImageButton("##thumb", thumb, sz);
 				else
 					ImGui::Button("No Preview", sz);
+				AcceptSceneObjectPrefabDrop(currentFolderAbs_);
 
 				if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 					AssetDragPayload payload{rec->type, rec->guid};
@@ -455,12 +538,41 @@ namespace CalyxEngine {
 					ImGui::EndDragDropSource();
 				}
 
-				ImGui::TextWrapped("%s", rec->sourcePath.filename().string().c_str());
+				if(renamingAsset_ && renameAssetPath_ == rec->sourcePath) {
+					ImGui::SetKeyboardFocusHere();
+					ImGui::SetNextItemWidth(thumbSize_);
+					if(ImGui::InputText("##RenameAsset", renameAssetBuf_, sizeof(renameAssetBuf_),
+										ImGuiInputTextFlags_EnterReturnsTrue |
+											ImGuiInputTextFlags_AutoSelectAll)) {
+						CommitRenameAsset();
+					}
+					if(ImGui::IsItemDeactivatedAfterEdit()) {
+						CommitRenameAsset();
+					}
+					if(ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+						renamingAsset_ = false;
+						renameAssetPath_.clear();
+					}
+				} else {
+					ImGui::TextWrapped("%s", rec->sourcePath.filename().string().c_str());
+				}
 				if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 					AssetDragPayload payload{rec->type, rec->guid};
 					ImGui::SetDragDropPayload("CALYX_ASSET", &payload, sizeof(payload));
 					ImGui::TextUnformatted(rec->sourcePath.filename().string().c_str());
 					ImGui::EndDragDropSource();
+				}
+				if(rec->type == AssetType::Prefab && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+					if(onPrefabEditRequested_) onPrefabEditRequested_(rec->sourcePath);
+				}
+				if(ImGui::BeginPopupContextItem("AssetContext")) {
+					if(rec->type == AssetType::Prefab && ImGui::MenuItem("Edit Prefab")) {
+						if(onPrefabEditRequested_) onPrefabEditRequested_(rec->sourcePath);
+					}
+					if(ImGui::MenuItem("Rename")) {
+						BeginRenameAsset(rec->sourcePath);
+					}
+					ImGui::EndPopup();
 				}
 
 				ImGui::EndGroup();

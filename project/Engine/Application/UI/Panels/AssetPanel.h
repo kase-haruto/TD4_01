@@ -10,6 +10,7 @@
 // c++
 #include <externals/imgui/imgui.h>
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <memory>
 #include <optional>
@@ -41,6 +42,9 @@ namespace CalyxEngine {
 		~AssetPanel() override = default;
 		void Initialize(const std::filesystem::path& assetsRoot);
 		void Render() override;
+		void SetOnPrefabEditRequested(std::function<void(const std::filesystem::path&)> callback) {
+			onPrefabEditRequested_ = std::move(callback);
+		}
 
 		// Inspector 側で使える：期待タイプを指定したドロップターゲット
 		static bool DrawAssetDropTarget(AssetType expect, Guid* inoutGuid, float height = 56.0f);
@@ -57,6 +61,8 @@ namespace CalyxEngine {
 
 		void DrawFavorites();
 		void DrawDirNode(DirNode* node);
+		void BeginRenameAsset(const std::filesystem::path& path);
+		void CommitRenameAsset();
 
 		// --- ツリー構築 ---
 		void EnsureFolderTreeBuilt();
@@ -87,6 +93,9 @@ namespace CalyxEngine {
 		Scope scope_ = Scope::All; // 初期は All の方がデバッグしやすい
 
 		std::optional<AssetType> typeFilter_; // Favorites から設定（All なら std::nullopt）
+		bool				  renamingAsset_ = false;
+		std::filesystem::path renameAssetPath_;
+		char				  renameAssetBuf_[256] = {};
 
 		// アイコン
 		ImTextureID iconFolder_	 = nullptr;
@@ -94,6 +103,7 @@ namespace CalyxEngine {
 
 		std::unique_ptr<DirNode> rootNode_;
 		bool					 needsRebuildTree_ = true;
+		std::function<void(const std::filesystem::path&)> onPrefabEditRequested_;
 
 		// ---- View cache ----
 		std::vector<std::filesystem::path> cacheSubDirs_;
