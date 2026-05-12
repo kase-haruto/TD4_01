@@ -3,12 +3,13 @@
 /*		include space
 /* ===================================================================== */
 // Engine
-#include <Engine/Foundation/Utility/Func/MyFunc.h>
+#include <Engine/Application/Settings/EngineSettings.h>
 #include <Engine/Foundation/Input/Input.h>
+#include <Engine/Foundation/Utility/Func/CxUtils.h>
+#include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/System/Command/EditorCommand/GuiCommand/ImGuiHelper/GuiCmd.h>
-#include <Engine/Foundation/Utility/Func/CxUtils.h>
 
 // C++
 #include "Engine/Foundation/Math/MathUtil.h"
@@ -18,20 +19,20 @@
 #include <numbers>
 
 namespace {
-bool NearlyEqual(float a, float b) {
-	return std::abs(a - b) < 0.0001f;
-}
+	bool NearlyEqual(float a, float b) {
+		return std::abs(a - b) < 0.0001f;
+	}
 
-bool NearlyEqual(const CalyxEngine::Vector3& a, const CalyxEngine::Vector3& b) {
-	return NearlyEqual(a.x, b.x) && NearlyEqual(a.y, b.y) && NearlyEqual(a.z, b.z);
-}
-}
+	bool NearlyEqual(const CalyxEngine::Vector3& a, const CalyxEngine::Vector3& b) {
+		return NearlyEqual(a.x, b.x) && NearlyEqual(a.y, b.y) && NearlyEqual(a.z, b.z);
+	}
+} // namespace
 
-DebugCamera::DebugCamera(const std::string& name){
+DebugCamera::DebugCamera(const std::string& name) {
 	BaseCamera::SetName(name);
-	fovAngleY_ = static_cast< float >(std::numbers::pi) * 0.25f; // 45度
-	worldTransform_.translation = {0.0f, 4.0f, -10.0f};
-	worldTransform_.eulerRotation = {0.0f, 0.0f, 0.0f};
+	fovAngleY_					   = static_cast<float>(std::numbers::pi) * 0.25f; // 45度
+	worldTransform_.translation	   = {0.0f, 4.0f, -10.0f};
+	worldTransform_.eulerRotation  = {0.0f, 0.0f, 0.0f};
 	worldTransform_.rotationSource = RotationSource::Euler;
 	SyncOrbitFromTransform();
 }
@@ -39,11 +40,13 @@ DebugCamera::DebugCamera(const std::string& name){
 //////////////////////////////////////////////////////////////////////////////
 //							メイン処理
 //////////////////////////////////////////////////////////////////////////////
-void DebugCamera::AlwaysUpdate(float dt){
-	if (!isActive_){ return; }
+void DebugCamera::AlwaysUpdate(float dt) {
+	if(!isActive_) {
+		return;
+	}
 
 	// 入力に基づいてカメラ操作
-	if (isInputEnabled_ || isDraggingRotate_ || isDraggingMove_) {
+	if(isInputEnabled_ || isDraggingRotate_ || isDraggingMove_) {
 		Rotate();
 		Move();
 		Zoom();
@@ -64,35 +67,35 @@ void DebugCamera::CopyStateFrom(const DebugCamera& other) {
 
 DebugCamera::State DebugCamera::CaptureState() const {
 	State state;
-	state.target = target_;
-	state.distance = distance_;
-	state.orbitAngle = orbitAngle_;
-	state.rotateSpeed = rotateSpeed_;
-	state.panSpeed = panSpeed_;
-	state.zoomSpeed = zoomSpeed_;
-	state.translation = worldTransform_.translation;
+	state.target		= target_;
+	state.distance		= distance_;
+	state.orbitAngle	= orbitAngle_;
+	state.rotateSpeed	= rotateSpeed_;
+	state.panSpeed		= panSpeed_;
+	state.zoomSpeed		= zoomSpeed_;
+	state.translation	= worldTransform_.translation;
 	state.eulerRotation = worldTransform_.eulerRotation;
 	return state;
 }
 
 void DebugCamera::ApplyState(const State& state) {
-	target_ = state.target;
-	distance_ = state.distance;
-	orbitAngle_ = state.orbitAngle;
-	rotateSpeed_ = state.rotateSpeed;
-	panSpeed_ = state.panSpeed;
-	zoomSpeed_ = state.zoomSpeed;
-	worldTransform_.translation = state.translation;
-	worldTransform_.eulerRotation = state.eulerRotation;
+	target_						   = state.target;
+	distance_					   = state.distance;
+	orbitAngle_					   = state.orbitAngle;
+	rotateSpeed_				   = state.rotateSpeed;
+	panSpeed_					   = state.panSpeed;
+	zoomSpeed_					   = state.zoomSpeed;
+	worldTransform_.translation	   = state.translation;
+	worldTransform_.eulerRotation  = state.eulerRotation;
 	worldTransform_.rotationSource = RotationSource::Euler;
-	isDraggingRotate_ = false;
-	isDraggingMove_ = false;
+	isDraggingRotate_			   = false;
+	isDraggingMove_				   = false;
 	StoreAppliedTransform();
 }
 
-void DebugCamera::ShowGui(){
+void DebugCamera::ShowGui() {
 
-	//名前の表示
+	// 名前の表示
 	SceneObject::ShowGui();
 
 	// アクティブかどうか
@@ -103,9 +106,9 @@ void DebugCamera::ShowGui(){
 }
 
 CalyxEngine::Vector3 DebugCamera::CalcOrbitOffset() const {
-	CalyxEngine::Matrix4x4 matRotYaw = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
+	CalyxEngine::Matrix4x4 matRotYaw   = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
 	CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
-	CalyxEngine::Matrix4x4 matRot = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+	CalyxEngine::Matrix4x4 matRot	   = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
 
 	CalyxEngine::Vector3 offset(0.0f, 0.0f, -distance_);
 	return CalyxEngine::TransformNormal(offset, matRot);
@@ -115,16 +118,16 @@ void DebugCamera::SyncOrbitFromTransform() {
 	orbitAngle_.x = worldTransform_.eulerRotation.y;
 	orbitAngle_.y = worldTransform_.eulerRotation.x;
 
-	const float limit = static_cast<float>(std::numbers::pi) * 0.5f - 0.01f;
-	orbitAngle_.y = std::clamp(orbitAngle_.y, -limit, limit);
-	target_ = worldTransform_.translation - CalcOrbitOffset();
+	const float limit			   = static_cast<float>(std::numbers::pi) * 0.5f - 0.01f;
+	orbitAngle_.y				   = std::clamp(orbitAngle_.y, -limit, limit);
+	target_						   = worldTransform_.translation - CalcOrbitOffset();
 	worldTransform_.rotationSource = RotationSource::Euler;
 	StoreAppliedTransform();
 }
 
 void DebugCamera::ApplyOrbitToTransform() {
-	worldTransform_.translation = target_ + CalcOrbitOffset();
-	worldTransform_.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
+	worldTransform_.translation	   = target_ + CalcOrbitOffset();
+	worldTransform_.eulerRotation  = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
 	worldTransform_.rotationSource = RotationSource::Euler;
 	StoreAppliedTransform();
 }
@@ -136,9 +139,9 @@ bool DebugCamera::IsTransformChangedExternally() const {
 }
 
 void DebugCamera::StoreAppliedTransform() {
-	lastAppliedTranslation_ = worldTransform_.translation;
+	lastAppliedTranslation_	  = worldTransform_.translation;
 	lastAppliedEulerRotation_ = worldTransform_.eulerRotation;
-	hasAppliedTransform_ = true;
+	hasAppliedTransform_	  = true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -148,35 +151,38 @@ void DebugCamera::StoreAppliedTransform() {
 //*-----------------------------------------------------------------------
 // 回転処理 (MMBドラッグ): ターゲット中心にカメラを回転させる
 //-----------------------------------------------------------------------
-void DebugCamera::Rotate(){
+void DebugCamera::Rotate() {
 	bool mmbPressed = CalyxFoundation::Input::PushMouseButton(CalyxFoundation::MouseButton::Middle);
-	bool shiftHeld = CalyxFoundation::Input::PushKey(DIK_LSHIFT) || CalyxFoundation::Input::PushKey(DIK_RSHIFT);
-	bool ctrlHeld = CalyxFoundation::Input::PushKey(DIK_LCONTROL) || CalyxFoundation::Input::PushKey(DIK_RCONTROL);
+	bool shiftHeld	= CalyxFoundation::Input::PushKey(DIK_LSHIFT) || CalyxFoundation::Input::PushKey(DIK_RSHIFT);
+	bool ctrlHeld	= CalyxFoundation::Input::PushKey(DIK_LCONTROL) || CalyxFoundation::Input::PushKey(DIK_RCONTROL);
 
 	// ShiftもCtrlも押されていない -> 回転処理
-	if (mmbPressed && !shiftHeld && !ctrlHeld){
-		if (!isDraggingRotate_){
+	if(mmbPressed && !shiftHeld && !ctrlHeld) {
+		if(!isDraggingRotate_) {
 			// ドラッグ開始時に現在のマウス位置を記録
 			lastMousePosRotate_ = CalyxFoundation::Input::GetMouseDelta(); // 初回のデルタは無視
-			isDraggingRotate_ = true;
+			isDraggingRotate_	= true;
 			return; // 初回は移動量を無視
 		}
 
 		CalyxEngine::Vector2 mouseDelta = CalyxFoundation::Input::GetMouseDelta(); // 各フレームの移動量を取得
 
 		// マウスがほとんど動いていない場合は無視
-		if (std::abs(mouseDelta.x) < 0.1f && std::abs(mouseDelta.y) < 0.1f){
+		if(std::abs(mouseDelta.x) < 0.1f && std::abs(mouseDelta.y) < 0.1f) {
 			return;
 		}
 
-		// 回転処理
-		orbitAngle_.x -= mouseDelta.x * rotateSpeed_;
-		orbitAngle_.y -= mouseDelta.y * rotateSpeed_;
+		// editorの設定からカメラの回転方向を設定
+		const bool isInv = CalyxEngine::EngineSettings::GetInstance().GetData().editor.DebugCameraRotateInverse;
+		const float invSign = isInv ? -1.0f : 1.0f;
+
+		orbitAngle_.x -= mouseDelta.x * rotateSpeed_ * invSign;
+		orbitAngle_.y -= mouseDelta.y * rotateSpeed_ * invSign;
 
 		// ピッチ角度を制限 (上下90度未満)
-		float limit = static_cast< float >(std::numbers::pi) * 0.5f - 0.01f;
+		float limit	  = static_cast<float>(std::numbers::pi) * 0.5f - 0.01f;
 		orbitAngle_.y = std::clamp(orbitAngle_.y, -limit, limit);
-	} else{
+	} else {
 		// ドラッグ終了時
 		isDraggingRotate_ = false;
 	}
@@ -185,45 +191,44 @@ void DebugCamera::Rotate(){
 //*-----------------------------------------------------------------------
 // パン処理 (Shift + MMBドラッグ): カメラのターゲットを移動させる
 //-----------------------------------------------------------------------
-void DebugCamera::Move(){
+void DebugCamera::Move() {
 	bool mmbPressed = CalyxFoundation::Input::PushMouseButton(CalyxFoundation::MouseButton::Middle); // 中央ボタンは通常ボタンインデックス2
-	bool shiftHeld = CalyxFoundation::Input::PushKey(DIK_LSHIFT) || CalyxFoundation::Input::PushKey(DIK_RSHIFT);
-	bool ctrlHeld = CalyxFoundation::Input::PushKey(DIK_LCONTROL) || CalyxFoundation::Input::PushKey(DIK_RCONTROL);
+	bool shiftHeld	= CalyxFoundation::Input::PushKey(DIK_LSHIFT) || CalyxFoundation::Input::PushKey(DIK_RSHIFT);
+	bool ctrlHeld	= CalyxFoundation::Input::PushKey(DIK_LCONTROL) || CalyxFoundation::Input::PushKey(DIK_RCONTROL);
 
 	// Shiftが押されていて、Ctrlは押されていない -> パン処理
-	if (mmbPressed && shiftHeld && !ctrlHeld){
-		if (!isDraggingMove_){
+	if(mmbPressed && shiftHeld && !ctrlHeld) {
+		if(!isDraggingMove_) {
 			// ドラッグ開始時に現在のマウス移動量を記録
 			lastMousePosMove_ = CalyxFoundation::Input::GetMouseDelta(); // 初回のデルタは無視
-			isDraggingMove_ = true;
+			isDraggingMove_	  = true;
 			return; // 初回は移動量を無視
 		}
 
 		CalyxEngine::Vector2 mouseDelta = CalyxFoundation::Input::GetMouseDelta(); // 各フレームの移動量を取得
 
 		// マウスがほとんど動いていない場合は無視
-		if (std::abs(mouseDelta.x) < 0.1f && std::abs(mouseDelta.y) < 0.1f){
+		if(std::abs(mouseDelta.x) < 0.1f && std::abs(mouseDelta.y) < 0.1f) {
 			return;
 		}
 
 		// カメラの回転行列を作成
-		CalyxEngine::Matrix4x4 matRotYaw = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
+		CalyxEngine::Matrix4x4 matRotYaw   = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
 		CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
-		CalyxEngine::Matrix4x4 matRot = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+		CalyxEngine::Matrix4x4 matRot	   = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
 
 		// パン方向の移動量 (画面右が-X, 上が+Yになるよう調整)
 		CalyxEngine::Vector3 localMove(
 			-mouseDelta.x * panSpeed_,
 			mouseDelta.y * panSpeed_,
-			0.0f
-		);
+			0.0f);
 
 		// ローカル移動量をワールド座標に変換
 		CalyxEngine::Vector3 worldMove = CalyxEngine::TransformNormal(localMove, matRot);
 
 		// ターゲット位置を移動
 		target_ += worldMove;
-	} else{
+	} else {
 		// ドラッグ終了時
 		isDraggingMove_ = false;
 	}
@@ -232,7 +237,7 @@ void DebugCamera::Move(){
 //*-----------------------------------------------------------------------
 // ズーム処理 (Ctrl + MMBドラッグ or マウスホイール): カメラの距離を変更
 //-----------------------------------------------------------------------
-void DebugCamera::Zoom(){
+void DebugCamera::Zoom() {
 
 	// ホイールクリックが押されている場合はズームを無視
 	if(CalyxFoundation::Input::PushMouseButton(CalyxFoundation::MouseButton::Middle)) {
@@ -241,9 +246,9 @@ void DebugCamera::Zoom(){
 
 	// マウスホイールによるズーム処理
 	float wheel = CalyxFoundation::Input::GetMouseWheel(); // 1フレーム当たりのホイール回転量
-	if (wheel != 0.0f){
+	if(wheel != 0.0f) {
 		distance_ -= wheel * (zoomSpeed_ * 5.0f);
-		distance_ = ( std::max ) (0.01f, distance_);
+		distance_ = (std::max)(0.01f, distance_);
 	}
 }
 REGISTER_SCENE_OBJECT(DebugCamera)

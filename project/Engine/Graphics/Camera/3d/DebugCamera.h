@@ -87,4 +87,7 @@ private:
 	CalyxEngine::Vector3 lastAppliedTranslation_{0.0f,0.0f,0.0f};
 	CalyxEngine::Vector3 lastAppliedEulerRotation_{0.0f,0.0f,0.0f};
 	bool	hasAppliedTransform_{false};
+
+	// 設定
+	bool isInverse_ = false;
 };

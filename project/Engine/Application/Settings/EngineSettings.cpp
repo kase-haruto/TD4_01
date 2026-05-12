@@ -11,8 +11,8 @@ namespace CalyxEngine {
 	namespace {
 		const char* GetCategoryLabel(EngineSettings::Category category) {
 			switch(category) {
-			case EngineSettings::Category::Runtime:
-				return "Runtime";
+			case EngineSettings::Category::Editor:
+				return "Editor";
 			default:
 				return "Unknown";
 			}
@@ -78,7 +78,7 @@ namespace CalyxEngine {
 
 		ImGui::BeginChild("SettingsCategories", ImVec2(leftWidth, contentSize.y - footerHeight), true);
 		const Category categories[] = {
-			Category::Runtime,
+			Category::Editor,
 		};
 		for(const Category category : categories) {
 			const bool selected = selectedCategory_ == category;
@@ -95,8 +95,9 @@ namespace CalyxEngine {
 		ImGui::Separator();
 
 		switch(selectedCategory_) {
-		case Category::Runtime:
-			ImGui::Checkbox("Fullscreen game view on play", &editingData_.runtime.fullscreenGameViewOnPlay);
+		case Category::Editor:
+			ImGui::Checkbox("Fullscreen game view on play", &editingData_.editor.fullscreenGameViewOnPlay);
+			ImGui::Checkbox("Debug camera rotate inverse", &editingData_.editor.DebugCameraRotateInverse);
 			break;
 		default:
 			break;
@@ -127,14 +128,17 @@ namespace CalyxEngine {
 
 	nlohmann::json EngineSettings::ToJson() const {
 		nlohmann::json json;
-		json["runtime"]["fullscreenGameViewOnPlay"] = data_.runtime.fullscreenGameViewOnPlay;
+		json["editor"]["fullscreenGameViewOnPlay"] = data_.editor.fullscreenGameViewOnPlay;
+		json["editor"]["DebugCameraRotateInverse"] = data_.editor.DebugCameraRotateInverse;
 		return json;
 	}
 
 	void EngineSettings::ApplyJson(const nlohmann::json& json) {
-		if(const auto runtime = json.find("runtime"); runtime != json.end() && runtime->is_object()) {
-			data_.runtime.fullscreenGameViewOnPlay =
-				runtime->value("fullscreenGameViewOnPlay", data_.runtime.fullscreenGameViewOnPlay);
+		if(const auto editor = json.find("editor"); editor != json.end() && editor->is_object()) {
+			data_.editor.fullscreenGameViewOnPlay =
+				editor->value("fullscreenGameViewOnPlay", data_.editor.fullscreenGameViewOnPlay);
+			data_.editor.DebugCameraRotateInverse =
+				editor->value("DebugCameraRotateInverse", data_.editor.DebugCameraRotateInverse);
 		}
 	}
 
