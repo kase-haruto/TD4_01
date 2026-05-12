@@ -1,21 +1,14 @@
 #pragma once
 
+#include "EngineSettingsDetails.h"
 #include <externals/nlohmann/json.hpp>
 
 namespace CalyxEngine {
 
-	struct RuntimeSettings {
-		bool fullscreenGameViewOnPlay = false;
-	};
-
-	struct EngineSettingsData {
-		RuntimeSettings runtime;
-	};
-
 	class EngineSettings {
 	public:
 		enum class Category {
-			Runtime,
+			Editor,
 		};
 
 		static EngineSettings& GetInstance();
@@ -39,7 +32,7 @@ namespace CalyxEngine {
 
 		EngineSettingsData data_{};
 		EngineSettingsData editingData_{};
-		Category		   selectedCategory_ = Category::Runtime;
+		Category		   selectedCategory_ = Category::Editor;
 		bool			   showSettingsWindow_ = false;
 		bool			   editingInitialized_ = false;
 	};

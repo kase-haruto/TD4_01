@@ -1645,12 +1645,12 @@ namespace CalyxEngine {
 	bool LevelEditor::ShouldRenderRuntimeFullscreen() const {
 		return pPlaySesseion_ &&
 			   pPlaySesseion_->IsRuntime() &&
-			   EngineSettings::GetInstance().GetData().runtime.fullscreenGameViewOnPlay;
+			   EngineSettings::GetInstance().GetData().editor.fullscreenGameViewOnPlay;
 	}
 
 	bool LevelEditor::ShouldHideEditorUiInGameMode() const {
 		return mode_ == EngineEdit::EditorMode::Game &&
-			   EngineSettings::GetInstance().GetData().runtime.fullscreenGameViewOnPlay;
+			   EngineSettings::GetInstance().GetData().editor.fullscreenGameViewOnPlay;
 	}
 
 	void LevelEditor::SetCameraForViewport(BaseCamera* mainCamera, BaseCamera* debugCamera) {
