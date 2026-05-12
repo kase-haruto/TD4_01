@@ -117,6 +117,7 @@ public:
 	 * \param camera カメラ
 	 */
 	void PreCullAndBatch(const class Camera3d* camera);
+	void BuildAllVisibleBatches();
 
 	/**
 	 * \brief 一括描画処理

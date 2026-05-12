@@ -14,6 +14,7 @@
 // c++
 #include <memory>
 #include <string>
+#include <vector>
 
 // externals
 #include "Engine/Foundation/Math/Vector3.h"
@@ -68,12 +69,14 @@ namespace CalyxEngine {
 								const ImVec2&	 viewportSize);
 		std::shared_ptr<SceneObject> PickObjectAtLocalPoint(const CalyxEngine::Vector2& localPoint) const;
 		bool ApplyAssetToObjectAtLocalPoint(const AssetDragPayload& payload, const CalyxEngine::Vector2& localPoint);
+		void ClearGhosts();
 
 	private:
 		enum class GhostKind {
 			None,
 			PlaceItem,
 			ModelAsset,
+			PrefabAsset,
 		};
 
 		std::vector<IOnViewportTool*> tools_;
@@ -91,6 +94,7 @@ namespace CalyxEngine {
 		bool			   overlayToolsEnabled_ = true;
 
 		std::shared_ptr<SceneObject> ghost_		  = nullptr;
+		std::vector<std::shared_ptr<SceneObject>> prefabGhosts_;
 		GhostKind					 ghostKind_	  = GhostKind::None;
 		Guid						 ghostAssetGuid_ = Guid::Empty();
 		PickingPass*				 pickingPass_ = nullptr;

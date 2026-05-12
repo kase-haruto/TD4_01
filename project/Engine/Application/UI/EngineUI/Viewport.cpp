@@ -130,12 +130,60 @@ namespace {
             ctx->AddObject(sp);
         }
     }
+
+    void AddPrefabGhostObjectsToCurrentScene(
+        const std::vector<std::shared_ptr<SceneObject>>& objects,
+        const CalyxEngine::Vector3& spawnOffset) {
+        SceneContext* ctx = SceneContext::Current();
+        if(!ctx) return;
+
+        std::unordered_set<SceneObject*> loaded;
+        loaded.reserve(objects.size());
+        for(const auto& sp : objects) {
+            if(sp) loaded.insert(sp.get());
+        }
+
+        for(const auto& sp : objects) {
+            if(!sp) continue;
+            sp->SetTransient(true);
+            sp->SetEnablePicking(false);
+            if(auto go = std::dynamic_pointer_cast<BaseGameObject>(sp)) {
+                go->SetBlendMode(BlendMode::ALPHA);
+                go->SetColor({0.35f, 0.65f, 1.0f, 0.45f});
+            }
+
+            auto parent = sp->GetParent();
+            if(!parent || !loaded.contains(parent.get())) {
+                sp->GetWorldTransform().translation =
+                    sp->GetWorldTransform().translation + spawnOffset;
+            }
+
+            ctx->AddObject(sp);
+        }
+    }
 }
 
 Viewport::Viewport(ViewportType type, const std::string& windowName)
     : IEngineUI(windowName), type_(type), windowName_(windowName) {}
 
 void Viewport::Update() {}
+
+void Viewport::ClearGhosts() {
+    if(auto* ctx = SceneContext::Current()) {
+        if(ghost_) {
+            ctx->RemoveObject(ghost_);
+        }
+        for(auto& prefabGhost : prefabGhosts_) {
+            if(prefabGhost && ctx->GetObjectLibrary() && ctx->GetObjectLibrary()->Contains(prefabGhost)) {
+                ctx->RemoveObject(prefabGhost);
+            }
+        }
+    }
+    ghost_ = nullptr;
+    prefabGhosts_.clear();
+    ghostKind_ = GhostKind::None;
+    ghostAssetGuid_ = Guid::Empty();
+}
 
 CalyxEngine::Vector3 Viewport::CalculateSpawnPosForPlace(const ImVec2& imagePos) {
     // マウス位置（Viewportローカル）
@@ -336,7 +384,11 @@ void Viewport::Render(const ImTextureID& tex) {
     // ============================================================
     // Drop target は Image の直後に固定（条件分岐の奥に入れない）
     // ============================================================
-    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
+    const bool acceptsViewportPlacement =
+        overlayToolsEnabled_ &&
+        (type_ == ViewportType::VIEWPORT_DEBUG || type_ == ViewportType::VIEWPORT_MAIN);
+
+    if(acceptsViewportPlacement) {
         if(ImGui::BeginDragDropTarget()) {
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_PLACE_ITEM")) {
                 const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(payload);
@@ -344,12 +396,7 @@ void Viewport::Render(const ImTextureID& tex) {
                     const CalyxEngine::Vector3 spawnPos = CalculateSpawnPosForPlace(imagePos);
                     item->createFunc(spawnPos);
 
-                    if(ghost_) {
-                        SceneContext::Current()->RemoveObject(ghost_);
-                        ghost_ = nullptr;
-                        ghostKind_ = GhostKind::None;
-                        ghostAssetGuid_ = Guid::Empty();
-                    }
+                    ClearGhosts();
                 }
             }
             if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CALYX_ASSET")) {
@@ -378,12 +425,7 @@ void Viewport::Render(const ImTextureID& tex) {
                         std::make_unique<CreateObjectCommand<BaseGameObject>>(
                             SceneContext::Current(), factory, "Create Model Asset"));
 
-                    if(ghost_) {
-                        SceneContext::Current()->RemoveObject(ghost_);
-                        ghost_ = nullptr;
-                        ghostKind_ = GhostKind::None;
-                        ghostAssetGuid_ = Guid::Empty();
-                    }
+                    ClearGhosts();
                 }
 
                 const AssetRecord* prefabRecord = GetDraggedPrefabRecord(payload);
@@ -394,12 +436,7 @@ void Viewport::Render(const ImTextureID& tex) {
                         PrefabSerializer::LoadOptions{false, prefabRecord->guid});
                     AddPrefabObjectsToCurrentScene(objects, prefabRecord->guid, spawnPos);
 
-                    if(ghost_) {
-                        SceneContext::Current()->RemoveObject(ghost_);
-                        ghost_ = nullptr;
-                        ghostKind_ = GhostKind::None;
-                        ghostAssetGuid_ = Guid::Empty();
-                    }
+                    ClearGhosts();
                 }
             }
             ImGui::EndDragDropTarget();
@@ -409,7 +446,7 @@ void Viewport::Render(const ImTextureID& tex) {
     // ============================================================
     // Ghost update（ドラッグ中＋画像矩形内のみ）
     // ============================================================
-    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
+    if(acceptsViewportPlacement) {
 
         const ImGuiPayload* dragPayload = ImGui::GetDragDropPayload();
         const bool draggingPlace = (dragPayload && dragPayload->IsDataType("DND_PLACE_ITEM"));
@@ -426,11 +463,8 @@ void Viewport::Render(const ImTextureID& tex) {
                 const PlaceToolPanel::PlaceItem* item = ReadPlaceItemFromPayload(dragPayload);
                 if(item && item->ghostFactory) {
 
-                    if(ghost_ && ghostKind_ != GhostKind::PlaceItem) {
-                        SceneContext::Current()->RemoveObject(ghost_);
-                        ghost_ = nullptr;
-                        ghostKind_ = GhostKind::None;
-                        ghostAssetGuid_ = Guid::Empty();
+                    if((ghost_ && ghostKind_ != GhostKind::PlaceItem) || !prefabGhosts_.empty()) {
+                        ClearGhosts();
                     }
 
                     if(!ghost_) {
@@ -449,11 +483,9 @@ void Viewport::Render(const ImTextureID& tex) {
             } else if(draggingModelAsset) {
                 const AssetRecord* record = GetDraggedModelRecord(dragPayload);
                 if(record) {
-                    if(ghost_ && (ghostKind_ != GhostKind::ModelAsset || ghostAssetGuid_ != record->guid)) {
-                        SceneContext::Current()->RemoveObject(ghost_);
-                        ghost_ = nullptr;
-                        ghostKind_ = GhostKind::None;
-                        ghostAssetGuid_ = Guid::Empty();
+                    if((ghost_ && (ghostKind_ != GhostKind::ModelAsset || ghostAssetGuid_ != record->guid)) ||
+                       !prefabGhosts_.empty()) {
+                        ClearGhosts();
                     }
 
                     if(!ghost_) {
@@ -467,20 +499,36 @@ void Viewport::Render(const ImTextureID& tex) {
                     }
                 }
             } else if(draggingPrefabAsset) {
-                if(ghost_) {
-                    SceneContext::Current()->RemoveObject(ghost_);
-                    ghost_ = nullptr;
-                    ghostKind_ = GhostKind::None;
-                    ghostAssetGuid_ = Guid::Empty();
+                const AssetRecord* record = GetDraggedPrefabRecord(dragPayload);
+                if(ghost_ || (record && ghostAssetGuid_ != record->guid)) {
+                    ClearGhosts();
+                }
+                if(record) {
+                    if(prefabGhosts_.empty()) {
+                        prefabGhosts_ = PrefabSerializer::Load(
+                            record->sourcePath.string(),
+                            PrefabSerializer::LoadOptions{false, Guid::Empty()});
+                        AddPrefabGhostObjectsToCurrentScene(prefabGhosts_, spawnPos);
+                        ghostKind_ = GhostKind::PrefabAsset;
+                        ghostAssetGuid_ = record->guid;
+                    } else {
+                        std::unordered_set<SceneObject*> loaded;
+                        loaded.reserve(prefabGhosts_.size());
+                        for(auto& sp : prefabGhosts_) {
+                            if(sp) loaded.insert(sp.get());
+                        }
+                        for(auto& sp : prefabGhosts_) {
+                            if(!sp) continue;
+                            auto parent = sp->GetParent();
+                            if(!parent || !loaded.contains(parent.get())) {
+                                sp->GetWorldTransform().translation = spawnPos;
+                            }
+                        }
+                    }
                 }
             }
         } else {
-            if(ghost_) {
-                SceneContext::Current()->RemoveObject(ghost_);
-                ghost_ = nullptr;
-                ghostKind_ = GhostKind::None;
-                ghostAssetGuid_ = Guid::Empty();
-            }
+            ClearGhosts();
         }
     }
 

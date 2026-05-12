@@ -436,6 +436,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\Core\GraphicsSystem.cpp" />
     <ClCompile Include="Engine\Editor\EditorSelectionCoordinator.cpp" />
     <ClCompile Include="Engine\Editor\LevelEditor.cpp" />
+    <ClCompile Include="Engine\Editor\Prefab\PrefabEditContextUtils.cpp" />
     <ClCompile Include="Engine\Editor\SceneObjectDuplicator.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Module\Velocity\GravityModule.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Emitter\GpuFxEmitter.cpp" />
@@ -877,6 +878,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <Content Include="Engine\Application\Settings\EngineSettingsDetails.h" />
     <Content Include="Engine\Foundation\Serialization\ParamStore.h" />
     <Content Include="Engine\Foundation\Utility\Func\CxUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Engine\Editor\Prefab\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
