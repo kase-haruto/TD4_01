@@ -1,10 +1,12 @@
 #include "LevelEditor.h"
 
 // engine
+#include <externals/nlohmann/json.hpp>
 #include <Engine/Application/Effects/FxSystem.h>
 #include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Application/Settings/EngineSettings.h>
+#include <Data/Engine/Configs/Scene/Objects/Transform/WorldTransformConfig.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Application/UI/EngineUI/Context/EditorContext.h>
@@ -136,6 +138,118 @@ namespace {
 		} else if(auto camera = std::dynamic_pointer_cast<Camera3d>(object)) {
 			ctx->GetCameraMgr()->SetMainCamera(camera);
 		}
+	}
+
+	bool IsMeshObject(const std::shared_ptr<SceneObject>& object) {
+		return object && object->GetObjectType() == ObjectType::GameObject;
+	}
+
+	void WriteDuplicateMetadata(const std::shared_ptr<SceneObject>& object, nlohmann::json& j) {
+		j["type"] = object->GetObjectClassName();
+		j["name"] = object->GetName();
+		j["objectType"] = static_cast<int>(object->GetObjectType());
+		j["drawEnable"] = object->IsDrawEnable();
+		j["castShadow"] = object->IsCastShadow();
+		j["outlineEnabled"] = object->IsOutlineEnabled();
+		j["outlineThickness"] = object->GetOutlineSettings().thickness;
+		j["outlineColor"] = object->GetOutlineSettings().color;
+		j["worldTransform"] = object->GetWorldTransform().ExtractConfig();
+		j["inheritScale"] = object->GetWorldTransform().inheritScale;
+		if(auto parent = object->GetParent()) {
+			j["parentGuid"] = parent->GetGuid();
+		}
+	}
+
+	void ApplyDuplicateMetadata(const std::shared_ptr<SceneObject>& object, const nlohmann::json& j) {
+		if(!object) return;
+		const int objectType = j.value("objectType", static_cast<int>(object->GetObjectType()));
+		object->SetName(j.value("name", object->GetName()), static_cast<ObjectType>(objectType));
+		object->SetDrawEnable(j.value("drawEnable", object->IsDrawEnable()));
+		object->SetCastShadow(j.value("castShadow", object->IsCastShadow()));
+		object->SetOutlineEnabled(j.value("outlineEnabled", object->IsOutlineEnabled()));
+		object->SetOutlineThickness(j.value("outlineThickness", object->GetOutlineSettings().thickness));
+		object->SetOutlineColor(j.value("outlineColor", object->GetOutlineSettings().color));
+		if(j.contains("worldTransform")) {
+			object->GetWorldTransform().ApplyConfig(j.at("worldTransform").get<WorldTransformConfig>());
+		}
+	}
+
+	std::shared_ptr<SceneObject> CloneMeshObjectWithoutHierarchy(const std::shared_ptr<SceneObject>& source) {
+		if(!IsMeshObject(source)) return nullptr;
+
+		nlohmann::json snapshot;
+		WriteDuplicateMetadata(source, snapshot);
+		if(auto* cfg = dynamic_cast<const IConfigurable*>(source.get())) {
+			nlohmann::json config;
+			cfg->ExtractConfigToJson(config);
+			for(auto it = config.begin(); it != config.end(); ++it) {
+				snapshot[it.key()] = it.value();
+			}
+		}
+
+		std::shared_ptr<SceneObject> clone;
+		try {
+			clone = SceneObjectRegistry::Get().Create(snapshot.value("type", ""));
+		} catch(...) {
+			return nullptr;
+		}
+		if(!clone || !IsMeshObject(clone)) return nullptr;
+
+		if(auto* cfg = dynamic_cast<IConfigurable*>(clone.get())) {
+			cfg->ApplyConfigFromJson(snapshot);
+		}
+		ApplyDuplicateMetadata(clone, snapshot);
+		clone->SetGuid(Guid::New());
+		clone->ClearPrefabLink();
+		clone->SetPickingID(0);
+		clone->Initialize();
+		return clone;
+	}
+
+	void CollectMeshDuplicateRoots(const std::vector<std::shared_ptr<SceneObject>>& selected,
+								   std::vector<std::shared_ptr<SceneObject>>& roots) {
+		for(const auto& object : selected) {
+			if(!IsMeshObject(object)) continue;
+
+			bool hasSelectedMeshAncestor = false;
+			for(auto parent = object->GetParent(); parent; parent = parent->GetParent()) {
+				if(!IsMeshObject(parent)) continue;
+				if(std::find(selected.begin(), selected.end(), parent) != selected.end()) {
+					hasSelectedMeshAncestor = true;
+					break;
+				}
+			}
+			if(!hasSelectedMeshAncestor) {
+				roots.push_back(object);
+			}
+		}
+	}
+
+	std::shared_ptr<SceneObject> DuplicateMeshSubtree(
+		SceneContext* ctx,
+		const std::shared_ptr<SceneObject>& source,
+		const std::shared_ptr<SceneObject>& duplicateParent,
+		std::vector<std::shared_ptr<SceneObject>>& created) {
+		if(!ctx || !IsMeshObject(source)) return nullptr;
+
+		auto clone = CloneMeshObjectWithoutHierarchy(source);
+		if(!clone) return nullptr;
+
+		if(duplicateParent) {
+			clone->SetParent(duplicateParent, source->GetWorldTransform().inheritScale);
+		} else if(auto parent = source->GetParent()) {
+			clone->SetParent(parent, source->GetWorldTransform().inheritScale);
+		}
+
+		ctx->AddObject(clone);
+		created.push_back(clone);
+
+		for(const auto& child : source->GetChildren()) {
+			if(IsMeshObject(child)) {
+				DuplicateMeshSubtree(ctx, child, clone, created);
+			}
+		}
+		return clone;
 	}
 
 	class DeleteObjectsCommand final
@@ -403,6 +517,89 @@ namespace CalyxEngine {
 		nlohmann::json snapshot_;
 	};
 
+	class DuplicateMeshObjectsCommand final : public BaseLevelEditorCommand {
+	public:
+		DuplicateMeshObjectsCommand(SceneContext* ctx,
+									std::vector<std::shared_ptr<SceneObject>> sources,
+									LevelEditor* editor)
+			: BaseLevelEditorCommand("Duplicate Mesh Objects"),
+			  ctx_(ctx),
+			  editor_(editor) {
+			sourceGuids_.reserve(sources.size());
+			for(const auto& source : sources) {
+				if(source) {
+					sourceGuids_.push_back(source->GetGuid());
+				}
+			}
+		}
+
+		void Execute() override {
+			createdRootGuids_.clear();
+			created_ = CreateDuplicates();
+			if(editor_) {
+				editor_->SetSelectedObjects(created_);
+				if(editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
+			}
+		}
+
+		void Undo() override {
+			if(!ctx_ || !ctx_->GetObjectLibrary()) return;
+			for(const auto& guid : createdRootGuids_) {
+				auto object = ctx_->GetObjectLibrary()->Find(guid);
+				if(object) {
+					ctx_->RemoveObject(object);
+				}
+			}
+			created_.clear();
+			if(editor_) {
+				editor_->ClearSelection();
+				if(editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
+			}
+		}
+
+		void Redo() override {
+			Execute();
+		}
+
+		const std::vector<std::shared_ptr<SceneObject>>& GetCreatedObjects() const {
+			return created_;
+		}
+
+	private:
+		std::vector<std::shared_ptr<SceneObject>> CreateDuplicates() {
+			std::vector<std::shared_ptr<SceneObject>> selectedDuplicates;
+			if(!ctx_) return selectedDuplicates;
+
+			std::vector<std::shared_ptr<SceneObject>> roots;
+			std::vector<std::shared_ptr<SceneObject>> allCreated;
+			if(auto* lib = ctx_->GetObjectLibrary()) {
+				std::vector<std::shared_ptr<SceneObject>> sources;
+				sources.reserve(sourceGuids_.size());
+				for(const auto& guid : sourceGuids_) {
+					auto source = lib->Find(guid);
+					if(source) {
+						sources.push_back(source);
+					}
+				}
+				CollectMeshDuplicateRoots(sources, roots);
+			}
+			for(const auto& root : roots) {
+				auto duplicateRoot = DuplicateMeshSubtree(ctx_, root, nullptr, allCreated);
+				if(duplicateRoot) {
+					createdRootGuids_.push_back(duplicateRoot->GetGuid());
+					selectedDuplicates.push_back(duplicateRoot);
+				}
+			}
+			return selectedDuplicates;
+		}
+
+		SceneContext* ctx_ = nullptr;
+		std::vector<Guid> sourceGuids_;
+		std::vector<std::shared_ptr<SceneObject>> created_;
+		std::vector<Guid> createdRootGuids_;
+		LevelEditor* editor_ = nullptr;
+	};
+
 	//=============================================================================
 	// Initialize
 	//=============================================================================
@@ -487,6 +684,9 @@ namespace CalyxEngine {
 
 		// Manipulator をツールとして登録
 		if(auto* manipulator = sceneEditor_->GetManipulator()) {
+			manipulator->SetOnCtrlTranslateDuplicate([this]() {
+				return DuplicateSelectedMeshObjects();
+			});
 			debugViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(performanceOverlay_.get());
 			debugViewport_->AddTool(debugOverlay_.get());
@@ -747,6 +947,15 @@ namespace CalyxEngine {
 
 		if(!selectedObjects_.empty() && !io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
 			DeleteSelectedObjects();
+		}
+
+		if(!selectedObjects_.empty() &&
+		   !io.WantTextInput &&
+		   io.KeyCtrl &&
+		   !io.KeyAlt &&
+		   !io.KeyShift &&
+		   ImGui::IsKeyPressed(ImGuiKey_D, false)) {
+			DuplicateSelectedMeshObjects();
 		}
 
 		// ----------------------------
@@ -1490,6 +1699,18 @@ namespace CalyxEngine {
 		return nullptr;
 	}
 
+	std::vector<std::shared_ptr<SceneObject>> LevelEditor::GetSelectedObjects() const {
+		std::vector<std::shared_ptr<SceneObject>> objects;
+		objects.reserve(selectedObjects_.size());
+		for(const auto& weak : selectedObjects_) {
+			auto object = weak.lock();
+			if(!object) continue;
+			if(std::find(objects.begin(), objects.end(), object) != objects.end()) continue;
+			objects.push_back(object);
+		}
+		return objects;
+	}
+
 	//=============================================================================
 	// Create / Delete Object
 	//=============================================================================
@@ -1558,6 +1779,36 @@ namespace CalyxEngine {
 				std::move(targets),
 				std::move(afterApply),
 				"Delete Selected Objects"));
+	}
+
+	std::vector<WorldTransform*> LevelEditor::DuplicateSelectedMeshObjects() {
+		std::vector<WorldTransform*> duplicatedTransforms;
+
+		SceneContext* ctx = SceneContext::Current();
+		if(!ctx) return duplicatedTransforms;
+
+		auto sources = GetSelectedObjects();
+		std::vector<std::shared_ptr<SceneObject>> meshSources;
+		meshSources.reserve(sources.size());
+		for(const auto& source : sources) {
+			if(IsMeshObject(source)) {
+				meshSources.push_back(source);
+			}
+		}
+		if(meshSources.empty()) return duplicatedTransforms;
+
+		auto command = std::make_unique<DuplicateMeshObjectsCommand>(ctx, std::move(meshSources), this);
+		auto* rawCommand = command.get();
+		CommandManager::GetInstance()->Execute(std::move(command));
+
+		const auto& createdObjects = rawCommand->GetCreatedObjects();
+		duplicatedTransforms.reserve(createdObjects.size());
+		for(const auto& object : createdObjects) {
+			if(object) {
+				duplicatedTransforms.push_back(&object->GetWorldTransform());
+			}
+		}
+		return duplicatedTransforms;
 	}
 
 	//=============================================================================

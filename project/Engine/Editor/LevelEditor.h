@@ -45,6 +45,7 @@ class BaseEditor;
 class SceneContext;
 class SceneObject;
 class BaseCamera;
+class WorldTransform;
 struct CalyxEngine::Vector2;
 struct CalyxEngine::Matrix4x4;
 struct Ray;
@@ -85,12 +86,14 @@ namespace CalyxEngine {
 		void SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects);
 		bool IsSelectedObject(const SceneObject* object) const;
 		std::shared_ptr<SceneObject> GetPrimarySelectedObject() const;
+		std::vector<std::shared_ptr<SceneObject>> GetSelectedObjects() const;
 
 		/// シーンへのオブジェクト追加（Prefab / PlaceTool などから呼ばれる）
 		void CreateObject(const std::shared_ptr<SceneObject>& obj);
 		/// シーンからオブジェクト削除（階層パネルなどから呼ばれる）
 		void DeleteObject(const std::shared_ptr<SceneObject>& sp);
 		void DeleteSelectedObjects();
+		std::vector<WorldTransform*> DuplicateSelectedMeshObjects();
 
 		// ビューポート関連 --------------------------------------------------------
 		void RenderViewport(ViewportType type, const ImTextureID& tex);
