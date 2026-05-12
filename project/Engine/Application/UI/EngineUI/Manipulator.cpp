@@ -5,13 +5,13 @@
 #include "Engine/Assets/Manager/AssetManager.h"
 
 #include <Engine/Assets/Texture/TextureManager.h>
+#include <Engine/Application/Settings/EngineSettings.h>
 #include <Engine/Editor/SceneObjectEditor.h>
 #include <Engine/Foundation/Math/Matrix4x4.h>
 #include <Engine/Foundation/Math/MathUtil.h>
 #include <Engine/Foundation/Utility/Func/CxUtils.h>
 #include <Engine/Graphics/Camera/Base/BaseCamera.h>
 #include <Engine/Objects/Transform/Transform.h>
-#include <Engine/Renderer/Primitive/PrimitiveDrawer.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/System/Command/Manager/CommandManager.h>
 
@@ -438,7 +438,7 @@ namespace CalyxEngine {
 		}
 
 		{
-			static bool showGrid = false;
+			const bool showGrid = EngineSettings::GetInstance().GetData().editor.showGrid;
 			int			i		 = IM_ARRAYSIZE(buttons);
 			spacing += 15.0f;
 			ImVec2 btnPos = ImVec2(basePos.x, basePos.y + i * (iconSize.y + spacing));
@@ -451,15 +451,11 @@ namespace CalyxEngine {
 			}
 
 			if(ImGui::ImageButton(iconDrawGrid_.texture, iconSize)) {
-				showGrid = !showGrid;
+				EngineSettings::GetInstance().OpenSettingsWindow();
 			}
 
 			if(pushStyle) {
-				ImGui::PopStyleColor(); // Push したときだけ Pop する
-			}
-
-			if(showGrid) {
-				PrimitiveDrawer::GetInstance()->DrawGrid();
+				ImGui::PopStyleColor();
 			}
 		}
 	}

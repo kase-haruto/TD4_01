@@ -21,6 +21,7 @@ namespace CalyxEngine {
 		void RenderSettingsWindow();
 
 		const EngineSettingsData& GetData() const { return data_; }
+		void SetData(const EngineSettingsData& data) { data_ = data; }
 
 	private:
 		EngineSettings() = default;

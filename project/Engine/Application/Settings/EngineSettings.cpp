@@ -98,6 +98,7 @@ namespace CalyxEngine {
 		case Category::Editor:
 			ImGui::Checkbox("Fullscreen game view on play", &editingData_.editor.fullscreenGameViewOnPlay);
 			ImGui::Checkbox("Debug camera rotate inverse", &editingData_.editor.DebugCameraRotateInverse);
+			ImGui::Checkbox("Show grid", &editingData_.editor.showGrid);
 			break;
 		default:
 			break;
@@ -122,7 +123,7 @@ namespace CalyxEngine {
 			showSettingsWindow_ = false;
 			editingInitialized_ = false;
 		}
-
+	
 		ImGui::End();
 	}
 
@@ -130,6 +131,7 @@ namespace CalyxEngine {
 		nlohmann::json json;
 		json["editor"]["fullscreenGameViewOnPlay"] = data_.editor.fullscreenGameViewOnPlay;
 		json["editor"]["DebugCameraRotateInverse"] = data_.editor.DebugCameraRotateInverse;
+		json["editor"]["showGrid"] = data_.editor.showGrid;
 		return json;
 	}
 
@@ -139,6 +141,8 @@ namespace CalyxEngine {
 				editor->value("fullscreenGameViewOnPlay", data_.editor.fullscreenGameViewOnPlay);
 			data_.editor.DebugCameraRotateInverse =
 				editor->value("DebugCameraRotateInverse", data_.editor.DebugCameraRotateInverse);
+			data_.editor.showGrid =
+				editor->value("showGrid", data_.editor.showGrid);
 		}
 	}
 
