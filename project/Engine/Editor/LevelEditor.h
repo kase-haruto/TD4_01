@@ -16,6 +16,7 @@
 #include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Application/Effects/FxObject.h>
+#include <Engine/Editor/EditorSelectionCoordinator.h>
 #include <Engine/Editor/ImGuiLayoutSwitcher.h>
 #include <Engine/Editor/SceneObjectEditor.h>
 #include <externals/nlohmann/json.hpp>
@@ -45,6 +46,7 @@ class BaseEditor;
 class SceneContext;
 class SceneObject;
 class BaseCamera;
+class WorldTransform;
 struct CalyxEngine::Vector2;
 struct CalyxEngine::Matrix4x4;
 struct Ray;
@@ -85,12 +87,14 @@ namespace CalyxEngine {
 		void SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects);
 		bool IsSelectedObject(const SceneObject* object) const;
 		std::shared_ptr<SceneObject> GetPrimarySelectedObject() const;
+		std::vector<std::shared_ptr<SceneObject>> GetSelectedObjects() const;
 
 		/// シーンへのオブジェクト追加（Prefab / PlaceTool などから呼ばれる）
 		void CreateObject(const std::shared_ptr<SceneObject>& obj);
 		/// シーンからオブジェクト削除（階層パネルなどから呼ばれる）
 		void DeleteObject(const std::shared_ptr<SceneObject>& sp);
 		void DeleteSelectedObjects();
+		std::vector<WorldTransform*> DuplicateSelectedObjects();
 
 		// ビューポート関連 --------------------------------------------------------
 		void RenderViewport(ViewportType type, const ImTextureID& tex);
@@ -190,9 +194,7 @@ namespace CalyxEngine {
 		// 状態
 		bool		  lastPlaying_	  = false;
 		SceneContext* prevCtx_		  = nullptr;
-		BaseEditor*	  selectedEditor_ = nullptr;
-		/// SceneObject 選択は weak_ptr で保持（寿命を伸ばさない）
-		std::vector<std::weak_ptr<SceneObject>> selectedObjects_;
+		EditorSelectionCoordinator selection_;
 		nlohmann::json			   livePPSnapshot_;
 		bool					   rangeSelectCandidate_ = false;
 		bool					   rangeSelecting_ = false;

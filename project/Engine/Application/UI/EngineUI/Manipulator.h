@@ -9,6 +9,7 @@
 #include <externals/imgui/ImGuizmo.h>
 #include <externals/imgui/imgui.h>
 
+#include <functional>
 #include <vector>
 
 class WorldTransform;
@@ -47,6 +48,9 @@ namespace CalyxEngine {
 		void SetTargets(const std::vector<WorldTransform*>& targets);
 		void SetCamera(BaseCamera* camera);
 		void SetViewRect(const ImVec2& origin, const ImVec2& size);
+		void SetOnCtrlTranslateDuplicate(std::function<std::vector<WorldTransform*>()> callback) {
+			onCtrlTranslateDuplicate_ = std::move(callback);
+		}
 
 	private:
 		//===================================================================*/
@@ -73,6 +77,7 @@ namespace CalyxEngine {
 		ImGuizmo::MODE		mode_	   = ImGuizmo::WORLD;
 
 		bool								wasUsing = false;
+		bool								skipGizmoCommandThisDrag_ = false;
 		std::unique_ptr<ScopedGizmoCommand> scopedCmd;
 
 		WorldTransform* target_ = nullptr;
@@ -81,6 +86,7 @@ namespace CalyxEngine {
 		CalyxEngine::Matrix4x4 groupStartPivot_ = CalyxEngine::Matrix4x4::MakeIdentity();
 		std::vector<CalyxEngine::Matrix4x4> groupStartWorlds_;
 		BaseCamera*		camera_ = nullptr;
+		std::function<std::vector<WorldTransform*>()> onCtrlTranslateDuplicate_;
 
 		ImVec2 viewOrigin_ = {0, 0};
 		ImVec2 viewSize_   = {0, 0};

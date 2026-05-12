@@ -1,6 +1,7 @@
 #include "LevelEditor.h"
 
 // engine
+#include <externals/nlohmann/json.hpp>
 #include <Engine/Application/Effects/FxSystem.h>
 #include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
@@ -12,6 +13,7 @@
 #include <Engine/Assets/System/AssetType.h>
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Editor/PickingPass.h>
+#include <Engine/Editor/SceneObjectDuplicator.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Graphics/Camera/3d/Camera3d.h>
@@ -403,6 +405,77 @@ namespace CalyxEngine {
 		nlohmann::json snapshot_;
 	};
 
+	class DuplicateSceneObjectsCommand final : public BaseLevelEditorCommand {
+	public:
+		DuplicateSceneObjectsCommand(SceneContext* ctx,
+									 std::vector<std::shared_ptr<SceneObject>> sources,
+									 LevelEditor* editor)
+			: BaseLevelEditorCommand("Duplicate Scene Objects"),
+			  ctx_(ctx),
+			  editor_(editor) {
+			sourceGuids_.reserve(sources.size());
+			for(const auto& source : sources) {
+				if(source) {
+					sourceGuids_.push_back(source->GetGuid());
+				}
+			}
+		}
+
+		void Execute() override {
+			result_ = CreateDuplicates();
+			if(editor_) {
+				editor_->SetSelectedObjects(result_.selectedRoots);
+				if(editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
+			}
+		}
+
+		void Undo() override {
+			if(!ctx_ || !ctx_->GetObjectLibrary()) return;
+			for(const auto& guid : result_.rootGuids) {
+				auto object = ctx_->GetObjectLibrary()->Find(guid);
+				if(object) {
+					ctx_->RemoveObject(object);
+				}
+			}
+			result_ = {};
+			if(editor_) {
+				editor_->ClearSelection();
+				if(editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
+			}
+		}
+
+		void Redo() override {
+			Execute();
+		}
+
+		const std::vector<std::shared_ptr<SceneObject>>& GetCreatedRoots() const {
+			return result_.selectedRoots;
+		}
+
+	private:
+		SceneObjectDuplicateResult CreateDuplicates() {
+			if(!ctx_) return {};
+
+			if(auto* lib = ctx_->GetObjectLibrary()) {
+				std::vector<std::shared_ptr<SceneObject>> sources;
+				sources.reserve(sourceGuids_.size());
+				for(const auto& guid : sourceGuids_) {
+					auto source = lib->Find(guid);
+					if(source) {
+						sources.push_back(source);
+					}
+				}
+				return SceneObjectDuplicator::Duplicate(ctx_, sources);
+			}
+			return {};
+		}
+
+		SceneContext* ctx_ = nullptr;
+		std::vector<Guid> sourceGuids_;
+		SceneObjectDuplicateResult result_;
+		LevelEditor* editor_ = nullptr;
+	};
+
 	//=============================================================================
 	// Initialize
 	//=============================================================================
@@ -476,6 +549,7 @@ namespace CalyxEngine {
 			});
 
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
+		selection_.Bind(hierarchy_.get(), inspector_.get(), sceneEditor_.get());
 
 		// ビューポートの初期化 ------------------------------------------------
 		mainViewport_	 = std::make_unique<Viewport>(ViewportType::VIEWPORT_MAIN, "Game Viewport");
@@ -487,6 +561,9 @@ namespace CalyxEngine {
 
 		// Manipulator をツールとして登録
 		if(auto* manipulator = sceneEditor_->GetManipulator()) {
+			manipulator->SetOnCtrlTranslateDuplicate([this]() {
+				return DuplicateSelectedObjects();
+			});
 			debugViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(performanceOverlay_.get());
 			debugViewport_->AddTool(debugOverlay_.get());
@@ -745,8 +822,17 @@ namespace CalyxEngine {
 			rangeSelecting_ = false;
 		}
 
-		if(!selectedObjects_.empty() && !io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
+		if(selection_.HasSelection() && !io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
 			DeleteSelectedObjects();
+		}
+
+		if(selection_.HasSelection() &&
+		   !io.WantTextInput &&
+		   io.KeyCtrl &&
+		   !io.KeyAlt &&
+		   !io.KeyShift &&
+		   ImGui::IsKeyPressed(ImGuiKey_D, false)) {
+			DuplicateSelectedObjects();
 		}
 
 		// ----------------------------
@@ -1384,110 +1470,31 @@ namespace CalyxEngine {
 	// Selection API
 	//=============================================================================
 	void LevelEditor::SetSelectedEditor(BaseEditor* editor) {
-		selectedEditor_ = editor;
-		selectedObjects_.clear();
-
-		if(inspector_) {
-			inspector_->SetSelectedEditor(editor);
-			// オブジェクト選択はクリア
-			inspector_->SetSelectedObject(std::shared_ptr<SceneObject>{});
-		}
-		if(sceneEditor_) {
-			sceneEditor_->ClearSelection();
-		}
+		selection_.SetSelectedEditor(editor);
 	}
 
 	void LevelEditor::SetSelectedObject(const std::shared_ptr<SceneObject>& sp) {
-		if(sp) {
-			SetSelectedObjects({sp});
-		} else {
-			SetSelectedObjects({});
-		}
+		selection_.SetSelectedObject(sp);
 	}
 
 	void LevelEditor::ToggleSelectedObject(const std::shared_ptr<SceneObject>& sp) {
-		if(!sp) {
-			ClearSelection();
-			return;
-		}
-
-		std::vector<std::shared_ptr<SceneObject>> objects;
-		objects.reserve(selectedObjects_.size() + 1);
-
-		bool removed = false;
-		for(auto& weak : selectedObjects_) {
-			auto current = weak.lock();
-			if(!current) continue;
-			if(current == sp) {
-				removed = true;
-				continue;
-			}
-			objects.push_back(current);
-		}
-
-		if(!removed) {
-			objects.push_back(sp);
-		}
-
-		SetSelectedObjects(objects);
+		selection_.ToggleSelectedObject(sp);
 	}
 
 	void LevelEditor::SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects) {
-		selectedObjects_.clear();
-		selectedEditor_ = nullptr;
-
-		std::vector<std::shared_ptr<SceneObject>> validObjects;
-		validObjects.reserve(objects.size());
-		for(const auto& object : objects) {
-			if(!object) continue;
-			if(std::find(validObjects.begin(), validObjects.end(), object) != validObjects.end()) continue;
-			validObjects.push_back(object);
-			selectedObjects_.push_back(object);
-		}
-
-		// Hierarchy / Inspector / SceneObjectEditor にも通知
-		if(hierarchy_) {
-			hierarchy_->SetSelectedObjects(validObjects);
-		}
-		if(inspector_) {
-			inspector_->SetSelectedEditor(nullptr);
-			inspector_->SetSelectedObjects(selectedObjects_);
-		}
-		if(sceneEditor_) {
-			std::vector<SceneObject*> rawObjects;
-			rawObjects.reserve(validObjects.size());
-			for(const auto& object : validObjects) {
-				rawObjects.push_back(object.get());
-			}
-			sceneEditor_->SetTargets(rawObjects);
-		}
-
-		if(auto* ctx = SceneContext::Current()) {
-			std::vector<SceneObject*> rawObjects;
-			rawObjects.reserve(validObjects.size());
-			for(const auto& object : validObjects) {
-				rawObjects.push_back(object.get());
-			}
-			ctx->SetDebugSelectedObjects(rawObjects);
-		}
+		selection_.SetSelectedObjects(objects);
 	}
 
 	bool LevelEditor::IsSelectedObject(const SceneObject* object) const {
-		if(!object) return false;
-		for(const auto& weak : selectedObjects_) {
-			auto selected = weak.lock();
-			if(selected.get() == object) return true;
-		}
-		return false;
+		return selection_.IsSelected(object);
 	}
 
 	std::shared_ptr<SceneObject> LevelEditor::GetPrimarySelectedObject() const {
-		for(auto it = selectedObjects_.rbegin(); it != selectedObjects_.rend(); ++it) {
-			if(auto selected = it->lock()) {
-				return selected;
-			}
-		}
-		return nullptr;
+		return selection_.GetPrimarySelectedObject();
+	}
+
+	std::vector<std::shared_ptr<SceneObject>> LevelEditor::GetSelectedObjects() const {
+		return selection_.GetSelectedObjects();
 	}
 
 	//=============================================================================
@@ -1529,15 +1536,7 @@ namespace CalyxEngine {
 	}
 
 	void LevelEditor::DeleteSelectedObjects() {
-		std::vector<std::shared_ptr<SceneObject>> targets;
-		targets.reserve(selectedObjects_.size());
-
-		for(auto& weak : selectedObjects_) {
-			auto object = weak.lock();
-			if(!object) continue;
-			if(std::find(targets.begin(), targets.end(), object) != targets.end()) continue;
-			targets.push_back(object);
-		}
+		std::vector<std::shared_ptr<SceneObject>> targets = GetSelectedObjects();
 
 		if(targets.empty()) {
 			ClearSelection();
@@ -1558,6 +1557,29 @@ namespace CalyxEngine {
 				std::move(targets),
 				std::move(afterApply),
 				"Delete Selected Objects"));
+	}
+
+	std::vector<WorldTransform*> LevelEditor::DuplicateSelectedObjects() {
+		std::vector<WorldTransform*> duplicatedTransforms;
+
+		SceneContext* ctx = SceneContext::Current();
+		if(!ctx) return duplicatedTransforms;
+
+		auto duplicatableSources = SceneObjectDuplicator::FilterDuplicatable(GetSelectedObjects());
+		if(duplicatableSources.empty()) return duplicatedTransforms;
+
+		auto command = std::make_unique<DuplicateSceneObjectsCommand>(ctx, std::move(duplicatableSources), this);
+		auto* rawCommand = command.get();
+		CommandManager::GetInstance()->Execute(std::move(command));
+
+		const auto& createdObjects = rawCommand->GetCreatedRoots();
+		duplicatedTransforms.reserve(createdObjects.size());
+		for(const auto& object : createdObjects) {
+			if(object) {
+				duplicatedTransforms.push_back(&object->GetWorldTransform());
+			}
+		}
+		return duplicatedTransforms;
 	}
 
 	//=============================================================================
@@ -1780,12 +1802,7 @@ namespace CalyxEngine {
 
 		std::vector<std::shared_ptr<SceneObject>> selected;
 		if(append) {
-			selected.reserve(selectedObjects_.size());
-			for(auto& weak : selectedObjects_) {
-				if(auto sp = weak.lock()) {
-					selected.push_back(sp);
-				}
-			}
+			selected = GetSelectedObjects();
 		}
 
 		for(auto& object : current->GetObjectLibrary()->GetAllObjectsShared()) {
@@ -1930,18 +1947,7 @@ namespace CalyxEngine {
 		}
 	}
 	void LevelEditor::ClearSelection() {
-		selectedObjects_.clear();
-		selectedEditor_ = nullptr;
-
-		std::weak_ptr<SceneObject> empty;
-
-		hierarchy_->SetSelectedObject(empty);
-		inspector_->SetSelectedObject(empty);
-		sceneEditor_->ClearSelection();
-
-		if(auto* ctx = SceneContext::Current()) {
-			ctx->SetDebugSelectedObjects({});
-		}
+		selection_.Clear();
 	}
 
 } // namespace CalyxEngine

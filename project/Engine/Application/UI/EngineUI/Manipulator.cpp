@@ -207,13 +207,33 @@ namespace CalyxEngine {
 		bool usingNow = ImGuizmo::IsUsing();
 
 		if(usingNow && !wasUsing) {
+			skipGizmoCommandThisDrag_ = false;
+			const bool duplicateByDrag =
+				(ImGui::GetIO().KeyCtrl && (operation_ & ImGuizmo::TRANSLATE) && onCtrlTranslateDuplicate_);
+			if(duplicateByDrag) {
+				std::vector<WorldTransform*> duplicatedTargets = onCtrlTranslateDuplicate_();
+				if(!duplicatedTargets.empty()) {
+					skipGizmoCommandThisDrag_ = true;
+					SetTargets(duplicatedTargets);
+					const bool duplicatedGroupMode = targets_.size() > 1;
+					if(duplicatedGroupMode) {
+						RefreshPivot();
+						target_ = &pivotTarget_;
+					} else {
+						target_ = targets_.front();
+					}
+				}
+			}
+
 			groupStartWorlds_.clear();
 			groupStartWorlds_.reserve(targets_.size());
 			for(auto* target : targets_) {
 				groupStartWorlds_.push_back(target ? target->matrix.world : CalyxEngine::Matrix4x4::MakeIdentity());
 			}
 			groupStartPivot_ = pivotTarget_.matrix.world;
-			scopedCmd = std::make_unique<ScopedGizmoCommand>(targets_, operation_);
+			if(!skipGizmoCommandThisDrag_) {
+				scopedCmd = std::make_unique<ScopedGizmoCommand>(targets_, operation_);
+			}
 		}
 
 		if(usingNow) {
@@ -375,8 +395,11 @@ namespace CalyxEngine {
 				CommandManager::GetInstance()->Execute(std::move(scopedCmd));
 			else
 				scopedCmd.reset();
+		}
+		if(!usingNow && wasUsing) {
 			groupStartWorlds_.clear();
 			RefreshPivot();
+			skipGizmoCommandThisDrag_ = false;
 		}
 		wasUsing = usingNow;
 	}
