@@ -58,6 +58,7 @@ namespace CalyxEngine {
 		void CreateMaterialAssetInCurrentFolder();
 		void CreatePrefabFromSceneObject(SceneObject* object, const std::filesystem::path& folder);
 		bool AcceptSceneObjectPrefabDrop(const std::filesystem::path& folder);
+		bool AcceptSceneObjectPrefabDropOnCurrentWindow(const std::filesystem::path& folder);
 
 		void DrawFavorites();
 		void DrawDirNode(DirNode* node);

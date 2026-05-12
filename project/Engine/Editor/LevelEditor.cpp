@@ -12,6 +12,7 @@
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetType.h>
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
+#include <Engine/Editor/Prefab/PrefabEditContextUtils.h>
 #include <Engine/Editor/PickingPass.h>
 #include <Engine/Editor/SceneObjectDuplicator.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
@@ -1222,42 +1223,16 @@ namespace CalyxEngine {
 	}
 
 	std::vector<SceneObject*> LevelEditor::GetPrefabEditRoots() const {
-		std::vector<SceneObject*> roots;
-		if(!prefabEditContext_ || !prefabEditContext_->GetObjectLibrary()) return roots;
-
-		for(auto* object : prefabEditContext_->GetObjectLibrary()->GetAllObjectsRaw()) {
-			if(!object || !object->IsSerializable()) continue;
-			if(object->GetParent()) continue;
-			roots.push_back(object);
-		}
-		return roots;
+		if(!prefabEditContext_) return {};
+		return PrefabEditContextUtils::GetSerializableRoots(*prefabEditContext_);
 	}
 
 	void LevelEditor::MarkPrefabEditorUtilityObjects() {
-		if(!prefabEditContext_ || !prefabEditContext_->GetObjectLibrary()) return;
-
-		for(auto* object : prefabEditContext_->GetObjectLibrary()->GetAllObjectsRaw()) {
-			if(!object) continue;
-
-			const std::string_view className = object->GetObjectClassName();
-			const std::string& name = object->GetName();
-			if(className == "Camera3d" || className == "DebugCamera" || className == "BaseCamera" ||
-			   name == "MainCamera" || name == "DebugCamera" ||
-			   name == "PrefabPreviewDirectionalLight" || name == "PrefabPreviewPointLight") {
-				object->SetTransient(true);
-				object->SetEnableRaycast(false);
-			}
-		}
+		if(prefabEditContext_) PrefabEditContextUtils::MarkEditorUtilityObjects(*prefabEditContext_);
 	}
 
 	void LevelEditor::NormalizePrefabEditRoots() {
-		MarkPrefabEditorUtilityObjects();
-		for(auto* root : GetPrefabEditRoots()) {
-			if(!root) continue;
-			auto& transform = root->GetWorldTransform();
-			transform.translation = CalyxEngine::Vector3::Zero();
-			transform.Update();
-		}
+		if(prefabEditContext_) PrefabEditContextUtils::NormalizeRoots(*prefabEditContext_);
 	}
 
 	void LevelEditor::ApplyPrefabOverridesFromInstance(const std::shared_ptr<SceneObject>& object) {
@@ -1462,7 +1437,7 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);
-			setShow(placeToolPanel_.get(), true);
+			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
@@ -1799,7 +1774,8 @@ namespace CalyxEngine {
 	}
 
 	SceneObject* LevelEditor::PickSceneObjectByRay(const Ray& ray) {
-		const auto* lib = hierarchy_ ? hierarchy_->GetSceneObjectLibrary() : nullptr;
+		const auto* current = SceneContext::Current();
+		const auto* lib = current ? current->GetObjectLibrary() : nullptr;
 		if(!lib) return nullptr;
 
 		const auto& allObjects = lib->GetAllObjectsRaw();

@@ -117,7 +117,7 @@ namespace CalyxEngine {
 				if(IsSelected(removed)) {
 					selected_.reset();
 					selectedObjects_.clear();
-					if(onSelect_) onSelect_(nullptr, false);
+					if(actions_) actions_->SelectObject(nullptr, false);
 				}
 			});
 		}
@@ -222,7 +222,7 @@ namespace CalyxEngine {
 				
 				selected_.reset();
 				selectedObjects_.clear();
-				if(onSelect_) onSelect_(nullptr, false);
+				if(actions_) actions_->SelectObject(nullptr, false);
 			}
 
 			// 右クリック空白メニュー (テーブル内の空白エリア)
@@ -237,7 +237,7 @@ namespace CalyxEngine {
 							record->sourcePath.string(),
 							PrefabSerializer::LoadOptions{false, record->guid});
 						for(auto& sp : objects) {
-							if(onCreate_) onCreate_(sp);
+							if(actions_) actions_->CreateObject(sp);
 						}
 						RefreshCache();
 					}
@@ -248,7 +248,7 @@ namespace CalyxEngine {
 			if(ImGui::BeginPopup("BlankContextMenu")) {
 				if(ImGui::BeginMenu("Create")) {
 					auto createRoot = [&](std::shared_ptr<SceneObject> obj) {
-						if(onCreate_) onCreate_(obj);
+						if(actions_) actions_->CreateObject(obj);
 					};
 
 					if(ImGui::MenuItem("Empty Scene Object")) createRoot(std::make_shared<SceneObject>());
@@ -312,8 +312,8 @@ namespace CalyxEngine {
 					PrefabSerializer::LoadOptions{false, prefabGuid});
 
 				for(auto& sp : vec) {
-					if(lib_ && onCreate_) {
-						onCreate_(sp);
+					if(lib_ && actions_) {
+						actions_->CreateObject(sp);
 					}
 				}
 			}
@@ -467,7 +467,7 @@ namespace CalyxEngine {
 						}
 
 						for(auto& sp : objects) {
-							if(onCreate_) onCreate_(sp);
+							if(actions_) actions_->CreateObject(sp);
 						}
 						RefreshCache();
 					}
@@ -480,7 +480,7 @@ namespace CalyxEngine {
 				if(ImGui::BeginMenu("Create Child")) {
 					auto createChild = [&](std::shared_ptr<SceneObject> child) {
 						child->SetParent(obj->shared_from_this());
-						if(onCreate_) onCreate_(child);
+						if(actions_) actions_->CreateObject(child);
 					};
 
 					if(ImGui::MenuItem("Empty Scene Object")) createChild(std::make_shared<SceneObject>());
@@ -497,17 +497,17 @@ namespace CalyxEngine {
 				}
 				ImGui::Separator();
 				if(ImGui::MenuItem("Rename")) BeginRename(obj);
-				if(ImGui::MenuItem("Delete") && onDelete_) {
-					if(auto sp = obj->shared_from_this()) onDelete_(sp);
+				if(ImGui::MenuItem("Delete") && actions_) {
+					if(auto sp = obj->shared_from_this()) actions_->DeleteObject(sp);
 				}
 				ImGui::Separator();
 				if(ImGui::MenuItem("Create Prefab")) {
 					prefabSaveTarget_  = obj;
 					showSavePrefabDlg_ = true;
 				}
-				if(obj->IsPrefabInstanceObject() && onApplyPrefab_) {
+				if(obj->IsPrefabInstanceObject() && actions_) {
 					if(ImGui::MenuItem("Apply Prefab Overrides")) {
-						if(auto sp = obj->shared_from_this()) onApplyPrefab_(sp);
+						if(auto sp = obj->shared_from_this()) actions_->ApplyPrefabOverrides(sp);
 					}
 				}
 				ImGui::EndPopup();
@@ -587,7 +587,7 @@ namespace CalyxEngine {
 				selectedObjects_.push_back(sp);
 				selected_ = sp;
 			}
-			if(onSelect_) onSelect_(sp, toggle);
+			if(actions_) actions_->SelectObject(sp, toggle);
 		} catch(...) {
 			selected_.reset();
 			selectedObjects_.clear();
@@ -715,8 +715,8 @@ namespace CalyxEngine {
 		}
 
 		if(auto sp = renameTarget_.lock()) {
-			if(onRename_) {
-				onRename_(sp, newName);
+			if(actions_) {
+				actions_->RenameObject(sp, newName);
 			} else {
 				sp->SetName(newName, sp->GetObjectType());
 			}

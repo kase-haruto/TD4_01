@@ -1,9 +1,9 @@
 [
     {
-        "castShadow": false,
+        "castShadow": true,
         "colliderConfig": {
-            "colliderType": 32,
-            "isCollisionEnabled": true,
+            "colliderType": 0,
+            "isCollisionEnabled": false,
             "isDraw": true,
             "offset": {
                 "x": 0.0,
@@ -21,19 +21,32 @@
                 "y": 1.0,
                 "z": 1.0
             },
-            "targetType": 1
+            "targetType": 0
         },
         "drawEnable": true,
-        "guid": "da4f93d6-227a-4e9d-8cc9-a612c39fe72f",
-        "name": "ProjectileFireEvent(1)",
-        "objectType": 5,
+        "guid": "645c3008-41a6-4990-9eb1-772c26aecef5",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "4367fd92-8f1f-4b12-b601-94e996adf837",
+            "modelName": "player.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "player(1)",
+        "objectType": 2,
         "outlineColor": {
             "w": 1.0,
             "x": 0.019999999552965164,
             "y": 0.019999999552965164,
             "z": 0.02500000037252903
         },
-        "outlineEnabled": false,
+        "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
         "parentGuid": "00000000-0000-0000-0000-000000000000",
         "transform": {
@@ -52,12 +65,12 @@
                 "z": 1.0
             },
             "translation": {
-                "x": 0.04922223091125488,
-                "y": 0.6965909600257874,
-                "z": 27.083972930908203
+                "x": 5.700550556182861,
+                "y": -0.007571232970803976,
+                "z": 0.02818997949361801
             }
         },
-        "type": "ProjectileFireEvent",
+        "type": "BaseGameObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": true,
@@ -74,17 +87,17 @@
                 "z": 1.0
             },
             "translation": {
-                "x": 0.04922223091125488,
-                "y": 0.6965909600257874,
-                "z": 27.083972930908203
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
             }
         }
     },
     {
         "castShadow": true,
         "colliderConfig": {
-            "colliderType": 64,
-            "isCollisionEnabled": true,
+            "colliderType": 0,
+            "isCollisionEnabled": false,
             "isDraw": true,
             "offset": {
                 "x": 0.0,
@@ -102,14 +115,14 @@
                 "y": 1.0,
                 "z": 1.0
             },
-            "targetType": 3
+            "targetType": 0
         },
         "drawEnable": true,
-        "guid": "88add3e9-fa86-42dc-9172-5f851b560f59",
+        "guid": "8d53b34a-368d-4836-897f-f9dfac7f56b5",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "debugCube.obj",
+            "materialGuid": "4367fd92-8f1f-4b12-b601-94e996adf837",
+            "modelName": "Hammer.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -119,7 +132,7 @@
                 }
             }
         },
-        "name": "ProjectileObject(1)",
+        "name": "Hammer(1)",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -129,10 +142,10 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "da4f93d6-227a-4e9d-8cc9-a612c39fe72f",
+        "parentGuid": "645c3008-41a6-4990-9eb1-772c26aecef5",
         "transform": {
             "inheritRotate": true,
-            "inheritScale": false,
+            "inheritScale": true,
             "inheritTranslate": true,
             "rotation": {
                 "w": 1.0,
@@ -141,20 +154,20 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 1.1800000667572021,
+                "y": 1.1800000667572021,
+                "z": 1.1800000667572021
             },
             "translation": {
-                "x": 4.7943878173828125,
-                "y": 2.482813835144043,
-                "z": 14.279708862304688
+                "x": 0.759758472442627,
+                "y": 1.9283913373947144,
+                "z": 0.30601629614830017
             }
         },
-        "type": "ProjectileObject",
+        "type": "BaseGameObject",
         "worldTransform": {
             "inheritRotate": true,
-            "inheritScale": false,
+            "inheritScale": true,
             "inheritTranslate": true,
             "rotation": {
                 "w": 1.0,
@@ -163,14 +176,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 1.1800000667572021,
+                "y": 1.1800000667572021,
+                "z": 1.1800000667572021
             },
             "translation": {
-                "x": 4.7943878173828125,
-                "y": 2.482813835144043,
-                "z": 14.279708862304688
+                "x": 0.759758472442627,
+                "y": 1.9283913373947144,
+                "z": 0.30601629614830017
             }
         }
     }

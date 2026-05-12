@@ -1,3 +1,4 @@
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "AssetPanel.h"
 
 #include "Engine/Assets/Manager/AssetManager.h"
@@ -8,7 +9,7 @@
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 
 #include <externals/imgui/ImGuiFileDialog.h>
-#include <externals/imgui/imgui.h>
+#include <externals/imgui/imgui_internal.h>
 
 #include <algorithm>
 #include <cctype>
@@ -304,6 +305,31 @@ namespace CalyxEngine {
 		return accepted;
 	}
 
+	bool AssetPanel::AcceptSceneObjectPrefabDropOnCurrentWindow(const std::filesystem::path& folder) {
+		ImGuiWindow* window = ImGui::GetCurrentWindowRead();
+		if(!window || window->SkipItems) return false;
+
+		const ImVec2 windowPos = ImGui::GetWindowPos();
+		const ImVec2 minRel = ImGui::GetWindowContentRegionMin();
+		const ImVec2 maxRel = ImGui::GetWindowContentRegionMax();
+		const ImRect dropRect(
+			ImVec2(windowPos.x + minRel.x, windowPos.y + minRel.y),
+			ImVec2(windowPos.x + maxRel.x, windowPos.y + maxRel.y));
+
+		bool accepted = false;
+		if(ImGui::BeginDragDropTargetCustom(dropRect, window->ID)) {
+			if(const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneObjectPtr")) {
+				if(payload->Data && payload->DataSize == sizeof(SceneObject*)) {
+					SceneObject* object = *reinterpret_cast<SceneObject**>(payload->Data);
+					CreatePrefabFromSceneObject(object, folder);
+					accepted = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+		return accepted;
+	}
+
 	/* ===================== 右ペイン ===================== */
 	static inline void toLowerInplace(std::string& s) {
 		std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return (char)std::tolower(c); });
@@ -496,6 +522,7 @@ namespace CalyxEngine {
 			const float dropHeight = (std::max)(48.0f, ImGui::GetContentRegionAvail().y);
 			ImGui::InvisibleButton("##PrefabDropTargetList", ImVec2(ImGui::GetContentRegionAvail().x, dropHeight));
 			AcceptSceneObjectPrefabDrop(currentFolderAbs_);
+			AcceptSceneObjectPrefabDropOnCurrentWindow(currentFolderAbs_);
 			return;
 		}
 
@@ -590,6 +617,7 @@ namespace CalyxEngine {
 		const float dropHeight = (std::max)(48.0f, ImGui::GetContentRegionAvail().y);
 		ImGui::InvisibleButton("##PrefabDropTargetGrid", ImVec2(ImGui::GetContentRegionAvail().x, dropHeight));
 		AcceptSceneObjectPrefabDrop(currentFolderAbs_);
+		AcceptSceneObjectPrefabDropOnCurrentWindow(currentFolderAbs_);
 	}
 
 	void AssetPanel::DrawFavorites() {
