@@ -47,6 +47,8 @@ namespace CalyxEngine {
 				return 2;
 			case ObjectType::Effect:
 				return 3;
+			case ObjectType::Event:
+				return 4;
 			default:
 				return 9;
 			}
@@ -370,25 +372,7 @@ namespace CalyxEngine {
 		// ---------------------------------------------------------------------
 		ImGui::TableSetColumnIndex(0);
 
-		// タイプのアイコン
-		ImTextureID typeTex = nullptr;
-		switch(obj->GetObjectType()) {
-		case ObjectType::Camera:
-			typeTex = iconCamera_.tex;
-			break;
-		case ObjectType::Light:
-			typeTex = iconLight_.tex;
-			break;
-		case ObjectType::GameObject:
-			typeTex = iconGameObj_.tex;
-			break;
-		case ObjectType::Effect:
-			typeTex = iconFx_.tex;
-			break;
-		default:
-			break;
-		}
-
+		ImTextureID typeTex = GetTypeIcon(obj->GetObjectType());
 		// リネームロジック
 		auto renameSP		= renameTarget_.lock();
 		bool isRenamingThis = (renaming_ && renameSP.get() == obj);
@@ -435,31 +419,7 @@ namespace CalyxEngine {
 
 			// インタラクション
 			if(ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
-				try {
-					auto sp = obj->shared_from_this();
-					const bool toggle = ImGui::GetIO().KeyCtrl;
-					if(toggle && IsSelected(obj)) {
-						selectedObjects_.erase(
-							std::remove_if(selectedObjects_.begin(), selectedObjects_.end(),
-										   [obj](const std::weak_ptr<SceneObject>& weak) {
-											   return weak.lock().get() == obj;
-										   }),
-							selectedObjects_.end());
-						selected_ = selectedObjects_.empty() ? std::weak_ptr<SceneObject>{} : selectedObjects_.back();
-					} else if(toggle) {
-						selectedObjects_.push_back(sp);
-						selected_ = sp;
-					} else {
-						selectedObjects_.clear();
-						selectedObjects_.push_back(sp);
-						selected_ = sp;
-					}
-					if(onSelect_) onSelect_(sp, toggle);
-				} catch(...) {
-					// Object might not be managed by shared_ptr, skip selection
-					selected_.reset();
-					selectedObjects_.clear();
-				}
+				HandleNodeSelectionClick(obj);
 			}
 
 			// ドラッグ＆ドロップ
@@ -578,22 +538,7 @@ namespace CalyxEngine {
 		// カラム 2: タイプ情報
 		// ---------------------------------------------------------------------
 		ImGui::TableSetColumnIndex(2);
-		const char* typeName = "Object";
-		switch(obj->GetObjectType()) {
-		case ObjectType::Camera:
-			typeName = "Camera";
-			break;
-		case ObjectType::Light:
-			typeName = "Light";
-			break;
-		case ObjectType::GameObject:
-			typeName = "Mesh";
-			break;
-		case ObjectType::Effect:
-			typeName = "Effect";
-			break;
-		}
-		ImGui::TextDisabled("%s", typeName);
+		ImGui::TextDisabled("%s", GetTypeLabel(obj->GetObjectType()));
 
 		return open;
 	}
@@ -601,6 +546,68 @@ namespace CalyxEngine {
 	/* ========================================================================
 	/*  utils
 	/* ===================================================================== */
+	void HierarchyPanel::HandleNodeSelectionClick(SceneObject* obj) {
+		if(!obj) return;
+
+		try {
+			auto sp = obj->shared_from_this();
+			const bool toggle = ImGui::GetIO().KeyCtrl;
+			if(toggle && IsSelected(obj)) {
+				selectedObjects_.erase(
+					std::remove_if(selectedObjects_.begin(), selectedObjects_.end(),
+								   [obj](const std::weak_ptr<SceneObject>& weak) {
+									   return weak.lock().get() == obj;
+								   }),
+					selectedObjects_.end());
+				selected_ = selectedObjects_.empty() ? std::weak_ptr<SceneObject>{} : selectedObjects_.back();
+			} else if(toggle) {
+				selectedObjects_.push_back(sp);
+				selected_ = sp;
+			} else {
+				selectedObjects_.clear();
+				selectedObjects_.push_back(sp);
+				selected_ = sp;
+			}
+			if(onSelect_) onSelect_(sp, toggle);
+		} catch(...) {
+			selected_.reset();
+			selectedObjects_.clear();
+		}
+	}
+
+	ImTextureID HierarchyPanel::GetTypeIcon(ObjectType type) const {
+		switch(type) {
+		case ObjectType::Camera:
+			return iconCamera_.tex;
+		case ObjectType::Light:
+			return iconLight_.tex;
+		case ObjectType::GameObject:
+		case ObjectType::Event:
+			return iconGameObj_.tex;
+		case ObjectType::Effect:
+			return iconFx_.tex;
+		default:
+			return nullptr;
+		}
+	}
+
+	const char* HierarchyPanel::GetTypeLabel(ObjectType type) const {
+		switch(type) {
+		case ObjectType::Camera:
+			return "Camera";
+		case ObjectType::Light:
+			return "Light";
+		case ObjectType::GameObject:
+			return "Mesh";
+		case ObjectType::Effect:
+			return "Effect";
+		case ObjectType::Event:
+			return "Event";
+		default:
+			return "Object";
+		}
+	}
+
 	bool HierarchyPanel::IsDescendantOf(SceneObject* parent, SceneObject* child) {
 		if(!child) return false;
 

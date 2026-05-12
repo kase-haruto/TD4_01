@@ -6,7 +6,6 @@
 #include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Application/Settings/EngineSettings.h>
-#include <Data/Engine/Configs/Scene/Objects/Transform/WorldTransformConfig.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Application/System/PlaySession.h>
 #include <Engine/Application/UI/EngineUI/Context/EditorContext.h>
@@ -14,6 +13,7 @@
 #include <Engine/Assets/System/AssetType.h>
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Editor/PickingPass.h>
+#include <Engine/Editor/SceneObjectDuplicator.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Graphics/Camera/3d/Camera3d.h>
@@ -138,118 +138,6 @@ namespace {
 		} else if(auto camera = std::dynamic_pointer_cast<Camera3d>(object)) {
 			ctx->GetCameraMgr()->SetMainCamera(camera);
 		}
-	}
-
-	bool IsMeshObject(const std::shared_ptr<SceneObject>& object) {
-		return object && object->GetObjectType() == ObjectType::GameObject;
-	}
-
-	void WriteDuplicateMetadata(const std::shared_ptr<SceneObject>& object, nlohmann::json& j) {
-		j["type"] = object->GetObjectClassName();
-		j["name"] = object->GetName();
-		j["objectType"] = static_cast<int>(object->GetObjectType());
-		j["drawEnable"] = object->IsDrawEnable();
-		j["castShadow"] = object->IsCastShadow();
-		j["outlineEnabled"] = object->IsOutlineEnabled();
-		j["outlineThickness"] = object->GetOutlineSettings().thickness;
-		j["outlineColor"] = object->GetOutlineSettings().color;
-		j["worldTransform"] = object->GetWorldTransform().ExtractConfig();
-		j["inheritScale"] = object->GetWorldTransform().inheritScale;
-		if(auto parent = object->GetParent()) {
-			j["parentGuid"] = parent->GetGuid();
-		}
-	}
-
-	void ApplyDuplicateMetadata(const std::shared_ptr<SceneObject>& object, const nlohmann::json& j) {
-		if(!object) return;
-		const int objectType = j.value("objectType", static_cast<int>(object->GetObjectType()));
-		object->SetName(j.value("name", object->GetName()), static_cast<ObjectType>(objectType));
-		object->SetDrawEnable(j.value("drawEnable", object->IsDrawEnable()));
-		object->SetCastShadow(j.value("castShadow", object->IsCastShadow()));
-		object->SetOutlineEnabled(j.value("outlineEnabled", object->IsOutlineEnabled()));
-		object->SetOutlineThickness(j.value("outlineThickness", object->GetOutlineSettings().thickness));
-		object->SetOutlineColor(j.value("outlineColor", object->GetOutlineSettings().color));
-		if(j.contains("worldTransform")) {
-			object->GetWorldTransform().ApplyConfig(j.at("worldTransform").get<WorldTransformConfig>());
-		}
-	}
-
-	std::shared_ptr<SceneObject> CloneMeshObjectWithoutHierarchy(const std::shared_ptr<SceneObject>& source) {
-		if(!IsMeshObject(source)) return nullptr;
-
-		nlohmann::json snapshot;
-		WriteDuplicateMetadata(source, snapshot);
-		if(auto* cfg = dynamic_cast<const IConfigurable*>(source.get())) {
-			nlohmann::json config;
-			cfg->ExtractConfigToJson(config);
-			for(auto it = config.begin(); it != config.end(); ++it) {
-				snapshot[it.key()] = it.value();
-			}
-		}
-
-		std::shared_ptr<SceneObject> clone;
-		try {
-			clone = SceneObjectRegistry::Get().Create(snapshot.value("type", ""));
-		} catch(...) {
-			return nullptr;
-		}
-		if(!clone || !IsMeshObject(clone)) return nullptr;
-
-		if(auto* cfg = dynamic_cast<IConfigurable*>(clone.get())) {
-			cfg->ApplyConfigFromJson(snapshot);
-		}
-		ApplyDuplicateMetadata(clone, snapshot);
-		clone->SetGuid(Guid::New());
-		clone->ClearPrefabLink();
-		clone->SetPickingID(0);
-		clone->Initialize();
-		return clone;
-	}
-
-	void CollectMeshDuplicateRoots(const std::vector<std::shared_ptr<SceneObject>>& selected,
-								   std::vector<std::shared_ptr<SceneObject>>& roots) {
-		for(const auto& object : selected) {
-			if(!IsMeshObject(object)) continue;
-
-			bool hasSelectedMeshAncestor = false;
-			for(auto parent = object->GetParent(); parent; parent = parent->GetParent()) {
-				if(!IsMeshObject(parent)) continue;
-				if(std::find(selected.begin(), selected.end(), parent) != selected.end()) {
-					hasSelectedMeshAncestor = true;
-					break;
-				}
-			}
-			if(!hasSelectedMeshAncestor) {
-				roots.push_back(object);
-			}
-		}
-	}
-
-	std::shared_ptr<SceneObject> DuplicateMeshSubtree(
-		SceneContext* ctx,
-		const std::shared_ptr<SceneObject>& source,
-		const std::shared_ptr<SceneObject>& duplicateParent,
-		std::vector<std::shared_ptr<SceneObject>>& created) {
-		if(!ctx || !IsMeshObject(source)) return nullptr;
-
-		auto clone = CloneMeshObjectWithoutHierarchy(source);
-		if(!clone) return nullptr;
-
-		if(duplicateParent) {
-			clone->SetParent(duplicateParent, source->GetWorldTransform().inheritScale);
-		} else if(auto parent = source->GetParent()) {
-			clone->SetParent(parent, source->GetWorldTransform().inheritScale);
-		}
-
-		ctx->AddObject(clone);
-		created.push_back(clone);
-
-		for(const auto& child : source->GetChildren()) {
-			if(IsMeshObject(child)) {
-				DuplicateMeshSubtree(ctx, child, clone, created);
-			}
-		}
-		return clone;
 	}
 
 	class DeleteObjectsCommand final
@@ -517,12 +405,12 @@ namespace CalyxEngine {
 		nlohmann::json snapshot_;
 	};
 
-	class DuplicateMeshObjectsCommand final : public BaseLevelEditorCommand {
+	class DuplicateSceneObjectsCommand final : public BaseLevelEditorCommand {
 	public:
-		DuplicateMeshObjectsCommand(SceneContext* ctx,
-									std::vector<std::shared_ptr<SceneObject>> sources,
-									LevelEditor* editor)
-			: BaseLevelEditorCommand("Duplicate Mesh Objects"),
+		DuplicateSceneObjectsCommand(SceneContext* ctx,
+									 std::vector<std::shared_ptr<SceneObject>> sources,
+									 LevelEditor* editor)
+			: BaseLevelEditorCommand("Duplicate Scene Objects"),
 			  ctx_(ctx),
 			  editor_(editor) {
 			sourceGuids_.reserve(sources.size());
@@ -534,23 +422,22 @@ namespace CalyxEngine {
 		}
 
 		void Execute() override {
-			createdRootGuids_.clear();
-			created_ = CreateDuplicates();
+			result_ = CreateDuplicates();
 			if(editor_) {
-				editor_->SetSelectedObjects(created_);
+				editor_->SetSelectedObjects(result_.selectedRoots);
 				if(editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
 			}
 		}
 
 		void Undo() override {
 			if(!ctx_ || !ctx_->GetObjectLibrary()) return;
-			for(const auto& guid : createdRootGuids_) {
+			for(const auto& guid : result_.rootGuids) {
 				auto object = ctx_->GetObjectLibrary()->Find(guid);
 				if(object) {
 					ctx_->RemoveObject(object);
 				}
 			}
-			created_.clear();
+			result_ = {};
 			if(editor_) {
 				editor_->ClearSelection();
 				if(editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
@@ -561,17 +448,14 @@ namespace CalyxEngine {
 			Execute();
 		}
 
-		const std::vector<std::shared_ptr<SceneObject>>& GetCreatedObjects() const {
-			return created_;
+		const std::vector<std::shared_ptr<SceneObject>>& GetCreatedRoots() const {
+			return result_.selectedRoots;
 		}
 
 	private:
-		std::vector<std::shared_ptr<SceneObject>> CreateDuplicates() {
-			std::vector<std::shared_ptr<SceneObject>> selectedDuplicates;
-			if(!ctx_) return selectedDuplicates;
+		SceneObjectDuplicateResult CreateDuplicates() {
+			if(!ctx_) return {};
 
-			std::vector<std::shared_ptr<SceneObject>> roots;
-			std::vector<std::shared_ptr<SceneObject>> allCreated;
 			if(auto* lib = ctx_->GetObjectLibrary()) {
 				std::vector<std::shared_ptr<SceneObject>> sources;
 				sources.reserve(sourceGuids_.size());
@@ -581,22 +465,14 @@ namespace CalyxEngine {
 						sources.push_back(source);
 					}
 				}
-				CollectMeshDuplicateRoots(sources, roots);
+				return SceneObjectDuplicator::Duplicate(ctx_, sources);
 			}
-			for(const auto& root : roots) {
-				auto duplicateRoot = DuplicateMeshSubtree(ctx_, root, nullptr, allCreated);
-				if(duplicateRoot) {
-					createdRootGuids_.push_back(duplicateRoot->GetGuid());
-					selectedDuplicates.push_back(duplicateRoot);
-				}
-			}
-			return selectedDuplicates;
+			return {};
 		}
 
 		SceneContext* ctx_ = nullptr;
 		std::vector<Guid> sourceGuids_;
-		std::vector<std::shared_ptr<SceneObject>> created_;
-		std::vector<Guid> createdRootGuids_;
+		SceneObjectDuplicateResult result_;
 		LevelEditor* editor_ = nullptr;
 	};
 
@@ -673,6 +549,7 @@ namespace CalyxEngine {
 			});
 
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
+		selection_.Bind(hierarchy_.get(), inspector_.get(), sceneEditor_.get());
 
 		// ビューポートの初期化 ------------------------------------------------
 		mainViewport_	 = std::make_unique<Viewport>(ViewportType::VIEWPORT_MAIN, "Game Viewport");
@@ -685,7 +562,7 @@ namespace CalyxEngine {
 		// Manipulator をツールとして登録
 		if(auto* manipulator = sceneEditor_->GetManipulator()) {
 			manipulator->SetOnCtrlTranslateDuplicate([this]() {
-				return DuplicateSelectedMeshObjects();
+				return DuplicateSelectedObjects();
 			});
 			debugViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(performanceOverlay_.get());
@@ -945,17 +822,17 @@ namespace CalyxEngine {
 			rangeSelecting_ = false;
 		}
 
-		if(!selectedObjects_.empty() && !io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
+		if(selection_.HasSelection() && !io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Delete)) {
 			DeleteSelectedObjects();
 		}
 
-		if(!selectedObjects_.empty() &&
+		if(selection_.HasSelection() &&
 		   !io.WantTextInput &&
 		   io.KeyCtrl &&
 		   !io.KeyAlt &&
 		   !io.KeyShift &&
 		   ImGui::IsKeyPressed(ImGuiKey_D, false)) {
-			DuplicateSelectedMeshObjects();
+			DuplicateSelectedObjects();
 		}
 
 		// ----------------------------
@@ -1593,122 +1470,31 @@ namespace CalyxEngine {
 	// Selection API
 	//=============================================================================
 	void LevelEditor::SetSelectedEditor(BaseEditor* editor) {
-		selectedEditor_ = editor;
-		selectedObjects_.clear();
-
-		if(inspector_) {
-			inspector_->SetSelectedEditor(editor);
-			// オブジェクト選択はクリア
-			inspector_->SetSelectedObject(std::shared_ptr<SceneObject>{});
-		}
-		if(sceneEditor_) {
-			sceneEditor_->ClearSelection();
-		}
+		selection_.SetSelectedEditor(editor);
 	}
 
 	void LevelEditor::SetSelectedObject(const std::shared_ptr<SceneObject>& sp) {
-		if(sp) {
-			SetSelectedObjects({sp});
-		} else {
-			SetSelectedObjects({});
-		}
+		selection_.SetSelectedObject(sp);
 	}
 
 	void LevelEditor::ToggleSelectedObject(const std::shared_ptr<SceneObject>& sp) {
-		if(!sp) {
-			ClearSelection();
-			return;
-		}
-
-		std::vector<std::shared_ptr<SceneObject>> objects;
-		objects.reserve(selectedObjects_.size() + 1);
-
-		bool removed = false;
-		for(auto& weak : selectedObjects_) {
-			auto current = weak.lock();
-			if(!current) continue;
-			if(current == sp) {
-				removed = true;
-				continue;
-			}
-			objects.push_back(current);
-		}
-
-		if(!removed) {
-			objects.push_back(sp);
-		}
-
-		SetSelectedObjects(objects);
+		selection_.ToggleSelectedObject(sp);
 	}
 
 	void LevelEditor::SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects) {
-		selectedObjects_.clear();
-		selectedEditor_ = nullptr;
-
-		std::vector<std::shared_ptr<SceneObject>> validObjects;
-		validObjects.reserve(objects.size());
-		for(const auto& object : objects) {
-			if(!object) continue;
-			if(std::find(validObjects.begin(), validObjects.end(), object) != validObjects.end()) continue;
-			validObjects.push_back(object);
-			selectedObjects_.push_back(object);
-		}
-
-		// Hierarchy / Inspector / SceneObjectEditor にも通知
-		if(hierarchy_) {
-			hierarchy_->SetSelectedObjects(validObjects);
-		}
-		if(inspector_) {
-			inspector_->SetSelectedEditor(nullptr);
-			inspector_->SetSelectedObjects(selectedObjects_);
-		}
-		if(sceneEditor_) {
-			std::vector<SceneObject*> rawObjects;
-			rawObjects.reserve(validObjects.size());
-			for(const auto& object : validObjects) {
-				rawObjects.push_back(object.get());
-			}
-			sceneEditor_->SetTargets(rawObjects);
-		}
-
-		if(auto* ctx = SceneContext::Current()) {
-			std::vector<SceneObject*> rawObjects;
-			rawObjects.reserve(validObjects.size());
-			for(const auto& object : validObjects) {
-				rawObjects.push_back(object.get());
-			}
-			ctx->SetDebugSelectedObjects(rawObjects);
-		}
+		selection_.SetSelectedObjects(objects);
 	}
 
 	bool LevelEditor::IsSelectedObject(const SceneObject* object) const {
-		if(!object) return false;
-		for(const auto& weak : selectedObjects_) {
-			auto selected = weak.lock();
-			if(selected.get() == object) return true;
-		}
-		return false;
+		return selection_.IsSelected(object);
 	}
 
 	std::shared_ptr<SceneObject> LevelEditor::GetPrimarySelectedObject() const {
-		for(auto it = selectedObjects_.rbegin(); it != selectedObjects_.rend(); ++it) {
-			if(auto selected = it->lock()) {
-				return selected;
-			}
-		}
-		return nullptr;
+		return selection_.GetPrimarySelectedObject();
 	}
 
 	std::vector<std::shared_ptr<SceneObject>> LevelEditor::GetSelectedObjects() const {
-		std::vector<std::shared_ptr<SceneObject>> objects;
-		objects.reserve(selectedObjects_.size());
-		for(const auto& weak : selectedObjects_) {
-			auto object = weak.lock();
-			if(!object) continue;
-			if(std::find(objects.begin(), objects.end(), object) != objects.end()) continue;
-			objects.push_back(object);
-		}
-		return objects;
+		return selection_.GetSelectedObjects();
 	}
 
 	//=============================================================================
@@ -1750,15 +1536,7 @@ namespace CalyxEngine {
 	}
 
 	void LevelEditor::DeleteSelectedObjects() {
-		std::vector<std::shared_ptr<SceneObject>> targets;
-		targets.reserve(selectedObjects_.size());
-
-		for(auto& weak : selectedObjects_) {
-			auto object = weak.lock();
-			if(!object) continue;
-			if(std::find(targets.begin(), targets.end(), object) != targets.end()) continue;
-			targets.push_back(object);
-		}
+		std::vector<std::shared_ptr<SceneObject>> targets = GetSelectedObjects();
 
 		if(targets.empty()) {
 			ClearSelection();
@@ -1781,27 +1559,20 @@ namespace CalyxEngine {
 				"Delete Selected Objects"));
 	}
 
-	std::vector<WorldTransform*> LevelEditor::DuplicateSelectedMeshObjects() {
+	std::vector<WorldTransform*> LevelEditor::DuplicateSelectedObjects() {
 		std::vector<WorldTransform*> duplicatedTransforms;
 
 		SceneContext* ctx = SceneContext::Current();
 		if(!ctx) return duplicatedTransforms;
 
-		auto sources = GetSelectedObjects();
-		std::vector<std::shared_ptr<SceneObject>> meshSources;
-		meshSources.reserve(sources.size());
-		for(const auto& source : sources) {
-			if(IsMeshObject(source)) {
-				meshSources.push_back(source);
-			}
-		}
-		if(meshSources.empty()) return duplicatedTransforms;
+		auto duplicatableSources = SceneObjectDuplicator::FilterDuplicatable(GetSelectedObjects());
+		if(duplicatableSources.empty()) return duplicatedTransforms;
 
-		auto command = std::make_unique<DuplicateMeshObjectsCommand>(ctx, std::move(meshSources), this);
+		auto command = std::make_unique<DuplicateSceneObjectsCommand>(ctx, std::move(duplicatableSources), this);
 		auto* rawCommand = command.get();
 		CommandManager::GetInstance()->Execute(std::move(command));
 
-		const auto& createdObjects = rawCommand->GetCreatedObjects();
+		const auto& createdObjects = rawCommand->GetCreatedRoots();
 		duplicatedTransforms.reserve(createdObjects.size());
 		for(const auto& object : createdObjects) {
 			if(object) {
@@ -2031,12 +1802,7 @@ namespace CalyxEngine {
 
 		std::vector<std::shared_ptr<SceneObject>> selected;
 		if(append) {
-			selected.reserve(selectedObjects_.size());
-			for(auto& weak : selectedObjects_) {
-				if(auto sp = weak.lock()) {
-					selected.push_back(sp);
-				}
-			}
+			selected = GetSelectedObjects();
 		}
 
 		for(auto& object : current->GetObjectLibrary()->GetAllObjectsShared()) {
@@ -2181,18 +1947,7 @@ namespace CalyxEngine {
 		}
 	}
 	void LevelEditor::ClearSelection() {
-		selectedObjects_.clear();
-		selectedEditor_ = nullptr;
-
-		std::weak_ptr<SceneObject> empty;
-
-		hierarchy_->SetSelectedObject(empty);
-		inspector_->SetSelectedObject(empty);
-		sceneEditor_->ClearSelection();
-
-		if(auto* ctx = SceneContext::Current()) {
-			ctx->SetDebugSelectedObjects({});
-		}
+		selection_.Clear();
 	}
 
 } // namespace CalyxEngine

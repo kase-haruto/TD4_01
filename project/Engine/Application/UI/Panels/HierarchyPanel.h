@@ -18,6 +18,7 @@
 // forward
 class SceneObject;
 class SceneObjectLibrary;
+enum class ObjectType;
 
 namespace CalyxEngine {
 
@@ -77,6 +78,9 @@ namespace CalyxEngine {
 		void CommitRename();
 		// render helper
 		bool DrawNode(SceneObject* obj);
+		void HandleNodeSelectionClick(SceneObject* obj);
+		ImTextureID GetTypeIcon(ObjectType type) const;
+		const char* GetTypeLabel(ObjectType type) const;
 		bool PassFilterRecursive(SceneObject* obj) const;
 		bool IsSelected(SceneObject* obj) const;
 

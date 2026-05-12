@@ -16,6 +16,7 @@
 #include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Application/Effects/FxObject.h>
+#include <Engine/Editor/EditorSelectionCoordinator.h>
 #include <Engine/Editor/ImGuiLayoutSwitcher.h>
 #include <Engine/Editor/SceneObjectEditor.h>
 #include <externals/nlohmann/json.hpp>
@@ -93,7 +94,7 @@ namespace CalyxEngine {
 		/// シーンからオブジェクト削除（階層パネルなどから呼ばれる）
 		void DeleteObject(const std::shared_ptr<SceneObject>& sp);
 		void DeleteSelectedObjects();
-		std::vector<WorldTransform*> DuplicateSelectedMeshObjects();
+		std::vector<WorldTransform*> DuplicateSelectedObjects();
 
 		// ビューポート関連 --------------------------------------------------------
 		void RenderViewport(ViewportType type, const ImTextureID& tex);
@@ -193,9 +194,7 @@ namespace CalyxEngine {
 		// 状態
 		bool		  lastPlaying_	  = false;
 		SceneContext* prevCtx_		  = nullptr;
-		BaseEditor*	  selectedEditor_ = nullptr;
-		/// SceneObject 選択は weak_ptr で保持（寿命を伸ばさない）
-		std::vector<std::weak_ptr<SceneObject>> selectedObjects_;
+		EditorSelectionCoordinator selection_;
 		nlohmann::json			   livePPSnapshot_;
 		bool					   rangeSelectCandidate_ = false;
 		bool					   rangeSelecting_ = false;

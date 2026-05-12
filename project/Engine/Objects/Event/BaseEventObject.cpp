@@ -16,6 +16,8 @@ REGISTER_SCENE_OBJECT(BaseEventObject);
 //		ctor/dtor
 /////////////////////////////////////////////////////////////////////////////////////////
 BaseEventObject::BaseEventObject() {
+	objectType_ = ObjectType::Event;
+
 	// 衝突の設定(boxで初期化
 	std::unique_ptr<BoxCollider> box = std::make_unique<BoxCollider>(true);
 	box->SetName(GetName() + "BoxCollider");   //< コライダー名前設定
