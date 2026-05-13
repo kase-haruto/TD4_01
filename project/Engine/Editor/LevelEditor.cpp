@@ -496,6 +496,7 @@ namespace CalyxEngine {
 		postEffectNodeEditorPanel_ = std::make_unique<PostEffectNodeEditorPanel>();
 		livePPPanel_		= std::make_unique<LivePPPanel>();
 		sceneSwitchOverlay_ = std::make_unique<SceneSwitchOverlay>();
+		debugCameraFocus_	= std::make_unique<DebugCameraFocusController>();
 
 		// レイアウトスイッチャーの初期化 --------------------------------------
 		std::string				 layoutDir = "Resources/Assets/Configs/Editor/Layout/";
@@ -555,6 +556,12 @@ namespace CalyxEngine {
 		hierarchy_->SetOnApplyPrefabOverrides(
 			[this](std::shared_ptr<SceneObject> sp) {
 				ApplyPrefabOverridesFromInstance(sp);
+			});
+		hierarchy_->SetOnObjectFocused(
+			[this](std::shared_ptr<SceneObject> sp) {
+				if(debugCameraFocus_) {
+					debugCameraFocus_->StartFocus(CameraManager::GetDebug(), sp);
+				}
 			});
 
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
@@ -819,8 +826,13 @@ namespace CalyxEngine {
 		// ImGui がマウスを掴んでいても、ビューポート上なら許可
 		const bool uiBlocksClick = io.WantCaptureMouse && !overDebugViewport;
 
+		if(debugCameraFocus_) {
+			debugCameraFocus_->Update(ClockManager::GetInstance()->GetDeltaTime());
+		}
+
 		if(auto* debugCam = CameraManager::GetDebug()) {
-			debugCam->SetInputEnabled(overDebugViewport);
+			const bool focusMoving = debugCameraFocus_ && debugCameraFocus_->IsActive();
+			debugCam->SetInputEnabled(overDebugViewport && !focusMoving);
 		}
 
 		if(editToolMode_ != EngineEdit::EditToolMode::ParticleEffect &&

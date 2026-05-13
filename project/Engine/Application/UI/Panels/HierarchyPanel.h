@@ -54,6 +54,7 @@ namespace CalyxEngine {
 		void SetOnObjectCreate(ObjectCB cb) { callbackActions_.SetOnObjectCreate(std::move(cb)); }
 		void SetOnObjectRename(RenameCB cb) { callbackActions_.SetOnObjectRename(std::move(cb)); }
 		void SetOnApplyPrefabOverrides(ObjectCB cb) { callbackActions_.SetOnApplyPrefabOverrides(std::move(cb)); }
+		void SetOnObjectFocused(ObjectCB cb) { callbackActions_.SetOnObjectFocused(std::move(cb)); }
 
 		void SetSelectedObject(std::weak_ptr<SceneObject> wp) {
 			selected_ = wp;

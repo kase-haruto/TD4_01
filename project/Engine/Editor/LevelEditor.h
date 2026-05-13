@@ -16,6 +16,7 @@
 #include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Application/Effects/FxObject.h>
+#include <Engine/Editor/DebugCameraFocusController.h>
 #include <Engine/Editor/EditorSelectionCoordinator.h>
 #include <Engine/Editor/ImGuiLayoutSwitcher.h>
 #include <Engine/Editor/SceneObjectEditor.h>
@@ -172,6 +173,7 @@ namespace CalyxEngine {
 		std::unique_ptr<LivePPPanel>		 livePPPanel_;
 		std::unique_ptr<SceneSwitchOverlay>	 sceneSwitchOverlay_;
 		std::unique_ptr<ImGuiLayoutSwitcher> layoutSwitcher_;
+		std::unique_ptr<DebugCameraFocusController> debugCameraFocus_;
 		PlaySession*						 pPlaySesseion_ = nullptr;
 		CalyxEngine::SceneManager*			 sceneManager_	= nullptr;
 
