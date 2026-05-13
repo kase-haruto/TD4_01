@@ -913,6 +913,13 @@ namespace CalyxEngine {
 			}
 		}
 
+		// prefab保存のショートカット
+		if(CalyxFoundation::Input::GetInstance()->PushKey(DIK_LCONTROL)) {
+			if(CalyxFoundation::Input::GetInstance()->TriggerKey(DIK_P)) {
+				SavePrefabEdit();
+			}
+		}
+
 		// LivePP Visibility Control
 		if(livePPPanel_) {
 			auto* service	 = CalyxEngine::LivePPService::GetInstance();
