@@ -59,8 +59,8 @@ void TitleScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 void TitleScene::Update([[maybe_unused]] float dt) {
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
+	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
+		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT));
 	}
 
 	// 衝突判定
