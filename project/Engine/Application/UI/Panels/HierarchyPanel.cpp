@@ -424,6 +424,9 @@ namespace CalyxEngine {
 			if(ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
 				HandleNodeSelectionClick(obj);
 			}
+			if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && actions_) {
+				actions_->FocusObject(obj->shared_from_this());
+			}
 
 			// ドラッグ＆ドロップ
 			if(ImGui::BeginDragDropSource()) {

@@ -17,6 +17,7 @@ namespace CalyxEngine {
 		virtual void CreateObject(std::shared_ptr<SceneObject> object) = 0;
 		virtual void RenameObject(std::shared_ptr<SceneObject> object, const std::string& newName) = 0;
 		virtual void ApplyPrefabOverrides(std::shared_ptr<SceneObject> object) = 0;
+		virtual void FocusObject(std::shared_ptr<SceneObject> object) = 0;
 	};
 
 	class CallbackHierarchyActions final
@@ -31,6 +32,7 @@ namespace CalyxEngine {
 		void SetOnObjectCreate(ObjectCB cb) { onCreate_ = std::move(cb); }
 		void SetOnObjectRename(RenameCB cb) { onRename_ = std::move(cb); }
 		void SetOnApplyPrefabOverrides(ObjectCB cb) { onApplyPrefab_ = std::move(cb); }
+		void SetOnObjectFocused(ObjectCB cb) { onFocus_ = std::move(cb); }
 
 		void SelectObject(std::shared_ptr<SceneObject> object, bool toggle) override {
 			if(onSelect_) onSelect_(std::move(object), toggle);
@@ -52,12 +54,17 @@ namespace CalyxEngine {
 			if(onApplyPrefab_) onApplyPrefab_(std::move(object));
 		}
 
+		void FocusObject(std::shared_ptr<SceneObject> object) override {
+			if(onFocus_) onFocus_(std::move(object));
+		}
+
 	private:
 		SelectCB onSelect_;
 		ObjectCB onDelete_;
 		ObjectCB onCreate_;
 		RenameCB onRename_;
 		ObjectCB onApplyPrefab_;
+		ObjectCB onFocus_;
 	};
 
 } // namespace CalyxEngine
