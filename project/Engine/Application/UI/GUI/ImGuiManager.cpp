@@ -50,7 +50,7 @@ void ImGuiManager::Initialize(WinApp* winApp, const CalyxEngine::DxCore* dxCore)
 		ImFontConfig mergeConfig;
 		mergeConfig.MergeMode = true;
 		mergeConfig.PixelSnapH = true;
-		const char* japaneseFontPath = "Resources/Assets/fonts/FiraMono.ttf";
+		const char* japaneseFontPath = "Resources/Assets/fonts/NotoSerifJP.ttf";
 		if(std::filesystem::exists(japaneseFontPath)) {
 			io.Fonts->AddFontFromFileTTF(japaneseFontPath, fontSize, &mergeConfig, io.Fonts->GetGlyphRangesJapanese());
 		}

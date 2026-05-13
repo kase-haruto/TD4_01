@@ -68,13 +68,13 @@ private:
 		CalyxEngine::Vector3 hammerSwingScale = {2.5f, 1.5f, 2.5f};
 
 		PlayerParameter() {
-			AddField("HP", playerHP).Category("Base Param");
-			AddField("Move Speed", moveSpeed).Category("Move Param");
-			AddField("Jump Force", jumpForce).Category("Move Param");
-			AddField("Dive Force", diveForce).Category("Move Param");
-			AddField("Gravity", gravity).Category("Move Param");
-			AddField("Stiffness", stiffness).Category("Pop Scale");
-			AddField("Damping", damping).Category("Pop Scale");
+			AddField("HP", playerHP).Category("Base Param").Tooltip("体力");
+			AddField("Move Speed", moveSpeed).Category("Move Param").Tooltip("移動速度");
+			AddField("Jump Force", jumpForce).Category("Move Param").Tooltip("ジャンプの初速");
+			AddField("Dive Force", diveForce).Category("Move Param").Tooltip("ダイブの初速");
+			AddField("Gravity", gravity).Category("Move Param").Tooltip("重力加速度");
+			AddField("Stiffness", stiffness).Category("Pop Scale").Tooltip("ポップスケールの硬さ（大きいほど速く元に戻る）");
+			AddField("Damping", damping).Category("Pop Scale").Tooltip("ポップスケールの減衰（大きいほど揺れが早く収まる）");
 			AddField("Dive Rotation Time", diveRotationTime).Category("Move Param");
 			AddField("Default ShockScale", defaultShockScale).Category("Shock Power");
 			AddField("Strong ShockScale", strongShockScale).Category("Shock Power");
