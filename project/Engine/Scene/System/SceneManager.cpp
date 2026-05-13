@@ -39,6 +39,18 @@ namespace CalyxEngine {
 		return *transitionService_;
 	}
 
+	void SceneManager::WaitForGpu() const {
+		if(dx_) {
+			dx_->WaitForGpu();
+		}
+	}
+
+	void SceneManager::RetireAfterGpu(std::shared_ptr<void> resource) const {
+		if(dx_) {
+			dx_->RetireAfterGpu(std::move(resource));
+		}
+	}
+
 	//------------------------------------------------------------
 	void SceneManager::Initialize() {
 

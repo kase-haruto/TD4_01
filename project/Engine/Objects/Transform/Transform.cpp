@@ -19,6 +19,12 @@
 
 using namespace CalyxEngine;
 
+namespace {
+	bool SameQuaternion(const CalyxEngine::Quaternion& lhs, const CalyxEngine::Quaternion& rhs) {
+		return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w;
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //	コンストラクタ
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -43,6 +49,7 @@ void BaseTransform::Initialize() {
 	// バッファの作成
 	DxConstantBuffer::Initialize(GraphicsGroup::GetInstance()->GetDevice());
 
+	revision_ = 1;
 	Update();
 }
 
@@ -332,6 +339,16 @@ void WorldTransform::Update(const CalyxEngine::Matrix4x4&) {
 //	worldTransformの更新
 /////////////////////////////////////////////////////////////////////////////////////////
 void WorldTransform::Update() {
+	uint64_t parentRevision = 0;
+	if(parent) {
+		parent->Update();
+		parentRevision = parent->GetRevision();
+	}
+
+	if(IsCacheValid(parentRevision)) {
+		return;
+	}
+
 	CalyxEngine::Matrix4x4 scaleMat = CalyxEngine::MakeScaleMatrix(scale);
 
 	switch(rotationSource) {
@@ -348,8 +365,6 @@ void WorldTransform::Update() {
 	CalyxEngine::Matrix4x4 localMat	  = scaleMat * rotateMat * translateMat;
 
 	if(parent) {
-		parent->Update();
-
 		// 親のワールド情報
 		CalyxEngine::Vector3 pScl = {
 			CalyxEngine::Vector3(parent->matrix.world.m[0][0], parent->matrix.world.m[0][1], parent->matrix.world.m[0][2]).Length(),
@@ -404,6 +419,37 @@ void WorldTransform::Update() {
 
 	matrix.WorldInverseTranspose = CalyxEngine::Matrix4x4::Transpose(CalyxEngine::Matrix4x4::Inverse(matrix.world));
 	TransferData(matrix);
+	StoreCache(parentRevision);
+	++revision_;
+}
+
+bool WorldTransform::IsCacheValid(uint64_t parentRevision) const {
+	if(!cacheValid_) return false;
+	if(parent != cachedParent_) return false;
+	if(parentRevision != cachedParentRevision_) return false;
+	if(scale != cachedScale_) return false;
+	if(translation != cachedTranslation_) return false;
+	if(rotationSource != cachedRotationSource_) return false;
+	if(eulerRotation != cachedEulerRotation_) return false;
+	if(!SameQuaternion(rotation, cachedRotation_)) return false;
+	if(inheritTranslate != cachedInheritTranslate_) return false;
+	if(inheritRotate != cachedInheritRotate_) return false;
+	if(inheritScale != cachedInheritScale_) return false;
+	return true;
+}
+
+void WorldTransform::StoreCache(uint64_t parentRevision) {
+	cachedScale_			   = scale;
+	cachedRotation_			   = rotation;
+	cachedEulerRotation_	   = eulerRotation;
+	cachedTranslation_		   = translation;
+	cachedParent_			   = parent;
+	cachedParentRevision_	   = parentRevision;
+	cachedRotationSource_	   = rotationSource;
+	cachedInheritTranslate_	   = inheritTranslate;
+	cachedInheritRotate_	   = inheritRotate;
+	cachedInheritScale_		   = inheritScale;
+	cacheValid_				   = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -472,6 +518,7 @@ void WorldTransform::ApplyConfig(const WorldTransformConfig& config) {
 
 	eulerRotation  = CalyxEngine::Quaternion::ToEuler(rotation);
 	rotationSource = RotationSource::Quaternion;
+	cacheValid_	   = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -107,10 +107,12 @@ protected:
 	//===================================================================*/
 	DxConstantBuffer<Material> materialBuffer_;
 	Material currentMaterial_{};
+	bool materialUploaded_ = false;
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle_{};
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> materialTextureHandles_;
 	mutable std::vector<DescriptorHandle> materialGraphTextureTables_;
+	mutable std::vector<std::string> materialGraphTextureTableKeys_;
 
 	std::string fileName_;
 	std::string textureName_ = "textures/white1x1.dds"; // デフォルトのテクスチャ名
@@ -136,16 +138,19 @@ protected:
 
 	virtual void CreateMaterialBuffer() = 0;
 	virtual void MaterialBufferMap() = 0;
+	void InvalidateMaterialGraphTextureTables();
 
 protected:
 	// -------- インスタンス行列（VS:t0） -----------------------------------------
 	DxStructuredBuffer<TransformationMatrix> instanceBuffer_;
 	bool instanceBufferCreated_ = false;
 	UINT instanceBufferCapacity_ = 0;
+	std::vector<TransformationMatrix> uploadedInstanceMatrices_;
 
 	// -------- ビルボード（VS:t1）フレームリング -------------------------------
 	DxStructuredBuffer<GpuBillboardParams> billboardBuffer_;
 	UINT billboardCapacity_ = 0;
+	std::vector<GpuBillboardParams> uploadedBillboardParams_;
 
 
 	CalyxEngine::RaytracingMesh rayMesh_;

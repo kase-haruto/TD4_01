@@ -28,6 +28,8 @@ public:
      * \brief 画面表示（フリップ）
      */
     void Present();
+    void SetVSyncEnabled(bool enabled) { syncInterval_ = enabled ? 1u : 0u; }
+    bool IsVSyncEnabled() const { return syncInterval_ != 0; }
 
     /**
      * \brief リサイズ
@@ -35,6 +37,7 @@ public:
      * \param height 高さ
      */
     void Resize(uint32_t width, uint32_t height);
+    void ReleaseBackBuffers();
 
     //===================================================================*/
     //                    accessor
@@ -80,5 +83,5 @@ private:
     std::array<ComPtr<ID3D12Resource>, 2> backBuffers_; //< バックバッファリソース
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc_ {}; //< スワップチェーン設定情報
 
-	UINT syncInterval_ = 1; //< 垂直同期の間隔
+	UINT syncInterval_ = 0; //< 垂直同期の間隔
 };

@@ -27,11 +27,14 @@ public:
 	/// シグナル
 	/// </summary>
 	/// <param name="commandQueue"></param>
-	void Signal(ComPtr<ID3D12CommandQueue> commandQueue);
+	uint64_t Signal(ComPtr<ID3D12CommandQueue> commandQueue);
 	/// <summary>
 	/// 待機
 	/// </summary>
 	void Wait();
+	void Wait(uint64_t fenceValue);
+	bool IsCompleted(uint64_t fenceValue) const;
+	uint64_t GetCurrentValue() const { return fenceValue_; }
 
 private:
 	///////////////////////////////////////////////////

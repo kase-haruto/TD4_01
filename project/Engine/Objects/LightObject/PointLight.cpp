@@ -10,6 +10,8 @@
 #include <Engine/System/Command/EditorCommand/GuiCommand/ImGuiHelper/GuiCmd.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
+#include <cstring>
+
 #ifdef _DEBUG
 #include<externals/imgui/imgui.h>
 #endif // _DEBUG
@@ -85,7 +87,13 @@ void PointLight::ShowGui(){
 }
 
 void PointLight::UploadToGpu(){
+	if(lightDataUploaded_ && std::memcmp(&uploadedLightData_, &lightData_, sizeof(PointLightData)) == 0) {
+		return;
+	}
+
 	constantBuffer_.TransferData(lightData_);
+	uploadedLightData_ = lightData_;
+	lightDataUploaded_ = true;
 }
 
 void PointLight::SetCommand(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, PipelineType type){
