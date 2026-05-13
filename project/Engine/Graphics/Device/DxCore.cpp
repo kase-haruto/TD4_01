@@ -4,7 +4,6 @@
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <Engine/Graphics/RenderTarget/OffscreenRT/OffscreenRenderTarget.h>
 #include <Engine/Graphics/RenderTarget/SwapChainRT/SwapChainRenderTarget.h>
-#include <Engine/Foundation/Profiling/FrameProfiler.h>
 #include <Engine/PostProcess/FullscreenDrawer.h>
 
 #include <cassert>
@@ -24,6 +23,10 @@ namespace CalyxEngine {
 	}
 
 	void DxCore::ReleaseResources() {
+		if(dxFence_ && dxCommand_) {
+			WaitForGpu();
+		}
+		retiredResources_.clear();
 		dxSwapChain_.reset();
 		dxFence_.reset();
 		dxCommand_.reset();
@@ -118,7 +121,6 @@ namespace CalyxEngine {
 	}
 
 	void DxCore::PostDraw() {
-		FrameProfiler::ScopedTimer postDrawProfile("DxCore.PostDraw");
 		UINT bufferIndex = dxSwapChain_->GetCurrentBackBufferIndex();
 		auto commandList = dxCommand_->GetCommandList();
 
@@ -138,30 +140,22 @@ namespace CalyxEngine {
 
 		ID3D12CommandList* commandLists[] = {commandList.Get()};
 		{
-			FrameProfiler::ScopedTimer profile("DxCore.ExecuteCommandLists");
 			dxCommand_->GetCommandQueue()->ExecuteCommandLists(_countof(commandLists), commandLists);
 		}
 
 		{
-			FrameProfiler::ScopedTimer profile("DxCore.Present");
 			dxSwapChain_->Present();
 		}
 
 		{
-			FrameProfiler::ScopedTimer profile("DxCore.Signal");
 			frameFenceValues_[currentFrameIndex_] = dxFence_->Signal(dxCommand_->GetCommandQueue());
 		}
+		dxFence_->Wait(frameFenceValues_[currentFrameIndex_]);
+		CollectRetiredResources();
 
 		const uint32_t nextFrameIndex = dxSwapChain_->GetCurrentBackBufferIndex() % DxCommand::kFrameCount;
-		const uint64_t nextFenceValue = frameFenceValues_[nextFrameIndex];
-		if(!dxFence_->IsCompleted(nextFenceValue)) {
-			FrameProfiler::ScopedTimer profile("DxCore.FrameWait");
-			dxFence_->Wait(nextFenceValue);
-		}
-
 		currentFrameIndex_ = nextFrameIndex;
 		{
-			FrameProfiler::ScopedTimer profile("DxCore.CommandReset");
 			dxCommand_->Reset(currentFrameIndex_);
 		}
 	}
@@ -174,16 +168,22 @@ namespace CalyxEngine {
 		clientHeight_ = height;
 
 		// GPUの完了を待つ
-		dxFence_->Signal(dxCommand_->GetCommandQueue());
-		dxFence_->Wait();
-		frameFenceValues_.fill(0);
+		WaitForGpu();
 
 		// コマンドリストの状態をクリアし、参照を外す
 		auto commandList = dxCommand_->GetCommandList();
 		commandList->ClearState(nullptr);
-		commandList->Close();
+		HRESULT hr = commandList->Close();
+		if(FAILED(hr)) {
+			OutputDebugStringA("commandList->Close() failed during resize.\n");
+		}
+
+		if(auto* swapchainRT = dynamic_cast<SwapChainRenderTarget*>(renderTargetCollection_->Get("BackBuffer"))) {
+			swapchainRT->ReleaseBackBufferViews();
+		}
+		dxSwapChain_->ReleaseBackBuffers();
+
 		currentFrameIndex_ = dxSwapChain_->GetCurrentBackBufferIndex() % DxCommand::kFrameCount;
-		dxCommand_->Reset(currentFrameIndex_);
 
 		// スワップチェーンをリサイズ (内部で古いバックバッファを解放する)
 		dxSwapChain_->Resize(width, height);
@@ -192,6 +192,35 @@ namespace CalyxEngine {
 		for (auto& pair : renderTargetCollection_->GetMap()) {
 			pair.second->Resize(width, height);
 		}
+
+		dxCommand_->Reset(currentFrameIndex_);
+	}
+
+	void DxCore::WaitForGpu() {
+		if(!dxFence_ || !dxCommand_) return;
+		dxFence_->Signal(dxCommand_->GetCommandQueue());
+		dxFence_->Wait();
+		frameFenceValues_.fill(0);
+		CollectRetiredResources();
+		retiredResources_.clear();
+	}
+
+	void DxCore::RetireAfterGpu(std::shared_ptr<void> resource) {
+		if(!resource) return;
+		if(!dxFence_ || !dxCommand_) {
+			return;
+		}
+
+		const uint64_t fenceValue = dxFence_->Signal(dxCommand_->GetCommandQueue());
+		retiredResources_.push_back(RetiredResource{fenceValue, std::move(resource)});
+		CollectRetiredResources();
+	}
+
+	void DxCore::CollectRetiredResources() {
+		if(!dxFence_) return;
+		std::erase_if(retiredResources_, [this](const RetiredResource& retired) {
+			return dxFence_->IsCompleted(retired.fenceValue);
+		});
 	}
 
 	void DxCore::RenderEngineUI() {

@@ -8,7 +8,6 @@
 #include <Engine/Application/UI/EngineUI/Core/EngineUICore.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Foundation/Input/Input.h>
-#include <Engine/Foundation/Profiling/FrameProfiler.h>
 #include <Engine/Scene/System/SceneManager.h>
 namespace CalyxEngine {
 	////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +60,6 @@ namespace CalyxEngine {
 	////////////////////////////////////////////////////////////////////////////////
 	void CalyxFrameWork::Run() {
 		while(!system_->ProcessMessage()) {
-			FrameProfiler::BeginFrame();
 			if(!Update()) break;
 			Render();
 
@@ -77,7 +75,6 @@ namespace CalyxEngine {
 
 	////////////////////////////////////////////////////////////////////////////////
 	bool CalyxFrameWork::Update() {
-		FrameProfiler::ScopedTimer profile("Update");
 		float dt	   = ClockManager::GetInstance()->GetPlayerDeltaTime();
 		float alwaysDt = ClockManager::GetInstance()->GetDeltaTime();
 
@@ -93,14 +90,12 @@ namespace CalyxEngine {
 
 	////////////////////////////////////////////////////////////////////////////////
 	void CalyxFrameWork::BeginUpdate() {
-		FrameProfiler::ScopedTimer profile("BeginUpdate");
 		system_->BeginFrame();
 		engineUICore_->Update();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
 	void CalyxFrameWork::EndUpdate() {
-		FrameProfiler::ScopedTimer profile("EndUpdate");
 		sceneManager_->PostUpdate(graphicsSystem_->GetCommandList(), graphicsSystem_->GetPipelineService());
 
 		engineUICore_->Render();
@@ -110,7 +105,6 @@ namespace CalyxEngine {
 
 	////////////////////////////////////////////////////////////////////////////////
 	void CalyxFrameWork::Render() {
-		FrameProfiler::ScopedTimer profile("Render");
 		sceneManager_->Draw(graphicsSystem_->GetCommandList(), graphicsSystem_->GetPipelineService());
 
 		system_->ExecutePostEffect(graphicsSystem_->GetPipelineService());

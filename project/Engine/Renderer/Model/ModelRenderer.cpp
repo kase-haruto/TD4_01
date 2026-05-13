@@ -14,7 +14,6 @@
 #include <Engine/Graphics/RenderTarget/Interface/IRenderTarget.h>
 #include <Engine/Lighting/LightLibrary.h>
 #include <Engine/Scene/Context/SceneContext.h>
-#include <Engine/Foundation/Profiling/FrameProfiler.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -179,7 +178,6 @@ void ModelRenderer::MarkSkinnedDirty(CalyxEngine::AnimationModel* model, size_t 
 //		視錐台判定 & バッチ化
 /////////////////////////////////////////////////////////////////////////////////////////
 void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCulling) {
-	CalyxEngine::FrameProfiler::ScopedTimer profile("Model.PreCullBatch");
 	PruneUnregisteredInstances();
 
 	// =========================================================
@@ -472,7 +470,6 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 
 	// Raytracing TLAS Build
 	if(raytracingSystem_) {
-		CalyxEngine::FrameProfiler::ScopedTimer rtProfile("Raytracing.TLAS");
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> cmd4;
 		Microsoft::WRL::ComPtr<ID3D12Device5>			   device5;
 

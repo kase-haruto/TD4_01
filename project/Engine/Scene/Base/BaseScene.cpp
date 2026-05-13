@@ -14,7 +14,6 @@
 #include <Engine/PostProcess/Manager/PostEffectManager.h>
 #include <Engine/Objects/Event/BaseEventObject.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
-#include <Engine/Foundation/Profiling/FrameProfiler.h>
 
 BaseScene::BaseScene() {
 	spriteRenderer_	 = std::make_unique<SpriteRenderer>();
@@ -33,7 +32,6 @@ void BaseScene::PostUpdate(ID3D12GraphicsCommandList* cmd,
 void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 					 PipelineService*			pso,
 					 IRenderTarget*				rt) {
-	CalyxEngine::FrameProfiler::ScopedTimer profile("Scene.Draw");
 	if(!sceneContext_) return;
 
 	// Skybox
@@ -97,7 +95,6 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 	// =========================================================
 	rt->SetRenderTarget(cmd);
 	{
-		CalyxEngine::FrameProfiler::ScopedTimer modelProfile("ModelRenderer.DrawAll");
 		modelRenderer_->DrawAll(cmd,
 								GraphicsGroup::GetInstance()->GetDevice().Get(),
 								rt,
@@ -107,7 +104,6 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 
 	// Particles
 	{
-		CalyxEngine::FrameProfiler::ScopedTimer fxProfile("FxSystem.Render");
 		sceneContext_->GetFxSystem()->Render(pso, cmd);
 	}
 
@@ -115,7 +111,6 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 
 	// OutlinePass
 	if(outlineEnabled) {
-		CalyxEngine::FrameProfiler::ScopedTimer outlineProfile("Outline.Render");
 		outlineRenderer_->Render(cmd,
 								 GraphicsGroup::GetInstance()->GetDevice().Get(),
 								 rt,

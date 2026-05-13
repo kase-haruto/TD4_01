@@ -54,12 +54,16 @@ void DxSwapChain::Present(){
 	swapChain_->Present(syncInterval_, 0);
 }
 
-void DxSwapChain::Resize(uint32_t width, uint32_t height) {
+void DxSwapChain::ReleaseBackBuffers() {
 	// リソースを確実に解放
 	for (auto& bb : backBuffers_) {
 		bb = nullptr;
 		bb.Reset();
 	}
+}
+
+void DxSwapChain::Resize(uint32_t width, uint32_t height) {
+	ReleaseBackBuffers();
 
 	HRESULT hr = swapChain_->ResizeBuffers(
 		swapChainDesc_.BufferCount,

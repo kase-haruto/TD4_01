@@ -19,7 +19,6 @@
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
-#include <Engine/Foundation/Profiling/FrameProfiler.h>
 #include <Engine/PostProcess/Manager/PostEffectManager.h>
 
 // editor
@@ -114,7 +113,6 @@ namespace CalyxEngine {
 	//  フレーム開始処理
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void CalyxCore::BeginFrame() {
-		FrameProfiler::ScopedTimer profile("Core.BeginFrame");
 		// インプットの更新
 		CalyxFoundation::Input::Update();
 
@@ -136,13 +134,10 @@ namespace CalyxEngine {
 	//  フレーム終了処理
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void CalyxCore::EndFrame() {
-		FrameProfiler::ScopedTimer profile("Core.EndFrame");
 		{
-			FrameProfiler::ScopedTimer imguiEndProfile("ImGui.End");
 			imguiManager_->End();
 		}
 		{
-			FrameProfiler::ScopedTimer imguiDrawProfile("ImGui.Draw");
 			imguiManager_->Draw();
 		}
 
@@ -150,7 +145,6 @@ namespace CalyxEngine {
 	}
 
 	void CalyxCore::ExecutePostEffect(const PipelineService* service) {
-		FrameProfiler::ScopedTimer profile("PostEffect");
 		auto* cmd = dxCore_->GetCommandList().Get();
 
 		auto* backBuffer   = dxCore_->GetRenderTargetCollection().Get("BackBuffer");

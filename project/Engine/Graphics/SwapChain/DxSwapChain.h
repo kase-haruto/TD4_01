@@ -37,6 +37,7 @@ public:
      * \param height 高さ
      */
     void Resize(uint32_t width, uint32_t height);
+    void ReleaseBackBuffers();
 
     //===================================================================*/
     //                    accessor
