@@ -9,12 +9,29 @@
 
 #include <functional>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace {
 
-	void WriteSceneObjectMetadata(SceneObject& obj, nlohmann::json& j) {
+	WorldTransformConfig MakePrefabRootTransformConfig(WorldTransform& transform) {
+		WorldTransformConfig config = transform.ExtractConfig();
+		config.translation = CalyxEngine::Vector3::Zero();
+		config.inheritTranslate = true;
+		config.inheritRotate = true;
+		config.inheritScale = true;
+		return config;
+	}
+
+	void WriteSceneObjectMetadata(SceneObject& obj,
+								  nlohmann::json& j,
+								  const std::unordered_set<SceneObject*>& prefabRoots,
+								  bool resetRootTransform,
+								  bool usePrefabSourceGuids) {
 		j["type"] = obj.GetObjectClassName();
-		j["guid"] = obj.GetGuid();
+		const Guid guid = (usePrefabSourceGuids && obj.GetPrefabSourceGuid().isValid())
+			? obj.GetPrefabSourceGuid()
+			: obj.GetGuid();
+		j["guid"] = guid;
 		j["name"] = obj.GetName();
 		j["objectType"] = static_cast<int>(obj.GetObjectType());
 		j["drawEnable"] = obj.IsDrawEnable();
@@ -22,9 +39,17 @@ namespace {
 		j["outlineEnabled"] = obj.IsOutlineEnabled();
 		j["outlineThickness"] = obj.GetOutlineSettings().thickness;
 		j["outlineColor"] = obj.GetOutlineSettings().color;
-		j["worldTransform"] = obj.GetWorldTransform().ExtractConfig();
+		if(resetRootTransform && prefabRoots.contains(&obj)) {
+			j["worldTransform"] = MakePrefabRootTransformConfig(obj.GetWorldTransform());
+		} else {
+			j["worldTransform"] = obj.GetWorldTransform().ExtractConfig();
+		}
 		if(auto parent = obj.GetParent()) {
-			j["parentGuid"] = parent->GetGuid();
+			if(usePrefabSourceGuids && parent->GetPrefabSourceGuid().isValid()) {
+				j["parentGuid"] = parent->GetPrefabSourceGuid();
+			} else {
+				j["parentGuid"] = parent->GetGuid();
+			}
 		} else {
 			j["parentGuid"] = Guid::Empty();
 		}
@@ -49,7 +74,17 @@ namespace {
 
 bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 							const std::string& path){
+	return Save(roots, path, SaveOptions{});
+}
+
+bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
+							const std::string& path,
+							const SaveOptions& options){
 	nlohmann::json jArray = nlohmann::json::array();
+	std::unordered_set<SceneObject*> prefabRoots;
+	for(auto* root : roots) {
+		if(root) prefabRoots.insert(root);
+	}
 
 	std::function<void(SceneObject*)> serializeRec;
 	serializeRec = [&] (SceneObject* obj){
@@ -59,7 +94,7 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 		if (auto* cfg = dynamic_cast< IConfigurable* >(obj)){
 			cfg->ExtractConfigToJson(j);
 		}
-		WriteSceneObjectMetadata(*obj, j);
+		WriteSceneObjectMetadata(*obj, j, prefabRoots, options.resetRootTransform, options.usePrefabSourceGuids);
 		jArray.push_back(std::move(j));
 
 		for (auto& childSp : obj->GetChildren()){

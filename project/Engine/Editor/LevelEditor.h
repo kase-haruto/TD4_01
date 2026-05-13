@@ -147,6 +147,9 @@ namespace CalyxEngine {
 		void SavePrefabEdit();
 		void SavePrefabEditAs(const std::string& path);
 		std::vector<SceneObject*> GetPrefabEditRoots() const;
+		void NormalizePrefabEditRoots();
+		void MarkPrefabEditorUtilityObjects();
+		void ApplyPrefabOverridesFromInstance(const std::shared_ptr<SceneObject>& object);
 		void UpdatePrefabEditContext(float dt);
 		void SyncPrefabInstancesInCurrentScene(const Guid& prefabAssetGuid,
 											   const std::string& prefabPath);
