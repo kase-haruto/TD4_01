@@ -26,6 +26,7 @@
 
 
 #include <Engine/Editor/PickingPass.h>
+#include <Engine/Foundation/Profiling/FrameProfiler.h>
 
 namespace CalyxEngine {
 	SceneManager::SceneManager(CalyxEngine::DxCore* dx)
@@ -170,6 +171,7 @@ namespace CalyxEngine {
 	}
 
 	void SceneManager::Update(float dt, float alwaysDt) {
+		FrameProfiler::ScopedTimer profile("SceneManager.Update");
 		if(slots_.empty()) return;
 
 		if(pPlaySession_ && pPlaySession_->ExitRequested()) {
@@ -198,6 +200,7 @@ namespace CalyxEngine {
 
 	//------------------------------------------------------------
 	void SceneManager::PostUpdate(ID3D12GraphicsCommandList* cmd, PipelineService* pso) {
+		FrameProfiler::ScopedTimer profile("SceneManager.PostUpdate");
 		if(slots_.empty()) return;
 
 		if(editorPreviewCtx_) {
@@ -214,6 +217,7 @@ namespace CalyxEngine {
 
 	//------------------------------------------------------------
 	void SceneManager::Draw(ID3D12GraphicsCommandList* cmd, PipelineService* pso) {
+		FrameProfiler::ScopedTimer profile("SceneManager.Draw");
 		if(slots_.empty()) return;
 		RebindIfContextChanged();
 
@@ -257,6 +261,7 @@ namespace CalyxEngine {
 	void SceneManager::DrawEditorPreview(IRenderTarget* rt,
 										 ID3D12GraphicsCommandList* cmd,
 										 PipelineService* pso) {
+		FrameProfiler::ScopedTimer profile("EditorPreview.Draw");
 		if(!rt || !editorPreviewCtx_) return;
 
 		editorPreviewCtx_->MakeCurrent();

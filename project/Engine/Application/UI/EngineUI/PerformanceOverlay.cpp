@@ -1,6 +1,7 @@
 #include "PerformanceOverlay.h"
 
 #include <Engine/Foundation/Clock/ClockManager.h>
+#include <Engine/Foundation/Profiling/FrameProfiler.h>
 
 namespace CalyxEngine {
 
@@ -50,6 +51,13 @@ namespace CalyxEngine {
         next.y += 20.0f;
         ImGui::SetCursorScreenPos(next);
         ImGui::Text("DeltaTime(raw): %.4f", rawDt);
+
+        const auto& samples = FrameProfiler::GetLastSamples();
+        for(const auto& sample : samples) {
+            next.y += 18.0f;
+            ImGui::SetCursorScreenPos(next);
+            ImGui::Text("%s: %.2f ms", sample.name.c_str(), sample.ms);
+        }
     }
 
     void PerformanceOverlay::RenderToolbar() {

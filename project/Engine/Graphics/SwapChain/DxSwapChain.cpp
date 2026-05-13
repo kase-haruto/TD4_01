@@ -39,8 +39,8 @@ void DxSwapChain::Initialize(
 	hr = tempSwapChain.As(&swapChain_);
 	assert(SUCCEEDED(hr));
 
-	// 1 = VSyncあり。現在のモニターリフレッシュレートに同期してティアリングを防ぐ。
-	syncInterval_ = 1;
+	// 0 = VSyncなし。最適化時にFPS上限で隠れないよう、既定はアンロック。
+	syncInterval_ = 0;
 
 	// バックバッファリソースを取得
 	for (UINT i = 0; i < swapChainDesc_.BufferCount; ++i) {

@@ -14,7 +14,10 @@
 #include <Engine/Graphics/RenderTarget/Interface/IRenderTarget.h>
 #include <Engine/Lighting/LightLibrary.h>
 #include <Engine/Scene/Context/SceneContext.h>
+#include <Engine/Foundation/Profiling/FrameProfiler.h>
 
+#include <algorithm>
+#include <cstdint>
 #include <cstring>
 
 ModelRenderer::ModelRenderer() {
@@ -31,25 +34,94 @@ ModelRenderer::ModelRenderer() {
 //		静的モデル登録（ビルボードモード付き）
 /////////////////////////////////////////////////////////////////////////////////////////
 void ModelRenderer::RegisterStatic(BaseModel* model, const WorldTransform& transform, BillboardMode billMode, SceneObject* owner) {
+	if(!model) return;
+	auto& insts = staticModels_[model];
+	auto isSameInstance = [&](const InstanceStatic& inst) {
+		if(owner || inst.owner) return inst.owner == owner;
+		return inst.sourceTransform == &transform;
+	};
+
+	for(auto& inst : insts) {
+		if(!isSameInstance(inst)) continue;
+
+		const uint64_t revision = transform.GetRevision();
+		if(inst.sourceRevision != revision || inst.mode != billMode) {
+			inst.tf			   = transform;
+			inst.sourceRevision = revision;
+			inst.mode		   = billMode;
+			inst.dirty		   = true;
+		}
+		inst.owner				 = owner;
+		inst.sourceTransform	 = &transform;
+		inst.visible			 = false;
+		inst.registeredThisFrame = true;
+		return;
+	}
+
 	InstanceStatic inst{};
 	inst.tf		 = transform;
 	inst.dirty	 = true;
 	inst.visible = false;
 	inst.mode	 = billMode;
 	inst.owner	 = owner;
-	staticModels_[model].push_back(inst);
+	inst.sourceTransform = &transform;
+	inst.sourceRevision = transform.GetRevision();
+	inst.registeredThisFrame = true;
+	insts.push_back(inst);
+}
+
+namespace {
+	void HashCombine(size_t& seed, size_t value) {
+		seed ^= value + 0x9e3779b97f4a7c15ull + (seed << 6) + (seed >> 2);
+	}
+
+	void HashBytes(size_t& seed, const void* data, size_t size) {
+		const auto* bytes = static_cast<const uint8_t*>(data);
+		size_t hash = 1469598103934665603ull;
+		for(size_t i = 0; i < size; ++i) {
+			hash ^= bytes[i];
+			hash *= 1099511628211ull;
+		}
+		HashCombine(seed, hash);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //		アニメーションモデル登録
 /////////////////////////////////////////////////////////////////////////////////////////
 void ModelRenderer::RegisterSkinned(CalyxEngine::AnimationModel* model, const WorldTransform& transform, SceneObject* owner) {
+	if(!model) return;
+	auto& insts = skinnedModels_[model];
+	auto isSameInstance = [&](const InstanceSkinned& inst) {
+		if(owner || inst.owner) return inst.owner == owner;
+		return inst.sourceTransform == &transform;
+	};
+
+	for(auto& inst : insts) {
+		if(!isSameInstance(inst)) continue;
+
+		const uint64_t revision = transform.GetRevision();
+		if(inst.sourceRevision != revision) {
+			inst.tf			   = transform;
+			inst.sourceRevision = revision;
+			inst.dirty		   = true;
+		}
+		inst.owner				 = owner;
+		inst.sourceTransform	 = &transform;
+		inst.visible			 = false;
+		inst.registeredThisFrame = true;
+		return;
+	}
+
 	InstanceSkinned inst{};
 	inst.tf		 = transform;
 	inst.dirty	 = true;
 	inst.visible = false;
 	inst.owner	 = owner;
-	skinnedModels_[model].push_back(inst);
+	inst.sourceTransform = &transform;
+	inst.sourceRevision = transform.GetRevision();
+	inst.registeredThisFrame = true;
+	insts.push_back(inst);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +134,8 @@ void ModelRenderer::Clear() {
 	skinnedBatches_.clear();
 	tempVisibleStatic_.clear();
 	tempVisibleSkinned_.clear();
+	raytracingTlasValid_ = false;
+	raytracingSceneSignature_ = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -71,19 +145,17 @@ void ModelRenderer::BeginFrame() {
 	for(auto& insts : staticModels_ | std::views::values) {
 		for(auto& inst : insts) {
 			inst.visible = false;
+			inst.registeredThisFrame = false;
 		}
 	}
 	for(auto& insts : skinnedModels_ | std::views::values) {
 		for(auto& inst : insts) {
 			inst.visible = false;
+			inst.registeredThisFrame = false;
 		}
 	}
 	staticBatches_.clear();
 	skinnedBatches_.clear();
-
-	// 毎フレ登録方式なのでクリア
-	staticModels_.clear();
-	skinnedModels_.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +179,8 @@ void ModelRenderer::MarkSkinnedDirty(CalyxEngine::AnimationModel* model, size_t 
 //		視錐台判定 & バッチ化
 /////////////////////////////////////////////////////////////////////////////////////////
 void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCulling) {
+	CalyxEngine::FrameProfiler::ScopedTimer profile("Model.PreCullBatch");
+	PruneUnregisteredInstances();
 
 	// =========================================================
 	// Shadow 用 visible / SceneBounds 初期化
@@ -202,6 +276,8 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCu
 }
 
 void ModelRenderer::BuildAllVisibleBatches() {
+	PruneUnregisteredInstances();
+
 	staticVisibleForShadow_.clear();
 	skinnedVisibleForShadow_.clear();
 	raytracingScene_.Clear();
@@ -270,6 +346,60 @@ void ModelRenderer::BuildStaticBatches() {
 		item.billboards.swap(visBb);
 		batch.emplace_back(std::move(item));
 	}
+}
+
+void ModelRenderer::PruneUnregisteredInstances() {
+	for(auto it = staticModels_.begin(); it != staticModels_.end();) {
+		auto& insts = it->second;
+		std::erase_if(insts, [](const InstanceStatic& inst) {
+			return !inst.registeredThisFrame;
+		});
+		if(insts.empty()) {
+			it = staticModels_.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	for(auto it = skinnedModels_.begin(); it != skinnedModels_.end();) {
+		auto& insts = it->second;
+		std::erase_if(insts, [](const InstanceSkinned& inst) {
+			return !inst.registeredThisFrame;
+		});
+		if(insts.empty()) {
+			it = skinnedModels_.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
+size_t ModelRenderer::BuildRaytracingSceneSignature() const {
+	size_t signature = 0;
+	HashCombine(signature, static_cast<size_t>(staticVisibleForShadow_.size()));
+	for(const auto& [model, transforms] : staticVisibleForShadow_) {
+		HashCombine(signature, reinterpret_cast<size_t>(model));
+		HashCombine(signature, static_cast<size_t>(transforms.size()));
+		if(model) {
+			HashCombine(signature, static_cast<size_t>(model->GetBLAS()));
+		}
+		for(const auto& tf : transforms) {
+			HashBytes(signature, &tf.matrix.world, sizeof(tf.matrix.world));
+		}
+	}
+
+	HashCombine(signature, static_cast<size_t>(skinnedVisibleForShadow_.size()));
+	for(const auto& [model, transforms] : skinnedVisibleForShadow_) {
+		HashCombine(signature, reinterpret_cast<size_t>(model));
+		HashCombine(signature, static_cast<size_t>(transforms.size()));
+		if(model) {
+			HashCombine(signature, static_cast<size_t>(model->GetBLAS()));
+		}
+		for(const auto& tf : transforms) {
+			HashBytes(signature, &tf.matrix.world, sizeof(tf.matrix.world));
+		}
+	}
+	return signature;
 }
 
 ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model) {
@@ -342,55 +472,74 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 
 	// Raytracing TLAS Build
 	if(raytracingSystem_) {
+		CalyxEngine::FrameProfiler::ScopedTimer rtProfile("Raytracing.TLAS");
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> cmd4;
 		Microsoft::WRL::ComPtr<ID3D12Device5>			   device5;
 
 		if(SUCCEEDED(cmdList->QueryInterface(IID_PPV_ARGS(&cmd4))) &&
 		   SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&device5)))) {
 
-			raytracingScene_.Clear();
-
-			// Static Models
 			for(auto& [model, transforms] : staticVisibleForShadow_) {
-				if(!model->GetModelData()) continue;
-
+				(void)transforms;
+				if(!model || !model->GetModelData()) continue;
 				model->EnsureRaytracingBLAS(device5.Get(), cmd4.Get());
-
-				if(model->HasBLAS()) {
-					for(const auto& tf : transforms) {
-						raytracingScene_.AddInstance(
-							CalyxEngine::Matrix3x4::ToMatrix3x4(tf.matrix.world),
-							model->GetBLAS(),
-							0);
-					}
-				}
 			}
-
-			// Skinned Models
 			for(auto& [model, transforms] : skinnedVisibleForShadow_) {
-				if(!model->GetModelData()) continue;
-				// TODO: Skinning update for BLAS if needed (Refitting/Rebuild)
+				(void)transforms;
+				if(!model || !model->GetModelData()) continue;
 				model->EnsureRaytracingBLAS(device5.Get(), cmd4.Get());
-
-				if(model->HasBLAS()) {
-					for(const auto& tf : transforms) {
-						raytracingScene_.AddInstance(
-							CalyxEngine::Matrix3x4::ToMatrix3x4(tf.matrix.world),
-							model->GetBLAS(),
-							0);
-					}
-				}
 			}
 
-			raytracingScene_.EnsureBuffer(device);
-			raytracingScene_.Upload();
+			const size_t sceneSignature = BuildRaytracingSceneSignature();
+			const bool needsTlasBuild =
+				!raytracingTlasValid_ ||
+				!raytracingSystem_->GetTLAS() ||
+				raytracingSceneSignature_ != sceneSignature;
 
-			D3D12_RESOURCE_BARRIER uav = {};
-			uav.Type				   = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-			uav.UAV.pResource		   = nullptr; // Global UAV barrier
-			cmdList->ResourceBarrier(1, &uav);
+			if(needsTlasBuild) {
+				raytracingScene_.Clear();
 
-			raytracingSystem_->BuildTLAS(cmd4.Get(), raytracingScene_);
+				// Static Models
+				for(auto& [model, transforms] : staticVisibleForShadow_) {
+					if(!model || !model->GetModelData()) continue;
+
+					if(model->HasBLAS()) {
+						for(const auto& tf : transforms) {
+							raytracingScene_.AddInstance(
+								CalyxEngine::Matrix3x4::ToMatrix3x4(tf.matrix.world),
+								model->GetBLAS(),
+								0);
+						}
+					}
+				}
+
+				// Skinned Models
+				for(auto& [model, transforms] : skinnedVisibleForShadow_) {
+					if(!model || !model->GetModelData()) continue;
+					// TODO: Skinning update for BLAS if needed (Refitting/Rebuild)
+
+					if(model->HasBLAS()) {
+						for(const auto& tf : transforms) {
+							raytracingScene_.AddInstance(
+								CalyxEngine::Matrix3x4::ToMatrix3x4(tf.matrix.world),
+								model->GetBLAS(),
+								0);
+						}
+					}
+				}
+
+				raytracingScene_.EnsureBuffer(device);
+				raytracingScene_.Upload();
+
+				D3D12_RESOURCE_BARRIER uav = {};
+				uav.Type				   = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+				uav.UAV.pResource		   = nullptr; // Global UAV barrier
+				cmdList->ResourceBarrier(1, &uav);
+
+				raytracingSystem_->BuildTLAS(cmd4.Get(), raytracingScene_);
+				raytracingSceneSignature_ = sceneSignature;
+				raytracingTlasValid_ = raytracingSystem_->GetTLAS() != nullptr;
+			}
 		}
 	}
 
@@ -408,7 +557,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				shadowMapSystem->BindForMainPass(cmdList);
 			}
 
-			if(raytracingSystem_) {
+			if(raytracingSystem_ && raytracingSystem_->GetTLAS()) {
 				cmdList->SetGraphicsRootShaderResourceView(
 					10, // Space0, t3
 					raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
@@ -523,7 +672,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 					shadowMapSystem->BindForMainPass(cmdList);
 				}
 
-				if(raytracingSystem_) {
+				if(raytracingSystem_ && raytracingSystem_->GetTLAS()) {
 					cmdList->SetGraphicsRootShaderResourceView(
 						10, // Space0, t3
 						raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
@@ -555,7 +704,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							if(shadowMapSystem) {
 								shadowMapSystem->BindForMainPass(cmdList);
 							}
-							if(raytracingSystem_) {
+							if(raytracingSystem_ && raytracingSystem_->GetTLAS()) {
 								cmdList->SetGraphicsRootShaderResourceView(
 									10, // Space0, t3
 									raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
@@ -573,7 +722,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							if(shadowMapSystem) {
 								shadowMapSystem->BindForMainPass(cmdList);
 							}
-							if(raytracingSystem_) {
+							if(raytracingSystem_ && raytracingSystem_->GetTLAS()) {
 								cmdList->SetGraphicsRootShaderResourceView(
 									10, // Space0, t3
 									raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
@@ -593,7 +742,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 					if(shadowMapSystem) {
 						shadowMapSystem->BindForMainPass(cmdList);
 					}
-					if(raytracingSystem_) {
+					if(raytracingSystem_ && raytracingSystem_->GetTLAS()) {
 						cmdList->SetGraphicsRootShaderResourceView(
 							10, // Space0, t3
 							raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());

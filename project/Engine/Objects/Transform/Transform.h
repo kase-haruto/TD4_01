@@ -12,6 +12,7 @@
 #include <Engine/Foundation/Math/Vector3.h>
 
 // c++
+#include <cstdint>
 #include <string>
 
 enum class RotationSource {
@@ -156,6 +157,7 @@ public:
 	 * \return ワールド座標
 	 */
 	virtual CalyxEngine::Vector3 GetWorldPosition() const;
+	uint64_t GetRevision() const { return revision_; }
 
 public:
 	//========================================================================*/
@@ -171,6 +173,9 @@ public:
 	BaseTransform*		 parent = nullptr; //< 親トランスフォーム
 
 	RotationSource rotationSource = RotationSource::Quaternion; //< 回転ソース
+
+protected:
+	uint64_t revision_ = 1; //< 行列が再計算された世代
 };
 
 /*-----------------------------------------------------------------------------------------
@@ -235,6 +240,22 @@ public:
 	bool inheritTranslate = true; //< 親の座標を継承するか
 	bool inheritRotate	  = true; //< 親の回転を継承するか
 	bool inheritScale	  = true; //< 親のスケールを継承するか
+
+private:
+	bool IsCacheValid(uint64_t parentRevision) const;
+	void StoreCache(uint64_t parentRevision);
+
+	CalyxEngine::Vector3	  cachedScale_ {};
+	CalyxEngine::Quaternion cachedRotation_ {};
+	CalyxEngine::Vector3	  cachedEulerRotation_ {};
+	CalyxEngine::Vector3	  cachedTranslation_ {};
+	BaseTransform*		  cachedParent_ = nullptr;
+	uint64_t			  cachedParentRevision_ = 0;
+	RotationSource		  cachedRotationSource_ = RotationSource::Quaternion;
+	bool				  cachedInheritTranslate_ = true;
+	bool				  cachedInheritRotate_	   = true;
+	bool				  cachedInheritScale_	   = true;
+	bool				  cacheValid_			   = false;
 };
 
 //============================================================================*/

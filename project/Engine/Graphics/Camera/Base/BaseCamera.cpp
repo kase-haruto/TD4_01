@@ -73,6 +73,24 @@ void BaseCamera::AlwaysUpdate([[maybe_unused]] float dt) {
 //  行列の更新
 /////////////////////////////////////////////////////////////////////////
 void BaseCamera::UpdateMatrix() {
+	auto* gg = GraphicsGroup::GetInstance();
+	CalyxEngine::Vector2 viewportSize{
+		static_cast<float>(gg->GetClientWidth()),
+		static_cast<float>(gg->GetClientHeight())
+	};
+
+	const uint64_t transformRevision = worldTransform_.GetRevision();
+	if(matrixCacheValid_ &&
+	   cachedTransformRevision_ == transformRevision &&
+	   cachedAspectRatio_ == aspectRatio_ &&
+	   cachedFovAngleY_ == fovAngleY_ &&
+	   cachedNearZ_ == nearZ_ &&
+	   cachedFarZ_ == farZ_ &&
+	   cachedViewportSize_.x == viewportSize.x &&
+	   cachedViewportSize_.y == viewportSize.y) {
+		return;
+	}
+
 	// 行列の更新
 	viewMatrix_			  = CalyxEngine::Matrix4x4::Inverse(worldTransform_.matrix.world);
 	projectionMatrix_	  = MakePerspectiveFovMatrix(fovAngleY_, aspectRatio_, nearZ_, farZ_);
@@ -85,13 +103,15 @@ void BaseCamera::UpdateMatrix() {
 		worldTransform_.matrix.world.m[3][2]
 	};
 
-	auto* gg = GraphicsGroup::GetInstance();
-	CalyxEngine::Vector2 viewportSize{
-		static_cast<float>(gg->GetClientWidth()),
-		static_cast<float>(gg->GetClientHeight())
-	};
-
 	cameraBuffer_.Update(viewMatrix_, projectionMatrix_, worldPos, viewportSize);
+
+	cachedTransformRevision_ = transformRevision;
+	cachedAspectRatio_		  = aspectRatio_;
+	cachedFovAngleY_		  = fovAngleY_;
+	cachedNearZ_			  = nearZ_;
+	cachedFarZ_			  = farZ_;
+	cachedViewportSize_	  = viewportSize;
+	matrixCacheValid_		  = true;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -196,6 +216,7 @@ void BaseCamera::SetRootCommand(ID3D12GraphicsCommandList* command, uint32_t roo
 
 void BaseCamera::SetAspectRatio(float aspect) {
 	aspectRatio_ = aspect;
+	matrixCacheValid_ = false;
 
 	float adjustedFov = fovAngleY_;
 

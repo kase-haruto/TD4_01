@@ -4,6 +4,7 @@
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <Engine/Graphics/RenderTarget/OffscreenRT/OffscreenRenderTarget.h>
 #include <Engine/Graphics/RenderTarget/SwapChainRT/SwapChainRenderTarget.h>
+#include <Engine/Foundation/Profiling/FrameProfiler.h>
 #include <Engine/PostProcess/FullscreenDrawer.h>
 
 #include <cassert>
@@ -117,6 +118,7 @@ namespace CalyxEngine {
 	}
 
 	void DxCore::PostDraw() {
+		FrameProfiler::ScopedTimer postDrawProfile("DxCore.PostDraw");
 		UINT bufferIndex = dxSwapChain_->GetCurrentBackBufferIndex();
 		auto commandList = dxCommand_->GetCommandList();
 
@@ -135,12 +137,33 @@ namespace CalyxEngine {
 		}
 
 		ID3D12CommandList* commandLists[] = {commandList.Get()};
-		dxCommand_->GetCommandQueue()->ExecuteCommandLists(_countof(commandLists), commandLists);
+		{
+			FrameProfiler::ScopedTimer profile("DxCore.ExecuteCommandLists");
+			dxCommand_->GetCommandQueue()->ExecuteCommandLists(_countof(commandLists), commandLists);
+		}
 
-		dxSwapChain_->Present();
-		dxFence_->Signal(dxCommand_->GetCommandQueue());
-		dxFence_->Wait();
-		dxCommand_->Reset();
+		{
+			FrameProfiler::ScopedTimer profile("DxCore.Present");
+			dxSwapChain_->Present();
+		}
+
+		{
+			FrameProfiler::ScopedTimer profile("DxCore.Signal");
+			frameFenceValues_[currentFrameIndex_] = dxFence_->Signal(dxCommand_->GetCommandQueue());
+		}
+
+		const uint32_t nextFrameIndex = dxSwapChain_->GetCurrentBackBufferIndex() % DxCommand::kFrameCount;
+		const uint64_t nextFenceValue = frameFenceValues_[nextFrameIndex];
+		if(!dxFence_->IsCompleted(nextFenceValue)) {
+			FrameProfiler::ScopedTimer profile("DxCore.FrameWait");
+			dxFence_->Wait(nextFenceValue);
+		}
+
+		currentFrameIndex_ = nextFrameIndex;
+		{
+			FrameProfiler::ScopedTimer profile("DxCore.CommandReset");
+			dxCommand_->Reset(currentFrameIndex_);
+		}
 	}
 
 	void DxCore::Resize(uint32_t width, uint32_t height) {
@@ -153,12 +176,14 @@ namespace CalyxEngine {
 		// GPUの完了を待つ
 		dxFence_->Signal(dxCommand_->GetCommandQueue());
 		dxFence_->Wait();
+		frameFenceValues_.fill(0);
 
 		// コマンドリストの状態をクリアし、参照を外す
 		auto commandList = dxCommand_->GetCommandList();
 		commandList->ClearState(nullptr);
 		commandList->Close();
-		dxCommand_->Reset();
+		currentFrameIndex_ = dxSwapChain_->GetCurrentBackBufferIndex() % DxCommand::kFrameCount;
+		dxCommand_->Reset(currentFrameIndex_);
 
 		// スワップチェーンをリサイズ (内部で古いバックバッファを解放する)
 		dxSwapChain_->Resize(width, height);
