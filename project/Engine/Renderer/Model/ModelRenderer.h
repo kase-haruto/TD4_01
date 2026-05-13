@@ -116,7 +116,7 @@ public:
 	 * \brief カリングおよびバッチング事前処理
 	 * \param camera カメラ
 	 */
-	void PreCullAndBatch(const class Camera3d* camera);
+	void PreCullAndBatch(const class Camera3d* camera, bool enableFrustumCulling = true);
 	void BuildAllVisibleBatches();
 
 	/**

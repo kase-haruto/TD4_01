@@ -80,11 +80,15 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 	}
 	if(!renderCam) return;
 
-	const Camera3d* cullCam = CameraManager::GetMain3d();
-	if(!cullCam) {
-		cullCam = renderCam;
+	if(rt->GetRenderTargetType() == RenderTargetType::DebugView) {
+		modelRenderer_->PreCullAndBatch(renderCam, false);
+	} else {
+		const Camera3d* cullCam = CameraManager::GetMain3d();
+		if(!cullCam) {
+			cullCam = renderCam;
+		}
+		modelRenderer_->PreCullAndBatch(cullCam, true);
 	}
-	modelRenderer_->PreCullAndBatch(cullCam);
 
 	// =========================================================
 	// MainPass

@@ -296,7 +296,7 @@ namespace CalyxEngine {
 			}
 
 			if(auto* camera = dynamic_cast<Camera3d*>(CameraManager::GetActive())) {
-				editorPreviewModelRenderer_->PreCullAndBatch(camera);
+				editorPreviewModelRenderer_->PreCullAndBatch(camera, false);
 			} else {
 				editorPreviewModelRenderer_->BuildAllVisibleBatches();
 			}

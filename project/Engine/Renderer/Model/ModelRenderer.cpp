@@ -106,7 +106,7 @@ void ModelRenderer::MarkSkinnedDirty(CalyxEngine::AnimationModel* model, size_t 
 /////////////////////////////////////////////////////////////////////////////////////////
 //		視錐台判定 & バッチ化
 /////////////////////////////////////////////////////////////////////////////////////////
-void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
+void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCulling) {
 
 	// =========================================================
 	// Shadow 用 visible / SceneBounds 初期化
@@ -150,7 +150,7 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
-			inst.visible = camera->IsVisible(inst.worldAABB);
+			inst.visible = !enableFrustumCulling || !camera || camera->IsVisible(inst.worldAABB);
 
 			// -------------------------
 			// Shadow / Raytracing：メインカメラの可視分だけ登録
@@ -182,7 +182,7 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera) {
 			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
-			inst.visible = camera->IsVisible(inst.worldAABB);
+			inst.visible = !enableFrustumCulling || !camera || camera->IsVisible(inst.worldAABB);
 
 			// -------------------------
 			// Shadow / Raytracing：メインカメラの可視分だけ登録
