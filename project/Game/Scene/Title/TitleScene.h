@@ -37,6 +37,10 @@ public:
 	void LoadAssets() override;
 
 private:
+
+	void PhaseUpdate(float dt);
+
+private:
 	/* graphics =====================================================*/
 	std::unique_ptr<FogEffect> fog_ = nullptr;
 
@@ -46,4 +50,7 @@ private:
 	std::shared_ptr<CalyxHuman>		animationHuman_;
 
 	std::unique_ptr<Sprite> pauseBg_ = nullptr;
+	std::unique_ptr<Sprite> phaseBg_ = nullptr;
+
+	bool IsPhase_ = false;
 };

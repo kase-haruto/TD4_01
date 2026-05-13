@@ -49,7 +49,8 @@ void TitleScene::Initialize() {
 	// グラフィック関連
 	//=========================
 	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {1280.0f, 720.0f});
+	pauseBg_->Initialize({640.0f, 0.0f}, {320.0f, 180.0f});
+	pauseBg_->SetAnchorPoint({0.5f, 0.0f});
 	pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
 }
@@ -58,6 +59,10 @@ void TitleScene::Initialize() {
 //	更新処理
 /////////////////////////////////////////////////////////////////////////////////////////
 void TitleScene::Update([[maybe_unused]] float dt) {
+
+	PhaseUpdate(dt);
+
+	if(IsPhase_) return;
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT));
@@ -82,4 +87,11 @@ void TitleScene::CleanUp() {
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
+}
+
+void TitleScene::PhaseUpdate(float dt) {
+	if(!IsPhase_) return;
+
+
+
 }
