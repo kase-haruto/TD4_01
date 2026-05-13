@@ -86,7 +86,7 @@ void TestScene::Initialize(){
 /////////////////////////////////////////////////////////////////////////////////////////
 void TestScene::Update([[maybe_unused]]float dt){
 	// ポーズの切り替え
-	if (CalyxFoundation::Input::TriggerKey(DIK_0)) {
+	if(CalyxFoundation::Input::TriggerKey(DIK_ESCAPE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::START)) {
 		isPaused_ = !isPaused_;
 		if(isPaused_) {
 			ClockManager::GetInstance()->SetTimeScale(0.0f);
@@ -153,15 +153,15 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 }
 
 void TestScene::PauseUpdate([[maybe_unused]] float dt) {
-	// キー入力による選択変更
-	if(CalyxFoundation::Input::TriggerKey(DIK_W)) {
+	// 入力による選択変更
+	if(CalyxFoundation::Input::TriggerKey(DIK_W) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_UP)) {
 		selectedIndex_ = (selectedIndex_ - 1 + 3) % 3;
 	}
-	if(CalyxFoundation::Input::TriggerKey(DIK_S)) {
+	if(CalyxFoundation::Input::TriggerKey(DIK_S) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_DOWN)) {
 		selectedIndex_ = (selectedIndex_ + 1) % 3;
 	}
 
-	bool isConfirmed = CalyxFoundation::Input::TriggerKey(DIK_SPACE);
+	bool isConfirmed = CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A);
 
 	// ボタンの更新処理
 	auto updateBtn = [&](std::unique_ptr<Sprite>& btn, int index, std::function<void()> onClick) {
@@ -173,7 +173,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		} else {
 			btn->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
 		}
-		btn->Update();
+		btn->Update(); 
 	};
 
 	updateBtn(resumeBtn_, 0, [&]() {
