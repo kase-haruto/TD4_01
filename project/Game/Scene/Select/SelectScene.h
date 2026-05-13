@@ -7,11 +7,13 @@
 #include <Engine/Objects/3D/Actor/TestObject/CalyxHuman.h>
 #include <Engine/Renderer/Sprite/Sprite.h>
 #include <Engine/scene/Base/BaseScene.h>
+#include <Engine/Scene/Transitioner/IScenePayload.h>
+
 /* c++ */
 #include <memory>
 #include <vector>
 
-#include <Game\DemoPlayer\DemoPlayer.h>
+#include <Game\Scene\Game\GameTransitionPayload.h>
 
 /// デバッグ関連///
 #ifdef _DEBUG
@@ -37,6 +39,11 @@ public:
 	void LoadAssets() override;
 
 private:
+
+	void SelectUpdate(float dt);
+	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
+
+private:
 	/* graphics =====================================================*/
 	std::unique_ptr<FogEffect> fog_ = nullptr;
 
@@ -46,4 +53,7 @@ private:
 	std::shared_ptr<CalyxHuman>		animationHuman_;
 
 	std::unique_ptr<Sprite> pauseBg_ = nullptr;
+
+	std::unique_ptr<CalyxEngine::IScenePayload> gamePayload_;
+	int selectedIndex_ = 0;
 };

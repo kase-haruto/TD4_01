@@ -227,6 +227,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Scene\Game\GameTransitionPayload.cpp" />
     <ClCompile Include="Game\Scene\Select\SelectScene.cpp" />
     <ClCompile Include="Game\Scene\Title\TitleScene.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\DroolRain\DroolRainEvent.cpp" />
@@ -510,6 +511,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\Scene\Game\GameTransitionPayload.h" />
     <ClInclude Include="Game\Scene\Select\SelectScene.h" />
     <ClInclude Include="Game\Scene\Title\TitleScene.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\DroolRain\DroolRainEvent.h" />

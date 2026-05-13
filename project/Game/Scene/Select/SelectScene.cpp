@@ -49,7 +49,7 @@ void SelectScene::Initialize() {
 	// グラフィック関連
 	//=========================
 	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {1280.0f, 720.0f});
+	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
 	pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 	pauseBg_->Update();
 }
@@ -58,6 +58,8 @@ void SelectScene::Initialize() {
 //	更新処理
 /////////////////////////////////////////////////////////////////////////////////////////
 void SelectScene::Update([[maybe_unused]] float dt) {
+
+	SelectUpdate(dt);
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
 		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
@@ -70,7 +72,7 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 void SelectScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoService, IRenderTarget* rt) {
 
 	//========================================================//
-	//	spriteの登録
+	//	sprite की 登録
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
 
@@ -82,4 +84,40 @@ void SelectScene::CleanUp() {
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
+}
+
+void SelectScene::SelectUpdate(float) {
+	const int maxStages = 5;
+
+	// 左右入力によるステージ選択
+	if(CalyxFoundation::Input::TriggerKey(DIK_A) || CalyxFoundation::Input::TriggerKey(DIK_LEFT) ||
+	   CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_LEFT)) {
+		selectedIndex_ = (selectedIndex_ - 1 + maxStages) % maxStages;
+	}
+	if(CalyxFoundation::Input::TriggerKey(DIK_D) || CalyxFoundation::Input::TriggerKey(DIK_RIGHT) ||
+	   CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_RIGHT)) {
+		selectedIndex_ = (selectedIndex_ + 1) % maxStages;
+	}
+
+	// 決定操作
+	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
+		gamePayload_ = BuildGamePayload(selectedIndex_);
+		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST),std::move(gamePayload_));
+	}
+
+	// 選択中のステージに応じて背景色を変更（デバッグ用フィードバック）
+	switch(selectedIndex_) {
+	case 0: pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f}); break;
+	case 1: pauseBg_->SetColor({1.0f, 0.0f, 0.0f, 1.0f}); break;
+	case 2: pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f}); break;
+	case 3: pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f}); break;
+	case 4: pauseBg_->SetColor({1.0f, 0.0f, 1.0f, 1.0f}); break;
+	}
+	pauseBg_->Update();
+}
+
+std::unique_ptr<GameTransitionPayload> SelectScene::BuildGamePayload(int num) {
+	auto payload = std::make_unique<GameTransitionPayload>();
+	payload->stageNum_ = num;
+	return payload;
 }

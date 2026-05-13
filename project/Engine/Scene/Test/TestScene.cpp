@@ -10,6 +10,7 @@
 #include "Game/Scene/Utility/SceneTypeUtil.h"
 #include <Game/DemoPlayer/DemoPlayer.h>
 #include <Game/DemoShockwave/ShockwaveManager.h>
+#include <Game\Scene\Game\GameTransitionPayload.h>
 
 // engine
 #include <Engine/Collision/CollisionManager.h>
@@ -32,7 +33,7 @@ TestScene::TestScene(){
 /////////////////////////////////////////////////////////////////////////////////////////
 //	アセットのロード
 /////////////////////////////////////////////////////////////////////////////////////////
-void TestScene::LoadAssets(){}
+void TestScene::LoadAssets() {}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //	初期化処理
@@ -188,4 +189,13 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 	updateBtn(toTitleBtn_, 2, [&]() {
 		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TITLE));
 	});
+}
+
+void TestScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
+	if(!payload) return;
+
+	// 自分が知っている型にだけキャストする
+	if(auto* p = static_cast<GameTransitionPayload*>(payload.get())) {
+		stageNum_ = p->stageNum_;
+	}
 }

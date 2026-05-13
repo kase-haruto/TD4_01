@@ -40,6 +40,9 @@ public:
 	void Draw(ID3D12GraphicsCommandList* cmdLst, class PipelineService* psoService, IRenderTarget* )override;
 	void CleanUp()override;
 	void LoadAssets()override;
+
+	void OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) override;
+
 private:
 
 	void CheckStageState(float dt);
@@ -64,6 +67,7 @@ private:
 
 	int selectedIndex_ = 0;
 	
+	int									 stageNum_			  = 0;
 	std::unique_ptr<Stage> stage_ = nullptr;
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 };
