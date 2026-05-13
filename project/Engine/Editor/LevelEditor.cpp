@@ -906,6 +906,13 @@ namespace CalyxEngine {
 			lastPlaying_ = playing;
 		}
 
+		// sceneの保存ロードのショートカット
+		if(CalyxFoundation::Input::GetInstance()->PushKey(DIK_LCONTROL)) {
+			if(CalyxFoundation::Input::GetInstance()->TriggerKey(DIK_S)) {
+				SceneSerializer::Save(*ctx, SceneContext::Current()->GetScenePath());
+			}
+		}
+
 		// LivePP Visibility Control
 		if(livePPPanel_) {
 			auto* service	 = CalyxEngine::LivePPService::GetInstance();
