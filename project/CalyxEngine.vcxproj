@@ -227,6 +227,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.cpp" />
     <ClCompile Include="Game\Scene\Game\GameTransitionPayload.cpp" />
     <ClCompile Include="Game\Scene\Select\SelectScene.cpp" />
     <ClCompile Include="Game\Scene\Title\TitleScene.cpp" />
@@ -511,6 +514,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.h" />
     <ClInclude Include="Game\Scene\Game\GameTransitionPayload.h" />
     <ClInclude Include="Game\Scene\Select\SelectScene.h" />
     <ClInclude Include="Game\Scene\Title\TitleScene.h" />

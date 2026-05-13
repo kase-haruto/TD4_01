@@ -14,8 +14,6 @@ void GroundSpikeEvent::SetTarget(const std::shared_ptr<GroundSpikeObject>& targe
 
 void GroundSpikeEvent::OnCollisionEnter(Collider* other) {
 
-	other;
-
 	// プレイヤー以外の衝突は無視する
 	if(other->GetType() != ColliderType::Type_Player) return;
 

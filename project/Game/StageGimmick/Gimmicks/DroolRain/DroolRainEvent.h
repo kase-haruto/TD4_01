@@ -52,7 +52,6 @@ private:
 	struct DroolRainEventParam : public CalyxEngine::SerializableObject {
 
 		DroolRainParam param_;
-		std::string	   name_;
 
 		DroolRainEventParam() {
 			AddField("VelocityY", param_.velocityY_).Category("DroolRainEvent");
