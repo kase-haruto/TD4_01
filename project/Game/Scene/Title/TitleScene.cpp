@@ -53,6 +53,12 @@ void TitleScene::Initialize() {
 	pauseBg_->SetAnchorPoint({0.5f, 0.0f});
 	pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
+
+	phaseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
+	phaseBg_->Initialize({1280.0f, 0.0f}, {1280.0f, 720.0f});
+	phaseBg_->SetAnchorPoint({0.f, 0.0f});
+	phaseBg_->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
+	phaseBg_->Update();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +71,7 @@ void TitleScene::Update([[maybe_unused]] float dt) {
 	if(IsPhase_) return;
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT));
+		IsPhase_ = true;
 	}
 
 	// 衝突判定
@@ -78,6 +84,10 @@ void TitleScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSe
 	//	spriteの登録
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
+
+	if(IsPhase_) {
+		spriteRenderer_->Register(phaseBg_.get());
+	}
 
 	// シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
@@ -92,6 +102,12 @@ void TitleScene::CleanUp() {
 void TitleScene::PhaseUpdate(float dt) {
 	if(!IsPhase_) return;
 
-
-
+	CalyxEngine::Vector2 pos = phaseBg_->GetPosition();
+	pos.x -= 2500.0f * dt;
+	if(pos.x <= 0.0f) {
+		pos.x = 0.0f;
+		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT));
+	}
+	phaseBg_->SetPosition(pos);
+	phaseBg_->Update();
 }
