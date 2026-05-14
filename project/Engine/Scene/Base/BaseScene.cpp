@@ -94,14 +94,18 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 	// MainPass
 	// =========================================================
 	rt->SetRenderTarget(cmd);
-	modelRenderer_->DrawAll(cmd,
-							GraphicsGroup::GetInstance()->GetDevice().Get(),
-							rt,
-							pso,
-							sceneContext_->GetLightLibrary(), nullptr);
+	{
+		modelRenderer_->DrawAll(cmd,
+								GraphicsGroup::GetInstance()->GetDevice().Get(),
+								rt,
+								pso,
+								sceneContext_->GetLightLibrary(), nullptr);
+	}
 
 	// Particles
-	sceneContext_->GetFxSystem()->Render(pso, cmd);
+	{
+		sceneContext_->GetFxSystem()->Render(pso, cmd);
+	}
 
 	const bool outlineEnabled = PostEffectManager::Get()->IsOutlineEnabled();
 

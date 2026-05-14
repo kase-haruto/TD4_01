@@ -14,7 +14,6 @@ void BreakableFloorEvent::SetTarget(const std::shared_ptr<BreakableFloorObject>&
 
 void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
 
-	other;
 	// ハンマー判定かどうか確認する
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();

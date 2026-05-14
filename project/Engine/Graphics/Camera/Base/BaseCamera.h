@@ -115,5 +115,13 @@ private:
 	//==================================================================*//
 	Camera3DBuffer cameraBuffer_; // カメラバッファ
 
+	uint64_t			  cachedTransformRevision_ = 0;
+	float				  cachedAspectRatio_		  = 0.0f;
+	float				  cachedFovAngleY_		  = 0.0f;
+	float				  cachedNearZ_			  = 0.0f;
+	float				  cachedFarZ_			  = 0.0f;
+	CalyxEngine::Vector2 cachedViewportSize_ {};
+	bool				  matrixCacheValid_ = false;
+
 	ConfigurableObject<SceneObjectConfig> config_;
 };

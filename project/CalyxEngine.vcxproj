@@ -227,6 +227,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.cpp" />
     <ClCompile Include="Game\Scene\Game\GameTransitionPayload.cpp" />
     <ClCompile Include="Game\Scene\Select\SelectScene.cpp" />
     <ClCompile Include="Game\Scene\Title\TitleScene.cpp" />
@@ -435,6 +438,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\System\Command\EditorCommand\GuiCommand\ImGuiHelper\GuiCmdInternal.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\PipelineDesc\GraphicsPipelineDesc.cpp" />
     <ClCompile Include="Engine\Graphics\Core\GraphicsSystem.cpp" />
+    <ClCompile Include="Engine\Editor\DebugCameraFocusController.cpp" />
     <ClCompile Include="Engine\Editor\EditorSelectionCoordinator.cpp" />
     <ClCompile Include="Engine\Editor\LevelEditor.cpp" />
     <ClCompile Include="Engine\Editor\Prefab\PrefabEditContextUtils.cpp" />
@@ -511,6 +515,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.h" />
     <ClInclude Include="Game\Scene\Game\GameTransitionPayload.h" />
     <ClInclude Include="Game\Scene\Select\SelectScene.h" />
     <ClInclude Include="Game\Scene\Title\TitleScene.h" />
@@ -810,6 +817,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\System\Command\Interface\ICommand.h" />
     <ClInclude Include="Engine\Foundation\Json\JsonFileIO.h" />
     <ClInclude Include="Engine\Foundation\Json\JsonUtils.h" />
+    <ClInclude Include="Engine\Editor\DebugCameraFocusController.h" />
     <ClInclude Include="Engine\Editor\SceneObjectEditor.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\TransformCommand\TransformSnapshot.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\GuizmoCommand\ScopedGizmoCommand.h" />
