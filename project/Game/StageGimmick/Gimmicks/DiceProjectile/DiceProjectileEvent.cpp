@@ -46,6 +46,7 @@ void DiceProjectileEvent::EventInitialize() {
 	auto object = SceneContext::Current()->FindObjectByName<DiceSocketObject>(socketName);
 	if(object) {
 		object->SetClearCount(eventData_.clearCount);
+		object->Initialize();
 		socket_ = object;
 
 	// シーンから対応するオブジェクトが無ければ生成する
@@ -64,6 +65,7 @@ void DiceProjectileEvent::EventInitialize() {
 			targetObjects_[i] = target;
 			targetObjects_[i].lock()->SetParam(eventParam_.param_);
 			targetObjects_[i].lock()->SetSocket(socket_.lock().get());
+			targetObjects_[i].lock()->Initialize();
 			continue;
 		}
 		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("debugCube.obj", indexedObjectName);

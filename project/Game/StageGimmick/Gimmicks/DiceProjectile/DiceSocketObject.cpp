@@ -31,7 +31,11 @@ void DiceSocketObject::ObjectInitialize() {
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
 	}
+
 	BaseGameObject::SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+
+	worldTransform_.inheritScale = false;
+	worldTransform_.scale.x = static_cast<float>(clearCount_ + 1u);
 }
 
 void DiceSocketObject::ObjectUpdate(float) {
