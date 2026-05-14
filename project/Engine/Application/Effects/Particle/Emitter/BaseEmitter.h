@@ -10,6 +10,8 @@
 #include "EmitterDetails.h"
 #include <Engine/Foundation/Math/Quaternion.h>
 
+class WorldTransform;
+
 namespace CalyxEngine {
 
 	enum class ParticlePrimitives {
@@ -38,6 +40,7 @@ namespace CalyxEngine {
 
 		virtual void Update(float deltaTime) = 0;
 		virtual void TransferParticleDataToGPU();
+		virtual void ShowGui() {}
 		/**
 		 * \brief モデルデータのチェックと読み込み
 		 */
@@ -57,6 +60,7 @@ namespace CalyxEngine {
 		 *  \brief 停止
 		 */
 		virtual void Stop() {}
+		virtual void Reset() {}
 		/**
 		 * \brief 再生中か
 		 * \return true:再生中 false:停止中
@@ -70,6 +74,13 @@ namespace CalyxEngine {
 		virtual void SetAlphaMultiplier(float a) { alphaMultiplier_ = a; }
 		virtual void SetCameraFade(float, float) {}
 		virtual void SetCameraFadeEnabled(bool) {}
+		virtual bool IsDrawEnable() const { return drawEnable_; }
+		virtual void SetDrawEnable(bool isEnable) { drawEnable_ = isEnable; }
+		virtual void SetPosition(const CalyxEngine::Vector3& pos) { position_ = pos; }
+		virtual void DrawEmitterShape(const WorldTransform&) {}
+		virtual const Guid& GetTextureGuid() const { return emptyGuid_; }
+		virtual bool LoadTextureByGuid(const Guid&) { return false; }
+		virtual void SetTextureGuid(const Guid&) {}
 
 		/**
 		 * \brief GUIDを用いてモデルデータをロード
@@ -125,6 +136,10 @@ namespace CalyxEngine {
 		DxConstantBuffer<ParticleMaterial>		 materialBuffer_; // パーティクルマテリアルの定数バッファ
 
 		float alphaMultiplier_ = 1.0f;
+		bool  drawEnable_ = true;
+
+	private:
+		inline static const Guid emptyGuid_{Guid::Empty()};
 	};
 
 } // namespace CalyxEngine

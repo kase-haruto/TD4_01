@@ -1,14 +1,5 @@
 #include "GpuParticle.hlsli"
 
-struct EmitterData {
-	float3 translate;
-	float radius;
-	uint count;
-	float frequency;
-	float frequencyTime;
-	uint emit;
-};
-
 float3 rand3dTo3d(float3 p) {
 	p = float3(dot(p, float3(127.1, 311.7, 74.7)),
                dot(p, float3(269.5, 183.3, 246.1)),
@@ -52,6 +43,47 @@ float3 RandomOnSphere(RandomGenerator generator) {
 	);
 }
 
+float3 RandomInSphere(RandomGenerator generator) {
+	float3 dir = RandomOnSphere(generator);
+	float r = pow(generator.Generate1d(), 1.0f / 3.0f);
+	return dir * r;
+}
+
+float3 RandomInBox(RandomGenerator generator) {
+	return generator.Generate3d() * 2.0f - 1.0f;
+}
+
+float3 RandomInCircle(RandomGenerator generator) {
+	float theta = generator.Generate1d() * 6.28318530718f;
+	float r = sqrt(generator.Generate1d());
+	return float3(cos(theta) * r, 0.0f, sin(theta) * r);
+}
+
+float3 RandomInCone(RandomGenerator generator, float angleDeg) {
+	float height = generator.Generate1d();
+	float angleRad = radians(clamp(angleDeg, 0.0f, 89.0f));
+	float maxRadius = height * tan(angleRad);
+	float theta = generator.Generate1d() * 6.28318530718f;
+	float r = sqrt(generator.Generate1d()) * maxRadius;
+	return float3(cos(theta) * r, height, sin(theta) * r);
+}
+
+float3 GenerateSpawnOffset(RandomGenerator generator) {
+	if(gEmitter.shape == 0) {
+		return float3(0.0f, 0.0f, 0.0f);
+	}
+	if(gEmitter.shape == 2) {
+		return RandomInCone(generator, gEmitter.angle) * gEmitter.radius;
+	}
+	if(gEmitter.shape == 3) {
+		return RandomInCircle(generator) * gEmitter.radius;
+	}
+	if(gEmitter.shape == 4) {
+		return RandomInBox(generator) * gEmitter.shapeSize;
+	}
+	return RandomInSphere(generator) * gEmitter.radius;
+}
+
 [numthreads(1024, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {
 	uint globalIndex = DTid.x;
@@ -70,19 +102,19 @@ void main(uint3 DTid : SV_DispatchThreadID) {
 
 	if(0 <= freeListIndex && freeListIndex < kMaxParticles) {
 		Particle p;
-		p.scale = float3(0.1f, 0.1f, 0.1f);
+		p.scale = gEmitter.scale;
+		p.initialScale = gEmitter.scale;
 		
-		// 球面上のランダムな位置に設定
-		float3 sphereDir = RandomOnSphere(generator);
-		p.translate = gEmitter.translate + sphereDir * gEmitter.radius;
+		p.translate = gEmitter.translate + GenerateSpawnOffset(generator);
 
-		p.color.rgb = generator.Generate3d();
-		p.color.a = 1.0f;
-		p.lifeTime = 3.0;
+		p.color = gEmitter.color;
+		p.color.rgb *= generator.Generate3d();
+		p.color.a = gEmitter.color.a;
+		p.lifeTime = max(gEmitter.lifeTime, 0.01f);
 		p.currentTime = 0.0f;
+		p.isAlive = 1;
 
-		// 上方向に移動する速度を設定
-		p.velocity = generator.Generate3d();
+		p.velocity = gEmitter.velocity;
         
 		uint particleIndex = gFreeList[freeListIndex];
 		gParticles[particleIndex] = p;

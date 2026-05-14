@@ -712,7 +712,7 @@ namespace CalyxEngine {
 	void FxEmitter::SetTextureGuid(const Guid& g) {
 		if(!g.isValid()) {
 			textureGuid_ = Guid::Empty();
-			textureHandle_ = AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material_.texturePath.empty() ? "particle.dds" : material_.texturePath);
+			textureHandle_ = AssetManager::GetInstance()->GetTextureManager()->LoadTexture(material_.texturePath.empty() ? "Textures/white1x1.dds" : material_.texturePath);
 			return;
 		}
 

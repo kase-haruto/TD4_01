@@ -21,10 +21,12 @@ void main(uint3 DTid : SV_DispatchThreadID) {
 
 	if(id < kMaxParticles) {
 		gParticles[id] = (Particle)0;
-		gFreeList[id] = id;
+		gFreeList[id] = kMaxParticles - 1 - id;
 		gParticles[id].scale = float3(0.5f, 0.5f, 0.5f);
 		gParticles[id].color = float4(1.0f, 1.0f, 1.0f, 0.0f);
 		gParticles[id].lifeTime = 2.0f;
 		gParticles[id].velocity = float3(0.0f, 0.0f, 0.0f);
+		gParticles[id].isAlive = 0;
+		gParticles[id].initialScale = gParticles[id].scale;
 	}
 }
