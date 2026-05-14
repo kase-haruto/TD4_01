@@ -44,6 +44,10 @@ struct DiceProjectileParam {
 	CalyxEngine::Vector3 direction = -CalyxEngine::Vector3::Forward();
 	// サイコロの速度
 	float speed;
+	// サイコロの回転スピード
+	float rotateSpeed;
+	// サイコロが収納箱に向かっていく時間
+	float parryDuration;
 
 };
 
