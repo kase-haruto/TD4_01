@@ -23,7 +23,7 @@ namespace CalyxEngine {
 
 		float		emitRate	= 0.1f;
 		std::string modelPath	= "plane.obj";
-		std::string texturePath = "particle.dds";
+		std::string texturePath = "Textures/white1x1.dds";
 
 		Guid textureGuid{Guid::Empty()};
 		Guid modelGuid{Guid::Empty()};
@@ -64,7 +64,7 @@ namespace CalyxEngine {
 		lifetime	   = j.value("lifetime", FxFloatParamConfig{});
 		emitRate	   = j.value("emitRate", 1.0f);
 		modelPath	   = j.value("modelPath", "plane.obj");
-		texturePath	   = j.value("texturePath", "particle.dds");
+		texturePath	   = j.value("texturePath", "Textures/white1x1.dds");
 		isDrawEnable   = j.value("isDrawEnable", true);
 		isComplement   = j.value("isComplement", true);
 		randomSpinEmit = j.value("randomSpinEmit", false);

@@ -42,6 +42,9 @@ private:
 							ID3D12GraphicsCommandList* cmdList,
 							UINT instanceCount,
 							D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	void DrawGpuBillboards(ID3D12GraphicsCommandList* cmdList,
+						   UINT instanceCount,
+						   D3D12_GPU_DESCRIPTOR_HANDLE particleHandle);
 
 private:
 	DxStructuredBuffer<CalyxEngine::ParticleConstantData> instanceBuffer_;

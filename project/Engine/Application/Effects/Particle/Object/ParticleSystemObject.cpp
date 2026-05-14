@@ -1,5 +1,6 @@
 #include "ParticleSystemObject.h"
 #include <Engine/Application/Effects/Particle/Emitter/FxEmitter.h>
+#include <Engine/Application/Effects/Particle/Emitter/GpuFxEmitter.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Context/SceneContext.h>
@@ -55,9 +56,20 @@ namespace CalyxEngine {
 		emitter_ = std::make_shared<CalyxEngine::FxEmitter>();
 
 		// デフォルト値の設定
-		emitter_->velocity_.SetConstant({0.0f, 2.0f, 0.0f});
-		emitter_->lifetime_.SetConstant({1.0f});
-		emitter_->scale_.SetConstant({1.0f, 1.0f, 1.0f});
+		if(auto fxEmitter = std::dynamic_pointer_cast<CalyxEngine::FxEmitter>(emitter_)) {
+			fxEmitter->velocity_.SetConstant({0.0f, 2.0f, 0.0f});
+			fxEmitter->lifetime_.SetConstant({1.0f});
+			fxEmitter->scale_.SetConstant({1.0f, 1.0f, 1.0f});
+		}
+
+		std::cout << "[CTOR] FxObject GUID=" << GetGuid().ToString() << std::endl;
+	}
+	ParticleSystemObject::ParticleSystemObject(
+		const std::string& name,
+		const std::shared_ptr<CalyxEngine::BaseEmitter>& emitter) {
+		SceneObject::SetName(name, ObjectType::Effect);
+
+		emitter_ = emitter ? emitter : std::make_shared<CalyxEngine::FxEmitter>();
 
 		std::cout << "[CTOR] FxObject GUID=" << GetGuid().ToString() << std::endl;
 	}
@@ -96,6 +108,11 @@ namespace CalyxEngine {
 
 	void ParticleSystemObject::SetPosition(const CalyxEngine::Vector3& pos) {
 		emitter_->SetPosition(pos);
+	}
+
+	void ParticleSystemObject::SetEmitter(const std::shared_ptr<CalyxEngine::BaseEmitter>& emitter) {
+		if(!emitter) return;
+		emitter_ = emitter;
 	}
 
 	void ParticleSystemObject::ApplyConfig() {

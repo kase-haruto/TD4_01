@@ -34,8 +34,8 @@ namespace CalyxEngine {
 
 		virtual void Update(float dt) override;
 		void		 TransferParticleDataToGPU() override; // BaseEmitterをoverride
-		void		 ShowGui();
-		void DrawEmitterShape(const WorldTransform& tf);
+		void		 ShowGui() override;
+		void DrawEmitterShape(const WorldTransform& tf) override;
 		// コマンドを積む
 		void SetCommand(ID3D12GraphicsCommandList* cmdList);
 
@@ -44,9 +44,9 @@ namespace CalyxEngine {
 
 		void Play() override; //< 再生
 		void Stop() override; //< ストップ
-		void Reset();		  //< リセット
-		bool LoadTextureByGuid(const Guid& g);
-		void SetTextureGuid(const Guid& g);
+		void Reset() override;		  //< リセット
+		bool LoadTextureByGuid(const Guid& g) override;
+		void SetTextureGuid(const Guid& g) override;
 
 		void SetCameraFade(float nearZ, float farZ) override;
 		void SetCameraFadeEnabled(bool enabled) override;
@@ -60,15 +60,15 @@ namespace CalyxEngine {
 		//--------- accessor -----------------------------------------------//
 		const std::vector<FxUnit>& GetUnits() const { return units_; }
 
-		bool							   IsDrawEnable() { return HasFlag(DrawEnable); }
-		void							   SetDrawEnable(bool isEnable) { SetFlag(DrawEnable, isEnable); }
+		bool							   IsDrawEnable() const override { return HasFlag(DrawEnable); }
+		void							   SetDrawEnable(bool isEnable) override { SetFlag(DrawEnable, isEnable); }
 		bool							   IsPlaying() const override { return HasFlag(Playing); }
 		const D3D12_GPU_DESCRIPTOR_HANDLE& GetTextureHandle() const { return textureHandle_; }
-		const Guid&						   GetTextureGuid() const { return textureGuid_; }
+		const Guid&						   GetTextureGuid() const override { return textureGuid_; }
 
 		//--------- Timed Preview（一定間隔での自動再生） ---------------//
 		void	  SetTimedPreview(bool v) { timedPreview_ = v; }
-		void	  SetPosition(const CalyxEngine::Vector3& pos) { position_ = pos; }
+		void	  SetPosition(const CalyxEngine::Vector3& pos) override { position_ = pos; }
 		bool	  GetTimedPreview() const { return timedPreview_; }
 		void	  SetPreviewInterval(float sec) { previewIntervalSec_ = (sec < 0.01f ? 0.01f : sec); }
 		float	  GetPreviewInterval() const { return previewIntervalSec_; }

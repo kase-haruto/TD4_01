@@ -48,26 +48,20 @@ void ParticleRenderer::Render(
 
 	// ───────────── GPU パーティクル ─────────────
 	if(!gpuEmitters.empty()) {
-		auto psoGpu = pipelineService->GetPipelineSet(
-			PipelineTag::Object::GpuParticle,BlendMode::ADD);
-		pipelineService->SetCommand(psoGpu,cmdList);
-
-		if(auto* cam = CameraManager::GetActive())
-			cam->SetCommand(cmdList,PipelineType::StructuredObject);
-
 		for(auto& em : gpuEmitters) {
-			if(!em) continue;
+			if(!em || !em->IsDrawEnable()) continue;
+
+			auto psoGpu = pipelineService->GetPipelineSet(
+				PipelineTag::Object::GpuParticle,em->GetBlendMode());
+			pipelineService->SetCommand(psoGpu,cmdList);
+
+			if(auto* cam = CameraManager::GetActive())
+				cam->SetCommand(cmdList,PipelineType::StructuredObject);
 
 			em->GetMaterialBuffer().SetCommand(cmdList,1);
-			auto tex = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture("Textures/" + em->GetTexturePath());
-			cmdList->SetGraphicsRootDescriptorTable(3,tex);
-			MeshResource& mesh = em->GetMeshResource();
-
-			if(mesh.Indices().empty()) continue;
-			//EnsureMeshIsReady(mesh,device);
-
-			DrawMeshInstanced(mesh,cmdList,
-							  CalyxEngine::GpuFxEmitter::kMaxParticles,
+			cmdList->SetGraphicsRootDescriptorTable(3,em->GetTextureHandle());
+			DrawGpuBillboards(cmdList,
+							  em->GetDrawInstanceCount(),
 							  em->GetParticleSrv());
 		}
 	}
@@ -127,4 +121,14 @@ void ParticleRenderer::DrawMeshInstanced(MeshResource&               mesh,
 	// インデックス描画に変更（インデックス数で描画）
 	const UINT indexCount = static_cast<UINT>(mesh.Indices().size());
 	cmdList->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
+}
+
+void ParticleRenderer::DrawGpuBillboards(ID3D12GraphicsCommandList*  cmdList,
+										 UINT                        instanceCount,
+										 D3D12_GPU_DESCRIPTOR_HANDLE particleHandle) {
+	if(instanceCount == 0) return;
+
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	cmdList->SetGraphicsRootDescriptorTable(2, particleHandle);
+	cmdList->DrawInstanced(4, instanceCount, 0, 0);
 }

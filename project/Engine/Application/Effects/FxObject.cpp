@@ -3,6 +3,8 @@
 /*		include space
 /* ===================================================================== */
 #include <Engine/Application/Effects/EffectAsset.h>
+#include <Engine/Application/Effects/Particle/Emitter/FxEmitter.h>
+#include <Engine/Application/Effects/Particle/Emitter/GpuFxEmitter.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 
@@ -164,6 +166,21 @@ namespace CalyxEngine {
 		}
 
 		ImGui::SeparatorText("Emitters");
+		if(ImGui::Button("Add CPU Emitter")) {
+			EffectEmitterNodeConfig node{};
+			node.name		  = "Emitter";
+			node.isDrawEnable = true;
+			node.isGpu		  = false;
+			AddEmitterNode(node);
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Add GPU Emitter")) {
+			EffectEmitterNodeConfig node{};
+			node.name		  = "GpuEmitter";
+			node.isDrawEnable = true;
+			node.isGpu		  = true;
+			AddEmitterNode(node);
+		}
 
 		// タブバー開始
 		if(ImGui::BeginTabBar("EmittersTabBar", ImGuiTabBarFlags_Reorderable)) {
@@ -172,6 +189,7 @@ namespace CalyxEngine {
 				EffectEmitterNodeConfig node{};
 				node.name		  = "Emitter";
 				node.isDrawEnable = true;
+				node.isGpu		  = false;
 				AddEmitterNode(node);
 			}
 
@@ -198,6 +216,8 @@ namespace CalyxEngine {
 				if(ImGui::BeginTabItem(label.c_str(), &open)) {
 					// ---------- タブ内容 ----------
 					ImGui::Text("GUID: %s", sp->GetGuid().ToString().c_str());
+					const bool isGpuEmitter = std::dynamic_pointer_cast<GpuFxEmitter>(sp->GetEmitter()) != nullptr;
+					ImGui::Text("Type: %s", isGpuEmitter ? "GPU Particle" : "CPU Particle");
 
 					// 名前編集
 					{
@@ -228,6 +248,7 @@ namespace CalyxEngine {
 						node.transform  = sp->GetWorldTransform().ExtractConfig();
 						sp->GetEmitter()->ExtractConfigTo(node.emitter);
 						node.isDrawEnable = true;
+						node.isGpu = std::dynamic_pointer_cast<GpuFxEmitter>(sp->GetEmitter()) != nullptr;
 						AddEmitterNode(node);
 					}
 					if(ImGui::MenuItem("Delete")) {
@@ -374,6 +395,7 @@ namespace CalyxEngine {
 
 				sp->GetEmitter()->ExtractConfigTo(n.emitter);
 				n.isDrawEnable = sp->IsDrawEnable();
+				n.isGpu = std::dynamic_pointer_cast<GpuFxEmitter>(sp->GetEmitter()) != nullptr;
 
 				cfg.emitters.push_back(std::move(n));
 				++it;
@@ -389,16 +411,26 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	std::shared_ptr<ParticleSystemObject>
 	FxObject::AddEmitterNode(const EffectEmitterNodeConfig& node) {
+		std::shared_ptr<BaseEmitter> emitter;
+		if(node.isGpu) {
+			auto gpuEmitter = std::make_shared<GpuFxEmitter>();
+			gpuEmitter->Initialize();
+			emitter = gpuEmitter;
+		} else {
+			emitter = std::make_shared<FxEmitter>();
+		}
+
 		auto child = SceneAPI::Instantiate<ParticleSystemObject>(
-			node.name.empty() ? "emitter" : node.name);
+			node.name.empty() ? "emitter" : node.name,
+			emitter);
 
 		if(node.guid.isValid()) {
 			child->SetGuid(node.guid);
 		}
 
 		child->GetWorldTransform().ApplyConfig(node.transform);
-		child->SetDrawEnable(node.isDrawEnable);
 		child->GetEmitter()->ApplyConfigFrom(node.emitter);
+		child->SetDrawEnable(node.isDrawEnable);
 		child->SetParent(shared_from_this());
 
 		emitters_.push_back(child);

@@ -21,14 +21,14 @@ StructuredBuffer<Particle> gParticles : register(t0);
 VertexShaderOutput main(uint vid : SV_VertexID, uint iid : SV_InstanceID) {
 	Particle p = gParticles[iid];
 
-	// ── 無効パーティクルは即クリップ ───────────────
-	//if (p.currentTime < 0.0f) {
-	//	VertexShaderOutput o;
-	//	o.position = float4(0, 0, 0, 0);
-	//	o.texcoord = 0;
-	//	o.color = 0;
-	//	return o;
-	//}
+	if(p.isAlive == 0) {
+		VertexShaderOutput o;
+		o.position = float4(0, 0, 0, 1);
+		o.texcoord = 0;
+		o.color = 0;
+		o.fade = 0;
+		return o;
+	}
 
 	// ── Billboard コーナー計算 (左下,左上,右下,右上) ──
 	float2 corner, uv;
@@ -64,7 +64,7 @@ VertexShaderOutput main(uint vid : SV_VertexID, uint iid : SV_InstanceID) {
 	o.texcoord = uv;
 
 	// フェードアウト（寿命に応じ α 減衰）
-	float lifeFade = saturate(1.0f - p.currentTime / p.lifeTime);
+	float lifeFade = saturate(1.0f - p.currentTime / max(p.lifeTime, 0.01f));
 	o.color = float4(p.color.rgb, p.color.a * lifeFade);
 	o.fade = 1.0f; // GPU パーティクルはカメラ距離ディザなし
 

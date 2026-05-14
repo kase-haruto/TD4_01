@@ -174,14 +174,13 @@ namespace CalyxEngine {
 			auto emitter = std::make_shared<GpuFxEmitter>();
 			emitter->Initialize();
 			emitter->ApplyConfigFrom(emitterData.emitter);
+			emitter->SetDrawEnable(emitterData.isDrawEnable);
 			return emitter;
 		}
 
 		auto emitter = std::make_shared<FxEmitter>();
 		emitter->ApplyConfigFrom(emitterData.emitter);
-		if(auto cpu = std::dynamic_pointer_cast<FxEmitter>(emitter)) {
-			cpu->SetDrawEnable(emitterData.isDrawEnable);
-		}
+		emitter->SetDrawEnable(emitterData.isDrawEnable);
 		return emitter;
 	}
 

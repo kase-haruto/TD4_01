@@ -26,6 +26,7 @@ namespace CalyxEngine {
 	public:
 		ParticleSystemObject();
 		ParticleSystemObject(const std::string& name);
+		ParticleSystemObject(const std::string& name, const std::shared_ptr<CalyxEngine::BaseEmitter>& emitter);
 		~ParticleSystemObject() override;
 
 		/* -------- SceneObject overrides -------- */
@@ -60,11 +61,12 @@ namespace CalyxEngine {
 
 		const ConfigurableObject<ParticleSystemObjectConfig>& GetConfigObject() const { return config_; }
 
-		std::shared_ptr<CalyxEngine::FxEmitter> GetEmitter() const { return emitter_; }
+		std::shared_ptr<CalyxEngine::BaseEmitter> GetEmitter() const { return emitter_; }
+		void SetEmitter(const std::shared_ptr<CalyxEngine::BaseEmitter>& emitter);
 
 	private:
 		ConfigurableObject<ParticleSystemObjectConfig> config_;
 
-		std::shared_ptr<CalyxEngine::FxEmitter> emitter_;
+		std::shared_ptr<CalyxEngine::BaseEmitter> emitter_;
 	};
 } // namespace CalyxEngine

@@ -5,6 +5,8 @@
 #include <Engine/Foundation/Math/Vector3.h>
 #include <Engine/Foundation/Math/Vector4.h>
 
+#include <cstdint>
+
 namespace CalyxEngine {
 
 	/*-----------------------------------------------------------------------------------------
@@ -43,5 +45,7 @@ namespace CalyxEngine {
 		CalyxEngine::Vector3 velocity;
 		float              currentTIme;
 		CalyxEngine::Vector4 color;
+		uint32_t           isAlive = 0;
+		CalyxEngine::Vector3 initialScale{1.0f, 1.0f, 1.0f};
 	};
 }
