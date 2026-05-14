@@ -79,6 +79,8 @@ public:
 	CameraManager*		   GetCameraMgr() { return cameraMgr_.get(); }
 	SceneObject*		   GetDebugSelectedObject() const { return debugSelectedObject_; }
 	const std::vector<SceneObject*>& GetDebugSelectedObjects() const { return debugSelectedObjects_; }
+	const std::string& GetScenePath()const { return sceneFilePath_; }
+	void SetSceneFilePath(const std::string& path){ sceneFilePath_ = path; }
 
 	// setter
 	void SetSceneName(const std::string& n) { sceneName_ = n; }
@@ -128,6 +130,7 @@ private:
 	std::vector<ObjectRemovedCallback> objectRemovedCallbacks_;
 	std::vector<ObjectAddedCallback>   objectAddedCallbacks_;
 
+	std::string sceneFilePath_ = "";
 	std::string sceneName_ = "scene";
 	bool		isRuntime_ = false;
 

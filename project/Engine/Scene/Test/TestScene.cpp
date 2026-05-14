@@ -44,8 +44,11 @@ void TestScene::Initialize(){
 	sceneContext_->SetSceneName("TestScene");
 
 	BaseScene::Initialize();
+	std::string sceneFilePath = "Resources/Assets/Scenes/test.scene";
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/test.scene");
+	SceneSerializer::Load(*sceneContext_, sceneFilePath);
+
+	sceneContext_->SetSceneFilePath(sceneFilePath);
 
 	LoadAssets();
 
