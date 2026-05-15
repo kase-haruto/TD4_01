@@ -601,7 +601,10 @@ namespace CalyxEngine {
 
 		// エディターメニューの初期化 ------------------------------------------
 		menu_ = std::make_unique<EditorMenu>();
-		EngineSettings::GetInstance().Initialize();
+		EngineSettings::GetInstance()->Initialize();
+		if(auto* manipulator = sceneEditor_->GetManipulator()) {
+			manipulator->ApplySettings(EngineSettings::GetInstance()->GetData().manipulator);
+		}
 
 		// --- Advanced Hot Reload (Object Re-instancing) ---
 		if(auto* lpp = CalyxEngine::LivePPService::GetInstance()) {
@@ -735,7 +738,7 @@ namespace CalyxEngine {
 		menu_->Add(MenuCategory::Settings,
 				   {"Engine Settings",
 					"",
-					[] { EngineSettings::GetInstance().OpenSettingsWindow(); },
+					[] { EngineSettings::GetInstance()->OpenSettingsWindow(); },
 					true});
 
 		// Viewport 表示トグル
@@ -1000,7 +1003,13 @@ namespace CalyxEngine {
 	}
 
 	void LevelEditor::RenderSettingsWindow() {
-		EngineSettings::GetInstance().RenderSettingsWindow();
+		auto* settings = EngineSettings::GetInstance();
+		settings->RenderSettingsWindow();
+		if(settings->ConsumeApplied()) {
+			if(auto* manipulator = sceneEditor_->GetManipulator()) {
+				manipulator->ApplySettings(settings->GetData().manipulator);
+			}
+		}
 	}
 
 	void LevelEditor::DrawEditModeCombo() {
@@ -1765,12 +1774,12 @@ namespace CalyxEngine {
 	bool LevelEditor::ShouldRenderRuntimeFullscreen() const {
 		return pPlaySesseion_ &&
 			   pPlaySesseion_->IsRuntime() &&
-			   EngineSettings::GetInstance().GetData().editor.fullscreenGameViewOnPlay;
+			   EngineSettings::GetInstance()->GetData().editor.fullscreenGameViewOnPlay;
 	}
 
 	bool LevelEditor::ShouldHideEditorUiInGameMode() const {
 		return mode_ == EngineEdit::EditorMode::Game &&
-			   EngineSettings::GetInstance().GetData().editor.fullscreenGameViewOnPlay;
+			   EngineSettings::GetInstance()->GetData().editor.fullscreenGameViewOnPlay;
 	}
 
 	void LevelEditor::SetCameraForViewport(BaseCamera* mainCamera, BaseCamera* debugCamera) {

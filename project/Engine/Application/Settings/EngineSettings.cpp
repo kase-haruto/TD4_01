@@ -2,9 +2,12 @@
 
 #include <Engine/Foundation/Json/JsonFileIO.h>
 #include <externals/imgui/imgui.h>
+#include <Engine/Application/UI/EngineUI/ManipulatorSettingsUI.h>
 
 #include <algorithm>
 #include <filesystem>
+#include <functional>
+#include <unordered_map>
 
 namespace CalyxEngine {
 
@@ -19,9 +22,9 @@ namespace CalyxEngine {
 		}
 	}
 
-	EngineSettings& EngineSettings::GetInstance() {
+	EngineSettings* EngineSettings::GetInstance() {
 		static EngineSettings instance;
-		return instance;
+		return &instance;
 	}
 
 	void EngineSettings::Initialize() {
@@ -94,13 +97,17 @@ namespace CalyxEngine {
 		ImGui::TextUnformatted(GetCategoryLabel(selectedCategory_));
 		ImGui::Separator();
 
-		switch(selectedCategory_) {
-		case Category::Editor:
-			ImGui::Checkbox("Fullscreen game view on play", &editingData_.editor.fullscreenGameViewOnPlay);
-			ImGui::Checkbox("Debug camera rotate inverse", &editingData_.editor.DebugCameraRotateInverse);
-			break;
-		default:
-			break;
+		using RenderFn = std::function<void(EngineSettingsData&)>;
+		static const std::unordered_map<Category, RenderFn> renderers = {
+			{Category::Editor, [](EngineSettingsData& data) {
+				ImGui::Checkbox("Fullscreen game view on play", &data.editor.fullscreenGameViewOnPlay);
+				ImGui::Checkbox("Debug camera rotate inverse", &data.editor.DebugCameraRotateInverse);
+				ManipulatorSettingsUI::Render(data.manipulator);
+			}},
+		};
+
+		if(const auto it = renderers.find(selectedCategory_); it != renderers.end()) {
+			it->second(editingData_);
 		}
 		ImGui::EndChild();
 
@@ -115,6 +122,7 @@ namespace CalyxEngine {
 			Save();
 			showSettingsWindow_ = false;
 			editingInitialized_ = false;
+			settingsApplied_ = true;
 		}
 		ImGui::SameLine();
 		if(ImGui::Button("Cancel", ImVec2(buttonWidth, 0.0f))) {
@@ -126,20 +134,21 @@ namespace CalyxEngine {
 		ImGui::End();
 	}
 
+	void EngineSettings::SetManipulatorSettings(const ManipulatorSettings& settings) {
+		data_.manipulator = settings;
+		Save();
+	}
+
 	nlohmann::json EngineSettings::ToJson() const {
-		nlohmann::json json;
-		json["editor"]["fullscreenGameViewOnPlay"] = data_.editor.fullscreenGameViewOnPlay;
-		json["editor"]["DebugCameraRotateInverse"] = data_.editor.DebugCameraRotateInverse;
-		return json;
+		return data_;
 	}
 
 	void EngineSettings::ApplyJson(const nlohmann::json& json) {
-		if(const auto editor = json.find("editor"); editor != json.end() && editor->is_object()) {
-			data_.editor.fullscreenGameViewOnPlay =
-				editor->value("fullscreenGameViewOnPlay", data_.editor.fullscreenGameViewOnPlay);
-			data_.editor.DebugCameraRotateInverse =
-				editor->value("DebugCameraRotateInverse", data_.editor.DebugCameraRotateInverse);
+		if(!json.is_object()) {
+			data_ = EngineSettingsData{};
+			return;
 		}
+		data_ = json.get<EngineSettingsData>();
 	}
 
 } // namespace CalyxEngine
