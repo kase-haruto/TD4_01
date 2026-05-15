@@ -15,7 +15,8 @@
 #include <Game\DemoPlayer\DemoPlayer.h>
 #include <Game\StageGimmick\Manager\StageGimmickManager.h>
 #include <Game/3d/Camera/RailCamera.h>
-
+#include <Game\Scene\Transition\TransitionPayload.h>
+#include <Game/Scene/Transition/TransitionControl.h>
 
 ///デバッグ関連///
 #ifdef _DEBUG
@@ -47,6 +48,7 @@ private:
 
 	void CheckStageState(float dt);
 	void PauseUpdate(float dt);
+	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
 
 private:
 	/* graphics =====================================================*/
@@ -70,4 +72,12 @@ private:
 	int									 stageNum_			  = 0;
 	std::unique_ptr<Stage> stage_ = nullptr;
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
+
+	std::unique_ptr<TransitionControl> transitionControl_ = nullptr;
+
+	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
+
+	SceneType preType_	 = SceneType::SELECT;
+	bool	  IsPhase_	 = false;
+	bool	  IsOpening_ = false;
 };

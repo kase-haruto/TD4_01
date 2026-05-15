@@ -101,6 +101,9 @@ void DemoPlayer::TakeDamage(int32_t damage) {
 	if(isInvincible_) {
 		return;
 	}
+	if(isDiving_) {
+		return;
+	}
 
 	life_ -= damage;
 	if(life_ <= 0) {
@@ -143,6 +146,10 @@ void DemoPlayer::Move(float dt) {
 	if(CalyxFoundation::Input::PushGamepadButton(CalyxFoundation::PadButton::DPAD_LEFT)) {horizonVelocity.x -= 1.0f;}
 	if(CalyxFoundation::Input::PushGamepadButton(CalyxFoundation::PadButton::DPAD_RIGHT)) {horizonVelocity.x += 1.0f;}
 
+	if(isJumping_) {
+		horizonVelocity.x = 0.0f;
+	}
+
 	// 斜め移動などで速くならないように最大1.0に制限
 	if(horizonVelocity.Length() > 1.0f) {
 		horizonVelocity.Normalize();
@@ -169,6 +176,11 @@ void DemoPlayer::Move(float dt) {
 
 		// 線形補間(SLERP)による滑らかな回転
 		baseRotation_ = CalyxEngine::Quaternion::Slerp(baseRotation_, targetRotation, rotationSpeed_ * dt);
+		if(!isJumping_) {
+			preRotate_ = baseRotation_;
+		} else {
+			baseRotation_ = preRotate_;
+		}
 	}
 
 	// 速度の更新（水平成分のみ上書き、垂直成分は維持）

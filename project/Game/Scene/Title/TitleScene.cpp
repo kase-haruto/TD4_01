@@ -49,9 +49,20 @@ void TitleScene::Initialize() {
 	// グラフィック関連
 	//=========================
 	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {1280.0f, 720.0f});
+	pauseBg_->Initialize({640.0f, 0.0f}, {320.0f, 180.0f});
+	pauseBg_->SetAnchorPoint({0.5f, 0.0f});
 	pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
+
+	transitionControl_ = std::make_unique<TransitionControl>();
+	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	// シーンタイプに基づいて自動で演出をセット
+	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TITLE);
+	transitionControl_->StartOpening(0.5f, [this]() {
+		IsOpening_ = false;
+	});
+	IsOpening_ = true;
+	IsPhase_ = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -59,8 +70,17 @@ void TitleScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 void TitleScene::Update([[maybe_unused]] float dt) {
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
+	transitionControl_->Update(dt);
+
+	if(IsPhase_ || IsOpening_) return;
+
+	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
+		IsPhase_ = true;
+		payload_ = BuildNowTypePayload(SceneType::TITLE);
+		transitionControl_->SetAutoPreset(SceneType::TITLE, SceneType::SELECT);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
+		});
 	}
 
 	// 衝突判定
@@ -74,6 +94,8 @@ void TitleScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSe
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
 
+	transitionControl_->Draw(spriteRenderer_.get());
+
 	// シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
 }
@@ -82,4 +104,23 @@ void TitleScene::CleanUp() {
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
+}
+
+void TitleScene::PhaseUpdate(float dt) {
+	dt;
+}
+
+std::unique_ptr<TransitionPayload> TitleScene::BuildNowTypePayload(SceneType Type) {
+	auto payload	   = std::make_unique<TransitionPayload>();
+	payload->type = Type;
+	return payload;
+}
+
+void TitleScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
+	if(!payload) return;
+
+	// 自分が知っている型にだけキャストする
+	if(auto* p = static_cast<TransitionPayload*>(payload.get())) {
+		preType_ = p->type;
+	}
 }
