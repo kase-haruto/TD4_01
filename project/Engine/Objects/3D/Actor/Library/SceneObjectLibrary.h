@@ -37,7 +37,7 @@ public:
     void AddObject(const std::shared_ptr<SceneObject>& object);
 
 	/**
-	 * @brief オブジェクト名をシーン内で一意になるように変更
+	 * @brief オブジェクト名を変更
 	 * @param object 対象オブジェクト
 	 * @param requestedName 希望名
 	 * @return 実際に設定された名前
@@ -46,7 +46,7 @@ public:
 							 const std::string& requestedName);
 
 	/**
-	 * @brief 現在の登録済みオブジェクトから一意な名前を作る
+	 * @brief 保存用オブジェクト名として使える形に整える
 	 * @param requestedName 希望名
 	 * @param ignore 同名判定から除外するオブジェクト
 	 */
@@ -139,7 +139,7 @@ private:
 
     static uint32_t nextPickingID_;
 
-	void CompactNumberedNames(const std::string& baseName);
+	void RefreshDuplicateNameIndices();
 };
 
 // =====================================================

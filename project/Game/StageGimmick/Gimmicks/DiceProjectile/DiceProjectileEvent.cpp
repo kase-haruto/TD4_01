@@ -4,9 +4,41 @@
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
+#include <algorithm>
+
 REGISTER_SCENE_OBJECT(DiceProjectileEvent);
 
 DiceProjectileEvent::DiceProjectileEvent(const std::string& name) : StageGimmickEventBase(name) {}
+
+namespace {
+	template <class TObject>
+	std::shared_ptr<TObject> FindDirectChildOfType(const SceneObject& parent) {
+		for(const auto& child : parent.GetChildren()) {
+			if(auto casted = std::dynamic_pointer_cast<TObject>(child)) {
+				return casted;
+			}
+		}
+		return nullptr;
+	}
+
+	template <class TObject>
+	std::vector<std::shared_ptr<TObject>> FindDirectChildrenOfType(const SceneObject& parent) {
+		std::vector<std::shared_ptr<TObject>> result;
+		for(const auto& child : parent.GetChildren()) {
+			if(auto casted = std::dynamic_pointer_cast<TObject>(child)) {
+				result.push_back(std::move(casted));
+			}
+		}
+
+		std::sort(result.begin(), result.end(),
+				  [](const std::shared_ptr<TObject>& lhs,
+					 const std::shared_ptr<TObject>& rhs) {
+					  if(lhs->GetName() != rhs->GetName()) return lhs->GetName() < rhs->GetName();
+					  return lhs->GetGuid().ToString() < rhs->GetGuid().ToString();
+				  });
+		return result;
+	}
+} // namespace
 
 void DiceProjectileEvent::OnCollisionEnter(Collider* other) {
 
@@ -24,8 +56,6 @@ void DiceProjectileEvent::OnCollisionEnter(Collider* other) {
 void DiceProjectileEvent::EventInitialize() {
 
 	targetObjects_.clear();
-	targetObjects_.resize(objectCount_);
-	eventData_.objectCount = objectCount_;
 
 	std::string eventName = GetName();
 	const std::string eventPrefix  = "DiceProjectileEvent";
@@ -39,11 +69,14 @@ void DiceProjectileEvent::EventInitialize() {
 	// 番号を抜き取る
 	std::string suffix = eventName.substr(eventPrefix.size());
 	// 対応するオブジェクト名を作る
-	std::string objectName = eventName + "/" + objectPrefix;
+	std::string objectName = objectPrefix;
 	std::string socketName = socketPrefix + suffix;
 
-	// シーンから対応するオブジェクトを探す
-	auto object = SceneContext::Current()->FindObjectByName<DiceSocketObject>(socketName);
+	// Prefab 配置済みの子があれば、名前ではなく親子関係から拾う
+	auto object = FindDirectChildOfType<DiceSocketObject>(*this);
+	if(!object) {
+		object = SceneContext::Current()->FindObjectByName<DiceSocketObject>(socketName);
+	}
 	if(object) {
 		object->SetClearCount(eventData_.clearCount);
 		object->Initialize();
@@ -56,6 +89,24 @@ void DiceProjectileEvent::EventInitialize() {
 		socket_.lock()->SetClearCount(eventData_.clearCount);
 		socket_.lock()->Initialize();
 	}
+
+	auto childTargets = FindDirectChildrenOfType<DiceProjectileObject>(*this);
+	if(!childTargets.empty()) {
+		objectCount_ = static_cast<uint32_t>(childTargets.size());
+		eventData_.objectCount = objectCount_;
+		targetObjects_.resize(objectCount_);
+
+		for(size_t i = 0; i < childTargets.size(); ++i) {
+			targetObjects_[i] = childTargets[i];
+			childTargets[i]->SetParam(eventParam_.param_);
+			childTargets[i]->SetSocket(socket_.lock().get());
+			childTargets[i]->Initialize();
+		}
+		return;
+	}
+
+	targetObjects_.resize(objectCount_);
+	eventData_.objectCount = objectCount_;
 
 	// シーンから対応するオブジェクトを生成する
 	for(uint32_t i = 0; i < objectCount_; ++i) {

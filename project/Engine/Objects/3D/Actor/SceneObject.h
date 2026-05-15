@@ -123,6 +123,7 @@ public:
 	ObjectType										 GetObjectType() const { return objectType_; }
 	const Guid&										 GetGuid() const { return id_; }
 	const std::string&								 GetName() const { return name_; }
+	std::string										 GetDisplayName() const;
 	const std::string&								 GetConfigPath() const;
 	bool											 IsEnableRaycast() const { return isEnableRaycast_; }
 	bool											 IsDrawEnable() const { return isDrawEnable_; }
@@ -137,6 +138,7 @@ public:
 	bool											 IsPrefabInstanceObject() const { return prefabAssetGuid_.isValid() && prefabSourceGuid_.isValid(); }
 
 	void		 SetGuid(const Guid& g) { id_ = g; }
+	void		 SetDuplicateNameIndex(uint32_t index) { duplicateNameIndex_ = index; }
 	void		 SetPrefabLink(const Guid& assetGuid, const Guid& sourceGuid) {
 		prefabAssetGuid_ = assetGuid;
 		prefabSourceGuid_ = sourceGuid;
@@ -193,4 +195,5 @@ protected:
 	bool 	isCastShadow_	  = true;  // 影を落とすか
 	OutlineSettings outlineSettings_{};
 	uint32_t pickingID_		  = 0;
+	uint32_t duplicateNameIndex_ = 0; //< 表示用の同名識別番号。保存名には含めない
 };

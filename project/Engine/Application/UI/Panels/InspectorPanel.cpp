@@ -90,7 +90,8 @@ namespace CalyxEngine {
 
 							ImGui::TextDisabled("Type: %s",sp->GetObjectTypeName().c_str());
 							ImGui::SameLine();
-							ImGui::Text("%s",sp->GetName().c_str());
+							const std::string displayName = sp->GetDisplayName();
+							ImGui::Text("%s",displayName.c_str());
 							ImGui::Separator();
 							ImGui::Spacing();
 
