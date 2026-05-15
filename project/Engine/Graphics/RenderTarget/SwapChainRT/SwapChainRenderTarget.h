@@ -33,7 +33,6 @@ public:
 	RenderTargetType GetRenderTargetType() const { return rtType_; }
 
 	void ReleaseSRVs();
-	void ReleaseBackBufferViews();
 	void SetDepthDSV(DescriptorHandle dsv) override { dsv_ = dsv; }
 
 private:

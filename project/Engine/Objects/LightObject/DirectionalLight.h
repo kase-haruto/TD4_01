@@ -172,8 +172,6 @@ private:
 	//===================================================================*/
 	DxConstantBuffer<DirectionalLightData> constantBuffer_; //< 定数バッファ
 	DirectionalLightData				   lightData_ = {}; //< ライトデータ本体
-	DirectionalLightData				   uploadedLightData_ = {};
-	bool								   lightDataUploaded_ = false;
 
 	std::shared_ptr<BaseGameObject> UiObject_ = nullptr; //< UI用オブジェクト
 	CalyxEngine::Matrix4x4			lightViewProj_;		 //< ライト用ビュープロジェクション行列
@@ -181,6 +179,4 @@ private:
 	ConfigurableObject<DirectionalLightConfig> config_; //< コンフィグ管理
 
 	DxConstantBuffer<ShadowParamGpu> shadowParamCB_;
-	ShadowParamGpu uploadedShadowParam_ = {};
-	bool shadowParamUploaded_ = false;
 };

@@ -53,11 +53,8 @@ private:
 		AABB		   worldAABB{};					  //< ワールドAABB
 		bool		   dirty   = true;				  //< ダーティフラグ
 		bool		   visible = false;				  //< 可視フラグ
-		bool		   registeredThisFrame = false;	  //< 今フレーム登録されたか
 		BillboardMode  mode	   = BillboardMode::None; //< ビルボードモード
 		SceneObject*   owner   = nullptr;			  //< 所有オブジェクト
-		const WorldTransform* sourceTransform = nullptr;
-		uint64_t	   sourceRevision = 0;
 	};
 
 	struct InstanceSkinned {
@@ -65,10 +62,7 @@ private:
 		AABB		   worldAABB{};		  //< ワールドAABB
 		bool		   dirty   = true;	  //< ダーティフラグ
 		bool		   visible = false;	  //< 可視フラグ
-		bool		   registeredThisFrame = false; //< 今フレーム登録されたか
 		SceneObject*   owner   = nullptr; //< 所有オブジェクト
-		const WorldTransform* sourceTransform = nullptr;
-		uint64_t	   sourceRevision = 0;
 	};
 
 	using PipelineKey		= PipelineService::PipelineKey;
@@ -196,8 +190,6 @@ private:
 	 * \brief スタティックモデルのバッチ構築
 	 */
 	void BuildStaticBatches();
-	void PruneUnregisteredInstances();
-	size_t BuildRaytracingSceneSignature() const;
 	StaticBatchItem* FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model);
 	/**
 	 * \brief スキンメッシュモデルのバッチ構築
@@ -226,6 +218,4 @@ private:
 	// Raytracing
 	std::unique_ptr<CalyxEngine::RaytracingSystem> raytracingSystem_; //< レイトレーシングシステム
 	CalyxEngine::RaytracingScene					 raytracingScene_;	//< レイトレーシングシーン
-	size_t											 raytracingSceneSignature_ = 0;
-	bool											 raytracingTlasValid_ = false;
 };

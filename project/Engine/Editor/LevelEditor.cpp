@@ -145,16 +145,13 @@ namespace {
 		: public ICommand {
 	public:
 		using AfterApply = std::function<void()>;
-		using RetireObject = std::function<void(std::shared_ptr<SceneObject>)>;
 
 		DeleteObjectsCommand(SceneContext* ctx,
 							 std::vector<std::shared_ptr<SceneObject>> targets,
 							 AfterApply afterApply,
-							 RetireObject retireObject,
 							 std::string name)
 			: ctx_(ctx),
 			  afterApply_(std::move(afterApply)),
-			  retireObject_(std::move(retireObject)),
 			  name_(std::move(name)) {
 			std::vector<Guid> selectedGuids;
 			selectedGuids.reserve(targets.size());
@@ -196,9 +193,6 @@ namespace {
 				auto object = ctx_->GetObjectLibrary()->Find(guid);
 				if(object) {
 					ctx_->RemoveObject(object);
-					if(retireObject_) {
-						retireObject_(std::move(object));
-					}
 				}
 			}
 		}
@@ -259,7 +253,6 @@ namespace {
 		std::vector<Guid> rootGuids_;
 		std::vector<nlohmann::json> snapshots_;
 		AfterApply afterApply_;
-		RetireObject retireObject_;
 		std::string name_;
 	};
 
@@ -315,14 +308,11 @@ namespace CalyxEngine {
 
 	class DeleteObjectCommand final : public BaseLevelEditorCommand {
 	public:
-		using RetireObject = std::function<void(std::shared_ptr<SceneObject>)>;
-
 		DeleteObjectCommand(SceneContext* ctx,
 							const std::shared_ptr<SceneObject>& object,
 							LevelEditor* editor,
-							RetireObject retireObject,
 							const char* label = "Delete Object")
-			: BaseLevelEditorCommand(label), ctx_(ctx), editor_(editor), retireObject_(std::move(retireObject)) {
+			: BaseLevelEditorCommand(label), ctx_(ctx), editor_(editor) {
 			if(object) {
 				rootGuid_ = object->GetGuid();
 				snapshot_ = SerializeSubtree(object.get());
@@ -337,9 +327,6 @@ namespace CalyxEngine {
 			if(!rootSp) return;
 
 			ctx_->RemoveObject(rootSp);
-			if(retireObject_) {
-				retireObject_(std::move(rootSp));
-			}
 			if(editor_ && editor_->GetHierarchyPanel()) editor_->GetHierarchyPanel()->RefreshCache();
 		}
 
@@ -415,7 +402,6 @@ namespace CalyxEngine {
 	private:
 		SceneContext* ctx_ = nullptr;
 		LevelEditor* editor_ = nullptr;
-		RetireObject retireObject_;
 		Guid rootGuid_{};
 		nlohmann::json snapshot_;
 	};
@@ -1658,14 +1644,8 @@ namespace CalyxEngine {
 			ClearSelection();
 		}
 
-		auto retireObject = [manager = sceneManager_](std::shared_ptr<SceneObject> object) {
-			if(manager) {
-				manager->RetireAfterGpu(std::move(object));
-			}
-		};
-
 		CommandManager::GetInstance()->Execute(
-			std::make_unique<DeleteObjectCommand>(ctx, sp, this, std::move(retireObject)));
+			std::make_unique<DeleteObjectCommand>(ctx, sp, this));
 	}
 
 	void LevelEditor::DeleteSelectedObjects() {
@@ -1683,18 +1663,12 @@ namespace CalyxEngine {
 			ClearSelection();
 			if(hierarchy_) hierarchy_->RefreshCache();
 		};
-		auto retireObject = [manager = sceneManager_](std::shared_ptr<SceneObject> object) {
-			if(manager) {
-				manager->RetireAfterGpu(std::move(object));
-			}
-		};
 
 		CommandManager::GetInstance()->Execute(
 			std::make_unique<DeleteObjectsCommand>(
 				ctx,
 				std::move(targets),
 				std::move(afterApply),
-				std::move(retireObject),
 				"Delete Selected Objects"));
 	}
 

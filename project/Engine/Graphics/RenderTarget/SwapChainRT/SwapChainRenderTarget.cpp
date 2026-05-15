@@ -102,30 +102,11 @@ void SwapChainRenderTarget::ReleaseSRVs(){
 	srvHandles_.clear();
 }
 
-void SwapChainRenderTarget::ReleaseBackBufferViews(){
-	ReleaseSRVs();
-	rtvHandles_.clear();
-	currentStates_.clear();
-	bufferIndex_ = 0;
-}
-
 void SwapChainRenderTarget::Resize(uint32_t width, uint32_t height) {
 	viewport_ = D3D12_VIEWPORT{0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 1.0f};
 	scissorRect_ = D3D12_RECT{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
 
 	auto device = GraphicsGroup::GetInstance()->GetDevice();
-
-	const UINT backBufferCount = swapChain_->GetSwapChainDesc().BufferCount;
-	if(rtvHandles_.size() != backBufferCount) {
-		rtvHandles_.resize(backBufferCount);
-		srvHandles_.resize(backBufferCount);
-		currentStates_.assign(backBufferCount, D3D12_RESOURCE_STATE_PRESENT);
-
-		for(UINT i = 0; i < backBufferCount; ++i) {
-			rtvHandles_[i] = DescriptorAllocator::Allocate(DescriptorUsage::Rtv);
-			srvHandles_[i] = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
-		}
-	}
 
 	for (UINT i = 0; i < srvHandles_.size(); ++i) {
 		auto resource = swapChain_->GetBackBuffer(i);

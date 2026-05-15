@@ -2,7 +2,6 @@
 
 #include <Engine/Foundation/Clock/ClockManager.h>
 
-
 namespace CalyxEngine {
 
     PerformanceOverlay::PerformanceOverlay() {
@@ -51,7 +50,6 @@ namespace CalyxEngine {
         next.y += 20.0f;
         ImGui::SetCursorScreenPos(next);
         ImGui::Text("DeltaTime(raw): %.4f", rawDt);
-
     }
 
     void PerformanceOverlay::RenderToolbar() {
