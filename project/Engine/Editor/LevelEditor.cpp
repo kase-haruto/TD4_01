@@ -814,13 +814,20 @@ namespace CalyxEngine {
 			layoutSwitcher_->ApplyPending();
 		}
 
+		const float dt = ClockManager::GetInstance()->GetDeltaTime();
+		auto notifySceneSaved = [this](const std::string& path) {
+			sceneSavedPopupPath_ = path;
+			sceneSavedPopupTimer_ = 1.5f;
+			ImGui::OpenPopup("SceneSavedPopup");
+		};
+
 		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect) {
-			UpdateParticlePreviewContext(ClockManager::GetInstance()->GetDeltaTime());
+			UpdateParticlePreviewContext(dt);
 			if(particlePreviewContext_) {
 				particlePreviewContext_->MakeCurrent();
 			}
 		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab) {
-			UpdatePrefabEditContext(ClockManager::GetInstance()->GetDeltaTime());
+			UpdatePrefabEditContext(dt);
 			if(prefabEditContext_) {
 				prefabEditContext_->MakeCurrent();
 			}
@@ -841,7 +848,7 @@ namespace CalyxEngine {
 		const bool uiBlocksClick = io.WantCaptureMouse && !overDebugViewport;
 
 		if(debugCameraFocus_) {
-			debugCameraFocus_->Update(ClockManager::GetInstance()->GetDeltaTime());
+			debugCameraFocus_->Update(dt);
 		}
 
 		if(auto* debugCam = CameraManager::GetDebug()) {
@@ -889,6 +896,7 @@ namespace CalyxEngine {
 			if(ImGuiFileDialog::Instance()->IsOk()) {
 				std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
 				SceneSerializer::Save(*ctx, filePath);
+				notifySceneSaved(filePath);
 			}
 			ImGuiFileDialog::Instance()->Close();
 		}
@@ -930,6 +938,30 @@ namespace CalyxEngine {
 				ExitGameMode();
 			}
 			lastPlaying_ = playing;
+		}
+
+		// shortcutでのシーンの保存
+		if(CalyxFoundation::Input::PushKey(DIK_LCONTROL)) {
+			if(CalyxFoundation::Input::TriggerKey(DIK_S)) {
+				if(SceneContext* scene = SceneContext::Current()) {
+					SceneSerializer::Save(*scene, scene->GetScenePath());
+					notifySceneSaved(scene->GetScenePath());
+				}
+			}
+		}
+
+		if(sceneSavedPopupTimer_ > 0.0f) {
+			sceneSavedPopupTimer_ -= dt;
+		}
+		if(ImGui::BeginPopup("SceneSavedPopup")) {
+			ImGui::TextUnformatted("シーンを保存しました");
+			if(!sceneSavedPopupPath_.empty()) {
+				ImGui::TextUnformatted(sceneSavedPopupPath_.c_str());
+			}
+			if(sceneSavedPopupTimer_ <= 0.0f) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
 		}
 
 		// LivePP Visibility Control
