@@ -76,6 +76,10 @@ void BaseTransform::ShowImGui(const std::string& label) {
 //	WorldTransform: imgui
 /////////////////////////////////////////////////////////////////////////////////////////
 void WorldTransform::ShowImGui(const std::string& label) {
+
+	//eulerとquauternionどちらの回転をさせているのか表示
+	rotationSource == RotationSource::Euler ? ImGui::Text("Rotation: Euler") : ImGui::Text("Rotation: Quaternion");
+
 	std::string nodeLabel = label + "##node";
 	// 小さめの折りたたみ見出しとして TreeNodeEx を使用
 	if(ImGui::TreeNodeEx(nodeLabel.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {

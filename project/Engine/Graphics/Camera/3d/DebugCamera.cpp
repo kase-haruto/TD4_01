@@ -26,6 +26,34 @@ namespace {
 	bool NearlyEqual(const CalyxEngine::Vector3& a, const CalyxEngine::Vector3& b) {
 		return NearlyEqual(a.x, b.x) && NearlyEqual(a.y, b.y) && NearlyEqual(a.z, b.z);
 	}
+
+	bool NearlyEqual(const CalyxEngine::Quaternion& a, const CalyxEngine::Quaternion& b) {
+		return NearlyEqual(a.x, b.x) && NearlyEqual(a.y, b.y) && NearlyEqual(a.z, b.z) && NearlyEqual(a.w, b.w);
+	}
+
+	CalyxEngine::Quaternion BuildOrbitQuaternion(const CalyxEngine::Vector2& orbitAngle) {
+		CalyxEngine::Matrix4x4 matRotYaw = CalyxEngine::MakeRotateYMatrix(orbitAngle.x);
+		CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle.y);
+		CalyxEngine::Matrix4x4 matRot = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+		return CalyxEngine::Quaternion::FromMatrix(matRot);
+	}
+
+	CalyxEngine::Matrix4x4 BuildOrbitRotationMatrix(const CalyxEngine::Vector2& orbitAngle) {
+		CalyxEngine::Matrix4x4 matRotYaw = CalyxEngine::MakeRotateYMatrix(orbitAngle.x);
+		CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle.y);
+		return CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+	}
+
+	CalyxEngine::Vector2 CalcOrbitAngleFromForward(const CalyxEngine::Vector3& forward) {
+		if(forward.LengthSquared() <= 0.000001f) {
+			return {0.0f, 0.0f};
+		}
+		CalyxEngine::Vector3 f = forward.Normalize();
+		const float limit = static_cast<float>(std::numbers::pi) * 0.5f - 0.01f;
+		float pitch = std::clamp(std::asin(-f.y), -limit, limit);
+		float yaw = std::atan2(f.x, f.z);
+		return {yaw, pitch};
+	}
 } // namespace
 
 DebugCamera::DebugCamera(const std::string& name) {
@@ -33,10 +61,12 @@ DebugCamera::DebugCamera(const std::string& name) {
 	fovAngleY_					   = static_cast<float>(std::numbers::pi) * 0.25f; // 45度
 	worldTransform_.translation	   = {0.0f, 4.0f, -10.0f};
 	worldTransform_.eulerRotation  = {0.0f, 0.0f, 0.0f};
-	worldTransform_.rotationSource = RotationSource::Euler;
 	SyncOrbitFromTransform();
 }
 
+void DebugCamera::Initialize() {
+	worldTransform_.rotationSource = RotationSource::Quaternion;
+}
 //////////////////////////////////////////////////////////////////////////////
 //							メイン処理
 //////////////////////////////////////////////////////////////////////////////
@@ -74,22 +104,23 @@ DebugCamera::State DebugCamera::CaptureState() const {
 	state.panSpeed		= panSpeed_;
 	state.zoomSpeed		= zoomSpeed_;
 	state.translation	= worldTransform_.translation;
-	state.eulerRotation = worldTransform_.eulerRotation;
+	state.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
 	return state;
 }
 
 void DebugCamera::ApplyState(const State& state) {
-	target_						   = state.target;
-	distance_					   = state.distance;
-	orbitAngle_					   = state.orbitAngle;
-	rotateSpeed_				   = state.rotateSpeed;
-	panSpeed_					   = state.panSpeed;
-	zoomSpeed_					   = state.zoomSpeed;
-	worldTransform_.translation	   = state.translation;
-	worldTransform_.eulerRotation  = state.eulerRotation;
-	worldTransform_.rotationSource = RotationSource::Euler;
-	isDraggingRotate_			   = false;
-	isDraggingMove_				   = false;
+	target_					   = state.target;
+	distance_			   = state.distance;
+	orbitAngle_			   = state.orbitAngle;
+	rotateSpeed_		   = state.rotateSpeed;
+	panSpeed_			   = state.panSpeed;
+	zoomSpeed_			   = state.zoomSpeed;
+	worldTransform_.translation   = state.translation;
+	worldTransform_.rotation	   = BuildOrbitQuaternion(orbitAngle_);
+	worldTransform_.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
+	worldTransform_.rotationSource = RotationSource::Quaternion;
+	isDraggingRotate_		   = false;
+	isDraggingMove_			   = false;
 	StoreAppliedTransform();
 }
 
@@ -100,48 +131,62 @@ void DebugCamera::ShowGui() {
 
 	// アクティブかどうか
 	BaseCamera::ShowGui();
+	worldTransform_.ShowImGui("world");
 
 	GuiCmd::DragFloat("panSpeed", panSpeed_);
 	GuiCmd::DragFloat("zoomSpeed", zoomSpeed_);
 }
 
 CalyxEngine::Vector3 DebugCamera::CalcOrbitOffset() const {
-	CalyxEngine::Matrix4x4 matRotYaw   = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
-	CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
-	CalyxEngine::Matrix4x4 matRot	   = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
-
+	CalyxEngine::Matrix4x4 matRot = BuildOrbitRotationMatrix(orbitAngle_);
 	CalyxEngine::Vector3 offset(0.0f, 0.0f, -distance_);
 	return CalyxEngine::TransformNormal(offset, matRot);
 }
 
 void DebugCamera::SyncOrbitFromTransform() {
-	orbitAngle_.x = worldTransform_.eulerRotation.y;
-	orbitAngle_.y = worldTransform_.eulerRotation.x;
+	CalyxEngine::Quaternion currentRotation = worldTransform_.rotation;
+	if(worldTransform_.rotationSource == RotationSource::Euler) {
+		currentRotation = CalyxEngine::Quaternion::EulerToQuaternion(worldTransform_.eulerRotation);
+	}
 
-	const float limit			   = static_cast<float>(std::numbers::pi) * 0.5f - 0.01f;
-	orbitAngle_.y				   = std::clamp(orbitAngle_.y, -limit, limit);
-	target_						   = worldTransform_.translation - CalcOrbitOffset();
-	worldTransform_.rotationSource = RotationSource::Euler;
+	CalyxEngine::Matrix4x4 rotMat = CalyxEngine::Quaternion::ToMatrix(currentRotation);
+	CalyxEngine::Vector3 forward = CalyxEngine::TransformNormal(CalyxEngine::Vector3(0.0f, 0.0f, 1.0f), rotMat);
+	orbitAngle_ = CalcOrbitAngleFromForward(forward);
+
+	target_ = worldTransform_.translation - CalcOrbitOffset();
+	worldTransform_.rotation = currentRotation;
+	worldTransform_.rotationSource = RotationSource::Quaternion;
 	StoreAppliedTransform();
 }
 
 void DebugCamera::ApplyOrbitToTransform() {
-	worldTransform_.translation	   = target_ + CalcOrbitOffset();
-	worldTransform_.eulerRotation  = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
-	worldTransform_.rotationSource = RotationSource::Euler;
+	worldTransform_.translation   = target_ + CalcOrbitOffset();
+	worldTransform_.rotation	   = BuildOrbitQuaternion(orbitAngle_);
+	worldTransform_.eulerRotation = CalyxEngine::Vector3(orbitAngle_.y, orbitAngle_.x, 0.0f);
+	worldTransform_.rotationSource = RotationSource::Quaternion;
 	StoreAppliedTransform();
 }
 
 bool DebugCamera::IsTransformChangedExternally() const {
+	CalyxEngine::Quaternion currentRotation = worldTransform_.rotation;
+	if(worldTransform_.rotationSource == RotationSource::Euler) {
+		currentRotation = CalyxEngine::Quaternion::EulerToQuaternion(worldTransform_.eulerRotation);
+	}
+
 	return !hasAppliedTransform_ ||
-		   (!NearlyEqual(worldTransform_.translation, lastAppliedTranslation_) ||
-			!NearlyEqual(worldTransform_.eulerRotation, lastAppliedEulerRotation_));
+			   (!NearlyEqual(worldTransform_.translation, lastAppliedTranslation_) ||
+				!NearlyEqual(currentRotation, lastAppliedRotation_));
 }
 
 void DebugCamera::StoreAppliedTransform() {
-	lastAppliedTranslation_	  = worldTransform_.translation;
-	lastAppliedEulerRotation_ = worldTransform_.eulerRotation;
-	hasAppliedTransform_	  = true;
+	CalyxEngine::Quaternion currentRotation = worldTransform_.rotation;
+	if(worldTransform_.rotationSource == RotationSource::Euler) {
+		currentRotation = CalyxEngine::Quaternion::EulerToQuaternion(worldTransform_.eulerRotation);
+	}
+
+	lastAppliedTranslation_ = worldTransform_.translation;
+	lastAppliedRotation_	 = currentRotation;
+	hasAppliedTransform_	 = true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -212,10 +257,7 @@ void DebugCamera::Move() {
 			return;
 		}
 
-		// カメラの回転行列を作成
-		CalyxEngine::Matrix4x4 matRotYaw   = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
-		CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
-		CalyxEngine::Matrix4x4 matRot	   = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
+		CalyxEngine::Matrix4x4 matRot = BuildOrbitRotationMatrix(orbitAngle_);
 
 		// パン方向の移動量 (画面右が-X, 上が+Yになるよう調整)
 		CalyxEngine::Vector3 localMove(
@@ -255,11 +297,7 @@ void DebugCamera::Zoom() {
 			float excess = kMinDistance - distance_;
 			distance_ = kMinDistance;
 
-			// カメラの正面方向ベクトルを計算
-			CalyxEngine::Matrix4x4 matRotYaw   = CalyxEngine::MakeRotateYMatrix(orbitAngle_.x);
-			CalyxEngine::Matrix4x4 matRotPitch = CalyxEngine::MakeRotateXMatrix(orbitAngle_.y);
-			CalyxEngine::Matrix4x4 matRot	   = CalyxEngine::Matrix4x4::Multiply(matRotPitch, matRotYaw);
-			
+			CalyxEngine::Matrix4x4 matRot = BuildOrbitRotationMatrix(orbitAngle_);
 			CalyxEngine::Vector3 forward = CalyxEngine::TransformNormal(CalyxEngine::Vector3(0.0f, 0.0f, 1.0f), matRot);
 			target_.x += forward.x * excess;
 			target_.y += forward.y * excess;
