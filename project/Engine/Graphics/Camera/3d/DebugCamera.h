@@ -8,6 +8,7 @@
 // forward declaration
 struct CalyxEngine::Vector3;
 struct CalyxEngine::Vector2;
+struct CalyxEngine::Quaternion;
 
 /* ========================================================================
 /*			デバッグ用カメラ
@@ -32,7 +33,7 @@ public:
 	DebugCamera() = default;
 	DebugCamera(const std::string& name);
 	~DebugCamera() = default;
-
+	void Initialize() override;
 	void AlwaysUpdate(float dt) override;
 	void ShowGui() override; //< ImGuiによるGUI表示
 
@@ -85,7 +86,7 @@ private:
 	bool    isDraggingMove_{false};       //* Moveがドラッグ中かどうか
 	bool	isInputEnabled_{true};
 	CalyxEngine::Vector3 lastAppliedTranslation_{0.0f,0.0f,0.0f};
-	CalyxEngine::Vector3 lastAppliedEulerRotation_{0.0f,0.0f,0.0f};
+	CalyxEngine::Quaternion lastAppliedRotation_{};
 	bool	hasAppliedTransform_{false};
 
 	// 設定
