@@ -60,8 +60,7 @@ private:
 	}
 	void ChangeScale() {
 		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
-			CalyxEngine::Vector3::One() * param_.scale, worldTransform_.scale, 0.1f
-		);
+			worldTransform_.scale, CalyxEngine::Vector3::One() * param_.scale, 0.1f);
 	}
 
 private:

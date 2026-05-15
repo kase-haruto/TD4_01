@@ -32,7 +32,7 @@ void DiceProjectileObject::OnCollisionEnter(Collider* other) {
 	// 収納箱の数をプラスする
 	socket_->AddDiceSocketCount();
 	isParry_ = true;
-	worldTransform_.scale = {1.5f, 1.5f, 1.5f};
+	worldTransform_.scale = CalyxEngine::Vector3::One() * 1.2f;
 }
 
 void DiceProjectileObject::ObjectInitialize() {
@@ -112,9 +112,8 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 
 		// 到達
 		if(t >= 1.0f) {
+			worldTransform_.scale = CalyxEngine::Vector3::One() * 1.2f;
 			isSocket_		= true;
-			isFlying_		= false;
-			isParry_		= false;
 			parryCurveInit_ = false;
 		}
 		return;
