@@ -6,6 +6,8 @@ void StageGimmickEventBase::Initialize() {
 
 	// イベントオブジェの初期化
 	BaseEventObject::Initialize();
+
+	worldTransform_.scale = {10.0f, 5.0f, 1.0f};
 }
 
 void StageGimmickEventBase::AlwaysUpdate(float dt) {
