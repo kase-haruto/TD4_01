@@ -61,7 +61,7 @@ private:
 
 	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
 
-	SceneType preType_	 = SceneType::CLEAR;
+	SceneType preType_	 = SceneType::SELECT;
 	bool	  IsPhase_	 = false;
 	bool	  IsOpening_ = false;
 };

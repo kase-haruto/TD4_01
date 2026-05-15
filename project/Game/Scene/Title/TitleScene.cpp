@@ -55,11 +55,16 @@ void TitleScene::Initialize() {
 	pauseBg_->Update();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
-	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	if(preType_ == SceneType::SELECT) {
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/Transition/wave.png");
+	} else {
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	}
 	// シーンタイプに基づいて自動で演出をセット
 	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TITLE);
 	transitionControl_->StartOpening(0.5f, [this]() {
 		IsOpening_ = false;
+		transitionControl_->SetTexturePlate1("Textures/Transition/wave.png");
 	});
 	IsOpening_ = true;
 	IsPhase_ = false;
@@ -72,7 +77,9 @@ void TitleScene::Update([[maybe_unused]] float dt) {
 
 	transitionControl_->Update(dt);
 
-	if(IsPhase_ || IsOpening_) return;
+	if(IsPhase_ || IsOpening_) {
+		return;
+	}
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
@@ -106,8 +113,8 @@ void TitleScene::CleanUp() {
 	CollisionManager::GetInstance()->ClearColliders();
 }
 
-void TitleScene::PhaseUpdate(float dt) {
-	dt;
+void TitleScene::PhaseUpdate(float) {
+
 }
 
 std::unique_ptr<TransitionPayload> TitleScene::BuildNowTypePayload(SceneType Type) {

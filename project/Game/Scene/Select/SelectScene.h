@@ -44,6 +44,7 @@ public:
 private:
 
 	void SelectUpdate(float dt);
+	void PhaseUpdate(float dt);
 	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
 
 private:

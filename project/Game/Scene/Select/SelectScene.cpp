@@ -55,11 +55,17 @@ void SelectScene::Initialize() {
 	pauseBg_->Update();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
-	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	if(preType_ == SceneType::TITLE) {
+		transitionControl_->Initialize("Textures/Transition/wave.png", "Textures/Transition/wave.png");
+	} else {
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	}
 	// シーンタイプに基づいて自動で演出をセット
 	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::SELECT);
 	transitionControl_->StartOpening(0.5f, [this]() {
 		IsOpening_ = false;
+		transitionControl_->SetTexturePlate1("Textures/uvChecker.dds");
+		transitionControl_->SetTexturePlate2("Textures/uvChecker.dds");
 	});
 	IsOpening_ = true;
 	IsPhase_   = false;
@@ -72,7 +78,9 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 
 	transitionControl_->Update(dt);
 
-	if(IsPhase_ || IsOpening_) return;
+	if(IsPhase_ || IsOpening_) {
+		return;
+	}
 
 	SelectUpdate(dt);
 
@@ -91,7 +99,7 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 void SelectScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoService, IRenderTarget* rt) {
 
 	//========================================================//
-	//	sprite की 登録
+	//	sprite の 登録
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
 	transitionControl_->Draw(spriteRenderer_.get());
@@ -138,6 +146,10 @@ void SelectScene::SelectUpdate(float) {
 	case 4: pauseBg_->SetColor({1.0f, 0.0f, 1.0f, 1.0f}); break;
 	}
 	pauseBg_->Update();
+}
+
+void SelectScene::PhaseUpdate(float) {
+
 }
 
 std::unique_ptr<GameTransitionPayload> SelectScene::BuildGamePayload(int num) {

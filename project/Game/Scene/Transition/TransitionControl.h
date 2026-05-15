@@ -69,6 +69,11 @@ public:
 	void SetPresetSplit();
 
 	/// <summary>
+	/// スライド（上：左から / 下：右から）演出をセット
+	/// </summary>
+	void SetPresetUpDownSlide();
+
+	/// <summary>
 	/// シーンタイプに基づいて演出を自動設定
 	/// </summary>
 	/// <param name="now"> 現在のシーンタイプ </param>
@@ -85,7 +90,15 @@ public:
 	// --- 状態取得 ---
 	TransitionState GetState() const { return state_; }
 	bool			IsIdle() const { return state_ == TransitionState::Idle; }
+	bool			IsOpening() const { return state_ == TransitionState::Opening; }
+	bool			IsClosing() const { return state_ == TransitionState::Closing; }
 	bool			IsFull() const { return state_ == TransitionState::Full; }
+
+	Sprite* GetPlate1() const { return plate1_.get(); }
+	Sprite* GetPlate2() const { return plate2_.get(); }
+
+	void SetTexturePlate1(const std::string& texPath1);
+	void SetTexturePlate2(const std::string& texPath2);
 
 private:
 	TransitionState state_ = TransitionState::Idle;

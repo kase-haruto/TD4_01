@@ -62,8 +62,8 @@ void TransitionControl::Update(float dt) {
 void TransitionControl::Draw(SpriteRenderer* renderer) {
 	if(state_ == TransitionState::Idle) return;
 
-	if(plate1_) renderer->Register(plate1_.get());
 	if(plate2_ && isDrawPlate2_) renderer->Register(plate2_.get());
+	if(plate1_) renderer->Register(plate1_.get());
 }
 
 void TransitionControl::StartClosing(float duration, std::function<void()> onCovered) {
@@ -137,11 +137,38 @@ void TransitionControl::SetPresetSplit() {
 	});
 }
 
+void TransitionControl::SetPresetUpDownSlide() {
+	SetUpdateFunc([this](float progress, Sprite* p1, Sprite* p2) {
+		if(!p2) return;
+		float w	 = static_cast<float>(kWindowWidth);
+		float h = static_cast<float>(kWindowHeight);
+		float halfH = static_cast<float>(kWindowHeight) * 0.5f;
+		float x1 = 0.0f;
+		float x2 = 0.0f;
+
+		p1->SetSize({w, h * 1.5f});
+		p2->SetSize({w, h * 1.5f});
+
+		if(state_ == TransitionState::Closing) {
+			// 画面外から画面内へ
+			x1 = w - w * progress;
+			x2 = -w + w * progress;
+		} else {
+			// 画面内から画面外へ
+			x1 = -w * progress;
+			x2 = w * progress;
+		}
+		p1->SetPosition({x1, -halfH*0.5f});
+		p2->SetPosition({x2, -h*0.75f});
+	});
+}
+
 void TransitionControl::SetAutoPreset(SceneType now, SceneType next) {
 	isDrawPlate2_ = false;
 	// タイトルからセレクトへはスライド
 	if(now == SceneType::TITLE && next == SceneType::SELECT) {
-		SetPresetSlide(false);
+		isDrawPlate2_ = true;
+		SetPresetUpDownSlide();
 	}
 	// テスト（ゲーム)からセレクトへは観音開き
 	else if(now == SceneType::TEST && next == SceneType::SELECT) {
@@ -167,7 +194,8 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 	isDrawPlate2_ = false;
 	// タイトルからセレクトに来た時はスライドで開ける
 	if(prev == SceneType::TITLE && now == SceneType::SELECT) {
-		SetPresetSlide(false);
+		isDrawPlate2_ = true;
+		SetPresetUpDownSlide();
 	}
 	// ゲームからセレクトに来た時は観音開きで開ける
 	else if(prev == SceneType::TEST && now == SceneType::SELECT) {
@@ -183,4 +211,12 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 	else {
 		SetPresetFade();
 	}
+}
+
+void TransitionControl::SetTexturePlate1(const std::string& texPath1) {
+	plate1_->SetTexture(texPath1);
+}
+
+void TransitionControl::SetTexturePlate2(const std::string& texPath2) {
+	plate2_->SetTexture(texPath2);
 }
