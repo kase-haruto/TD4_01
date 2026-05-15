@@ -31,8 +31,8 @@ void DiceProjectileObject::OnCollisionEnter(Collider* other) {
 	targetPos_.z -= socket_->GetWorldTransform().scale.z / 2.0f;  
 	// 収納箱の数をプラスする
 	socket_->AddDiceSocketCount();
+	worldTransform_.scale = param_.hitScale;
 	isParry_ = true;
-	worldTransform_.scale = CalyxEngine::Vector3::One() * 1.2f;
 }
 
 void DiceProjectileObject::ObjectInitialize() {
@@ -46,6 +46,7 @@ void DiceProjectileObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(true);
 	}
 
+	worldTransform_.scale = CalyxEngine::Vector3::One() * param_.scale;
 	worldTransform_.inheritScale = false;
 	isParry_ = false;
 }
@@ -112,7 +113,7 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 
 		// 到達
 		if(t >= 1.0f) {
-			worldTransform_.scale = CalyxEngine::Vector3::One() * 1.2f;
+			worldTransform_.scale = param_.hitScale;
 			isSocket_		= true;
 			parryCurveInit_ = false;
 		}
@@ -124,4 +125,10 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 	CalyxEngine::Vector3 velocity = dire * param_.speed * dt;
 	worldTransform_.translation += velocity;
 
+}
+
+void DiceProjectileObject::OffsetRotation() {
+	auto rotation = socket_->GetSameNumberRotation();
+	worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
+		worldTransform_.rotation, rotation, 0.1f);
 }

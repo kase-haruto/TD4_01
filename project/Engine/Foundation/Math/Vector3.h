@@ -22,7 +22,7 @@ namespace CalyxEngine {
 		void				 Initialize(const Vector3& value);
 		void				 Initialize(float v);
 		static Vector3		 Forward();
-		Vector3				 Right();
+		static Vector3		 Right();
 		static const Vector3 Zero();
 		static Vector3		 One();
 		static const Vector3 Up();

@@ -33,6 +33,8 @@ public:
 	}
 	// 今収納可能な座標を取得
 	const CalyxEngine::Vector3 GetSocketPos();
+	// ゾロ目用の回転を取得する
+	const CalyxEngine::Quaternion GetSameNumberRotation();
 
 
 protected:
@@ -44,6 +46,9 @@ protected:
 	void ObjectUpdate(float dt) override;
 
 private:
+
+	// 揃えるゾロ目の数字
+	uint32_t sameNumbers_ = 1;
 
 	// 扉が開く数
 	uint32_t clearCount_ = 1;
