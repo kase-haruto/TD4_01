@@ -88,6 +88,14 @@ void SceneObject::SetName(const std::string& name, std::optional<ObjectType> typ
 	if(type.has_value()) objectType_ = type.value();
 }
 
+std::string SceneObject::GetDisplayName() const {
+	if(duplicateNameIndex_ == 0) {
+		return name_;
+	}
+
+	return name_ + "(" + std::to_string(duplicateNameIndex_) + ")";
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //		パラメータ適用Interfaceを持っているか
 /////////////////////////////////////////////////////////////////////////////////////////

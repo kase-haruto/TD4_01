@@ -432,7 +432,8 @@ namespace CalyxEngine {
 			if(ImGui::BeginDragDropSource()) {
 				SceneObject* drag = obj;
 				ImGui::SetDragDropPayload("SceneObjectPtr", &drag, sizeof(SceneObject*));
-				ImGui::Text("%s", obj->GetName().c_str());
+				const std::string displayName = obj->GetDisplayName();
+				ImGui::Text("%s", displayName.c_str());
 				ImGui::EndDragDropSource();
 			}
 
@@ -531,7 +532,8 @@ namespace CalyxEngine {
 				ImGui::Image(typeTex, ImVec2(iconSize, iconSize));
 				ImGui::SameLine();
 			}
-			ImGui::TextUnformatted(obj->GetName().c_str());
+			const std::string displayName = obj->GetDisplayName();
+			ImGui::TextUnformatted(displayName.c_str());
 			if(prefabInstance) {
 				ImGui::PopStyleColor();
 			}
