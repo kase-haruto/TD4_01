@@ -201,10 +201,14 @@ namespace CalyxEngine {
 		SceneContext* prevCtx_		  = nullptr;
 		EditorSelectionCoordinator selection_;
 		nlohmann::json			   livePPSnapshot_;
-		bool					   rangeSelectCandidate_ = false;
-		bool					   rangeSelecting_ = false;
+		bool				   rangeSelectCandidate_ = false;
+		bool				   rangeSelecting_ = false;
 		CalyxEngine::Vector2	   rangeSelectStart_{};
 		CalyxEngine::Vector2	   rangeSelectEnd_{};
+
+		// シーン保存のポップアップ表示
+		float		  sceneSavedPopupTimer_ = 0.0f;
+		std::string   sceneSavedPopupPath_;
 
 		// Editors メニューに並べるパネル群
 		std::vector<IEngineUI*> editorPanels_;
