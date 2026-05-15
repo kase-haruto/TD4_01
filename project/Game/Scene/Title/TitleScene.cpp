@@ -54,11 +54,15 @@ void TitleScene::Initialize() {
 	pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
 
-	phaseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	phaseBg_->Initialize({1280.0f, 0.0f}, {1280.0f, 720.0f});
-	phaseBg_->SetAnchorPoint({0.f, 0.0f});
-	phaseBg_->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
-	phaseBg_->Update();
+	transitionControl_ = std::make_unique<TransitionControl>();
+	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	// シーンタイプに基づいて自動で演出をセット
+	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TITLE);
+	transitionControl_->StartOpening(0.5f, [this]() {
+		IsOpening_ = false;
+	});
+	IsOpening_ = true;
+	IsPhase_ = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -66,12 +70,17 @@ void TitleScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 void TitleScene::Update([[maybe_unused]] float dt) {
 
-	PhaseUpdate(dt);
+	transitionControl_->Update(dt);
 
-	if(IsPhase_) return;
+	if(IsPhase_ || IsOpening_) return;
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
+		payload_ = BuildNowTypePayload(SceneType::TITLE);
+		transitionControl_->SetAutoPreset(SceneType::TITLE, SceneType::SELECT);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
+		});
 	}
 
 	// 衝突判定
@@ -85,9 +94,7 @@ void TitleScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSe
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
 
-	if(IsPhase_) {
-		spriteRenderer_->Register(phaseBg_.get());
-	}
+	transitionControl_->Draw(spriteRenderer_.get());
 
 	// シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
@@ -100,14 +107,20 @@ void TitleScene::CleanUp() {
 }
 
 void TitleScene::PhaseUpdate(float dt) {
-	if(!IsPhase_) return;
+	dt;
+}
 
-	CalyxEngine::Vector2 pos = phaseBg_->GetPosition();
-	pos.x -= 2500.0f * dt;
-	if(pos.x <= 0.0f) {
-		pos.x = 0.0f;
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT));
+std::unique_ptr<TransitionPayload> TitleScene::BuildNowTypePayload(SceneType Type) {
+	auto payload	   = std::make_unique<TransitionPayload>();
+	payload->type = Type;
+	return payload;
+}
+
+void TitleScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
+	if(!payload) return;
+
+	// 自分が知っている型にだけキャストする
+	if(auto* p = static_cast<TransitionPayload*>(payload.get())) {
+		preType_ = p->type;
 	}
-	phaseBg_->SetPosition(pos);
-	phaseBg_->Update();
 }

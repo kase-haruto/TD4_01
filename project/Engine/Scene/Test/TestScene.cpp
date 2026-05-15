@@ -80,12 +80,29 @@ void TestScene::Initialize(){
 	toTitleBtn_->Initialize({640.0f, 500.0f}, {300.0f, 60.0f});
 	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+
+	transitionControl_ = std::make_unique<TransitionControl>();
+	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	// シーンタイプに基づいて自動で演出をセット
+	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TEST);
+	transitionControl_->StartOpening(0.5f, [this]() {
+		IsOpening_ = false;
+	});
+	IsOpening_ = true;
+	IsPhase_   = false;
+	isPaused_ = false;
+	selectedIndex_ = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //	更新処理
 /////////////////////////////////////////////////////////////////////////////////////////
 void TestScene::Update([[maybe_unused]]float dt){
+
+	transitionControl_->Update(dt);
+
+	if(IsPhase_ || IsOpening_) return;
+
 	// ポーズの切り替え
 	if(CalyxFoundation::Input::TriggerKey(DIK_ESCAPE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::START)) {
 		isPaused_ = !isPaused_;
@@ -127,6 +144,8 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 		spriteRenderer_->Register(toTitleBtn_.get());
 	}
 	
+	transitionControl_->Draw(spriteRenderer_.get());
+
 	//シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
 
@@ -140,16 +159,40 @@ void TestScene::CleanUp(){
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
 	if(stage_->IsClear()) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR));
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::CLEAR);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR), std::move(payload_));
+		});
 	}
 	if(stage_->IsGameOver()) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER));
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::CLEAR);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
+		});
 	}
 	if(CalyxFoundation::Input::TriggerKey(DIK_9)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR));
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::CLEAR);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR), std::move(payload_));
+		});
 	}
 	if(CalyxFoundation::Input::TriggerKey(DIK_8)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER));
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::CLEAR);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
+		});
 	}
 }
 
@@ -183,12 +226,30 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 	});
 
 	updateBtn(toSelectBtn_, 1, [&]() {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT));
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::SELECT);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
+		});
 	});
 
 	updateBtn(toTitleBtn_, 2, [&]() {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TITLE));
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::TITLE);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TITLE), std::move(payload_));
+		});
 	});
+}
+
+std::unique_ptr<TransitionPayload> TestScene::BuildNowTypePayload(SceneType Type) {
+	auto payload  = std::make_unique<TransitionPayload>();
+	payload->type = Type;
+	return payload;
 }
 
 void TestScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {

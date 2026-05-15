@@ -7,11 +7,15 @@
 #include <Engine/Objects/3D/Actor/TestObject/CalyxHuman.h>
 #include <Engine/Renderer/Sprite/Sprite.h>
 #include <Engine/scene/Base/BaseScene.h>
+#include <Engine/Scene/Transitioner/IScenePayload.h>
 /* c++ */
 #include <memory>
 #include <vector>
 
+
 #include <Game\DemoPlayer\DemoPlayer.h>
+#include <Game\Scene\Transition\TransitionPayload.h>
+#include <Game/Scene/Transition/TransitionControl.h>
 
 /// デバッグ関連///
 #ifdef _DEBUG
@@ -36,9 +40,12 @@ public:
 	void CleanUp() override;
 	void LoadAssets() override;
 
+	void OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) override;
+
 private:
 
 	void PhaseUpdate(float dt);
+	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
 
 private:
 	/* graphics =====================================================*/
@@ -50,7 +57,11 @@ private:
 	std::shared_ptr<CalyxHuman>		animationHuman_;
 
 	std::unique_ptr<Sprite> pauseBg_ = nullptr;
-	std::unique_ptr<Sprite> phaseBg_ = nullptr;
+	std::unique_ptr<TransitionControl> transitionControl_ = nullptr;
 
-	bool IsPhase_ = false;
+	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
+
+	SceneType preType_	 = SceneType::CLEAR;
+	bool	  IsPhase_	 = false;
+	bool	  IsOpening_ = false;
 };
