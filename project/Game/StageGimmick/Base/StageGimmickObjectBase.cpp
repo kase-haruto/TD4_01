@@ -23,3 +23,9 @@ void StageGimmickObjectBase::Update(float dt) {
 	// 実体オブジェの更新
 	ObjectUpdate(dt);
 }
+
+const CalyxEngine::Vector3 StageGimmickObjectBase::GetCenterPos() const {
+	const CalyxEngine::Vector3 offset	= CalyxEngine::Vector3::Zero();
+	CalyxEngine::Vector3	   worldPos = CalyxEngine::Vector3::Transform(offset, worldTransform_.matrix.world);
+	return worldPos;
+}

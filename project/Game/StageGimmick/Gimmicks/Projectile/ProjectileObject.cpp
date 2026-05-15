@@ -17,16 +17,13 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();
-	if(otherObj && other->GetType() != ColliderType::Type_PlayerAttack && other->GetType() != ColliderType::Type_Player) {
+	if(otherObj && (other->GetType() != ColliderType::Type_PlayerAttack || other->GetType() != ColliderType::Type_Player)) {
 		return;
 	}
 	// コライダーとモデルを無効化
 	isFlying_ = false;
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
-	}
-	if(model_) {
-		BaseGameObject::SetDrawEnable(false);
 	}
 }
 
