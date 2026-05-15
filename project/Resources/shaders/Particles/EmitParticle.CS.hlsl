@@ -1,28 +1,7 @@
 #include "GpuParticle.hlsli"
+#include "../Utility/Function/Random.hlsli"
 
-float3 rand3dTo3d(float3 p) {
-	p = float3(dot(p, float3(127.1, 311.7, 74.7)),
-               dot(p, float3(269.5, 183.3, 246.1)),
-               dot(p, float3(113.5, 271.9, 124.6)));
-	return frac(sin(p) * 43758.5453);
-}
 
-float rand3dTo1d(float3 p) {
-	return frac(sin(dot(p, float3(12.9898, 78.233, 37.719))) * 43758.5453);
-}
-
-class RandomGenerator {
-	float3 seed;
-	float3 Generate3d() {
-		seed = rand3dTo3d(seed);
-		return seed;
-	}
-	float Generate1d() {
-		float result = rand3dTo1d(seed);
-		seed.x = result;
-		return result;
-	}
-};
 
 ConstantBuffer<EmitterData> gEmitter : register(b0);
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
@@ -30,6 +9,18 @@ ConstantBuffer<PerFrame> gPerFrame : register(b1);
 RWStructuredBuffer<Particle> gParticles : register(u0);
 RWStructuredBuffer<int> gFreeListIndex : register(u1);
 RWStructuredBuffer<int> gFreeList : register(u2);
+
+float3 RandomUnitVector(inout RandomGenerator gen) {
+	float3 v;
+	v = gen.Generate3d(); // [-1, 1]
+	if (length(v) < 0.0001f) {
+		v = gen.Generate3d();
+	}
+	if (length(v) > 1.0f) {
+		v = gen.Generate3d();
+	}
+	return normalize(v);
+}
 
 // 球面上のランダムな位置を得る関数
 float3 RandomOnSphere(RandomGenerator generator) {
@@ -95,7 +86,7 @@ void main(uint3 DTid : SV_DispatchThreadID) {
 		return;
 
 	RandomGenerator generator;
-	generator.seed = (DTid + gPerFrame.time) * gPerFrame.time;
+	generator.InitSeed(DTid, gPerFrame.time);
 
 	int freeListIndex;
 	InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
@@ -108,7 +99,7 @@ void main(uint3 DTid : SV_DispatchThreadID) {
 		p.translate = gEmitter.translate + GenerateSpawnOffset(generator);
 
 		p.color = gEmitter.color;
-		p.color.rgb *= generator.Generate3d();
+		p.color.rgb *= (generator.Generate3d()+1)*0.5;
 		p.color.a = gEmitter.color.a;
 		p.lifeTime = max(gEmitter.lifeTime, 0.01f);
 		p.currentTime = 0.0f;
