@@ -11,7 +11,7 @@ namespace CalyxEngine {
 			Editor,
 		};
 
-		static EngineSettings& GetInstance();
+		static EngineSettings* GetInstance();
 
 		void Initialize();
 		bool Load();
@@ -21,6 +21,13 @@ namespace CalyxEngine {
 		void RenderSettingsWindow();
 
 		const EngineSettingsData& GetData() const { return data_; }
+		bool ConsumeApplied() {
+			if(!settingsApplied_) return false;
+			settingsApplied_ = false;
+			return true;
+		}
+
+		void SetManipulatorSettings(const ManipulatorSettings& settings);
 
 	private:
 		EngineSettings() = default;
@@ -35,6 +42,7 @@ namespace CalyxEngine {
 		Category		   selectedCategory_ = Category::Editor;
 		bool			   showSettingsWindow_ = false;
 		bool			   editingInitialized_ = false;
+		bool settingsApplied_ = false;
 	};
 
 } // namespace CalyxEngine

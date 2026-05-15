@@ -173,7 +173,7 @@ void DebugCamera::Rotate() {
 		}
 
 		// editorの設定からカメラの回転方向を設定
-		const bool isInv = CalyxEngine::EngineSettings::GetInstance().GetData().editor.DebugCameraRotateInverse;
+		const bool isInv = CalyxEngine::EngineSettings::GetInstance()->GetData().editor.DebugCameraRotateInverse;
 		const float invSign = isInv ? -1.0f : 1.0f;
 
 		orbitAngle_.x -= mouseDelta.x * rotateSpeed_ * invSign;

@@ -3,6 +3,9 @@
 /* include space
 /* ===================================================================== */
 
+#include "Engine/Foundation/Serialization/SerializableObject.h"
+#include "Engine/Application/UI/EngineUI/ManipulatorSettings.h"
+
 #include <Engine/Application/UI/EngineUI/IOnViewportTool.h>
 #include <Engine/System/Command/EditorCommand/GuizmoCommand/ScopedGizmoCommand.h>
 
@@ -47,10 +50,11 @@ namespace CalyxEngine {
 		void SetTarget(WorldTransform* target);
 		void SetTargets(const std::vector<WorldTransform*>& targets);
 		void SetCamera(BaseCamera* camera);
-		void SetViewRect(const ImVec2& origin, const ImVec2& size);
-		void SetOnCtrlTranslateDuplicate(std::function<std::vector<WorldTransform*>()> callback) {
-			onCtrlTranslateDuplicate_ = std::move(callback);
-		}
+		void SetViewRect(const ImVec2& origin,const ImVec2& size);
+		void SetOnCtrlTranslateDuplicate(std::function<std::vector<WorldTransform*>()> callback) { onCtrlTranslateDuplicate_ = std::move(callback); }
+
+		void ApplySettings(const ManipulatorSettings& settings);
+		ManipulatorSettings GetSettings() const;
 
 	private:
 		//===================================================================*/
@@ -62,10 +66,10 @@ namespace CalyxEngine {
 		/// </summary>
 		/// <param name="m"></param>
 		/// <param name="out"></param>
-		void				 RowToColumnArray(const CalyxEngine::Matrix4x4& m, float out[16]);
+		void                   RowToColumnArray(const CalyxEngine::Matrix4x4& m,float out[16]);
 		CalyxEngine::Matrix4x4 ColumnArrayToRow(const float in_[16]);
-		void				 ApplyWorldMatrix(WorldTransform* target, const CalyxEngine::Matrix4x4& worldEdited);
-		void				 RefreshPivot();
+		void                   ApplyWorldMatrix(WorldTransform* target,const CalyxEngine::Matrix4x4& worldEdited);
+		void                   RefreshPivot();
 
 		/// <summary>
 		/// ImGuizmo による操作・描画処理
@@ -74,28 +78,30 @@ namespace CalyxEngine {
 
 	private:
 		ImGuizmo::OPERATION operation_ = ImGuizmo::TRANSLATE;
-		ImGuizmo::MODE		mode_	   = ImGuizmo::WORLD;
+		ImGuizmo::MODE      mode_      = ImGuizmo::WORLD;
 
-		bool								wasUsing = false;
-		bool								skipGizmoCommandThisDrag_ = false;
+		bool                                wasUsing                  = false;
+		bool                                skipGizmoCommandThisDrag_ = false;
 		std::unique_ptr<ScopedGizmoCommand> scopedCmd;
 
-		WorldTransform* target_ = nullptr;
-		std::vector<WorldTransform*> targets_;
-		WorldTransform pivotTarget_;
-		CalyxEngine::Matrix4x4 groupStartPivot_ = CalyxEngine::Matrix4x4::MakeIdentity();
-		std::vector<CalyxEngine::Matrix4x4> groupStartWorlds_;
-		BaseCamera*		camera_ = nullptr;
+		WorldTransform*                               target_ = nullptr;
+		std::vector<WorldTransform*>                  targets_;
+		WorldTransform                                pivotTarget_;
+		CalyxEngine::Matrix4x4                        groupStartPivot_ = CalyxEngine::Matrix4x4::MakeIdentity();
+		std::vector<CalyxEngine::Matrix4x4>           groupStartWorlds_;
+		BaseCamera*                                   camera_ = nullptr;
 		std::function<std::vector<WorldTransform*>()> onCtrlTranslateDuplicate_;
 
-		ImVec2 viewOrigin_ = {0, 0};
-		ImVec2 viewSize_   = {0, 0};
+		ImVec2 viewOrigin_ = {0,0};
+		ImVec2 viewSize_   = {0,0};
+
+		ManipulatorSettings settings_;
 
 	private:
 		// アイコン
 		struct Icon {
 			ImTextureID texture = nullptr;
-			ImVec2		size{24.0f, 24.0f};
+			ImVec2      size{24.0f,24.0f};
 		};
 
 	public:
@@ -106,6 +112,10 @@ namespace CalyxEngine {
 		Icon iconWorld_;
 
 		Icon iconDrawGrid_;
+
+		Icon snapIcon_;
+
+
 	};
 
 } // namespace CalyxEngine

@@ -2,6 +2,7 @@
 /* ========================================================================
 /* include space
 /* ===================================================================== */
+#include "Engine/Application/Settings/EngineSettings.h"
 #include "Engine/Assets/Manager/AssetManager.h"
 
 #include <Engine/Assets/Texture/TextureManager.h>
@@ -21,56 +22,54 @@ namespace CalyxEngine {
 
 	Manipulator::Manipulator() {
 		iconTranslate_.texture = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/translate.dds").ptr);
-		iconRotate_.texture	   = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/rotate.dds").ptr);
-		iconScale_.texture	   = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/scale.dds").ptr);
+		iconRotate_.texture    = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/rotate.dds").ptr);
+		iconScale_.texture     = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/scale.dds").ptr);
 		iconUniversal_.texture = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/universal.dds").ptr);
-		iconWorld_.texture	   = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/world.dds").ptr);
+		iconWorld_.texture     = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/world.dds").ptr);
 		iconDrawGrid_.texture  = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/grid.dds").ptr);
+		snapIcon_.texture      = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/snap.png").ptr);
 		SetOverlayAlign(OverlayAlign::TopLeft);
 		SetOverlayOffset(overlayOffset_); // Viewport右上から左下に少しずらす
+
+		ApplySettings(EngineSettings::GetInstance()->GetData().manipulator);
 	}
 
 	void Manipulator::SetTarget(WorldTransform* target) {
-		if(target_ != target) {
-			target_ = target;
-		}
+		if(target_ != target) { target_ = target; }
 		targets_.clear();
-		if(target) {
-			targets_.push_back(target);
-		}
+		if(target) { targets_.push_back(target); }
 	}
 
 	void Manipulator::SetTargets(const std::vector<WorldTransform*>& targets) {
 		targets_.clear();
 		for(auto* target : targets) {
 			if(!target) continue;
-			if(std::find(targets_.begin(), targets_.end(), target) != targets_.end()) continue;
+			if(std::find(targets_.begin(),targets_.end(),target) != targets_.end()) continue;
 			targets_.push_back(target);
 		}
 		target_ = targets_.empty() ? nullptr : targets_.back();
-		if(targets_.size() <= 1) {
-			return;
-		}
+		if(targets_.size() <= 1) { return; }
 		RefreshPivot();
 	}
 
-	void Manipulator::SetCamera(BaseCamera* camera) {
-		camera_ = camera;
-	}
+	void Manipulator::SetCamera(BaseCamera* camera) { camera_ = camera; }
 
-	void Manipulator::SetViewRect(const ImVec2& origin, const ImVec2& size) {
+	void Manipulator::SetViewRect(const ImVec2& origin,const ImVec2& size) {
 		viewOrigin_ = origin;
-		viewSize_	= size;
+		viewSize_   = size;
 	}
 
-	void Manipulator::Update() {
-	}
+	void Manipulator::Update() {}
+
+	void Manipulator::ApplySettings(const ManipulatorSettings& settings) { settings_ = settings; }
+
+	ManipulatorSettings Manipulator::GetSettings() const { return settings_; }
 
 	void Manipulator::RefreshPivot() {
 		if(targets_.empty() || wasUsing) return;
 
-		CalyxEngine::Vector3 center = CalyxEngine::Vector3::Zero();
-		int count = 0;
+		Vector3 center = Vector3::Zero();
+		int     count  = 0;
 		for(auto* target : targets_) {
 			if(!target) continue;
 			center += target->GetWorldPosition();
@@ -80,21 +79,21 @@ namespace CalyxEngine {
 
 		center /= static_cast<float>(count);
 		pivotTarget_.Initialize();
-		pivotTarget_.scale = {1.0f, 1.0f, 1.0f};
-		pivotTarget_.rotation = CalyxEngine::Quaternion::MakeIdentity();
+		pivotTarget_.scale       = {1.0f,1.0f,1.0f};
+		pivotTarget_.rotation    = Quaternion::MakeIdentity();
 		pivotTarget_.translation = center;
 		pivotTarget_.Update();
 	}
 
-	void Manipulator::ApplyWorldMatrix(WorldTransform* target, const CalyxEngine::Matrix4x4& worldEdited) {
+	void Manipulator::ApplyWorldMatrix(WorldTransform* target,const Matrix4x4& worldEdited) {
 		if(!target) return;
 
 		float worldCol[16];
-		RowToColumnArray(worldEdited, worldCol);
-		float pW[3], rW[3], sW[3];
-		ImGuizmo::DecomposeMatrixToComponents(worldCol, pW, rW, sW);
+		RowToColumnArray(worldEdited,worldCol);
+		float pW[3],rW[3],sW[3];
+		ImGuizmo::DecomposeMatrixToComponents(worldCol,pW,rW,sW);
 
-		CalyxEngine::Matrix4x4 rotMat = worldEdited;
+		Matrix4x4 rotMat = worldEdited;
 		if(std::abs(sW[0]) > 0.0001f) {
 			rotMat.m[0][0] /= sW[0];
 			rotMat.m[0][1] /= sW[0];
@@ -110,17 +109,17 @@ namespace CalyxEngine {
 			rotMat.m[2][1] /= sW[2];
 			rotMat.m[2][2] /= sW[2];
 		}
-		rotMat.m[3][0] = rotMat.m[3][1] = rotMat.m[3][2] = 0.0f;
-		rotMat.m[3][3] = 1.0f;
-		const CalyxEngine::Quaternion worldRot = CalyxEngine::Quaternion::FromMatrix(rotMat);
+		rotMat.m[3][0]            = rotMat.m[3][1] = rotMat.m[3][2] = 0.0f;
+		rotMat.m[3][3]            = 1.0f;
+		const Quaternion worldRot = Quaternion::FromMatrix(rotMat);
 
 		if(target->parent) {
-			CalyxEngine::Vector3 pScl = {
-				CalyxEngine::Vector3(target->parent->matrix.world.m[0][0], target->parent->matrix.world.m[0][1], target->parent->matrix.world.m[0][2]).Length(),
-				CalyxEngine::Vector3(target->parent->matrix.world.m[1][0], target->parent->matrix.world.m[1][1], target->parent->matrix.world.m[1][2]).Length(),
-				CalyxEngine::Vector3(target->parent->matrix.world.m[2][0], target->parent->matrix.world.m[2][1], target->parent->matrix.world.m[2][2]).Length()};
+			Vector3 pScl = {
+				Vector3(target->parent->matrix.world.m[0][0],target->parent->matrix.world.m[0][1],target->parent->matrix.world.m[0][2]).Length(),
+				Vector3(target->parent->matrix.world.m[1][0],target->parent->matrix.world.m[1][1],target->parent->matrix.world.m[1][2]).Length(),
+				Vector3(target->parent->matrix.world.m[2][0],target->parent->matrix.world.m[2][1],target->parent->matrix.world.m[2][2]).Length()};
 
-			CalyxEngine::Matrix4x4 pRotMat = target->parent->matrix.world;
+			Matrix4x4 pRotMat = target->parent->matrix.world;
 			if(pScl.x > 0.0001f) {
 				pRotMat.m[0][0] /= pScl.x;
 				pRotMat.m[0][1] /= pScl.x;
@@ -139,35 +138,35 @@ namespace CalyxEngine {
 			pRotMat.m[3][0] = pRotMat.m[3][1] = pRotMat.m[3][2] = 0.0f;
 			pRotMat.m[3][3] = 1.0f;
 
-			const CalyxEngine::Quaternion pRotQ = CalyxEngine::Quaternion::FromMatrix(pRotMat);
-			const CalyxEngine::Vector3 pPos = {
+			const Quaternion pRotQ = Quaternion::FromMatrix(pRotMat);
+			const Vector3    pPos  = {
 				target->parent->matrix.world.m[3][0],
 				target->parent->matrix.world.m[3][1],
 				target->parent->matrix.world.m[3][2]};
 
-			const CalyxEngine::Vector3 effPScl = target->inheritScale ? pScl : CalyxEngine::Vector3{1, 1, 1};
-			const CalyxEngine::Quaternion effPRot = target->inheritRotate ? pRotQ : CalyxEngine::Quaternion::MakeIdentity();
-			const CalyxEngine::Vector3 effPPos = target->inheritTranslate ? pPos : CalyxEngine::Vector3{0, 0, 0};
+			const Vector3    effPScl = target->inheritScale ? pScl : Vector3{1,1,1};
+			const Quaternion effPRot = target->inheritRotate ? pRotQ : Quaternion::MakeIdentity();
+			const Vector3    effPPos = target->inheritTranslate ? pPos : Vector3{0,0,0};
 
-			CalyxEngine::Vector3 localTrans = CalyxEngine::Quaternion::RotateVector(
-				CalyxEngine::Vector3{pW[0] - effPPos.x, pW[1] - effPPos.y, pW[2] - effPPos.z},
-				CalyxEngine::Quaternion::Inverse(effPRot));
+			Vector3 localTrans = Quaternion::RotateVector(
+				Vector3{pW[0] - effPPos.x,pW[1] - effPPos.y,pW[2] - effPPos.z},
+				Quaternion::Inverse(effPRot));
 			if(std::abs(effPScl.x) > 0.0001f) localTrans.x /= effPScl.x;
 			if(std::abs(effPScl.y) > 0.0001f) localTrans.y /= effPScl.y;
 			if(std::abs(effPScl.z) > 0.0001f) localTrans.z /= effPScl.z;
 
-			CalyxEngine::Vector3 localScale = {sW[0], sW[1], sW[2]};
+			Vector3 localScale = {sW[0],sW[1],sW[2]};
 			if(std::abs(effPScl.x) > 0.0001f) localScale.x /= effPScl.x;
 			if(std::abs(effPScl.y) > 0.0001f) localScale.y /= effPScl.y;
 			if(std::abs(effPScl.z) > 0.0001f) localScale.z /= effPScl.z;
 
 			target->translation = localTrans;
-			target->scale = localScale;
-			target->rotation = CalyxEngine::Quaternion::Multiply(worldRot, CalyxEngine::Quaternion::Inverse(effPRot));
+			target->scale       = localScale;
+			target->rotation    = Quaternion::Multiply(worldRot,Quaternion::Inverse(effPRot));
 		} else {
-			target->translation = {pW[0], pW[1], pW[2]};
-			target->scale = {sW[0], sW[1], sW[2]};
-			target->rotation = worldRot;
+			target->translation = {pW[0],pW[1],pW[2]};
+			target->scale       = {sW[0],sW[1],sW[2]};
+			target->rotation    = worldRot;
 		}
 
 		target->rotationSource = RotationSource::Quaternion;
@@ -175,9 +174,7 @@ namespace CalyxEngine {
 	}
 
 	void Manipulator::Manipulate() {
-		if(camera_ != SceneContext::Current()->GetCameraMgr()->GetDebug()) {
-			camera_ = SceneContext::Current()->GetCameraMgr()->GetDebug();
-		}
+		if(camera_ != SceneContext::Current()->GetCameraMgr()->GetDebug()) { camera_ = SceneContext::Current()->GetCameraMgr()->GetDebug(); }
 
 		if(targets_.empty() || !camera_) return;
 
@@ -185,29 +182,45 @@ namespace CalyxEngine {
 		if(groupMode) {
 			RefreshPivot();
 			target_ = &pivotTarget_;
-		} else {
-			target_ = targets_.front();
-		}
+		} else { target_ = targets_.front(); }
 
 		if(!target_) return;
 
-		float view[16], proj[16], world[16];
+		float view[16],proj[16],world[16];
 
 		// カメラビュー、プロジェクションを転置して列優先配列に変換
-		CalyxEngine::Matrix4x4::Transpose(camera_->GetViewMatrix()).CopyToArray(view);
-		CalyxEngine::Matrix4x4::Transpose(camera_->GetProjectionMatrix()).CopyToArray(proj);
+		Matrix4x4::Transpose(camera_->GetViewMatrix()).CopyToArray(view);
+		Matrix4x4::Transpose(camera_->GetProjectionMatrix()).CopyToArray(proj);
 
 		// 操作対象のワールド行列を転置して列優先配列に変換
-		CalyxEngine::Matrix4x4::Transpose(target_->matrix.world).CopyToArray(world);
+		Matrix4x4::Transpose(target_->matrix.world).CopyToArray(world);
 
 		// 操作対象のワールド行列でManipulateを呼ぶ
-		// （本来なら第9引数は boundsSnap です。親行列ではないためここでは nullptr にします）
-		ImGuizmo::Manipulate(view, proj, operation_, mode_, world, nullptr, nullptr, nullptr, nullptr);
+		float  snapValues[3] = {0.0f,0.0f,0.0f};
+		float* snapPtr       = nullptr;
+
+		if(settings_.useSnap) {
+			if(operation_ & ImGuizmo::TRANSLATE) {
+				snapValues[0] = settings_.snapTranslate[0];
+				snapValues[1] = settings_.snapTranslate[1];
+				snapValues[2] = settings_.snapTranslate[2];
+				snapPtr       = snapValues;
+			} else if(operation_ & ImGuizmo::ROTATE) {
+				snapValues[0] = settings_.snapRotate;
+				snapPtr       = snapValues;
+			} else if(operation_ & ImGuizmo::SCALE) {
+				snapValues[0] = settings_.snapScale[0];
+				snapValues[1] = settings_.snapScale[1];
+				snapValues[2] = settings_.snapScale[2];
+				snapPtr       = snapValues;
+			}
+		}
+		ImGuizmo::Manipulate(view,proj,operation_,mode_,world,nullptr,snapPtr,nullptr,nullptr);
 
 		bool usingNow = ImGuizmo::IsUsing();
 
 		if(usingNow && !wasUsing) {
-			skipGizmoCommandThisDrag_ = false;
+			skipGizmoCommandThisDrag_  = false;
 			const bool duplicateByDrag =
 				(ImGui::GetIO().KeyCtrl && (operation_ & ImGuizmo::TRANSLATE) && onCtrlTranslateDuplicate_);
 			if(duplicateByDrag) {
@@ -219,172 +232,159 @@ namespace CalyxEngine {
 					if(duplicatedGroupMode) {
 						RefreshPivot();
 						target_ = &pivotTarget_;
-					} else {
-						target_ = targets_.front();
-					}
+					} else { target_ = targets_.front(); }
 				}
 			}
 
 			groupStartWorlds_.clear();
 			groupStartWorlds_.reserve(targets_.size());
-			for(auto* target : targets_) {
-				groupStartWorlds_.push_back(target ? target->matrix.world : CalyxEngine::Matrix4x4::MakeIdentity());
-			}
+			for(auto* target : targets_) { groupStartWorlds_.push_back(target ? target->matrix.world : Matrix4x4::MakeIdentity()); }
 			groupStartPivot_ = pivotTarget_.matrix.world;
-			if(!skipGizmoCommandThisDrag_) {
-				scopedCmd = std::make_unique<ScopedGizmoCommand>(targets_, operation_);
-			}
+			if(!skipGizmoCommandThisDrag_) { scopedCmd = std::make_unique<ScopedGizmoCommand>(targets_,operation_); }
 		}
 
 		if(usingNow) {
-			CalyxEngine::Matrix4x4 worldEdited = ColumnArrayToRow(world);
+			Matrix4x4 worldEdited = ColumnArrayToRow(world);
 
 			if(groupMode) {
 				if(groupStartWorlds_.size() != targets_.size()) {
 					groupStartWorlds_.clear();
 					groupStartWorlds_.reserve(targets_.size());
-					for(auto* target : targets_) {
-						groupStartWorlds_.push_back(target ? target->matrix.world : CalyxEngine::Matrix4x4::MakeIdentity());
-					}
+					for(auto* target : targets_) { groupStartWorlds_.push_back(target ? target->matrix.world : Matrix4x4::MakeIdentity()); }
 					groupStartPivot_ = pivotTarget_.matrix.world;
 				}
 
-				const CalyxEngine::Matrix4x4 delta = CalyxEngine::Matrix4x4::Inverse(groupStartPivot_) * worldEdited;
+				const Matrix4x4 delta = Matrix4x4::Inverse(groupStartPivot_) * worldEdited;
 				for(size_t i = 0; i < targets_.size(); ++i) {
 					auto* target = targets_[i];
 					if(!target || i >= groupStartWorlds_.size()) continue;
-					ApplyWorldMatrix(target, groupStartWorlds_[i] * delta);
+					ApplyWorldMatrix(target,groupStartWorlds_[i] * delta);
 				}
 
 				pivotTarget_.matrix.world = worldEdited;
-				pivotTarget_.translation = CalyxEngine::Matrix4x4::Translation(worldEdited);
+				pivotTarget_.translation  = Matrix4x4::Translation(worldEdited);
 			} else {
-			float wE[16];
-			RowToColumnArray(worldEdited, wE);
-			float pW[3], rW[3], sW[3];
-			ImGuizmo::DecomposeMatrixToComponents(wE, pW, rW, sW);
+				float wE[16];
+				RowToColumnArray(worldEdited,wE);
+				float pW[3],rW[3],sW[3];
+				ImGuizmo::DecomposeMatrixToComponents(wE,pW,rW,sW);
 
-			WorldTransform* worldTarget = dynamic_cast<WorldTransform*>(target_);
-			if(worldTarget && worldTarget->parent) {
-				CalyxEngine::Matrix4x4 effP	  = worldTarget->GetEffectiveParentMatrix();
-				CalyxEngine::Matrix4x4 localMat = worldEdited * CalyxEngine::Matrix4x4::Inverse(effP);
+				WorldTransform* worldTarget = dynamic_cast<WorldTransform*>(target_);
+				if(worldTarget && worldTarget->parent) {
+					Matrix4x4 effP     = worldTarget->GetEffectiveParentMatrix();
+					Matrix4x4 localMat = worldEdited * Matrix4x4::Inverse(effP);
 
-				float localCol[16];
-				RowToColumnArray(localMat, localCol);
-				float pL[3], rL[3], sL[3];
-				ImGuizmo::DecomposeMatrixToComponents(localCol, pL, rL, sL);
+					float localCol[16];
+					RowToColumnArray(localMat,localCol);
+					float pL[3],rL[3],sL[3];
+					ImGuizmo::DecomposeMatrixToComponents(localCol,pL,rL,sL);
 
-				// --- Rigid Inverse Reconstruction (Updateの合成ロジックの逆計算) ---
+					// --- Rigid Inverse Reconstruction (Updateの合成ロジックの逆計算) ---
 
-				// 親の情報を取得 (Updateと同じ方法で抽出)
-				CalyxEngine::Vector3 pScl = {
-					CalyxEngine::Vector3(worldTarget->parent->matrix.world.m[0][0], worldTarget->parent->matrix.world.m[0][1], worldTarget->parent->matrix.world.m[0][2]).Length(),
-					CalyxEngine::Vector3(worldTarget->parent->matrix.world.m[1][0], worldTarget->parent->matrix.world.m[1][1], worldTarget->parent->matrix.world.m[1][2]).Length(),
-					CalyxEngine::Vector3(worldTarget->parent->matrix.world.m[2][0], worldTarget->parent->matrix.world.m[2][1], worldTarget->parent->matrix.world.m[2][2]).Length()};
+					// 親の情報を取得 (Updateと同じ方法で抽出)
+					Vector3 pScl = {
+						Vector3(worldTarget->parent->matrix.world.m[0][0],worldTarget->parent->matrix.world.m[0][1],worldTarget->parent->matrix.world.m[0][2]).Length(),
+						Vector3(worldTarget->parent->matrix.world.m[1][0],worldTarget->parent->matrix.world.m[1][1],worldTarget->parent->matrix.world.m[1][2]).Length(),
+						Vector3(worldTarget->parent->matrix.world.m[2][0],worldTarget->parent->matrix.world.m[2][1],worldTarget->parent->matrix.world.m[2][2]).Length()};
 
-				CalyxEngine::Matrix4x4 pRotMat = worldTarget->parent->matrix.world;
-				if(pScl.x > 0.0001f) {
-					pRotMat.m[0][0] /= pScl.x;
-					pRotMat.m[0][1] /= pScl.x;
-					pRotMat.m[0][2] /= pScl.x;
-				}
-				if(pScl.y > 0.0001f) {
-					pRotMat.m[1][0] /= pScl.y;
-					pRotMat.m[1][1] /= pScl.y;
-					pRotMat.m[1][2] /= pScl.y;
-				}
-				if(pScl.z > 0.0001f) {
-					pRotMat.m[2][0] /= pScl.z;
-					pRotMat.m[2][1] /= pScl.z;
-					pRotMat.m[2][2] /= pScl.z;
-				}
-				pRotMat.m[3][0] = pRotMat.m[3][1] = pRotMat.m[3][2] = 0.0f;
-				pRotMat.m[3][3]										= 1.0f;
-				CalyxEngine::Quaternion pRotQ							= CalyxEngine::Quaternion::FromMatrix(pRotMat);
-
-				CalyxEngine::Vector3 pPos = {worldTarget->parent->matrix.world.m[3][0], worldTarget->parent->matrix.world.m[3][1], worldTarget->parent->matrix.world.m[3][2]};
-
-				CalyxEngine::Vector3	  effPScl = worldTarget->inheritScale ? pScl : CalyxEngine::Vector3{1, 1, 1};
-				CalyxEngine::Quaternion effPRot = worldTarget->inheritRotate ? pRotQ : CalyxEngine::Quaternion::MakeIdentity();
-				CalyxEngine::Vector3	  effPPos = worldTarget->inheritTranslate ? pPos : CalyxEngine::Vector3{0, 0, 0};
-
-				// 操作モードに応じて変更箇所を絞る
-				if(operation_ & ImGuizmo::TRANSLATE) {
-					// worldPos = effPPos + effPRot * (effPScl * localPos)
-					// localPos = (effPRot.Inv * (worldPos - effPPos)) / effPScl
-					CalyxEngine::Vector3 diff		  = {pW[0] - effPPos.x, pW[1] - effPPos.y, pW[2] - effPPos.z};
-					CalyxEngine::Vector3 localTrans = CalyxEngine::Quaternion::RotateVector(diff, CalyxEngine::Quaternion::Inverse(effPRot));
-					if(std::abs(effPScl.x) > 0.0001f) localTrans.x /= effPScl.x;
-					if(std::abs(effPScl.y) > 0.0001f) localTrans.y /= effPScl.y;
-					if(std::abs(effPScl.z) > 0.0001f) localTrans.z /= effPScl.z;
-					target_->translation = localTrans;
-				}
-				if(operation_ & ImGuizmo::SCALE) {
-					// worldScl = localScl * effPScl
-					CalyxEngine::Vector3 localScl = {sW[0], sW[1], sW[2]};
-					if(std::abs(effPScl.x) > 0.0001f) localScl.x /= effPScl.x;
-					if(std::abs(effPScl.y) > 0.0001f) localScl.y /= effPScl.y;
-					if(std::abs(effPScl.z) > 0.0001f) localScl.z /= effPScl.z;
-					target_->scale = localScl;
-				}
-				if(operation_ & ImGuizmo::ROTATE) {
-					// worldRot = localRot * effPRot
-					// localRot = worldRot * effPRot.Inv
-					CalyxEngine::Matrix4x4 wRotMat = worldEdited;
-					if(std::abs(sW[0]) > 0.0001f) {
-						wRotMat.m[0][0] /= sW[0];
-						wRotMat.m[0][1] /= sW[0];
-						wRotMat.m[0][2] /= sW[0];
+					Matrix4x4 pRotMat = worldTarget->parent->matrix.world;
+					if(pScl.x > 0.0001f) {
+						pRotMat.m[0][0] /= pScl.x;
+						pRotMat.m[0][1] /= pScl.x;
+						pRotMat.m[0][2] /= pScl.x;
 					}
-					if(std::abs(sW[1]) > 0.0001f) {
-						wRotMat.m[1][0] /= sW[1];
-						wRotMat.m[1][1] /= sW[1];
-						wRotMat.m[1][2] /= sW[1];
+					if(pScl.y > 0.0001f) {
+						pRotMat.m[1][0] /= pScl.y;
+						pRotMat.m[1][1] /= pScl.y;
+						pRotMat.m[1][2] /= pScl.y;
 					}
-					if(std::abs(sW[2]) > 0.0001f) {
-						wRotMat.m[2][0] /= sW[2];
-						wRotMat.m[2][1] /= sW[2];
-						wRotMat.m[2][2] /= sW[2];
+					if(pScl.z > 0.0001f) {
+						pRotMat.m[2][0] /= pScl.z;
+						pRotMat.m[2][1] /= pScl.z;
+						pRotMat.m[2][2] /= pScl.z;
 					}
-					wRotMat.m[3][0] = wRotMat.m[3][1] = wRotMat.m[3][2] = 0.0f;
-					wRotMat.m[3][3]										= 1.0f;
+					pRotMat.m[3][0]  = pRotMat.m[3][1] = pRotMat.m[3][2] = 0.0f;
+					pRotMat.m[3][3]  = 1.0f;
+					Quaternion pRotQ = Quaternion::FromMatrix(pRotMat);
 
-					CalyxEngine::Quaternion worldRot = CalyxEngine::Quaternion::FromMatrix(wRotMat);
-					target_->rotation			   = CalyxEngine::Quaternion::Multiply(worldRot, CalyxEngine::Quaternion::Inverse(effPRot));
-					target_->rotationSource		   = RotationSource::Quaternion;
-				}
+					Vector3 pPos = {worldTarget->parent->matrix.world.m[3][0],worldTarget->parent->matrix.world.m[3][1],worldTarget->parent->matrix.world.m[3][2]};
 
-			} else {
-				// 親がない、またはWorldTransformでない場合は world 直接
-				// 操作モードに応じて変更箇所を絞る
-				if(operation_ & ImGuizmo::TRANSLATE) {
-					target_->translation = {pW[0], pW[1], pW[2]};
-				}
-				if(operation_ & ImGuizmo::SCALE) {
-					target_->scale = {sW[0], sW[1], sW[2]};
-				}
-				if(operation_ & ImGuizmo::ROTATE) {
-					CalyxEngine::Matrix4x4 rotMat = worldEdited;
-					if(std::abs(sW[0]) > 0.0001f) {
-						rotMat.m[0][0] /= sW[0];
-						rotMat.m[0][1] /= sW[0];
-						rotMat.m[0][2] /= sW[0];
-					}
-					if(std::abs(sW[1]) > 0.0001f) {
-						rotMat.m[1][0] /= sW[1];
-						rotMat.m[1][1] /= sW[1];
-						rotMat.m[1][2] /= sW[1];
-					}
-					if(std::abs(sW[2]) > 0.0001f) {
-						rotMat.m[2][0] /= sW[2];
-						rotMat.m[2][1] /= sW[2];
-						rotMat.m[2][2] /= sW[2];
-					}
+					Vector3    effPScl = worldTarget->inheritScale ? pScl : Vector3{1,1,1};
+					Quaternion effPRot = worldTarget->inheritRotate ? pRotQ : Quaternion::MakeIdentity();
+					Vector3    effPPos = worldTarget->inheritTranslate ? pPos : Vector3{0,0,0};
 
-					target_->rotation		= CalyxEngine::Quaternion::FromMatrix(rotMat);
-					target_->rotationSource = RotationSource::Quaternion;
+					// 操作モードに応じて変更箇所を絞る
+					if(operation_ & ImGuizmo::TRANSLATE) {
+						// worldPos = effPPos + effPRot * (effPScl * localPos)
+						// localPos = (effPRot.Inv * (worldPos - effPPos)) / effPScl
+						Vector3 diff       = {pW[0] - effPPos.x,pW[1] - effPPos.y,pW[2] - effPPos.z};
+						Vector3 localTrans = Quaternion::RotateVector(diff,Quaternion::Inverse(effPRot));
+						if(std::abs(effPScl.x) > 0.0001f) localTrans.x /= effPScl.x;
+						if(std::abs(effPScl.y) > 0.0001f) localTrans.y /= effPScl.y;
+						if(std::abs(effPScl.z) > 0.0001f) localTrans.z /= effPScl.z;
+						target_->translation = localTrans;
+					}
+					if(operation_ & ImGuizmo::SCALE) {
+						// worldScl = localScl * effPScl
+						Vector3 localScl = {sW[0],sW[1],sW[2]};
+						if(std::abs(effPScl.x) > 0.0001f) localScl.x /= effPScl.x;
+						if(std::abs(effPScl.y) > 0.0001f) localScl.y /= effPScl.y;
+						if(std::abs(effPScl.z) > 0.0001f) localScl.z /= effPScl.z;
+						target_->scale = localScl;
+					}
+					if(operation_ & ImGuizmo::ROTATE) {
+						// worldRot = localRot * effPRot
+						// localRot = worldRot * effPRot.Inv
+						Matrix4x4 wRotMat = worldEdited;
+						if(std::abs(sW[0]) > 0.0001f) {
+							wRotMat.m[0][0] /= sW[0];
+							wRotMat.m[0][1] /= sW[0];
+							wRotMat.m[0][2] /= sW[0];
+						}
+						if(std::abs(sW[1]) > 0.0001f) {
+							wRotMat.m[1][0] /= sW[1];
+							wRotMat.m[1][1] /= sW[1];
+							wRotMat.m[1][2] /= sW[1];
+						}
+						if(std::abs(sW[2]) > 0.0001f) {
+							wRotMat.m[2][0] /= sW[2];
+							wRotMat.m[2][1] /= sW[2];
+							wRotMat.m[2][2] /= sW[2];
+						}
+						wRotMat.m[3][0] = wRotMat.m[3][1] = wRotMat.m[3][2] = 0.0f;
+						wRotMat.m[3][3] = 1.0f;
+
+						Quaternion worldRot     = Quaternion::FromMatrix(wRotMat);
+						target_->rotation       = Quaternion::Multiply(worldRot,Quaternion::Inverse(effPRot));
+						target_->rotationSource = RotationSource::Quaternion;
+					}
+				} else {
+					// 親がない、またはWorldTransformでない場合は world 直接
+					// 操作モードに応じて変更箇所を絞る
+					if(operation_ & ImGuizmo::TRANSLATE) { target_->translation = {pW[0],pW[1],pW[2]}; }
+					if(operation_ & ImGuizmo::SCALE) { target_->scale = {sW[0],sW[1],sW[2]}; }
+					if(operation_ & ImGuizmo::ROTATE) {
+						Matrix4x4 rotMat = worldEdited;
+						if(std::abs(sW[0]) > 0.0001f) {
+							rotMat.m[0][0] /= sW[0];
+							rotMat.m[0][1] /= sW[0];
+							rotMat.m[0][2] /= sW[0];
+						}
+						if(std::abs(sW[1]) > 0.0001f) {
+							rotMat.m[1][0] /= sW[1];
+							rotMat.m[1][1] /= sW[1];
+							rotMat.m[1][2] /= sW[1];
+						}
+						if(std::abs(sW[2]) > 0.0001f) {
+							rotMat.m[2][0] /= sW[2];
+							rotMat.m[2][1] /= sW[2];
+							rotMat.m[2][2] /= sW[2];
+						}
+
+						target_->rotation       = Quaternion::FromMatrix(rotMat);
+						target_->rotationSource = RotationSource::Quaternion;
+					}
 				}
-			}
 			}
 		}
 
@@ -404,104 +404,136 @@ namespace CalyxEngine {
 		wasUsing = usingNow;
 	}
 
+
 	void Manipulator::RenderOverlay(const ImVec2& basePos) {
 		Manipulate();
 
 		ImVec2 iconSize = iconTranslate_.size;
-		float  spacing	= 10.0f;
+		float  spacing  = 10.0f;
 
 		struct ButtonInfo {
-			ImGuizmo::OPERATION		 op;
-			const char*				 tooltip;
+			ImGuizmo::OPERATION      op;
+			const char*              tooltip;
 			const Manipulator::Icon& icon;
 		};
 
 		ButtonInfo buttons[] = {
-			{ImGuizmo::TRANSLATE, "Translate", iconTranslate_},
-			{ImGuizmo::ROTATE, "Rotate", iconRotate_},
-			{ImGuizmo::SCALE, "Scale", iconScale_},
-			{ImGuizmo::UNIVERSAL, "Universal", iconUniversal_}};
+			{ImGuizmo::TRANSLATE,"Translate",iconTranslate_},
+			{ImGuizmo::ROTATE,"Rotate",iconRotate_},
+			{ImGuizmo::SCALE,"Scale",iconScale_},
+			{ImGuizmo::UNIVERSAL,"Universal",iconUniversal_}};
 
 		for(int i = 0; i < IM_ARRAYSIZE(buttons); ++i) {
-			ImVec2 btnPos = ImVec2(basePos.x, basePos.y + i * (iconSize.y + spacing));
+			ImVec2 btnPos = ImVec2(basePos.x,basePos.y + i * (iconSize.y + spacing));
 			ImGui::SetCursorScreenPos(btnPos);
 
 			bool isSelected = (operation_ == buttons[i].op);
 			if(isSelected)
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 0.45f, 0.25f, 1.00f));
+				ImGui::PushStyleColor(ImGuiCol_Button,ImVec4(1.00f,0.45f,0.25f,1.00f));
 
-			if(ImGui::ImageButton(buttons[i].icon.texture, iconSize))
+			if(ImGui::ImageButton(buttons[i].icon.texture,iconSize))
 				operation_ = buttons[i].op;
 
 			if(isSelected)
 				ImGui::PopStyleColor();
 
 			if(ImGui::IsItemHovered())
-				ImGui::SetTooltip("%s", buttons[i].tooltip);
+				ImGui::SetTooltip("%s",buttons[i].tooltip);
 		}
 
 		// ワールド/ローカル切り替えボタン
 		{
-			int	   i	  = IM_ARRAYSIZE(buttons);
-			ImVec2 btnPos = ImVec2(basePos.x, basePos.y + i * (iconSize.y + spacing));
+			int    i      = IM_ARRAYSIZE(buttons);
+			ImVec2 btnPos = ImVec2(basePos.x,basePos.y + i * (iconSize.y + spacing));
 			ImGui::SetCursorScreenPos(btnPos);
 
 			bool isWorld = (mode_ == ImGuizmo::WORLD);
 			if(isWorld)
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 0.45f, 0.25f, 1.00f));
+				ImGui::PushStyleColor(ImGuiCol_Button,ImVec4(1.00f,0.45f,0.25f,1.00f));
 
-			if(ImGui::ImageButton(iconWorld_.texture, iconSize))
+			if(ImGui::ImageButton(iconWorld_.texture,iconSize))
 				mode_ = isWorld ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
 			if(isWorld)
 				ImGui::PopStyleColor();
 
 			if(ImGui::IsItemHovered())
-				ImGui::SetTooltip("%s Mode", isWorld ? "World" : "Local");
+				ImGui::SetTooltip("%s Mode",isWorld ? "World" : "Local");
 		}
 
 		{
 			static bool showGrid = false;
-			int			i		 = IM_ARRAYSIZE(buttons);
+			int         i        = IM_ARRAYSIZE(buttons);
 			spacing += 15.0f;
-			ImVec2 btnPos = ImVec2(basePos.x, basePos.y + i * (iconSize.y + spacing));
+			ImVec2 btnPos = ImVec2(basePos.x,basePos.y + i * (iconSize.y + spacing));
 			ImGui::SetCursorScreenPos(btnPos);
 
 			bool pushStyle = false;
 			if(showGrid) {
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 0.45f, 0.25f, 1.00f));
+				ImGui::PushStyleColor(ImGuiCol_Button,ImVec4(1.00f,0.45f,0.25f,1.00f));
 				pushStyle = true;
 			}
 
-			if(ImGui::ImageButton(iconDrawGrid_.texture, iconSize)) {
-				showGrid = !showGrid;
-			}
+			if(ImGui::ImageButton(iconDrawGrid_.texture,iconSize)) { showGrid = !showGrid; }
 
 			if(pushStyle) {
 				ImGui::PopStyleColor(); // Push したときだけ Pop する
 			}
 
-			if(showGrid) {
-				PrimitiveDrawer::GetInstance()->DrawGrid();
+			if(showGrid) { PrimitiveDrawer::GetInstance()->DrawGrid(); }
+		}
+
+		{
+			const int snapIndex = IM_ARRAYSIZE(buttons) + 1;
+			ImVec2    snapPos   = ImVec2(basePos.x,basePos.y + snapIndex * (iconSize.y + spacing));
+			ImGui::SetCursorScreenPos(snapPos);
+			ImGui::PushID("ManipulatorSnap");
+			bool settingsChanged = false;
+
+			bool pushStyle = false;
+			if(settings_.useSnap) {
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 0.45f, 0.25f, 1.00f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.00f, 0.55f, 0.35f, 1.00f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.00f, 0.40f, 0.20f, 1.00f));
+				pushStyle = true;
 			}
+			if(ImGui::ImageButton(snapIcon_.texture, snapIcon_.size)) {
+				settingsChanged = true;
+				settings_.useSnap = !settings_.useSnap;
+			}
+			if(pushStyle) {
+				ImGui::PopStyleColor(3);
+			}
+
+			if(settings_.useSnap) {
+				ImGui::SetNextItemWidth(120.0f);
+				if(operation_ & ImGuizmo::TRANSLATE) {
+					settingsChanged |= ImGui::InputFloat3("Move Step",settings_.snapTranslate);
+				} else if(operation_ & ImGuizmo::ROTATE) {
+					settingsChanged |= ImGui::InputFloat("Angle Step",&settings_.snapRotate);
+				} else if(operation_ & ImGuizmo::SCALE) {
+					settingsChanged |= ImGui::InputFloat3("Scale Step",settings_.snapScale);
+				}
+			}
+			if(settingsChanged) { EngineSettings::GetInstance()->SetManipulatorSettings(settings_); }
+			ImGui::PopID();
 		}
 	}
 
-	void Manipulator::RenderToolbar() {
-	}
+	void Manipulator::RenderToolbar() {}
 
-	void Manipulator::RowToColumnArray(const CalyxEngine::Matrix4x4& m, float out[16]) {
+	void Manipulator::RowToColumnArray(const Matrix4x4& m,float out[16]) {
 		// 回転スケール 3×3 を転置（row→column変換）
-		out[0]	= m.m[0][0];
-		out[1]	= m.m[0][1];
-		out[2]	= m.m[0][2];
-		out[3]	= 0.0f;
-		out[4]	= m.m[1][0];
-		out[5]	= m.m[1][1];
-		out[6]	= m.m[1][2];
-		out[7]	= 0.0f;
-		out[8]	= m.m[2][0];
-		out[9]	= m.m[2][1];
+		out[0]  = m.m[0][0];
+		out[1]  = m.m[0][1];
+		out[2]  = m.m[0][2];
+		out[3]  = 0.0f;
+		out[4]  = m.m[1][0];
+		out[5]  = m.m[1][1];
+		out[6]  = m.m[1][2];
+		out[7]  = 0.0f;
+		out[8]  = m.m[2][0];
+		out[9]  = m.m[2][1];
 		out[10] = m.m[2][2];
 		out[11] = 0.0f;
 
@@ -511,8 +543,8 @@ namespace CalyxEngine {
 		out[15] = 1.0f;
 	}
 
-	CalyxEngine::Matrix4x4 Manipulator::ColumnArrayToRow(const float in_[16]) {
-		CalyxEngine::Matrix4x4 m;
+	Matrix4x4 Manipulator::ColumnArrayToRow(const float in_[16]) {
+		Matrix4x4 m;
 		m.m[0][0] = in_[0];
 		m.m[0][1] = in_[1];
 		m.m[0][2] = in_[2];
@@ -532,5 +564,6 @@ namespace CalyxEngine {
 		m.m[3][3] = 1.0f;
 		return m;
 	}
+
 
 } // namespace CalyxEngine
