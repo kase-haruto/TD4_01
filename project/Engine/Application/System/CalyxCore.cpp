@@ -134,12 +134,8 @@ namespace CalyxEngine {
 	//  フレーム終了処理
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void CalyxCore::EndFrame() {
-		{
-			imguiManager_->End();
-		}
-		{
-			imguiManager_->Draw();
-		}
+		imguiManager_->End();
+		imguiManager_->Draw();
 
 		dxCore_->PostDraw();
 	}

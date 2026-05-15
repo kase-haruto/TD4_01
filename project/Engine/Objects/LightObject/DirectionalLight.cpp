@@ -12,8 +12,6 @@
 #include <Engine/System/Command/EditorCommand/GuiCommand/ImGuiHelper/GuiCmd.h>
 #include <Engine/foundation/Utility/FileSystem/ConfigPathResolver/ConfigPathResolver.h>
 
-#include <cstring>
-
 /////////////////////////////////////////////////////////////////////////////////////////
 //		ctor
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -81,11 +79,7 @@ void DirectionalLight::AlwaysUpdate([[maybe_unused]] float dt) {}
 //		gpuに転送
 /////////////////////////////////////////////////////////////////////////////////////////
 void DirectionalLight::UploadToGpu() {
-	if(!lightDataUploaded_ || std::memcmp(&uploadedLightData_, &lightData_, sizeof(DirectionalLightData)) != 0) {
-		constantBuffer_.TransferData(lightData_);
-		uploadedLightData_ = lightData_;
-		lightDataUploaded_ = true;
-	}
+	constantBuffer_.TransferData(lightData_);
 
 	// ShadowParam (SerializableObject継承) から GPU用POD構造体に変換
 	ShadowParamGpu gpuData{};
@@ -93,12 +87,7 @@ void DirectionalLight::UploadToGpu() {
 	gpuData.baseAngularRadius = shadow_.baseAngularRadius;
 	gpuData.minShadow = shadow_.minShadow;
 	gpuData.isSoft = shadow_.isSoft ? 1u : 0u;
-
-	if(!shadowParamUploaded_ || std::memcmp(&uploadedShadowParam_, &gpuData, sizeof(ShadowParamGpu)) != 0) {
-		shadowParamCB_.TransferData(gpuData);
-		uploadedShadowParam_ = gpuData;
-		shadowParamUploaded_ = true;
-	}
+	shadowParamCB_.TransferData(gpuData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

@@ -19,29 +19,20 @@ void DxFence::Initialize(ComPtr<ID3D12Device> device){
 	assert(fenceEvent_ != nullptr);
 }
 
-uint64_t DxFence::Signal(ComPtr<ID3D12CommandQueue> commandQueue){
+void DxFence::Signal(ComPtr<ID3D12CommandQueue> commandQueue){
 	//Fenceの値を更新
 	fenceValue_++;
 	//GPUがここまでたどり着いたときに,Fenceの値を指定した値に代入するようにSignalを送る
 	commandQueue->Signal(fence_.Get(), fenceValue_);
-	return fenceValue_;
 }
 
 void DxFence::Wait(){
-	Wait(fenceValue_);
-}
-
-void DxFence::Wait(uint64_t fenceValue){
 	//fenceの値が指定したsignalの値にたどり着いてるか確認する
 	//GetCompletedValueの初期値はfence作成時に渡した初期値
-	if (fence_->GetCompletedValue() < fenceValue){
+	if (fence_->GetCompletedValue() < fenceValue_){
 		//指定したsignalにたどり着いていないので、たどり着くまで待つようにイベントを指定する
-		fence_->SetEventOnCompletion(fenceValue, fenceEvent_);
+		fence_->SetEventOnCompletion(fenceValue_, fenceEvent_);
 		//イベントを待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
-}
-
-bool DxFence::IsCompleted(uint64_t fenceValue) const{
-	return fenceValue == 0 || fence_->GetCompletedValue() >= fenceValue;
 }

@@ -12,8 +12,6 @@
 
 // c++
 #include <memory>
-#include <array>
-#include <vector>
 
 using Microsoft::WRL::ComPtr;
 
@@ -68,8 +66,6 @@ namespace CalyxEngine {
 		 * \param height 高さ
 		 */
 		void Resize(uint32_t width, uint32_t height);
-		void WaitForGpu();
-		void RetireAfterGpu(std::shared_ptr<void> resource);
 
 		/**
 		 * \brief エンジンUIの描画
@@ -85,7 +81,6 @@ namespace CalyxEngine {
 		 * \brief リソース解放
 		 */
 		void ReleaseResources();
-		void CollectRetiredResources();
 
 	public:
 		//===================================================================*/
@@ -140,14 +135,6 @@ namespace CalyxEngine {
 		DXGI_FORMAT                             format_            = DXGI_FORMAT_R8G8B8A8_UNORM; //< バックバッファフォーマット
 		std::unique_ptr<RenderTargetCollection> renderTargetCollection_; //< レンダリングターゲット管理
 		std::unique_ptr<DxFence>                dxFence_; //< フェンス管理
-		std::array<uint64_t, DxCommand::kFrameCount> frameFenceValues_ {};
-		uint32_t currentFrameIndex_ = 0;
-
-		struct RetiredResource {
-			uint64_t fenceValue = 0;
-			std::shared_ptr<void> resource;
-		};
-		std::vector<RetiredResource> retiredResources_;
 	};
 
 } // namespace CalyxEngine

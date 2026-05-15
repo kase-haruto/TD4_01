@@ -30,7 +30,6 @@
 #include "Engine/Graphics/Context/GraphicsGroup.h"
 
 #include <array>
-#include <sstream>
 
 const std::string BaseModel::directoryPath_ = "Resource/models";
 
@@ -47,6 +46,11 @@ void BaseModel::Update(float deltaTime) {
 	} else {
 		// テクスチャの更新
 		UpdateTexture(deltaTime);
+
+		// UV transform を行列化
+		CalyxEngine::Matrix4x4 uvTransformMatrix = CalyxEngine::MakeScaleMatrix(CalyxEngine::Vector3(uvTransform.scale.x, uvTransform.scale.y, 1.0f));
+		uvTransformMatrix					   = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeRotateZMatrix(uvTransform.rotate));
+		uvTransformMatrix					   = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 
 		TransferMaterial();
 
@@ -85,7 +89,6 @@ void BaseModel::OnModelLoaded() {
 	if(!handle_) {
 		textureName_ = modelData_->meshResource.Material().textureFilePath;
 	}
-	InvalidateMaterialGraphTextureTables();
 
 	// -------- インスタンシングバッファの初期確保 --------
 	if(!instanceBufferCreated_) {
@@ -199,7 +202,6 @@ void BaseModel::ApplyConfig(const BaseModelConfig& config) {
 	uvTransform.ApplyConfig(config.uvTransConfig);
 	blendMode_ = static_cast<BlendMode>(config.blendMode);
 	fileName_  = config.modelName;
-	InvalidateMaterialGraphTextureTables();
 
 	bool ok = false;
 
@@ -395,7 +397,6 @@ bool BaseModel::LoadTextureByGuid(const Guid& g) {
 
 	handle_		 = h;
 	textureGuid_ = g;
-	InvalidateMaterialGraphTextureTables();
 	return true;
 }
 
@@ -403,17 +404,14 @@ void BaseModel::SetTextureGuid(const Guid& g) {
 	if(!g.isValid()) {
 		handle_.reset();
 		textureGuid_ = Guid::Empty();
-		InvalidateMaterialGraphTextureTables();
 		return;
 	}
 
 	LoadTextureByGuid(g);
-	InvalidateMaterialGraphTextureTables();
 }
 
 void BaseModel::SetMaterialGuid(const Guid& g) {
 	materialGuid_ = g;
-	InvalidateMaterialGraphTextureTables();
 	TransferMaterial();
 }
 
@@ -424,7 +422,6 @@ ModelData* BaseModel::GetModelData() const { return modelData_; }
 void BaseModel::SetTex(const std::string& name) {
 	textureName_ = "textures/" + name;
 	handle_ = CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->LoadTexture(textureName_);
-	InvalidateMaterialGraphTextureTables();
 }
 
 void BaseModel::EnsureInstanceCapacity(ID3D12Device* device, UINT needCount) {
@@ -433,7 +430,6 @@ void BaseModel::EnsureInstanceCapacity(ID3D12Device* device, UINT needCount) {
 		instanceBuffer_.Initialize(device, instanceBufferCapacity_); // Upload
 		instanceBuffer_.CreateSrv(device);
 		instanceBufferCreated_ = true;
-		uploadedInstanceMatrices_.clear();
 		return;
 	}
 	if(needCount <= instanceBufferCapacity_) return;
@@ -444,7 +440,6 @@ void BaseModel::EnsureInstanceCapacity(ID3D12Device* device, UINT needCount) {
 	instanceBuffer_.Reset();
 	instanceBuffer_.Initialize(device, instanceBufferCapacity_);
 	instanceBuffer_.CreateSrv(device);
-	uploadedInstanceMatrices_.clear();
 }
 
 void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transforms) {
@@ -453,17 +448,10 @@ void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transf
 	for(const auto& tf : transforms) {
 		TransformationMatrix m{};
 		m.world					= tf.matrix.world;
-		m.WorldInverseTranspose = tf.matrix.WorldInverseTranspose;
+		m.WorldInverseTranspose = CalyxEngine::Matrix4x4::Transpose(CalyxEngine::Matrix4x4::Inverse(tf.matrix.world));
 		matrices.push_back(m);
 	}
-
-	if(uploadedInstanceMatrices_.size() == matrices.size() &&
-	   std::memcmp(uploadedInstanceMatrices_.data(), matrices.data(), sizeof(TransformationMatrix) * matrices.size()) == 0) {
-		return;
-	}
-
 	instanceBuffer_.TransferVectorData(matrices);
-	uploadedInstanceMatrices_ = std::move(matrices);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetInstanceSrv() const { return instanceBuffer_.GetGpuSrvHandle(); }
@@ -507,38 +495,9 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t ma
 	if(materialGraphTextureTables_.size() <= materialIndex) {
 		materialGraphTextureTables_.resize(materialIndex + 1);
 	}
-	if(materialGraphTextureTableKeys_.size() <= materialIndex) {
-		materialGraphTextureTableKeys_.resize(materialIndex + 1);
-	}
 	DescriptorHandle& textureTable = materialGraphTextureTables_[materialIndex];
 	if(!textureTable.IsValid()) {
 		textureTable = DescriptorAllocator::AllocateRange(DescriptorUsage::CbvSrvUav, kMaxGraphTextures);
-	}
-
-	std::ostringstream key;
-	key << materialIndex << '|'
-		<< materialGuid_.ToString() << '|'
-		<< textureGuid_.ToString() << '|'
-		<< textureName_ << '|';
-	if(modelData_) {
-		const auto& materials = modelData_->meshResource.Materials();
-		if(materialIndex < materials.size()) key << materials[materialIndex].textureFilePath;
-		if(!materials.empty()) key << '|' << materials[0].textureFilePath;
-	}
-	if(auto material = GetMaterialAsset()) {
-		key << "|object=" << material->objectTextureGuid.ToString();
-		for(const auto& node : material->graph.nodes) {
-			if(node.type != "ObjectTexture" && node.type != "Texture2D") continue;
-			key << "|node=" << node.id << ':' << node.type;
-			if(auto it = node.properties.find("textureGuid"); it != node.properties.end() && it->is_string()) {
-				key << ':' << it->get<std::string>();
-			}
-		}
-	}
-
-	const std::string tableKey = key.str();
-	if(materialGraphTextureTableKeys_[materialIndex] == tableKey) {
-		return textureTable.gpu;
 	}
 
 	const UINT descriptorSize = DescriptorAllocator::GetDescriptorSize(DescriptorUsage::CbvSrvUav);
@@ -582,7 +541,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t ma
 		}
 	}
 
-	materialGraphTextureTableKeys_[materialIndex] = tableKey;
 	return textureTable.gpu;
 }
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetEnvMapSrv() const { return CalyxEngine::AssetManager::GetInstance()->GetTextureManager()->GetEnvironmentTextureSrvHandle(); }
@@ -619,7 +577,6 @@ void BaseModel::EnsureBillboardCapacity(ID3D12Device* device, UINT needCount) {
 		billboardCapacity_ = std::max<UINT>(needCount, 256u);
 		billboardBuffer_.Initialize(device, billboardCapacity_); // Upload
 		billboardBuffer_.CreateSrv(device);						 // VS:t1
-		uploadedBillboardParams_.clear();
 		return;
 	}
 	if(needCount <= billboardCapacity_) return;
@@ -628,18 +585,11 @@ void BaseModel::EnsureBillboardCapacity(ID3D12Device* device, UINT needCount) {
 	billboardBuffer_.Reset();
 	billboardBuffer_.Initialize(device, billboardCapacity_);
 	billboardBuffer_.CreateSrv(device);
-	uploadedBillboardParams_.clear();
 }
 
 void BaseModel::UploadBillboardParams(const std::vector<GpuBillboardParams>& params) {
 	if(!billboardBuffer_.IsValid() || params.empty()) return;
-	if(uploadedBillboardParams_.size() == params.size() &&
-	   std::memcmp(uploadedBillboardParams_.data(), params.data(), sizeof(GpuBillboardParams) * params.size()) == 0) {
-		return;
-	}
-
 	std::memcpy(billboardBuffer_.Data(), params.data(), sizeof(GpuBillboardParams) * params.size());
-	uploadedBillboardParams_ = params;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetBillboardSrv() const { return billboardBuffer_.GetGpuSrvHandle(); }
@@ -682,19 +632,10 @@ void BaseModel::TransferMaterial() {
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeRotateZMatrix(uvTransform.rotate));
 	uvTransformMatrix = CalyxEngine::Matrix4x4::Multiply(uvTransformMatrix, CalyxEngine::MakeTranslateMatrix(CalyxEngine::Vector3(uvTransform.translate.x, uvTransform.translate.y, 0.0f)));
 	data.uvTransform = uvTransformMatrix;
-	data.pad3 = 0.0f;
-
-	if(materialUploaded_ && std::memcmp(&currentMaterial_, &data, sizeof(Material)) == 0) {
-		return;
-	}
+	data.pad3 = ClockManager::GetInstance()->GetTotalTime();
 
 	currentMaterial_ = data;
 	materialBuffer_.TransferData(data);
-	materialUploaded_ = true;
-}
-
-void BaseModel::InvalidateMaterialGraphTextureTables() {
-	materialGraphTextureTableKeys_.clear();
 }
 
 const CalyxEngine::Vector4& BaseModel::GetColor() const {

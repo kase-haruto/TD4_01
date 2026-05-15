@@ -136,8 +136,6 @@ private:
 	//===================================================================*/
 	DxConstantBuffer<PointLightData> constantBuffer_; //< 定数バッファ
 	PointLightData lightData_ = {}; //< ライトデータ本体
-	PointLightData uploadedLightData_ = {};
-	bool lightDataUploaded_ = false;
 
 	ConfigurableObject<PointLightConfig> config_; //< コンフィグ管理
 };

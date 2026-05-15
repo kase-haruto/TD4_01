@@ -49,8 +49,6 @@ namespace CalyxEngine {
 
 		void BindPlaySession(CalyxEngine::PlaySession* ps) { pPlaySession_ = ps; }
 		void SetEditorPreviewContext(SceneContext* ctx) { editorPreviewCtx_ = ctx; }
-		void WaitForGpu() const;
-		void RetireAfterGpu(std::shared_ptr<void> resource) const;
 
 		SceneContext* ActiveCtx() const;
 		bool		  ActiveRuntimeFlag() const;
