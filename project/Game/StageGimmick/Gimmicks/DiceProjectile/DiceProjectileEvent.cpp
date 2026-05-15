@@ -68,7 +68,7 @@ void DiceProjectileEvent::EventInitialize() {
 			targetObjects_[i].lock()->Initialize();
 			continue;
 		}
-		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("debugCube.obj", indexedObjectName);
+		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", indexedObjectName);
 		if(targetObject) {
 			targetObject->SetParent(shared_from_this());
 			targetObject->SetParam(eventParam_.param_);

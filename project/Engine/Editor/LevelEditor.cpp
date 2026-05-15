@@ -935,6 +935,15 @@ namespace CalyxEngine {
 			lastPlaying_ = playing;
 		}
 
+		// shortcutでのシーンの保存
+		if(CalyxFoundation::Input::PushKey(DIK_LCONTROL)) {
+			if(CalyxFoundation::Input::TriggerKey(DIK_S)) {
+				if(SceneContext* scene = SceneContext::Current()) {
+					SceneSerializer::Save(*scene, scene->GetScenePath());
+				}
+			}
+		}
+
 		// LivePP Visibility Control
 		if(livePPPanel_) {
 			auto* service	 = CalyxEngine::LivePPService::GetInstance();

@@ -95,6 +95,7 @@ private:
 	PlayerParameter param_;
 	bool  isJumping_	 = false;
 	bool  isDiving_		 = false;
+	CalyxEngine::Quaternion preRotate_;
 
 	// ダメージ点滅用
 	float damageFlashTimer_ = 0.0f;

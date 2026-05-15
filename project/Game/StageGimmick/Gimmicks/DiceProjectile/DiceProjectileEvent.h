@@ -48,6 +48,7 @@ private:
 
 		DiceProjectileEventParam() {
 			AddField("scale", param_.scale).Category("DiceProjectileEvent");
+			AddField("hitScale", param_.hitScale).Category("DiceProjectileEvent");
 			AddField("rotateSpeed", param_.rotateSpeed).Category("DiceProjectileEvent");
 			AddField("speed", param_.speed).Category("DiceProjectileEvent");
 			AddField("parryDuration", param_.parryDuration).Category("DiceProjectileEvent");

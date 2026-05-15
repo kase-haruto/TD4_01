@@ -1,5 +1,7 @@
 #include "DiceSocketObject.h"
 
+#include <numbers>
+
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine\Foundation\Utility\Ease\CxEase.h>
 
@@ -21,6 +23,28 @@ const CalyxEngine::Vector3 DiceSocketObject::GetSocketPos() {
 	return position;
 }
 
+const CalyxEngine::Quaternion DiceSocketObject::GetSameNumberRotation() {
+
+	CalyxEngine::Vector3 axis  = CalyxEngine::Vector3::Up();
+	float angle = 0.0f;
+
+	if(sameNumbers_ == 1) {
+		angle = std::numbers::pi_v<float> / 2.0f;
+		axis  = CalyxEngine::Vector3::Right();
+	} else if(sameNumbers_ == 3) {
+		angle = -std::numbers::pi_v<float> / 2.0f;
+	} else if(sameNumbers_ == 4) {
+		angle = std::numbers::pi_v<float> / 2.0f;
+	} else if(sameNumbers_ == 5) {
+		angle = std::numbers::pi_v<float>;
+	} else if(sameNumbers_ == 6) {
+		angle = -std::numbers::pi_v<float> / 2.0f;
+		axis  = CalyxEngine::Vector3::Right();
+	}
+
+	return CalyxEngine::Quaternion::MakeRotateAxisQuaternion(axis, angle);
+}
+
 void DiceSocketObject::ObjectInitialize() {
 
 	// コライダーの初期化
@@ -36,6 +60,8 @@ void DiceSocketObject::ObjectInitialize() {
 
 	worldTransform_.inheritScale = false;
 	worldTransform_.scale.x = static_cast<float>(clearCount_ + 1u);
+
+	sameNumbers_ = static_cast<uint32_t>(rand() % 6 + 1);
 }
 
 void DiceSocketObject::ObjectUpdate(float) {

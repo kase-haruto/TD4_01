@@ -40,6 +40,8 @@ struct DiceProjectileParam {
 
 	// オブジェクトのスケール
 	float scale = 1.0f;
+	// 判定を取った際のスケール
+	float hitScale = 1.0f;
 	// 飛んでいく方向
 	CalyxEngine::Vector3 direction = -CalyxEngine::Vector3::Forward();
 	// サイコロの速度

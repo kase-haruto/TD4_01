@@ -52,16 +52,10 @@ private:
 		const float u = 1.0f - t;
 		return (u * u) * p0 + (2.0f * u * t) * p1 + (t * t) * p2;
 	}
-	void OffsetRotation() {
-		auto rotation = CalyxEngine::Quaternion::MakeRotateAxisQuaternion(
-			CalyxEngine::Vector3::One(), std::numbers::pi_v<float> * 2.0f);
-		worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
-			worldTransform_.rotation, rotation, 0.1f);
-	}
+	void OffsetRotation();
 	void ChangeScale() {
 		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
-			CalyxEngine::Vector3::One() * param_.scale, worldTransform_.scale, 0.1f
-		);
+			worldTransform_.scale, CalyxEngine::Vector3::One() * param_.scale, 0.1f);
 	}
 
 private:

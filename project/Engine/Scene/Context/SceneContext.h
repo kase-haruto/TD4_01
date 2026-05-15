@@ -80,6 +80,9 @@ public:
 	SceneObject*		   GetDebugSelectedObject() const { return debugSelectedObject_; }
 	const std::vector<SceneObject*>& GetDebugSelectedObjects() const { return debugSelectedObjects_; }
 
+	const std::string& GetScenePath() const { return scenePath; }
+	void SetScenePath(const std::string& path) { scenePath = path; }
+
 	// setter
 	void SetSceneName(const std::string& n) { sceneName_ = n; }
 	void SetRuntime(bool f) { isRuntime_ = f; }
@@ -128,6 +131,7 @@ private:
 	std::vector<ObjectRemovedCallback> objectRemovedCallbacks_;
 	std::vector<ObjectAddedCallback>   objectAddedCallbacks_;
 
+	std::string scenePath = "";
 	std::string sceneName_ = "scene";
 	bool		isRuntime_ = false;
 

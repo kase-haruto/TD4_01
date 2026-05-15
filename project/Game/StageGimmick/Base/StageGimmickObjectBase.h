@@ -16,6 +16,8 @@ public:
 
 	void Initialize() override;
 	void Update(float dt) override;
+
+	const CalyxEngine::Vector3 GetCenterPos() const override;
 	
 	std::string_view GetObjectClassName() const override {
 		return "StageGimmickObjectBase";

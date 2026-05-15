@@ -9,6 +9,7 @@
 #include "Game/Scene/Utility/SceneTypeUtil.h"
 #include <Game/DemoPlayer/DemoPlayer.h>
 #include <Game/Scene/Select/SelectScene.h>
+#include <Game\Scene\Transition\TransitionPayload.h>
 
 // engine
 #include <Engine/Collision/CollisionManager.h>
@@ -52,6 +53,16 @@ void SelectScene::Initialize() {
 	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
 	pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 	pauseBg_->Update();
+
+	transitionControl_ = std::make_unique<TransitionControl>();
+	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	// シーンタイプに基づいて自動で演出をセット
+	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::SELECT);
+	transitionControl_->StartOpening(0.5f, [this]() {
+		IsOpening_ = false;
+	});
+	IsOpening_ = true;
+	IsPhase_   = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -59,10 +70,18 @@ void SelectScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 void SelectScene::Update([[maybe_unused]] float dt) {
 
+	transitionControl_->Update(dt);
+
+	if(IsPhase_ || IsOpening_) return;
+
 	SelectUpdate(dt);
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
+		});
 	}
 
 	// 衝突判定
@@ -75,6 +94,7 @@ void SelectScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoS
 	//	sprite की 登録
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
+	transitionControl_->Draw(spriteRenderer_.get());
 
 	// シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
@@ -102,7 +122,11 @@ void SelectScene::SelectUpdate(float) {
 	// 決定操作
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		gamePayload_ = BuildGamePayload(selectedIndex_);
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST),std::move(gamePayload_));
+		IsPhase_	 = true;
+		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
+		});
 	}
 
 	// 選択中のステージに応じて背景色を変更（デバッグ用フィードバック）
@@ -120,4 +144,13 @@ std::unique_ptr<GameTransitionPayload> SelectScene::BuildGamePayload(int num) {
 	auto payload = std::make_unique<GameTransitionPayload>();
 	payload->stageNum_ = num;
 	return payload;
+}
+
+void SelectScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
+	if(!payload) return;
+
+	// 自分が知っている型にだけキャストする
+	if(auto* p = static_cast<TransitionPayload*>(payload.get())) {
+		preType_ = p->type;
+	}
 }

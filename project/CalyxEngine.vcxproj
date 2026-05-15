@@ -228,6 +228,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Application\UI\EngineUI\ManipulatorSettingsUI.cpp" />
+    <ClCompile Include="Game\Scene\Transition\TransitionControl.cpp" />
+    <ClCompile Include="Game\Scene\Transition\TransitionPayload.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.cpp" />
@@ -518,6 +520,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Engine\Application\UI\EngineUI\ManipulatorSettings.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\ManipulatorSettingsUI.h" />
+    <ClInclude Include="Game\Scene\Transition\TransitionControl.h" />
+    <ClInclude Include="Game\Scene\Transition\TransitionPayload.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.h" />
