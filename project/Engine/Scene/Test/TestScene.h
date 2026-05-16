@@ -6,6 +6,7 @@
 #include <Engine/Extensions/Fog/FogEffect.h>
 #include <Engine/scene/Base/BaseScene.h>
 #include <Engine/Renderer/Sprite/Sprite.h>
+#include <Engine/Objects/2D/Object2d/SpriteObject2d.h>
 #include <Engine/Objects/3D/Actor/TestObject/CalyxHuman.h>
 /* c++ */
 #include <memory>
@@ -46,8 +47,12 @@ public:
 
 private:
 
+	void InitPauseResource();
 	void CheckStageState(float dt);
 	void PauseUpdate(float dt);
+	void PauseUIUpdate(float dt);
+	void PauseOpen();
+	void PauseClose();
 	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
 
 private:
@@ -62,15 +67,21 @@ private:
 	std::shared_ptr<DemoPlayer>		player_;
 
 	bool isPaused_ = false;
-	std::unique_ptr<Sprite> pauseBg_ = nullptr;
+	std::unique_ptr<Sprite> fanBg_		 = nullptr;
 	std::unique_ptr<Sprite> resumeBtn_ = nullptr;
 	std::unique_ptr<Sprite> toSelectBtn_ = nullptr;
 	std::unique_ptr<Sprite> toTitleBtn_ = nullptr;
 
-	int selectedIndex_ = 0;
+	float openingTime_	 = 0.0f;
+	float currentOpeningTime_ = 0.0f;
+	float frameDuration_	  = 0.0f;
+	int frame_	  = 0;
+	bool isFanOpen_		= false;
+	float	 lastDt_		= 0.0f;
+	int	 selectedIndex_ = 0;
 	
 	int									 stageNum_			  = 0;
-	std::unique_ptr<Stage> stage_ = nullptr;
+	std::unique_ptr<Stage>				 stage_				  = nullptr;
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 
 	std::unique_ptr<TransitionControl> transitionControl_ = nullptr;

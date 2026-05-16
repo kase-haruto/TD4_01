@@ -15,10 +15,11 @@
 // engine
 #include <Engine/Collision/CollisionManager.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
+#include <Engine/Foundation/Utility/Ease/CxEase.h>
 #include <Engine/Scene/Serializer/SceneSerializer.h>
-#include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Foundation/Clock/ClockManager.h>
+#include <Engine/Application/System/Environment.h>
 // lib
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -62,26 +63,8 @@ void TestScene::Initialize(){
 	//=========================
 	// グラフィック関連
 	//=========================
-	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {1280.0f, 720.0f});
-	pauseBg_->SetColor({0.0f, 0.0f, 0.0f, 0.5f});
-	pauseBg_->Update();
 
-	const std::string whiteTex = "Textures/white1x1.dds";
-	resumeBtn_ = std::make_unique<Sprite>(whiteTex);
-	resumeBtn_->Initialize({640.0f, 200.0f}, {300.0f, 60.0f});
-	resumeBtn_->SetAnchorPoint({0.5f, 0.5f});
-	resumeBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
-
-	toSelectBtn_ = std::make_unique<Sprite>(whiteTex);
-	toSelectBtn_->Initialize({640.0f, 350.0f}, {300.0f, 60.0f});
-	toSelectBtn_->SetAnchorPoint({0.5f, 0.5f});
-	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
-
-	toTitleBtn_ = std::make_unique<Sprite>(whiteTex);
-	toTitleBtn_->Initialize({640.0f, 500.0f}, {300.0f, 60.0f});
-	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
-	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+	InitPauseResource();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
@@ -93,6 +76,7 @@ void TestScene::Initialize(){
 	IsOpening_ = true;
 	IsPhase_   = false;
 	isPaused_ = false;
+	isFanOpen_	   = false;
 	selectedIndex_ = 0;
 }
 
@@ -107,18 +91,21 @@ void TestScene::Update([[maybe_unused]]float dt){
 
 	// ポーズの切り替え
 	if(CalyxFoundation::Input::TriggerKey(DIK_ESCAPE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::START)) {
-		isPaused_ = !isPaused_;
-		if(isPaused_) {
+		if(!isPaused_) {
+			lastDt_	  = dt;
+			isPaused_ = true;
 			ClockManager::GetInstance()->SetTimeScale(0.0f);
+			PauseOpen();
 		} else {
-			ClockManager::GetInstance()->SetTimeScale(1.0f);
+			PauseClose();
 		}
 	}
 
 	CheckStageState(dt);
 
 	if (isPaused_) {
-		PauseUpdate(dt);
+		PauseUIUpdate(lastDt_);
+		PauseUpdate(lastDt_);
 		return;
 	}
 
@@ -140,7 +127,7 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	stage_->Draw(spriteRenderer_.get());
 
 	if (isPaused_) {
-		spriteRenderer_->Register(pauseBg_.get());
+		spriteRenderer_->Register(fanBg_.get());
 		spriteRenderer_->Register(resumeBtn_.get());
 		spriteRenderer_->Register(toSelectBtn_.get());
 		spriteRenderer_->Register(toTitleBtn_.get());
@@ -157,6 +144,33 @@ void TestScene::CleanUp(){
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
+}
+
+void TestScene::InitPauseResource() {
+	const std::string whiteTex = "Textures/white1x1.dds";
+	resumeBtn_				   = std::make_unique<Sprite>(whiteTex);
+	resumeBtn_->Initialize({640.0f, 200.0f}, {300.0f, 60.0f});
+	resumeBtn_->SetAnchorPoint({0.5f, 0.5f});
+	resumeBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+
+	toSelectBtn_ = std::make_unique<Sprite>(whiteTex);
+	toSelectBtn_->Initialize({640.0f, 350.0f}, {300.0f, 60.0f});
+	toSelectBtn_->SetAnchorPoint({0.5f, 0.5f});
+	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+
+	toTitleBtn_ = std::make_unique<Sprite>(whiteTex);
+	toTitleBtn_->Initialize({640.0f, 500.0f}, {300.0f, 60.0f});
+	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
+	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+
+	fanBg_ = std::make_unique<Sprite>("Textures/Pause/fan.png");
+	fanBg_->Initialize({0.0f, 720.0f}, {1280.0f, 720.0f});
+	fanBg_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	fanBg_->SetUvScale({1.0f / 7.0f, 1.0f});
+	fanBg_->SetUvOffset({0.0f, 0.0f});
+	openingTime_   = 1.0f;
+	frameDuration_ = 0.6f / 7.0f;
+	frame_		   = 0;
 }
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
@@ -223,8 +237,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 	};
 
 	updateBtn(resumeBtn_, 0, [&]() {
-		isPaused_ = false;
-		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		PauseClose();
 	});
 
 	updateBtn(toSelectBtn_, 1, [&]() {
@@ -246,6 +259,74 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TITLE), std::move(payload_));
 		});
 	});
+}
+
+void TestScene::PauseUIUpdate(float dt) {
+	currentOpeningTime_ += dt;
+	float t = (std::min)(currentOpeningTime_ / openingTime_, 1.0f);
+
+	float h		= static_cast<float>(kWindowHeight) * 1.75f;
+	float y		= 0.0f;
+	int	  frame = 0;
+
+	if(isFanOpen_) {
+		// t:0~0.4は下からfanBg_が登ってくる（ｙが720から０まで）
+		if(t <= 0.4f) {
+			float upT = (std::min)(t / 0.4f, 1.0f);
+			float easeT = std::sqrtf(1.0f - std::powf(upT - 1.0f, 2));
+			y			= h * (1.0f - easeT);
+			frame	  = 0;
+		} else {
+			// t:0.4~1はfanBg_が開く（1280＊720の連番（横1280＊７、縦７２０））
+			y			= 0.0f;
+			float animT = (std::min)((t - 0.4f) / 0.6f, 1.0f);
+			frame		= static_cast<int>(animT * 7.0f);
+			if(frame > 6) frame = 6;
+		}
+	} else {
+		// isFanOpen_じゃない時は
+		// t:0~0.6はfanBg_が閉じる（1280＊720の連番（横1280＊７、縦７２０））
+		if(t <= 0.6f) {
+			y			= 0.0f;
+			float animT = (std::min)(t / 0.6f, 1.0f);
+			frame		= static_cast<int>((1.0f - animT) * 7.0f);
+			if(frame > 6) frame = 6;
+		} else {
+			// t:0.6~1はfanBg_が下がっていく（ｙが0から720まで）
+			float downT = (std::min)((t - 0.6f) / 0.4f, 1.0f);
+			float easeT = 1.0f - std::sqrtf(1.0f - std::powf(downT, 2));
+			y			= h * easeT;
+			frame		= 0;
+		}
+	}
+
+	fanBg_->SetPosition({0.0f, y});
+
+	// UVアニメーション (横1280*7の連番)
+	float frameWidth = 1.0f / 7.0f;
+	fanBg_->SetUvScale({frameWidth, 1.0f});
+	fanBg_->SetUvOffset({static_cast<float>(frame) * frameWidth, 0.0f});
+
+	fanBg_->Update();
+	// 閉じきったらポーズ終了
+	if(isFanOpen_) {
+		return;
+	}
+	if(t >= 1.0f) {
+		isPaused_ = false;
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+	}
+}
+
+void TestScene::PauseOpen() {
+	isFanOpen_ = true;
+	currentOpeningTime_ = 0.0f;
+}
+
+void TestScene::PauseClose() {
+	if(!isFanOpen_) return;
+	isFanOpen_			= false;
+	currentOpeningTime_ = 0.0f;
 }
 
 std::unique_ptr<TransitionPayload> TestScene::BuildNowTypePayload(SceneType Type) {
