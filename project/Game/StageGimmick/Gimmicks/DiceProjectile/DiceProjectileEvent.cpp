@@ -59,7 +59,7 @@ void DiceProjectileEvent::EventInitialize() {
 
 	std::string eventName = GetName();
 	const std::string eventPrefix  = "DiceProjectileEvent";
-	const std::string objectPrefix = "DiceProjectileObject(";
+	const std::string objectPrefix = "DiceProjectileObject";
 	const std::string socketPrefix = "DiceSocketObject";
 
 	// イベント名が"DroolRainEvent"で始まっているか確認する
@@ -74,9 +74,6 @@ void DiceProjectileEvent::EventInitialize() {
 
 	// Prefab 配置済みの子があれば、名前ではなく親子関係から拾う
 	auto object = FindDirectChildOfType<DiceSocketObject>(*this);
-	if(!object) {
-		object = SceneContext::Current()->FindObjectByName<DiceSocketObject>(socketName);
-	}
 	if(object) {
 		object->SetClearCount(eventData_.clearCount);
 		object->Initialize();
@@ -110,16 +107,7 @@ void DiceProjectileEvent::EventInitialize() {
 
 	// シーンから対応するオブジェクトを生成する
 	for(uint32_t i = 0; i < objectCount_; ++i) {
-		std::string indexedObjectName = objectName + std::to_string(i) + ")";
-		auto target = SceneContext::Current()->FindObjectByName<DiceProjectileObject>(indexedObjectName);
-		if(target) {
-			targetObjects_[i] = target;
-			targetObjects_[i].lock()->SetParam(eventParam_.param_);
-			targetObjects_[i].lock()->SetSocket(socket_.lock().get());
-			targetObjects_[i].lock()->Initialize();
-			continue;
-		}
-		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", indexedObjectName);
+		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
 		if(targetObject) {
 			targetObject->SetParent(shared_from_this());
 			targetObject->SetParam(eventParam_.param_);
@@ -147,13 +135,11 @@ void DiceProjectileEvent::DerivativeGui() {
 	ImGui::Text("DroolRainObject");
 	ImGui::SameLine();
 	if(ImGui::Button("+")) {
-		++objectCount_;
-		EventInitialize();
+		AddDiceProjectileObject();
 	}
 	if(objectCount_ > 1) {
 		ImGui::SameLine();
 		if(ImGui::Button("-")) {
-			--objectCount_;
 			DeleteDroolObject();
 		}
 	}
@@ -161,8 +147,25 @@ void DiceProjectileEvent::DerivativeGui() {
 	eventParam_.ShowGui();
 }
 
+void DiceProjectileEvent::AddDiceProjectileObject() {
+
+	const std::string objectName   = "DiceProjectileObject";
+	auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
+	if(!targetObject) return;
+
+	targetObject->SetParent(shared_from_this());
+	targetObject->SetParam(eventParam_.param_);
+	targetObject->SetSocket(socket_.lock().get());
+	targetObject->Initialize();
+
+	targetObjects_.push_back(targetObject);
+	++objectCount_;
+	eventData_.objectCount = objectCount_;
+}
+
 void DiceProjectileEvent::DeleteDroolObject() {
 
+	--objectCount_;
 	// シーンコンテキストが存在する場合に削除処理を行う
 	if(auto* ctx = SceneContext::Current()) {
 		if(targetObjects_[objectCount_].lock()) {
