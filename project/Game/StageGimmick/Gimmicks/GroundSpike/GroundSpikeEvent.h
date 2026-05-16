@@ -39,6 +39,9 @@ protected:
 
 	// gui
 	void DerivativeGui() override;
+	void ApplyDerivedConfigFromJson(const nlohmann::json& root, const nlohmann::json* derived) override;
+	void ExtractDerivedConfigToJson(nlohmann::json& root, nlohmann::json& derived) const override;
+	void RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) override;
 
 private:
 	/// <summary>
@@ -62,6 +65,7 @@ private:
 
 	// ターゲットの地面スパイクオブジェクト
 	std::weak_ptr<GroundSpikeObject> targetObject_;
+	Guid targetObjectGuid_;
 
 
 	GroundSpikeEventParam eventParam_;

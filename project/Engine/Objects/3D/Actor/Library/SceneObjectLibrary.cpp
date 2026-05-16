@@ -215,6 +215,18 @@ std::shared_ptr<SceneObject> SceneObjectLibrary::FindByName(const std::string& n
 	return nullptr;
 }
 
+std::vector<std::shared_ptr<SceneObject>> SceneObjectLibrary::FindByClassName(
+	std::string_view className) const {
+	std::vector<std::shared_ptr<SceneObject>> result;
+	for(const auto& [id, sp] : objects_) {
+		(void)id;
+		if(sp && sp->GetObjectClassName() == className) {
+			result.push_back(sp);
+		}
+	}
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 ///     オブジェクトの一覧取得(raw)
 //////////////////////////////////////////////////////////////////////////////////

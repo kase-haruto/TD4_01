@@ -21,7 +21,23 @@
 namespace CalyxEngine {
 	namespace {
 
+		std::string StripTrailingNumberSuffix(const std::string& name) {
+			if(name.size() < 3 || name.back() != ')') return name;
+
+			const auto open = name.find_last_of('(');
+			if(open == std::string::npos || open + 1 >= name.size() - 1) return name;
+
+			for(size_t i = open + 1; i < name.size() - 1; ++i) {
+				if(!std::isdigit(static_cast<unsigned char>(name[i]))) {
+					return name;
+				}
+			}
+
+			return name.substr(0, open);
+		}
+
 		std::string SanitizeAssetFileStem(std::string name) {
+			name = StripTrailingNumberSuffix(name);
 			if(name.empty()) name = "NewPrefab";
 			for(char& c : name) {
 				const unsigned char uc = static_cast<unsigned char>(c);

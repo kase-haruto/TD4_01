@@ -21,3 +21,18 @@ void StageGimmickEventBase::AlwaysUpdate(float dt) {
 	// イベントの更新
 	EventUpdate(dt);
 }
+
+void StageGimmickEventBase::RemapGuid(Guid& guid,
+									  const std::unordered_map<Guid, Guid>& guidMap) {
+	if(!guid.isValid()) return;
+	if(auto it = guidMap.find(guid); it != guidMap.end()) {
+		guid = it->second;
+	}
+}
+
+void StageGimmickEventBase::RemapGuids(std::vector<Guid>& guids,
+									   const std::unordered_map<Guid, Guid>& guidMap) {
+	for(auto& guid : guids) {
+		RemapGuid(guid, guidMap);
+	}
+}

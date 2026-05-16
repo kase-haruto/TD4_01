@@ -2,7 +2,6 @@
 
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
-#include <Engine/Scene/Context/SceneContext.h>
 
 REGISTER_SCENE_OBJECT(BreakableFloorEvent)
 
@@ -10,6 +9,7 @@ BreakableFloorEvent::BreakableFloorEvent(const std::string& name) : StageGimmick
 
 void BreakableFloorEvent::SetTarget(const std::shared_ptr<BreakableFloorObject>& target) {
 	targetObject_ = target;
+	targetObjectGuid_ = target ? target->GetGuid() : Guid{};
 }
 
 void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
@@ -41,28 +41,24 @@ void BreakableFloorEvent::EventInitialize() {
 		return;
 	}
 
-	std::string eventName = GetName();
-
 	const std::string eventPrefix  = "BreakableFloorEvent";
 	const std::string objectPrefix = "BreakableFloorObject";
 
-	// イベント名が"BreakableFloorEvent"で始まっているか確認する
-	if(eventName.find(eventPrefix) != 0) {
+	if(GetName() != eventPrefix) {
 		return;
 	}
-	// 番号を抜き取る
-	std::string suffix = eventName.substr(eventPrefix.size());
-	// 対応するオブジェクト名を作る
-	std::string targetName = objectPrefix + suffix;
-	// シーンから対応するオブジェクトを探す
-	auto object = SceneContext::Current()->FindObjectByName<BreakableFloorObject>(targetName);
+
+	auto object = ResolveLinkedObject<BreakableFloorObject>(targetObjectGuid_, objectPrefix);
+	if(!object) object = FindOwnedObjectByClassName<BreakableFloorObject>(objectPrefix);
 	if(object) {
-		targetObject_ = object;
+		object->SetName(objectPrefix);
+		SetTarget(object);
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<BreakableFloorObject>("breakableFloor.obj", targetName);
+	targetObject_ = SceneAPI::Instantiate<BreakableFloorObject>("breakableFloor.obj", objectPrefix);
 	targetObject_.lock()->SetParent(shared_from_this());
+	targetObjectGuid_ = targetObject_.lock()->GetGuid();
 	targetObject_.lock()->Initialize();
 	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;
 	targetObject_.lock()->GetWorldTransform().inheritScale = false;
@@ -80,4 +76,21 @@ void BreakableFloorEvent::EventUpdate(float dt) {
 
 void BreakableFloorEvent::DerivativeGui() {
 	param_.ShowGui();
+}
+
+void BreakableFloorEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
+	if(!derived) return;
+	targetObjectGuid_ = derived->value("targetObjectGuid", Guid{});
+}
+
+void BreakableFloorEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	if(auto target = targetObject_.lock()) {
+		derived["targetObjectGuid"] = target->GetGuid();
+	} else if(targetObjectGuid_.isValid()) {
+		derived["targetObjectGuid"] = targetObjectGuid_;
+	}
+}
+
+void BreakableFloorEvent::RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) {
+	RemapGuid(targetObjectGuid_, guidMap);
 }
