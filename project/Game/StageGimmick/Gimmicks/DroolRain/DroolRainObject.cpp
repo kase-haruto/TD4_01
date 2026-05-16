@@ -1,6 +1,7 @@
 #include "DroolRainObject.h"
 
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include <Engine\Foundation\Utility\Random\Random.h>
 #include <Engine\Foundation\Utility\Ease\CxEase.h>
 
 REGISTER_SCENE_OBJECT(DroolRainObject)
@@ -24,8 +25,11 @@ void DroolRainObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(true);
 	}
 
-	defaultScale_ = worldTransform_.scale;
+	defaultScale_				 = worldTransform_.scale;
 	worldTransform_.inheritScale = false;
+	dropTime_					 = Random::Generate<float>(0.0f, 1.0f);
+	isRaining_					 = false;
+	isOnceSet_					 = true;
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {
@@ -35,6 +39,17 @@ void DroolRainObject::ObjectUpdate(float dt) {
 		isOnceSet_ = false;
 		return;
 	}
+
+	if(dropTime_ >= 0.0f) {
+		dropTime_ -= dt;
+		if(dropTime_ < 0.0f) {
+			isRaining_ = true;
+			SetDrawEnable(true);
+		}
+	}
+
+	if(!isRaining_) return;
+
 	// 落下中の処理
 	if(worldTransform_.GetWorldPosition().y >= 0.0f) {
 
@@ -64,9 +79,12 @@ void DroolRainObject::ObjectUpdate(float dt) {
 			worldTransform_.scale.y = defaultScale_.y * t;
 
 		} else {
-			worldTransform_.translation.y = offsetY_;
-			worldTransform_.scale = defaultScale_;
-			runtimeParam_ = param_;
+			worldTransform_.translation.y = offsetY_ * Random::Generate<float>(1.0f, 1.2f);
+			worldTransform_.scale		  = defaultScale_;
+			runtimeParam_				  = param_;
+			dropTime_					  = Random::Generate<float>(0.0f, 1.0f);
+			isRaining_					  = false;
+			SetDrawEnable(false);
 		}
 	}
 }

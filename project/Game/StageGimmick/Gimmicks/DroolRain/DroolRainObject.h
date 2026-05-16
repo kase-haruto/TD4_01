@@ -43,6 +43,7 @@ private:
 	// 実行中に変更されるパラメータ
 	DroolRainParam runtimeParam_;
 	float offsetY_ = 0.0f;
+	float dropTime_ = 0.0f;
 	CalyxEngine::Vector3 defaultScale_;
 
 	// 雨が降っているか
