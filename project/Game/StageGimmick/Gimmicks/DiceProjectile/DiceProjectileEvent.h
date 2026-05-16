@@ -86,6 +86,8 @@ private:
 		}
 	};
 
+	// 追加用関数
+	void AddDiceProjectileObject();
 	// 削除用関数
 	void DeleteDroolObject();
 
