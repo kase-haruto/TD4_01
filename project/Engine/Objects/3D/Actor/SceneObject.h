@@ -10,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // externals
@@ -96,6 +97,7 @@ public:
 	 */
 	virtual void ExtractDerivedConfigToJson([[maybe_unused]] nlohmann::json& root,
 											[[maybe_unused]] nlohmann::json& derived) const {}
+	virtual void RemapSceneObjectReferences([[maybe_unused]] const std::unordered_map<Guid, Guid>& guidMap) {}
 
 	// =======================
 	// Config I/O virtuals

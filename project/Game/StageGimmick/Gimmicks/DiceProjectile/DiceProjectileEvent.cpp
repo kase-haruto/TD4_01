@@ -2,43 +2,10 @@
 
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
-#include <Engine/Scene/Context/SceneContext.h>
-
-#include <algorithm>
 
 REGISTER_SCENE_OBJECT(DiceProjectileEvent);
 
 DiceProjectileEvent::DiceProjectileEvent(const std::string& name) : StageGimmickEventBase(name) {}
-
-namespace {
-	template <class TObject>
-	std::shared_ptr<TObject> FindDirectChildOfType(const SceneObject& parent) {
-		for(const auto& child : parent.GetChildren()) {
-			if(auto casted = std::dynamic_pointer_cast<TObject>(child)) {
-				return casted;
-			}
-		}
-		return nullptr;
-	}
-
-	template <class TObject>
-	std::vector<std::shared_ptr<TObject>> FindDirectChildrenOfType(const SceneObject& parent) {
-		std::vector<std::shared_ptr<TObject>> result;
-		for(const auto& child : parent.GetChildren()) {
-			if(auto casted = std::dynamic_pointer_cast<TObject>(child)) {
-				result.push_back(std::move(casted));
-			}
-		}
-
-		std::sort(result.begin(), result.end(),
-				  [](const std::shared_ptr<TObject>& lhs,
-					 const std::shared_ptr<TObject>& rhs) {
-					  if(lhs->GetName() != rhs->GetName()) return lhs->GetName() < rhs->GetName();
-					  return lhs->GetGuid().ToString() < rhs->GetGuid().ToString();
-				  });
-		return result;
-	}
-} // namespace
 
 void DiceProjectileEvent::OnCollisionEnter(Collider* other) {
 
@@ -57,47 +24,44 @@ void DiceProjectileEvent::EventInitialize() {
 
 	targetObjects_.clear();
 
-	std::string eventName = GetName();
 	const std::string eventPrefix  = "DiceProjectileEvent";
-	const std::string objectPrefix = "DiceProjectileObject(";
+	const std::string objectName = "DiceProjectileObject";
 	const std::string socketPrefix = "DiceSocketObject";
 
-	// イベント名が"DroolRainEvent"で始まっているか確認する
-	if(eventName.find(eventPrefix) != 0) {
+	if(GetName() != eventPrefix) {
 		return;
 	}
-	// 番号を抜き取る
-	std::string suffix = eventName.substr(eventPrefix.size());
-	// 対応するオブジェクト名を作る
-	std::string objectName = objectPrefix;
-	std::string socketName = socketPrefix + suffix;
 
-	// Prefab 配置済みの子があれば、名前ではなく親子関係から拾う
-	auto object = FindDirectChildOfType<DiceSocketObject>(*this);
-	if(!object) {
-		object = SceneContext::Current()->FindObjectByName<DiceSocketObject>(socketName);
-	}
+	auto object = ResolveLinkedObject<DiceSocketObject>(socketGuid_, socketPrefix);
+	if(!object) object = FindOwnedObjectByClassName<DiceSocketObject>(socketPrefix);
 	if(object) {
+		object->SetName(socketPrefix);
 		object->SetClearCount(eventData_.clearCount);
 		object->Initialize();
 		socket_ = object;
+		socketGuid_ = object->GetGuid();
 
 	// シーンから対応するオブジェクトが無ければ生成する
 	} else {
-		socket_ = SceneAPI::Instantiate<DiceSocketObject>("debugCube.obj", socketName);
+		socket_ = SceneAPI::Instantiate<DiceSocketObject>("debugCube.obj", socketPrefix);
 		socket_.lock()->SetParent(shared_from_this());
 		socket_.lock()->SetClearCount(eventData_.clearCount);
 		socket_.lock()->Initialize();
+		socketGuid_ = socket_.lock()->GetGuid();
 	}
 
-	auto childTargets = FindDirectChildrenOfType<DiceProjectileObject>(*this);
+	auto childTargets = ResolveLinkedObjects<DiceProjectileObject>(targetObjectGuids_, objectName);
+	if(childTargets.empty()) childTargets = FindOwnedObjectsByClassName<DiceProjectileObject>(objectName);
 	if(!childTargets.empty()) {
 		objectCount_ = static_cast<uint32_t>(childTargets.size());
 		eventData_.objectCount = objectCount_;
 		targetObjects_.resize(objectCount_);
+		targetObjectGuids_.resize(objectCount_);
 
 		for(size_t i = 0; i < childTargets.size(); ++i) {
 			targetObjects_[i] = childTargets[i];
+			targetObjectGuids_[i] = childTargets[i]->GetGuid();
+			childTargets[i]->SetName(objectName);
 			childTargets[i]->SetParam(eventParam_.param_);
 			childTargets[i]->SetSocket(socket_.lock().get());
 			childTargets[i]->Initialize();
@@ -106,26 +70,19 @@ void DiceProjectileEvent::EventInitialize() {
 	}
 
 	targetObjects_.resize(objectCount_);
+	targetObjectGuids_.resize(objectCount_);
 	eventData_.objectCount = objectCount_;
 
 	// シーンから対応するオブジェクトを生成する
 	for(uint32_t i = 0; i < objectCount_; ++i) {
-		std::string indexedObjectName = objectName + std::to_string(i) + ")";
-		auto target = SceneContext::Current()->FindObjectByName<DiceProjectileObject>(indexedObjectName);
-		if(target) {
-			targetObjects_[i] = target;
-			targetObjects_[i].lock()->SetParam(eventParam_.param_);
-			targetObjects_[i].lock()->SetSocket(socket_.lock().get());
-			targetObjects_[i].lock()->Initialize();
-			continue;
-		}
-		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", indexedObjectName);
+		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
 		if(targetObject) {
 			targetObject->SetParent(shared_from_this());
 			targetObject->SetParam(eventParam_.param_);
 			targetObject->SetSocket(socket_.lock().get());
 			targetObject->Initialize();
 			targetObjects_[i] = (targetObject);
+			targetObjectGuids_[i] = targetObject->GetGuid();
 		}
 	}
 }
@@ -168,7 +125,35 @@ void DiceProjectileEvent::DeleteDroolObject() {
 		if(targetObjects_[objectCount_].lock()) {
 			ctx->RemoveObject(targetObjects_[objectCount_].lock());
 			targetObjects_.resize(objectCount_);
+			targetObjectGuids_.resize(objectCount_);
 		}
 	}
 	eventData_.objectCount = objectCount_;
+}
+
+void DiceProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
+	if(!derived) return;
+	socketGuid_ = derived->value("socketGuid", Guid{});
+	targetObjectGuids_ = derived->value("targetObjectGuids", std::vector<Guid>{});
+}
+
+void DiceProjectileEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	if(auto socket = socket_.lock()) {
+		derived["socketGuid"] = socket->GetGuid();
+	} else if(socketGuid_.isValid()) {
+		derived["socketGuid"] = socketGuid_;
+	}
+
+	std::vector<Guid> guids;
+	guids.reserve(targetObjects_.size());
+	for(const auto& target : targetObjects_) {
+		if(auto object = target.lock()) guids.push_back(object->GetGuid());
+	}
+	if(guids.empty()) guids = targetObjectGuids_;
+	if(!guids.empty()) derived["targetObjectGuids"] = guids;
+}
+
+void DiceProjectileEvent::RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) {
+	RemapGuid(socketGuid_, guidMap);
+	RemapGuids(targetObjectGuids_, guidMap);
 }
