@@ -90,6 +90,8 @@ private:
 		}
 	};
 
+	// 追加用関数
+	void AddDroolObject();
 	// 削除用関数
 	void DeleteDroolObject();
 

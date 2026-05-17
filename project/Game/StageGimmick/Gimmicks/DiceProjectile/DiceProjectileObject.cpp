@@ -51,6 +51,12 @@ void DiceProjectileObject::ObjectInitialize() {
 	isParry_ = false;
 }
 
+void DiceProjectileObject::SameNumberRotation() {
+	auto rotation = socket_->GetSameNumberRotation();
+	worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
+		worldTransform_.rotation, rotation, 0.1f);
+}
+
 void DiceProjectileObject::ObjectUpdate(float dt) {
 
 	// スケールを戻す処理
@@ -58,7 +64,7 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 	// 収納したら回転を戻す
 	if(isSocket_) {
 		// 回転を元に戻す
-		OffsetRotation();
+		SameNumberRotation();
 		return;
 	}
 
@@ -68,8 +74,8 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 		if(time_ >= (std::numbers::pi_v<float> * 2.0f)) {
 			time_ = 0.0f;
 		}
-		float angle = time_ * param_.rotateSpeed;
-		auto  rotation = CalyxEngine::Quaternion::MakeRotateAxisQuaternion(CalyxEngine::Vector3::One(), angle);
+		float angle				 = time_ * param_.rotateSpeed;
+		auto  rotation			 = CalyxEngine::Quaternion::MakeRotateAxisQuaternion(CalyxEngine::Vector3::One(), angle);
 		worldTransform_.rotation = rotation;
 	}
 
@@ -86,8 +92,8 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 		if(!parryCurveInit_) {
 			parryCurveInit_ = true;
 			parryT_			= 0.0f;
-			parryP0_ = worldTransform_.translation;
-			parryP2_ = targetPos_;
+			parryP0_		= worldTransform_.translation;
+			parryP2_		= targetPos_;
 			// 中点上方向オフセットで山なりにする
 			CalyxEngine::Vector3 mid = (parryP0_ + parryP2_) * 0.5f;
 			mid.y += 5.0f;
@@ -107,28 +113,21 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 		float t = std::clamp(parryT_, 0.0f, 1.0f);
 
 		// 回転を元に戻す
-		OffsetRotation();
+		SameNumberRotation();
 		// ベジェ位置へ
 		worldTransform_.translation = Bezier2(parryP0_, parryP1_, parryP2_, t);
 
 		// 到達
 		if(t >= 1.0f) {
 			worldTransform_.scale = param_.hitScale;
-			isSocket_		= true;
-			parryCurveInit_ = false;
+			isSocket_			  = true;
+			parryCurveInit_		  = false;
+			return;
 		}
-		return;
 	}
 
 	// パラメータ方向に移動
 	CalyxEngine::Vector3 dire	  = param_.direction.Normalize();
 	CalyxEngine::Vector3 velocity = dire * param_.speed * dt;
 	worldTransform_.translation += velocity;
-
-}
-
-void DiceProjectileObject::OffsetRotation() {
-	auto rotation = socket_->GetSameNumberRotation();
-	worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
-		worldTransform_.rotation, rotation, 0.1f);
 }
