@@ -52,7 +52,7 @@ private:
 		const float u = 1.0f - t;
 		return (u * u) * p0 + (2.0f * u * t) * p1 + (t * t) * p2;
 	}
-	void OffsetRotation();
+	void SameNumberRotation();
 	void ChangeScale() {
 		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
 			worldTransform_.scale, CalyxEngine::Vector3::One() * param_.scale, 0.1f);
