@@ -195,6 +195,8 @@ private:
 	 * \brief スキンメッシュモデルのバッチ構築
 	 */
 	void BuildSkinnedBatches();
+	void CollectShadowCasters();
+	void BindRaytracingScene(ID3D12GraphicsCommandList* cmdList) const;
 
 	//===================================================================*/
 	//                    private member variables

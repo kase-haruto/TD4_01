@@ -49,6 +49,7 @@ public:
 	virtual void Map() = 0;
 	virtual void ShowImGuiInterface();
 	virtual void Draw(const WorldTransform& transform);
+	static void BeginUploadFrame();
 
 	//--------- config -----------------------------------------------------
 	void ApplyConfig(const BaseModelConfig& config);
@@ -142,10 +143,17 @@ protected:
 	DxStructuredBuffer<TransformationMatrix> instanceBuffer_;
 	bool instanceBufferCreated_ = false;
 	UINT instanceBufferCapacity_ = 0;
+	std::vector<std::unique_ptr<DxStructuredBuffer<TransformationMatrix>>> instanceUploadBuffers_;
+	DxStructuredBuffer<TransformationMatrix>* currentInstanceBuffer_ = nullptr;
+	size_t instanceUploadCursor_ = 0;
 
 	// -------- ビルボード（VS:t1）フレームリング -------------------------------
 	DxStructuredBuffer<GpuBillboardParams> billboardBuffer_;
 	UINT billboardCapacity_ = 0;
+	std::vector<std::unique_ptr<DxStructuredBuffer<GpuBillboardParams>>> billboardUploadBuffers_;
+	DxStructuredBuffer<GpuBillboardParams>* currentBillboardBuffer_ = nullptr;
+	size_t billboardUploadCursor_ = 0;
+	uint64_t uploadFrameGenerationSeen_ = 0;
 
 
 	CalyxEngine::RaytracingMesh rayMesh_;
