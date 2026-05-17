@@ -5,6 +5,7 @@
 
 // engine
 #include <Engine/Application/System/Environment.h>
+#include <Engine/Assets/Model/BaseModel.h>
 #include <Engine/Foundation/Audio/Audio.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Foundation/Utility/Func/DxFunc.h>
@@ -113,6 +114,8 @@ namespace CalyxEngine {
 	//  フレーム開始処理
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void CalyxCore::BeginFrame() {
+		BaseModel::BeginUploadFrame();
+
 		// インプットの更新
 		CalyxFoundation::Input::Update();
 

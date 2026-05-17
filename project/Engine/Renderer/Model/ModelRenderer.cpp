@@ -109,27 +109,6 @@ void ModelRenderer::MarkSkinnedDirty(CalyxEngine::AnimationModel* model, size_t 
 void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCulling) {
 
 	// =========================================================
-	// Shadow 用 visible / SceneBounds 初期化
-	// =========================================================
-	staticVisibleForShadow_.clear();
-	skinnedVisibleForShadow_.clear();
-
-	// Raytracing Scene Clear
-	raytracingScene_.Clear();
-
-	hasSceneBounds_ = false;
-
-	auto ExpandSceneBounds = [&](const AABB& aabb) {
-		if(!hasSceneBounds_) {
-			sceneBounds_	= aabb;
-			hasSceneBounds_ = true;
-			return;
-		}
-		sceneBounds_.min_ = CalyxEngine::Vector3::Min(sceneBounds_.min_, aabb.min_);
-		sceneBounds_.max_ = CalyxEngine::Vector3::Max(sceneBounds_.max_, aabb.max_);
-	};
-
-	// =========================================================
 	// 静的モデル
 	// =========================================================
 	for(auto& [model, insts] : staticModels_) {
@@ -151,14 +130,6 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCu
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = !enableFrustumCulling || !camera || camera->IsVisible(inst.worldAABB);
-
-			// -------------------------
-			// Shadow / Raytracing：メインカメラの可視分だけ登録
-			// -------------------------
-			if(inst.visible && (!inst.owner || inst.owner->IsCastShadow())) {
-				staticVisibleForShadow_[model].push_back(inst.tf);
-				ExpandSceneBounds(inst.worldAABB);
-			}
 		}
 	}
 
@@ -183,16 +154,10 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCu
 			// MainPass：カメラカリング
 			// -------------------------
 			inst.visible = !enableFrustumCulling || !camera || camera->IsVisible(inst.worldAABB);
-
-			// -------------------------
-			// Shadow / Raytracing：メインカメラの可視分だけ登録
-			// -------------------------
-			if(inst.visible && (!inst.owner || inst.owner->IsCastShadow())) {
-				skinnedVisibleForShadow_[model].push_back(inst.tf);
-				ExpandSceneBounds(inst.worldAABB);
-			}
 		}
 	}
+
+	CollectShadowCasters();
 
 	// =========================================================
 	// MainPass 用バッチ生成
@@ -202,11 +167,6 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCu
 }
 
 void ModelRenderer::BuildAllVisibleBatches() {
-	staticVisibleForShadow_.clear();
-	skinnedVisibleForShadow_.clear();
-	raytracingScene_.Clear();
-	hasSceneBounds_ = false;
-
 	for(auto& [model, insts] : staticModels_) {
 		if(!model || !model->GetModelData() || !model->GetIsDrawEnable()) continue;
 		for(auto& inst : insts) {
@@ -229,8 +189,67 @@ void ModelRenderer::BuildAllVisibleBatches() {
 		}
 	}
 
+	CollectShadowCasters();
+
 	BuildStaticBatches();
 	BuildSkinnedBatches();
+}
+
+void ModelRenderer::CollectShadowCasters() {
+	staticVisibleForShadow_.clear();
+	skinnedVisibleForShadow_.clear();
+	raytracingScene_.Clear();
+	hasSceneBounds_ = false;
+
+	auto expandSceneBounds = [&](const AABB& aabb) {
+		if(!hasSceneBounds_) {
+			sceneBounds_	= aabb;
+			hasSceneBounds_ = true;
+			return;
+		}
+		sceneBounds_.min_ = CalyxEngine::Vector3::Min(sceneBounds_.min_, aabb.min_);
+		sceneBounds_.max_ = CalyxEngine::Vector3::Max(sceneBounds_.max_, aabb.max_);
+	};
+
+	for(auto& [model, insts] : staticModels_) {
+		if(!model || !model->GetModelData() || !model->GetIsDrawEnable()) continue;
+
+		const AABB& localAABB = model->GetModelData()->localAABB;
+		for(auto& inst : insts) {
+			if(inst.owner && !inst.owner->IsCastShadow()) continue;
+			if(inst.dirty) {
+				inst.worldAABB = localAABB.Transform(inst.tf.matrix.world);
+				inst.dirty	   = false;
+			}
+			staticVisibleForShadow_[model].push_back(inst.tf);
+			expandSceneBounds(inst.worldAABB);
+		}
+	}
+
+	for(auto& [model, insts] : skinnedModels_) {
+		if(!model || !model->GetModelData() || !model->GetIsDrawEnable()) continue;
+
+		const AABB& localAABB = model->GetModelData()->localAABB;
+		for(auto& inst : insts) {
+			if(inst.owner && !inst.owner->IsCastShadow()) continue;
+			if(inst.dirty) {
+				inst.worldAABB = localAABB.Transform(inst.tf.matrix.world);
+				inst.dirty	   = false;
+			}
+			skinnedVisibleForShadow_[model].push_back(inst.tf);
+			expandSceneBounds(inst.worldAABB);
+		}
+	}
+}
+
+void ModelRenderer::BindRaytracingScene(ID3D12GraphicsCommandList* cmdList) const {
+	if(!raytracingSystem_) return;
+	ID3D12Resource* tlas = raytracingSystem_->GetTLAS();
+	if(!tlas) return;
+
+	cmdList->SetGraphicsRootShaderResourceView(
+		10, // Space0, t3
+		tlas->GetGPUVirtualAddress());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -408,11 +427,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				shadowMapSystem->BindForMainPass(cmdList);
 			}
 
-			if(raytracingSystem_) {
-				cmdList->SetGraphicsRootShaderResourceView(
-					10, // Space0, t3
-					raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
-			}
+			BindRaytracingScene(cmdList);
 
 			if(auto* cam = CameraManager::GetActive()) {
 				cam->SetCommand(cmdList, PipelineType::Object3D);
@@ -523,11 +538,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 					shadowMapSystem->BindForMainPass(cmdList);
 				}
 
-				if(raytracingSystem_) {
-					cmdList->SetGraphicsRootShaderResourceView(
-						10, // Space0, t3
-						raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
-				}
+				BindRaytracingScene(cmdList);
 
 				if(auto* cam = CameraManager::GetActive()) {
 					cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
@@ -555,11 +566,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							if(shadowMapSystem) {
 								shadowMapSystem->BindForMainPass(cmdList);
 							}
-							if(raytracingSystem_) {
-								cmdList->SetGraphicsRootShaderResourceView(
-									10, // Space0, t3
-									raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
-							}
+							BindRaytracingScene(cmdList);
 							if(auto* cam = CameraManager::GetActive()) {
 								cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
 							} else {
@@ -573,11 +580,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							if(shadowMapSystem) {
 								shadowMapSystem->BindForMainPass(cmdList);
 							}
-							if(raytracingSystem_) {
-								cmdList->SetGraphicsRootShaderResourceView(
-									10, // Space0, t3
-									raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
-							}
+							BindRaytracingScene(cmdList);
 							if(auto* cam = CameraManager::GetActive()) {
 								cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
 							} else {
@@ -593,11 +596,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 					if(shadowMapSystem) {
 						shadowMapSystem->BindForMainPass(cmdList);
 					}
-					if(raytracingSystem_) {
-						cmdList->SetGraphicsRootShaderResourceView(
-							10, // Space0, t3
-							raytracingSystem_->GetTLAS()->GetGPUVirtualAddress());
-					}
+					BindRaytracingScene(cmdList);
 					if(auto* cam = CameraManager::GetActive()) {
 						cam->SetCommand(cmdList, PipelineType::SkinningObject3D);
 					} else {
