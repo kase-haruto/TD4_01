@@ -25,7 +25,6 @@
 
 #include <externals/imgui/ImGuiFileDialog.h>
 
-#include <algorithm>
 #include <unordered_set>
 #include <string>
 #include <vector>
@@ -36,31 +35,6 @@ namespace CalyxEngine {
 	 *  include space
 	 * ===================================================================== */
 	namespace {
-
-		inline int TypePriority(ObjectType t) {
-			switch(t) {
-			case ObjectType::Camera:
-				return 0;
-			case ObjectType::Light:
-				return 1;
-			case ObjectType::GameObject:
-				return 2;
-			case ObjectType::Effect:
-				return 3;
-			case ObjectType::Event:
-				return 4;
-			default:
-				return 9;
-			}
-		}
-
-		inline bool LessByTypeThenName(const std::shared_ptr<SceneObject>& a,
-									   const std::shared_ptr<SceneObject>& b) {
-			int pa = TypePriority(a->GetObjectType());
-			int pb = TypePriority(b->GetObjectType());
-			if(pa != pb) return pa < pb;
-			return a->GetName() < b->GetName();
-		}
 
 		inline const AssetDragPayload* ReadAssetPayload(const ImGuiPayload* payload) {
 			if(!payload || !payload->Data || payload->DataSize != (int)sizeof(AssetDragPayload)) {
@@ -109,10 +83,10 @@ namespace CalyxEngine {
 		// 追加/削除イベントにフックしてキャッシュ更新を促す
 		if(auto* ctx = SceneContext::Current()) {
 			ctx->AddOnObjectAddedListener([this](SceneObject*) {
-				cacheDirty_ = true;
+				RefreshCache();
 			});
 			ctx->AddOnObjectRemovedListener([this](SceneObject* removed) {
-				cacheDirty_ = true;
+				RefreshCache();
 				// 選択が削除対象ならクリア
 				if(IsSelected(removed)) {
 					selected_.reset();
@@ -185,36 +159,8 @@ namespace CalyxEngine {
 
 			ImGui::TableHeadersRow();
 
-			// --- root 探索 (キャッシュ使用) ---
-			if(cacheDirty_ || sortedCache_.find(nullptr) == sortedCache_.end()) {
-				// キャッシュ再構築（ルートのみ）
-				std::vector<std::shared_ptr<SceneObject>> roots;
-				const auto&								  objects = lib_->GetObjects();
-				roots.reserve(objects.size());
-
-				for(const auto& [id, sp] : objects) {
-					(void)id;
-					if(!sp || sp->IsTransient()) continue;
-					auto parent = sp->GetParent();
-					if(!parent || !lib_->Contains(parent)) {
-						roots.push_back(sp);
-					}
-				}
-				std::sort(roots.begin(), roots.end(), LessByTypeThenName);
-
-				if(cacheDirty_) {
-					sortedCache_.clear();
-					cacheDirty_ = false;
-				}
-				sortedCache_[nullptr] = std::move(roots);
-			}
-
-			// --- 描画 ---
-			auto it = sortedCache_.find(nullptr);
-			if(it != sortedCache_.end()) {
-				for(auto& sp : it->second) {
-					ShowObjectRecursive(sp.get());
-				}
+			for(auto& sp : treeCache_.GetRoots(*lib_)) {
+				ShowObjectRecursive(sp.get());
 			}
 
 			// 空白クリックで選択解除 (テーブル内の空白エリア)
@@ -343,20 +289,8 @@ namespace CalyxEngine {
 			const bool isRenamingThis = (renaming_ && renameSP.get() == obj);
 
 			if(!isRenamingThis) {
-				if(sortedCache_.find(obj) == sortedCache_.end()) {
-					std::vector<std::shared_ptr<SceneObject>> sortedChildren;
-					for(auto& ch : obj->GetChildren()) {
-						if(ch) sortedChildren.push_back(ch);
-					}
-					std::sort(sortedChildren.begin(), sortedChildren.end(), LessByTypeThenName);
-					sortedCache_[obj] = std::move(sortedChildren);
-				}
-
-				auto it = sortedCache_.find(obj);
-				if(it != sortedCache_.end()) {
-					for(auto& ch : it->second) {
-						ShowObjectRecursive(ch.get());
-					}
+				for(auto& child : treeCache_.GetChildren(*obj)) {
+					ShowObjectRecursive(child.get());
 				}
 			}
 

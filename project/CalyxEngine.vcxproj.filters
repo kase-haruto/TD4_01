@@ -1323,6 +1323,9 @@
     <ClCompile Include="Engine\Application\UI\Panels\HierarchyPanel.cpp">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Application\UI\Panels\HierarchyTreeCache.cpp">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Application\UI\Panels\InspectorPanel.cpp">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClCompile>
@@ -1375,6 +1378,18 @@
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\LevelEditor.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\ParticlePreviewSession.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\PrefabEditSession.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\SceneObjectEditCommands.cpp">
+      <Filter>Engine\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Editor\ViewportSelectionController.cpp">
       <Filter>Engine\Editor</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Editor\EditorSelectionCoordinator.cpp">
@@ -2182,6 +2197,9 @@
     <ClInclude Include="Engine\Application\UI\Panels\HierarchyPanel.h">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Application\UI\Panels\HierarchyTreeCache.h">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\InspectorPanel.h">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClInclude>
@@ -2330,6 +2348,18 @@
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\LevelEditor.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\ParticlePreviewSession.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\PrefabEditSession.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\SceneObjectEditCommands.h">
+      <Filter>Engine\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Editor\ViewportSelectionController.h">
       <Filter>Engine\Editor</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Editor\EditorSelectionCoordinator.h">
@@ -2668,6 +2698,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Application\UI\EngineUI\IEngineUI.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\HierarchyPanel.cpp" />
+    <ClCompile Include="Engine\Application\UI\Panels\HierarchyTreeCache.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\InspectorPanel.cpp" />
     <ClCompile Include="Engine\Objects\3D\Actor\SceneObject.cpp" />
     <ClCompile Include="Engine\PostProcess\Interface\IPostEffectPass.cpp" />
@@ -2685,6 +2716,10 @@
     <ClCompile Include="Engine\Graphics\Pipeline\PipelineDesc\GraphicsPipelineDesc.cpp" />
     <ClCompile Include="Engine\Graphics\Core\GraphicsSystem.cpp" />
     <ClCompile Include="Engine\Editor\LevelEditor.cpp" />
+    <ClCompile Include="Engine\Editor\ParticlePreviewSession.cpp" />
+    <ClCompile Include="Engine\Editor\PrefabEditSession.cpp" />
+    <ClCompile Include="Engine\Editor\SceneObjectEditCommands.cpp" />
+    <ClCompile Include="Engine\Editor\ViewportSelectionController.cpp" />
     <ClCompile Include="Engine\Editor\EditorSelectionCoordinator.cpp" />
     <ClCompile Include="Engine\Editor\SceneObjectDuplicator.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Module\Velocity\GravityModule.cpp" />
@@ -2986,6 +3021,7 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\IEngineUI.h" />
     <ClInclude Include="Engine\Application\UI\Panels\HierarchyPanel.h" />
+    <ClInclude Include="Engine\Application\UI\Panels\HierarchyTreeCache.h" />
     <ClInclude Include="Engine\Application\UI\Panels\InspectorPanel.h" />
     <ClInclude Include="Engine\Objects\3D\Actor\SceneObject.h" />
     <ClInclude Include="Engine\Graphics\Camera\Base\ICamera.h" />
@@ -3035,6 +3071,10 @@
     <ClInclude Include="Engine\System\Observer\SceneObject\IRenderableDeathListener.h" />
     <ClInclude Include="Engine\Editor\PostProcessEditor.h" />
     <ClInclude Include="Engine\Editor\LevelEditor.h" />
+    <ClInclude Include="Engine\Editor\ParticlePreviewSession.h" />
+    <ClInclude Include="Engine\Editor\PrefabEditSession.h" />
+    <ClInclude Include="Engine\Editor\SceneObjectEditCommands.h" />
+    <ClInclude Include="Engine\Editor\ViewportSelectionController.h" />
     <ClInclude Include="Engine\Editor\EditorSelectionCoordinator.h" />
     <ClInclude Include="Engine\Editor\SceneObjectDuplicator.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\Viewport.h" />
