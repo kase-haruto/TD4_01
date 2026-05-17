@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
-#include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 
 REGISTER_SCENE_OBJECT(FireLoadEvent)
@@ -32,6 +31,7 @@ void FireLoadEvent::OnCollisionExit(Collider* other) {
 
 void FireLoadEvent::SetTarget(const std::shared_ptr<FireLoadObject>& target) {
 	targetObjects_.push_back(target);
+	if(target) targetObjectGuids_.push_back(target->GetGuid());
 }
 
 void FireLoadEvent::EventInitialize() {
@@ -45,21 +45,20 @@ void FireLoadEvent::EventInitialize() {
 	const int width = (std::max)(1, eventParam_.param_.width);
 	const int depth = (std::max)(1, eventParam_.param_.depth);
 	objectCount_	= width * depth;
-	targetObjects_.resize(objectCount_);
+	const std::string eventPrefix = "FireLoadEvent";
+	const std::string objectName	 = "FireLoadObject";
 
-	std::string eventName = GetName();
-
-	const std::string eventPrefix			 = "FireLoadEvent";
-	const std::string objectPrefix			 = "FireLoadObject(";
-
-	// イベント名が"FireLoadEvent"で始まっているか確認する
-	if(eventName.find(eventPrefix) != 0) {
+	if(GetName() != eventPrefix) {
 		return;
 	}
-	// 番号を抜き取る
-	std::string suffix = eventName.substr(eventPrefix.size());
-	// 対応するオブジェクト名を作る
-	std::string objectName			 = eventName + "/" + objectPrefix;
+
+	auto childTargets = ResolveLinkedObjects<FireLoadObject>(targetObjectGuids_, objectName);
+	if(childTargets.empty()) childTargets = FindOwnedObjectsByClassName<FireLoadObject>(objectName);
+	if(!childTargets.empty()) {
+		objectCount_ = static_cast<uint32_t>(childTargets.size());
+	}
+	targetObjects_.resize(objectCount_);
+	targetObjectGuids_.resize(objectCount_);
 
 	// グリッドの間隔
 	const float xInterval = 2.5f;
@@ -67,15 +66,13 @@ void FireLoadEvent::EventInitialize() {
 
 	// シーンから対応するオブジェクトを生成する
 	for(uint32_t i = 0; i < objectCount_; ++i) {
-		std::string indexedObjectName = objectName + std::to_string(i) + ")";
-		auto		object			  = SceneContext::Current()->FindObjectByName<FireLoadObject>(indexedObjectName);
-		if(object) {
-			targetObjects_[i] = object;
-			targetObjects_[i].lock()->SetParam(eventParam_.param_);
-			continue;
+		std::shared_ptr<FireLoadObject> targetObject =
+			i < childTargets.size() ? childTargets[i] : nullptr;
+		if(!targetObject) {
+			targetObject = SceneAPI::Instantiate<FireLoadObject>("cone.obj", objectName);
 		}
-		auto targetObject = SceneAPI::Instantiate<FireLoadObject>("cone.obj", indexedObjectName);
 		if(targetObject) {
+			targetObject->SetName(objectName);
 			targetObject->SetParent(shared_from_this());
 			targetObject->Initialize();
 			targetObject->SetParam(eventParam_.param_);
@@ -100,6 +97,7 @@ void FireLoadEvent::EventInitialize() {
 			targetObject->GetWorldTransform().translation = pos;
 
 			targetObjects_[i] = (targetObject);
+			targetObjectGuids_[i] = targetObject->GetGuid();
 		}
 	}
 }
@@ -125,4 +123,25 @@ void FireLoadEvent::EventUpdate(float dt) {
 
 void FireLoadEvent::DerivativeGui() {
 	eventParam_.ShowGui();
+}
+
+void FireLoadEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
+	if(!derived) return;
+	targetObjectGuids_ = derived->value("targetObjectGuids", std::vector<Guid>{});
+}
+
+void FireLoadEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	std::vector<Guid> guids;
+	guids.reserve(targetObjects_.size());
+	for(const auto& target : targetObjects_) {
+		if(auto object = target.lock()) {
+			guids.push_back(object->GetGuid());
+		}
+	}
+	if(guids.empty()) guids = targetObjectGuids_;
+	if(!guids.empty()) derived["targetObjectGuids"] = guids;
+}
+
+void FireLoadEvent::RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) {
+	RemapGuids(targetObjectGuids_, guidMap);
 }

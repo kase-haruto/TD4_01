@@ -151,6 +151,13 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 		guidMap[newGuid] = sp;
 	}
 
+	for(auto& [oldGuid, sp] : oldToObject) {
+		(void)oldGuid;
+		if(sp) {
+			sp->RemapSceneObjectReferences(oldToNewGuid);
+		}
+	}
+
 	// 親子リンク復元
 	for (const auto& j : jArray) {
 		Guid oldChild = j.value("guid", Guid{});

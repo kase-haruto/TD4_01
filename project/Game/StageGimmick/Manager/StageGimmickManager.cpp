@@ -4,9 +4,49 @@
 #include <externals/imgui/imgui.h>
 
 #include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorEvent.h"
+#include "Game/StageGimmick/Gimmicks/BreakableFloor/BreakableFloorObject.h"
 #include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeEvent.h"
+#include "Game/StageGimmick/Gimmicks/GroundSpike/GroundSpikeObject.h"
 #include "Game/StageGimmick/Gimmicks/DroolRain/DroolRainEvent.h"
+#include "Game/StageGimmick/Gimmicks/DroolRain/DroolRainObject.h"
 #include "Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.h"
+#include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
+
+namespace {
+	template <class TObject>
+	std::vector<std::shared_ptr<TObject>> FindChildrenByClassName(
+		const SceneObject& parent,
+		std::string_view className) {
+		std::vector<std::shared_ptr<TObject>> result;
+		for(const auto& child : parent.GetChildren()) {
+			if(child && child->GetObjectClassName() == className) {
+				result.push_back(std::static_pointer_cast<TObject>(child));
+			}
+		}
+		return result;
+	}
+
+	template <class TObject>
+	std::vector<std::shared_ptr<TObject>> FindObjectsByClassName(SceneObjectLibrary& lib,
+																std::string_view className) {
+		std::vector<std::shared_ptr<TObject>> result;
+		for(auto& object : lib.FindByClassName(className)) {
+			result.push_back(std::static_pointer_cast<TObject>(object));
+		}
+		return result;
+	}
+
+	template <class TObject>
+	std::vector<std::shared_ptr<StageGimmickObjectBase>> ToGimmickObjects(
+		const std::vector<std::shared_ptr<TObject>>& objects) {
+		std::vector<std::shared_ptr<StageGimmickObjectBase>> result;
+		result.reserve(objects.size());
+		for(const auto& object : objects) {
+			result.push_back(object);
+		}
+		return result;
+	}
+}
 
 void StageGimmickManager::Initialize() {
 
@@ -45,81 +85,44 @@ void StageGimmickManager::GimmickShowGui(const std::string& gimmickName) {
 }
 
 void StageGimmickManager::ReloadGimmicks(const std::string& gimmickName) {
+	auto* ctx = SceneContext::Current();
+	if(!ctx) return;
+	auto* lib = ctx->GetObjectLibrary();
+	if(!lib) return;
 
-	const std::string eventPrefix  = gimmickName + "Event(";
-	const std::string objectPrefix = gimmickName + "Object(";
-
-	// シーン内のすべてのイベントを確認する
-	uint32_t index = 0;
-	// 対応するオブジェクト名を作る
-	std::string targetName = eventPrefix + std::to_string(index) + ")";
-	// オブジェクトとイベントをシーンに生成
-	std::shared_ptr<StageGimmickEventBase>	event;
-	// シーンから対応するオブジェクトを探す
 	if(gimmickName == "BreakableFloor") {
-		auto breakableEvent = SceneContext::Current()->FindObjectByName<BreakableFloorEvent>(targetName);
-		event  = breakableEvent;
+		for(auto& event : FindObjectsByClassName<BreakableFloorEvent>(*lib, "BreakableFloorEvent")) {
+			auto objects = FindChildrenByClassName<BreakableFloorObject>(*event, "BreakableFloorObject");
+			if(objects.empty()) continue;
+			event->SetTarget(objects.front());
+			event->Initialize();
+			gimmicks_.push_back({event, ToGimmickObjects(objects), gimmickName});
+		}
 	} else if(gimmickName == "GroundSpike") {
-		auto spikeEvent	 = SceneContext::Current()->FindObjectByName<GroundSpikeEvent>(targetName);
-		event  = spikeEvent;
+		for(auto& event : FindObjectsByClassName<GroundSpikeEvent>(*lib, "GroundSpikeEvent")) {
+			auto objects = FindChildrenByClassName<GroundSpikeObject>(*event, "GroundSpikeObject");
+			if(objects.empty()) continue;
+			event->SetTarget(objects.front());
+			event->Initialize();
+			gimmicks_.push_back({event, ToGimmickObjects(objects), gimmickName});
+		}
 	} else if(gimmickName == "DroolRain") {
-		auto droolEvent = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
-		event  = droolEvent;
+		for(auto& event : FindObjectsByClassName<DroolRainEvent>(*lib, "DroolRainEvent")) {
+			auto objects = FindChildrenByClassName<DroolRainObject>(*event, "DroolRainObject");
+			if(objects.empty()) continue;
+			for(auto& object : objects) {
+				event->SetTarget(object);
+			}
+			event->Initialize();
+			gimmicks_.push_back({event, ToGimmickObjects(objects), gimmickName});
+		}
 	} else if(gimmickName == "Projectile") {
-		auto projectileEvent = SceneContext::Current()->FindObjectByName<ProjectileFireEvent>(targetName);
-		event  = projectileEvent;
-	}
-	if(event) {
-		event->Initialize();
-	}
-
-	// イベントが見つからなくなるまでループする
-	while(event) {
-		std::vector<std::shared_ptr<StageGimmickObjectBase>> objects;
-
-		if(gimmickName == "BreakableFloor") {
-			auto object = SceneContext::Current()->FindObjectByName<BreakableFloorObject>(
-				objectPrefix + std::to_string(index) + ")");
-			if(object) {
-				objects.push_back(object);
-			}
-		} else if(gimmickName == "GroundSpike") {
-			auto object = SceneContext::Current()->FindObjectByName<GroundSpikeObject>(
-				objectPrefix + std::to_string(index) + ")");
-			if(object) {
-				objects.push_back(object);
-			}
-		} else if(gimmickName == "DroolRain") {
-			for(uint32_t i = 0; i < event->GetObjectCount(); ++i) {
-				auto object = SceneContext::Current()->FindObjectByName<DroolRainObject>(
-					targetName + "/" + objectPrefix + std::to_string(i) + ")");
-				if(object) {
-					objects.push_back(object);
-				}
-			}
-		} else if(gimmickName == "Projectile") {
-			auto object = SceneContext::Current()->FindObjectByName<ProjectileObject>(
-				objectPrefix + std::to_string(index) + ")");
-			if(object) {
-				objects.push_back(object);
-			}
-		}
-
-		if(!objects.empty()) {
-			gimmicks_.push_back({event, objects, gimmickName});
-		}
-
-		++index;
-		targetName = eventPrefix + std::to_string(index) + ")";
-
-		if(gimmickName == "BreakableFloor") {
-			event = SceneContext::Current()->FindObjectByName<BreakableFloorEvent>(targetName);
-		} else if(gimmickName == "GroundSpike") {
-			event = SceneContext::Current()->FindObjectByName<GroundSpikeEvent>(targetName);
-		}else if(gimmickName == "DroolRain") {
-			event = SceneContext::Current()->FindObjectByName<DroolRainEvent>(targetName);
-		}else if(gimmickName == "Projectile") {
-			event = SceneContext::Current()->FindObjectByName<ProjectileFireEvent>(targetName);
+		for(auto& event : FindObjectsByClassName<ProjectileFireEvent>(*lib, "ProjectileFireEvent")) {
+			auto objects = FindChildrenByClassName<ProjectileObject>(*event, "ProjectileObject");
+			if(objects.empty()) continue;
+			event->SetTarget(objects.front());
+			event->Initialize();
+			gimmicks_.push_back({event, ToGimmickObjects(objects), gimmickName});
 		}
 	}
 
@@ -161,11 +164,7 @@ void StageGimmickManager::CreateGimmick(const std::string& gimmickName) {
 		droolEvent->Initialize();
 		event = droolEvent;
 		for(uint32_t i = 0; i < event->GetObjectCount(); ++i) {
-			std::string indexedObjectName = objectName + "(" + std::to_string(i) + ")";
-			if(event->GetName() == "DroolRainEvent") {
-				indexedObjectName = "DroolRainEvent(0)/" + indexedObjectName;
-			}
-			auto droolObject = SceneAPI::Instantiate<DroolRainObject>("debugCube.obj", indexedObjectName);
+			auto droolObject = SceneAPI::Instantiate<DroolRainObject>("debugCube.obj", objectName);
 			droolObject->SetParent(droolEvent);
 			droolObject->Initialize();
 			objects.push_back(droolObject);
@@ -223,26 +222,14 @@ void StageGimmickManager::ReindexGimmickNames(const std::string& gimmickName) {
 			continue;
 		}
 		if(gimmicks_[i].event) {
-			gimmicks_[i].event->SetName(
-				gimmickName + "Event(" + std::to_string(index) + ")",
-				std::nullopt);
+			gimmicks_[i].event->SetName(gimmickName + "Event", std::nullopt);
 		}
 		for(size_t objectIndex = 0; objectIndex < gimmicks_[i].objects.size(); ++objectIndex) {
 			auto& object = gimmicks_[i].objects[objectIndex];
-			const auto& eventName = gimmicks_[i].event->GetName();
 			if(!object) {
 				continue;
 			}
-			// 今は1ギミックにつきObjectが1つなので、従来通りの名前にする
-			if(gimmicks_[i].objects.size() == 1) {
-				object->SetName(
-					gimmickName + "Object(" + std::to_string(index) + ")");
-			}
-			// 将来的に1つのEventに複数Objectを持たせる場合
-			else {
-				object->SetName(
-					eventName + "/" + gimmickName + "Object(" + std::to_string(objectIndex) + ")");
-			}
+			object->SetName(gimmickName + "Object");
 		}
 		++index;
 	}

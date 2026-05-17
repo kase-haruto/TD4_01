@@ -37,6 +37,9 @@ protected:
 
 	// gui
 	void DerivativeGui() override;
+	void ApplyDerivedConfigFromJson(const nlohmann::json& root, const nlohmann::json* derived) override;
+	void ExtractDerivedConfigToJson(nlohmann::json& root, nlohmann::json& derived) const override;
+	void RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) override;
 
 private:
 
@@ -61,6 +64,7 @@ private:
 
 	// ターゲットの壊れる床オブジェクト
 	std::weak_ptr<BreakableFloorObject> targetObject_;
+	Guid targetObjectGuid_;
 
 	// 調整項目
 	BreakableFloorEventParam param_;

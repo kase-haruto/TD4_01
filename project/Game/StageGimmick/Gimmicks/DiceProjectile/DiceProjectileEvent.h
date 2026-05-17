@@ -37,6 +37,9 @@ protected:
 
 	// gui
 	void DerivativeGui() override;
+	void ApplyDerivedConfigFromJson(const nlohmann::json& root, const nlohmann::json* derived) override;
+	void ExtractDerivedConfigToJson(nlohmann::json& root, nlohmann::json& derived) const override;
+	void RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) override;
 
 private:
 	/// <summary>
@@ -92,9 +95,11 @@ private:
 	
 	// サイコロの収納箱
 	std::weak_ptr<DiceSocketObject> socket_;
+	Guid socketGuid_;
 
 	// ターゲットのサイコロオブジェクト
 	std::vector<std::weak_ptr<DiceProjectileObject>> targetObjects_;
+	std::vector<Guid> targetObjectGuids_;
 
 	// パラメータ
 	DiceProjectileEventParam eventParam_;
