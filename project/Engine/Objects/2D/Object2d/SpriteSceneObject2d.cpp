@@ -8,6 +8,7 @@
 #include <Engine\Assets\System\AssetRecord.h>
 #include <Engine\Objects\3D\Actor\Registry\SceneObjectRegistry.h>
 #include <Engine\Renderer\Sprite\SpriteRenderer.h>
+#include <Engine\Scene\Context\SceneContext.h>
 #include <Engine\System\Command\EditorCommand\GuiCommand\ImGuiHelper\GuiCmd.h>
 
 #include <externals\imgui\imgui.h>
@@ -220,14 +221,29 @@ namespace CalyxEngine {
 		RefreshAnimationAsset();
 	}
 
+	void AnimatedSpriteSceneObject2d::Update(float dt) {
+		UpdateAnimatedSprite(dt, true);
+	}
+
 	void AnimatedSpriteSceneObject2d::AlwaysUpdate(float dt) {
+		const SceneContext* context = SceneContext::Current();
+		if(context && context->IsRuntime()) return;
+		UpdateAnimatedSprite(dt, true);
+	}
+
+	void AnimatedSpriteSceneObject2d::UpdateAnimatedSprite(float dt, bool updateAnimation) {
 		EnsureSprite();
 		transformAnimation2d_.Update(worldTransform_, dt);
 		worldTransform_.Update();
 		SyncSpriteFromTransform();
 		sprite_->SetColor(color_);
 		RefreshAnimationAsset();
-		animator_.Update(dt);
+		if(updateAnimation) {
+			if(autoPlay_ && !clipName_.empty() && animator_.GetCurrentClipName() != clipName_ && !animator_.IsFinished()) {
+				PlayCurrentClip(true);
+			}
+			animator_.Update(dt);
+		}
 		sprite_->Update(dt);
 	}
 
@@ -246,6 +262,15 @@ namespace CalyxEngine {
 					CreateAnimationAsset();
 				}
 				ImGui::Checkbox("Auto Play", &autoPlay_);
+				if(ImGui::Checkbox("Override Loop", &useLoopOverride_)) {
+					ApplyLoopSettings();
+				}
+				if(useLoopOverride_) {
+					ImGui::SameLine();
+					if(ImGui::Checkbox("Loop", &loopOverride_)) {
+						ApplyLoopSettings();
+					}
+				}
 
 				auto asset = animator_.GetAnimationAsset();
 				if(asset && !asset->clips.empty()) {
@@ -279,7 +304,10 @@ namespace CalyxEngine {
 		animationGuid_ = j.value("animationGuid", animationGuid_);
 		clipName_ = j.value("clipName", clipName_);
 		autoPlay_ = j.value("autoPlay", autoPlay_);
+		useLoopOverride_ = j.value("useLoopOverride", useLoopOverride_);
+		loopOverride_ = j.value("loopOverride", loopOverride_);
 		RefreshAnimationAsset();
+		ApplyLoopSettings();
 	}
 
 	void AnimatedSpriteSceneObject2d::ExtractConfigToJson(nlohmann::json& j) const {
@@ -287,6 +315,8 @@ namespace CalyxEngine {
 		j["animationGuid"] = animationGuid_;
 		j["clipName"] = clipName_;
 		j["autoPlay"] = autoPlay_;
+		j["useLoopOverride"] = useLoopOverride_;
+		j["loopOverride"] = loopOverride_;
 	}
 
 	void AnimatedSpriteSceneObject2d::SetAnimationGuid(const Guid& guid) {
@@ -312,13 +342,23 @@ namespace CalyxEngine {
 		}
 		animator_.Bind(sprite_.get());
 		animator_.SetAnimationAsset(asset);
+		ApplyLoopSettings();
 		boundAnimationGuid_ = animationGuid_;
 		if(autoPlay_) PlayCurrentClip(true);
 	}
 
 	void AnimatedSpriteSceneObject2d::PlayCurrentClip(bool restart) {
 		if(clipName_.empty()) return;
+		ApplyLoopSettings();
 		animator_.Play(clipName_, restart);
+	}
+
+	void AnimatedSpriteSceneObject2d::ApplyLoopSettings() {
+		if(useLoopOverride_) {
+			animator_.SetLoopOverride(loopOverride_);
+		} else {
+			animator_.ClearLoopOverride();
+		}
 	}
 
 	void AnimatedSpriteSceneObject2d::DrawAnimationAssetEditor(SpriteAnimationAsset& asset) {
@@ -423,6 +463,7 @@ namespace CalyxEngine {
 		auto* manager = AssetManager::GetInstance()->GetDataAssetManager();
 		if(!db || !manager) return;
 		std::filesystem::path folder = db->GetRoot() / "SpriteAnimations";
+		std::filesystem::create_directories(folder);
 		const std::string fileName = name_.empty() ? "AnimatedSprite2D.spriteanim" : name_ + ".spriteanim";
 		std::filesystem::path path = folder / fileName;
 		int suffix = 1;
@@ -430,7 +471,7 @@ namespace CalyxEngine {
 			path = folder / (name_ + "_" + std::to_string(suffix++) + ".spriteanim");
 		}
 
-		const Guid guid = db->RegisterOrUpdate(path, AssetType::SpriteAnimation);
+		const Guid guid = Guid::New();
 		auto asset = manager->CreateSpriteAnimationAsset(path, guid, path.stem().string());
 		if(!asset) return;
 		if(textureGuid_.isValid()) {
@@ -438,6 +479,7 @@ namespace CalyxEngine {
 			asset->texturePath = ResolveTexturePath();
 			manager->SaveAsset(*asset, path);
 		}
+		db->RegisterOrUpdate(path, AssetType::SpriteAnimation);
 		SetAnimationGuid(asset->GetGuid());
 	}
 

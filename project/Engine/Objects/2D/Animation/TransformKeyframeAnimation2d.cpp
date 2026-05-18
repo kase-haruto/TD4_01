@@ -190,7 +190,9 @@ namespace CalyxEngine {
 	bool TransformKeyframeAnimation2d::ShowGui(WorldTransform& target) {
 		bool changed = false;
 		if(ImGui::TreeNodeEx("2D Transform Animation", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::Checkbox("Loop", &loop_);
+			changed |= ImGui::Checkbox("Auto Play", &autoPlay_);
+			ImGui::SameLine();
+			changed |= ImGui::Checkbox("Loop", &loop_);
 			ImGui::SameLine();
 			if(ImGui::Button(playing_ ? "Stop" : "Play", ImVec2(64.0f, 0.0f))) {
 				if(playing_) Stop();
@@ -280,18 +282,23 @@ namespace CalyxEngine {
 	void TransformKeyframeAnimation2d::ApplyConfigFromJson(const nlohmann::json& j) {
 		keys_.clear();
 		loop_ = j.value("loop", loop_);
+		autoPlay_ = j.value("autoPlay", autoPlay_);
 		currentTime_ = j.value("currentTime", 0.0f);
 		if(j.contains("keys") && j.at("keys").is_array()) {
 			keys_ = j.at("keys").get<std::vector<TransformKeyframe2d>>();
 		}
 		SortKeys();
 		RecalculateDuration();
-		playing_ = false;
+		playing_ = autoPlay_ && !keys_.empty();
+		if(playing_) {
+			currentTime_ = 0.0f;
+		}
 		selectedKeyIndex_ = -1;
 	}
 
 	void TransformKeyframeAnimation2d::ExtractConfigToJson(nlohmann::json& j) const {
 		j["loop"] = loop_;
+		j["autoPlay"] = autoPlay_;
 		j["currentTime"] = currentTime_;
 		j["keys"] = keys_;
 	}

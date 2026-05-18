@@ -51,6 +51,8 @@ namespace CalyxEngine {
 		float GetDuration() const { return duration_; }
 		bool IsPlaying() const { return playing_; }
 		bool IsLoop() const { return loop_; }
+		bool IsAutoPlay() const { return autoPlay_; }
+		void SetAutoPlay(bool autoPlay) { autoPlay_ = autoPlay; }
 		bool IsEmpty() const { return keys_.empty(); }
 		const std::vector<TransformKeyframe2d>& GetKeys() const { return keys_; }
 
@@ -69,6 +71,7 @@ namespace CalyxEngine {
 		float currentTime_ = 0.0f;
 		float duration_ = 1.0f;
 		bool loop_ = true;
+		bool autoPlay_ = true;
 		bool playing_ = false;
 		int32_t selectedKeyIndex_ = -1;
 	};

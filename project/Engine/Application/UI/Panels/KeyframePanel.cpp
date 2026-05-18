@@ -120,6 +120,24 @@ namespace CalyxEngine {
 		}
 
 		ImGui::SameLine();
+		if(ImGui::Button("Auto Play All")) {
+			for(auto& weak : targets_) {
+				if(auto object = weak.lock()) {
+					object->Get2DTransformAnimation().SetAutoPlay(true);
+				}
+			}
+		}
+
+		ImGui::SameLine();
+		if(ImGui::Button("Manual All")) {
+			for(auto& weak : targets_) {
+				if(auto object = weak.lock()) {
+					object->Get2DTransformAnimation().SetAutoPlay(false);
+				}
+			}
+		}
+
+		ImGui::SameLine();
 		if(selectionProvider_ && ImGui::Button("Add Selection")) {
 			for(const auto& object : selectionProvider_()) {
 				AddObject(object);
