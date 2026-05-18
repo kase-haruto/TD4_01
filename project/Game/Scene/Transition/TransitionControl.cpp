@@ -9,11 +9,13 @@ TransitionControl::~TransitionControl() = default;
 void TransitionControl::Initialize(const std::string& texPath1, const std::string& texPath2) {
 	plate1_ = std::make_unique<Sprite>(texPath1);
 	plate1_->Initialize({0.0f, 0.0f}, {static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight)});
+	plate1_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	plate1_->Update();
 
 	if(!texPath2.empty()) {
 		plate2_ = std::make_unique<Sprite>(texPath2);
 		plate2_->Initialize({0.0f, 0.0f}, {static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight)});
+		plate2_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		plate2_->Update();
 	}
 
@@ -81,6 +83,7 @@ void TransitionControl::StartOpening(float duration, std::function<void()> onOpe
 }
 
 void TransitionControl::SetPresetSlide(bool toRight) {
+	plate1_->Update();
 	SetUpdateFunc([toRight, this](float progress, Sprite* p1, Sprite* p2) {
 		p2;
 		float w = static_cast<float>(kWindowWidth);
@@ -98,6 +101,8 @@ void TransitionControl::SetPresetSlide(bool toRight) {
 }
 
 void TransitionControl::SetPresetFade() {
+	plate1_->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
+	plate1_->Update();
 	SetUpdateFunc([this](float progress, Sprite* p1, Sprite* p2) {
 		p2;
 		p1->SetPosition({0, 0});
@@ -112,6 +117,8 @@ void TransitionControl::SetPresetFade() {
 }
 
 void TransitionControl::SetPresetSplit() {
+	plate1_->Update();
+	plate2_->Update();
 	SetUpdateFunc([this](float progress, Sprite* p1, Sprite* p2) {
 		if(!p2) return;
 
@@ -138,6 +145,8 @@ void TransitionControl::SetPresetSplit() {
 }
 
 void TransitionControl::SetPresetUpDownSlide() {
+	plate1_->Update();
+	plate2_->Update();
 	SetUpdateFunc([this](float progress, Sprite* p1, Sprite* p2) {
 		if(!p2) return;
 		float w	 = static_cast<float>(kWindowWidth);
@@ -165,6 +174,8 @@ void TransitionControl::SetPresetUpDownSlide() {
 
 void TransitionControl::SetAutoPreset(SceneType now, SceneType next) {
 	isDrawPlate2_ = false;
+	plate1_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	plate2_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	// タイトルからセレクトへはスライド
 	if(now == SceneType::TITLE && next == SceneType::SELECT) {
 		isDrawPlate2_ = true;
@@ -192,14 +203,33 @@ void TransitionControl::SetAutoPreset(SceneType now, SceneType next) {
 
 void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now) {
 	isDrawPlate2_ = false;
+
+	// 初期位置や初期サイズを設定しておかないと一瞬Init状態で描画される
+	plate1_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	plate2_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	float w		= static_cast<float>(kWindowWidth);
+	float halfW = w * 0.5f;
+	float h		= static_cast<float>(kWindowHeight);
+	float halfH = h * 0.5f;
 	// タイトルからセレクトに来た時はスライドで開ける
 	if(prev == SceneType::TITLE && now == SceneType::SELECT) {
 		isDrawPlate2_ = true;
+		plate1_->SetSize({w, h * 1.5f});
+		plate2_->SetSize({w, h * 1.5f});
+		plate1_->SetPosition({0.0f, -halfH * 0.5f});
+		plate2_->SetPosition({0.0f, -h * 0.75f});
 		SetPresetUpDownSlide();
 	}
 	// ゲームからセレクトに来た時は観音開きで開ける
 	else if(prev == SceneType::TEST && now == SceneType::SELECT) {
 		isDrawPlate2_ = true;
+		plate1_->SetSize({halfW, h});
+		plate2_->SetSize({halfW, h});
+
+		float offset = 0.0f;
+		offset = halfW;
+		plate1_->SetPosition({0.0f, 0});
+		plate2_->SetPosition({halfW, 0});
 		SetPresetSplit();
 	}
 	// ゲームからタイトルに来た時は観音開きで開ける

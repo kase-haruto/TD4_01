@@ -18,6 +18,7 @@
 #include <Game\StageGimmick\Manager\StageGimmickManager.h>
 #include <Game/3d/Camera/RailCamera.h>
 #include <Game\Scene\Transition\TransitionPayload.h>
+#include <Game\Scene\Game\GameTransitionPayload.h>
 #include <Game/Scene/Transition/TransitionControl.h>
 
 ///デバッグ関連///
@@ -55,6 +56,7 @@ private:
 	void PauseOpen();
 	void PauseClose();
 	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
+	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
 
 private:
 	/* graphics =====================================================*/

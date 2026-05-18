@@ -265,11 +265,11 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 
 	updateBtn(toSelectBtn_, 1, [&]() {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
-		payload_ = BuildNowTypePayload(SceneType::TEST);
+		payload_ = BuildGamePayload(stageNum_);
 		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::SELECT);
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::TEST);
 		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(payload_));
 		});
 	});
 
@@ -363,11 +363,19 @@ std::unique_ptr<TransitionPayload> TestScene::BuildNowTypePayload(SceneType Type
 	return payload;
 }
 
+std::unique_ptr<GameTransitionPayload> TestScene::BuildGamePayload(int num) {
+	auto payload	   = std::make_unique<GameTransitionPayload>();
+	payload->stageNum_ = num;
+	payload->type_	   = SceneType::TEST;
+	return payload;
+}
+
 void TestScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
 	if(!payload) return;
 
 	// 自分が知っている型にだけキャストする
 	if(auto* p = static_cast<GameTransitionPayload*>(payload.get())) {
 		stageNum_ = p->stageNum_;
+		preType_ = p->type_;
 	}
 }

@@ -3,6 +3,7 @@
  *	include space
  * ========================================================================*/
 #include <Engine/Scene/Transitioner/IScenePayload.h>
+#include <Game/Scene/Details/SceneType.h>
 #include <cstdint>
 #include <vector>
 
@@ -22,4 +23,5 @@ public:
 
 public:
 	int stageNum_ = 0;
+	SceneType type_		= SceneType::SELECT;
 };
