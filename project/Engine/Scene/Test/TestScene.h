@@ -55,6 +55,8 @@ private:
 	void PauseUIUpdate(float dt);
 	void PauseOpen();
 	void PauseClose();
+	void ButtonFadeIn(float dt);
+	void ButtonFadeOut(float dt);
 	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
 	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
 
@@ -69,21 +71,11 @@ private:
 	std::shared_ptr<CalyxHuman> animationHuman_;
 	std::shared_ptr<DemoPlayer>		player_;
 
-	bool isPaused_ = false;
 	std::unique_ptr<CalyxEngine::SpriteObject2d> fanBg_		  = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteAnimator2d> fanAnim_		  = nullptr;
-	std::unique_ptr<Sprite> resumeBtn_ = nullptr;
-	std::unique_ptr<Sprite> toSelectBtn_ = nullptr;
-	std::unique_ptr<Sprite> toTitleBtn_ = nullptr;
-
-	bool	 isOncePlay_		 = false;
-	float openingTime_	 = 0.0f;
-	float currentOpeningTime_ = 0.0f;
-	float frameDuration_	  = 0.0f;
-	int frame_	  = 0;
-	bool isFanOpen_		= false;
-	float	 lastDt_		= 0.0f;
-	int	 selectedIndex_ = 0;
+	std::unique_ptr<CalyxEngine::SpriteObject2d>   resumeBtn_	= nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d>   toSelectBtn_	  = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d>   toTitleBtn_	  = nullptr;
 	
 	int									 stageNum_			  = 0;
 	std::unique_ptr<Stage>				 stage_				  = nullptr;
@@ -94,6 +86,22 @@ private:
 	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
 
 	SceneType preType_	 = SceneType::SELECT;
-	bool	  IsPhase_	 = false;
-	bool	  IsOpening_ = false;
+
+	float lastDt_			  = 0.0f;
+	int	  selectedIndex_	  = 0;
+
+	// ポーズ用（ボタン）
+	float fadeTime_		   = 0.0f;
+	float currentFadeTime_ = 0.0f;
+	bool  isFadeFinish_	   = false;
+	
+	// ポーズ用（扇子）
+	float openingTime_		  = 0.0f;
+	float currentOpeningTime_ = 0.0f;
+	bool  isFanOpen_		  = false;
+	bool  isOncePlay_		  = false;
+	bool  isPaused_			  = false;
+	// 遷移用
+	bool IsPhase_	= false;
+	bool IsOpening_ = false;
 };
