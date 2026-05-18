@@ -3,6 +3,8 @@
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
+REGISTER_SCENE_OBJECT(BreakableWallEvent)
+
 BreakableWallEvent::BreakableWallEvent(const std::string& name) : StageGimmickEventBase(name) {}
 
 void BreakableWallEvent::SetTarget(const std::shared_ptr<BreakableWallObject>& target) {
@@ -42,13 +44,10 @@ void BreakableWallEvent::EventInitialize() {
 	const std::string eventPrefix  = "BreakableWallEvent";
 	const std::string objectPrefix = "BreakableWallObject";
 
-	if(GetName() != eventPrefix) {
-		return;
-	}
-
 	auto object = ResolveLinkedObject<BreakableWallObject>(targetObjectGuid_, objectPrefix);
 	if(!object) object = FindOwnedObjectByClassName<BreakableWallObject>(objectPrefix);
 	if(object) {
+		targetObject_ = object;
 		object->SetName(objectPrefix);
 		SetTarget(object);
 		return;

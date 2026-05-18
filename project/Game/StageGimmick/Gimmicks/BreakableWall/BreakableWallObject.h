@@ -15,7 +15,7 @@ public:
 	~BreakableWallObject() override = default;
 
 	std::string_view GetObjectClassName() const override {
-		return "BreakableFloorObject";
+		return "BreakableWallObject";
 	}
 
 	bool IsBroken() const { return isBroken_; }

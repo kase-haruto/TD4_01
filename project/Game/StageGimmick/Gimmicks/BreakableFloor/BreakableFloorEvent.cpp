@@ -44,13 +44,10 @@ void BreakableFloorEvent::EventInitialize() {
 	const std::string eventPrefix  = "BreakableFloorEvent";
 	const std::string objectPrefix = "BreakableFloorObject";
 
-	if(GetName() != eventPrefix) {
-		return;
-	}
-
 	auto object = ResolveLinkedObject<BreakableFloorObject>(targetObjectGuid_, objectPrefix);
 	if(!object) object = FindOwnedObjectByClassName<BreakableFloorObject>(objectPrefix);
 	if(object) {
+		targetObject_ = object;
 		object->SetName(objectPrefix);
 		SetTarget(object);
 		return;

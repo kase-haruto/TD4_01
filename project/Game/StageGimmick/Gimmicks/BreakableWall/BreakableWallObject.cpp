@@ -1,5 +1,9 @@
 #include "BreakableWallObject.h"
 
+#include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+
+REGISTER_SCENE_OBJECT(BreakableWallObject)
+
 BreakableWallObject::BreakableWallObject(
 	const std::string&		   modelName,
 	std::optional<std::string> objectName)
