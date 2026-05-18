@@ -550,6 +550,9 @@
     <Filter Include="Engine\Objects\2D\Object2d">
       <UniqueIdentifier>{09C6C304-6EF3-494A-A948-02CF7EB5F649}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Objects\2D\Animation">
+      <UniqueIdentifier>{2F3A5E4E-BE30-47B4-85F9-184A8F9C1640}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Objects\2D\Renderer">
       <UniqueIdentifier>{5A6BDA32-6FB2-4223-8EC5-F430A082975B}</UniqueIdentifier>
     </Filter>
@@ -954,6 +957,15 @@
     <ClCompile Include="Engine\Objects\2D\Object2d\SpriteObject2d.cpp">
       <Filter>Engine\Objects\2D\Object2d</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Objects\2D\Object2d\SpriteSceneObject2d.cpp">
+      <Filter>Engine\Objects\2D\Object2d</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\2D\Animation\SpriteAnimator2d.cpp">
+      <Filter>Engine\Objects\2D\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\2D\Animation\TransformKeyframeAnimation2d.cpp">
+      <Filter>Engine\Objects\2D\Animation</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Objects\2D\Renderer\Renderer2d.cpp">
       <Filter>Engine\Objects\2D\Renderer</Filter>
     </ClCompile>
@@ -1002,10 +1014,19 @@
     <ClCompile Include="Engine\Assets\DataAsset\MaterialAsset.cpp">
       <Filter>Engine\Assets\DataAsset</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Assets\DataAsset\SpriteAnimationAsset.cpp">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Application\UI\Panels\AssetPanel.cpp">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Application\UI\Panels\KeyframePanel.cpp">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.cpp">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Application\UI\Panels\SpriteAnimationEditorPanel.cpp">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Application\UI\Panels\PostEffectNodeEditorPanel.cpp">
@@ -1666,6 +1687,15 @@
     <ClInclude Include="Engine\Objects\2D\Object2d\SpriteObject2d.h">
       <Filter>Engine\Objects\2D\Object2d</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Objects\2D\Object2d\SpriteSceneObject2d.h">
+      <Filter>Engine\Objects\2D\Object2d</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\2D\Animation\SpriteAnimator2d.h">
+      <Filter>Engine\Objects\2D\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\2D\Animation\TransformKeyframeAnimation2d.h">
+      <Filter>Engine\Objects\2D\Animation</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Objects\2D\Renderer\Renderer2d.h">
       <Filter>Engine\Objects\2D\Renderer</Filter>
     </ClInclude>
@@ -1720,10 +1750,19 @@
     <ClInclude Include="Engine\Assets\DataAsset\MaterialAsset.h">
       <Filter>Engine\Assets\DataAsset</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Assets\DataAsset\SpriteAnimationAsset.h">
+      <Filter>Engine\Assets\DataAsset</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\AssetPanel.h">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Application\UI\Panels\KeyframePanel.h">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.h">
+      <Filter>Engine\Application\UI\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Application\UI\Panels\SpriteAnimationEditorPanel.h">
       <Filter>Engine\Application\UI\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\PostEffectNodeEditorPanel.h">
@@ -2577,6 +2616,8 @@
     <ClCompile Include="Engine\Objects\2D\Hud\HudMotionSet.cpp" />
     <ClCompile Include="Engine\Objects\2D\Object2d\GameObject2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Object2d\SpriteObject2d.cpp" />
+    <ClCompile Include="Engine\Objects\2D\Object2d\SpriteSceneObject2d.cpp" />
+    <ClCompile Include="Engine\Objects\2D\Animation\SpriteAnimator2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Renderer\Renderer2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Sprite\Component\SpriteComponent.cpp" />
     <ClCompile Include="Engine\Objects\2D\Sprite\SpriteAsset.cpp" />
@@ -2595,8 +2636,10 @@
     <ClCompile Include="Engine\Assets\Database\AssetDatabase.cpp" />
     <ClCompile Include="Engine\Assets\DataAsset\DataAssetManager.cpp" />
     <ClCompile Include="Engine\Assets\DataAsset\MaterialAsset.cpp" />
+    <ClCompile Include="Engine\Assets\DataAsset\SpriteAnimationAsset.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\AssetPanel.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.cpp" />
+    <ClCompile Include="Engine\Application\UI\Panels\SpriteAnimationEditorPanel.cpp" />
     <ClCompile Include="Engine\Editor\NodeEditor\NodeEditorCanvas.cpp" />
     <ClCompile Include="Engine\Editor\NodeEditor\NodeGraph.cpp" />
     <ClCompile Include="Engine\Objects\3D\Geometory\Spline\SplineData.cpp" />
@@ -2838,6 +2881,8 @@
     <ClInclude Include="Engine\Objects\2D\Hud\HudMotionSet.h" />
     <ClInclude Include="Engine\Objects\2D\Object2d\GameObject2d.h" />
     <ClInclude Include="Engine\Objects\2D\Object2d\SpriteObject2d.h" />
+    <ClInclude Include="Engine\Objects\2D\Object2d\SpriteSceneObject2d.h" />
+    <ClInclude Include="Engine\Objects\2D\Animation\SpriteAnimator2d.h" />
     <ClInclude Include="Engine\Objects\2D\Renderer\Renderer2d.h" />
     <ClInclude Include="Engine\Objects\2D\Renderer\SpriteDrawData.h" />
     <ClInclude Include="Engine\Objects\2D\Sprite\Component\SpriteComponent.h" />
@@ -2858,8 +2903,10 @@
     <ClInclude Include="Engine\Assets\DataAsset\DataAsset.h" />
     <ClInclude Include="Engine\Assets\DataAsset\DataAssetManager.h" />
     <ClInclude Include="Engine\Assets\DataAsset\MaterialAsset.h" />
+    <ClInclude Include="Engine\Assets\DataAsset\SpriteAnimationAsset.h" />
     <ClInclude Include="Engine\Application\UI\Panels\AssetPanel.h" />
     <ClInclude Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.h" />
+    <ClInclude Include="Engine\Application\UI\Panels\SpriteAnimationEditorPanel.h" />
     <ClInclude Include="Engine\Editor\NodeEditor\NodeEditorCanvas.h" />
     <ClInclude Include="Engine\Editor\NodeEditor\NodeGraph.h" />
     <ClInclude Include="Engine\Assets\System\AssetDragPayload.h" />

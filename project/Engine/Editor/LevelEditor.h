@@ -10,6 +10,7 @@
 #include <Engine/Application/UI/Panels/EditorPanel.h>
 #include <Engine/Application/UI/Panels/HierarchyPanel.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
+#include <Engine/Application/UI/Panels/KeyframePanel.h>
 #include <Engine/Application/UI/Panels/LivePPPanel.h>
 #include <Engine/Application/UI/Panels/MaterialNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
@@ -34,6 +35,7 @@ namespace EngineEdit {
 
 	enum class EditToolMode {
 		Object,
+		Object2D,
 		Prefab,
 		ParticleEffect,
 		PostEffect,
@@ -146,6 +148,7 @@ namespace CalyxEngine {
 		std::unique_ptr<HierarchyPanel>		 hierarchy_;
 		std::unique_ptr<EditorPanel>		 editor_;
 		std::unique_ptr<InspectorPanel>		 inspector_;
+		std::unique_ptr<KeyframePanel>		 keyframePanel_;
 		std::unique_ptr<SceneObjectEditor>	 sceneEditor_;
 		std::unique_ptr<PlaceToolPanel>		 placeToolPanel_;
 		std::unique_ptr<SplineEditorPanel>	 splineEditor_;

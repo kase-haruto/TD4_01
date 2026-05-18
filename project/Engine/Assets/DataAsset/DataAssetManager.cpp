@@ -1,6 +1,7 @@
 #include "DataAssetManager.h"
 
 #include "MaterialAsset.h"
+#include "SpriteAnimationAsset.h"
 
 #include <Engine\Foundation\Serialization\SerializableField.h>
 #include <Engine\Foundation\Utility\FileSystem\FileSystemHelper.h>
@@ -53,6 +54,25 @@ namespace CalyxEngine {
 			ofs << j.dump(2);
 			return true;
 		}
+
+		nlohmann::json ClipToJson(const SpriteAnimationClip& clip) {
+			return nlohmann::json{
+				{"name", clip.name},
+				{"startFrame", clip.startFrame},
+				{"frameCount", clip.frameCount},
+				{"frameDuration", clip.frameDuration},
+				{"loop", clip.loop}};
+		}
+
+		SpriteAnimationClip ClipFromJson(const nlohmann::json& root) {
+			SpriteAnimationClip clip;
+			clip.name = root.value("name", clip.name);
+			clip.startFrame = root.value("startFrame", clip.startFrame);
+			clip.frameCount = root.value("frameCount", clip.frameCount);
+			clip.frameDuration = root.value("frameDuration", clip.frameDuration);
+			clip.loop = root.value("loop", clip.loop);
+			return clip;
+		}
 	}
 
 	void DataAssetManager::RegisterAsset(const std::shared_ptr<DataAsset>& asset) {
@@ -103,6 +123,37 @@ namespace CalyxEngine {
 		return material;
 	}
 
+	std::shared_ptr<SpriteAnimationAsset> DataAssetManager::LoadSpriteAnimationAsset(const std::filesystem::path& path, const Guid& guid) {
+		if(!guid.isValid()) return nullptr;
+
+		auto spriteAnimation = std::make_shared<SpriteAnimationAsset>();
+		spriteAnimation->SetGuid(guid);
+		spriteAnimation->SetName(path.stem().string());
+
+		nlohmann::json root;
+		if(ReadJsonFile(path, root)) {
+			spriteAnimation->SetName(root.value("name", spriteAnimation->GetName()));
+			ApplyFieldsFromJson(*spriteAnimation, root);
+			spriteAnimation->texturePath = root.value("texturePath", spriteAnimation->texturePath);
+			spriteAnimation->clips.clear();
+			if(root.contains("clips") && root["clips"].is_array()) {
+				for(const auto& clipJson : root["clips"]) {
+					if(clipJson.is_object()) {
+						spriteAnimation->clips.push_back(ClipFromJson(clipJson));
+					}
+				}
+			}
+			if(spriteAnimation->clips.empty()) {
+				spriteAnimation->clips.push_back({});
+			}
+		} else {
+			SaveAsset(*spriteAnimation, path);
+		}
+
+		RegisterAsset(spriteAnimation);
+		return spriteAnimation;
+	}
+
 	bool DataAssetManager::SaveAsset(const DataAsset& asset, const std::filesystem::path& path) const {
 		nlohmann::json root;
 		root["type"] = asset.GetAssetTypeName();
@@ -111,6 +162,13 @@ namespace CalyxEngine {
 		root["fields"] = FieldsToJson(asset);
 		if(auto material = dynamic_cast<const MaterialAsset*>(&asset)) {
 			root["graph"] = material->graph;
+		}
+		if(auto spriteAnimation = dynamic_cast<const SpriteAnimationAsset*>(&asset)) {
+			root["texturePath"] = spriteAnimation->texturePath;
+			root["clips"] = nlohmann::json::array();
+			for(const auto& clip : spriteAnimation->clips) {
+				root["clips"].push_back(ClipToJson(clip));
+			}
 		}
 		return WriteJsonFile(path, root);
 	}
@@ -122,6 +180,15 @@ namespace CalyxEngine {
 		if(!SaveAsset(*material, path)) return nullptr;
 		RegisterAsset(material);
 		return material;
+	}
+
+	std::shared_ptr<SpriteAnimationAsset> DataAssetManager::CreateSpriteAnimationAsset(const std::filesystem::path& path, const Guid& guid, const std::string& name) {
+		auto spriteAnimation = std::make_shared<SpriteAnimationAsset>();
+		spriteAnimation->SetGuid(guid.isValid() ? guid : Guid::New());
+		spriteAnimation->SetName(name.empty() ? path.stem().string() : name);
+		if(!SaveAsset(*spriteAnimation, path)) return nullptr;
+		RegisterAsset(spriteAnimation);
+		return spriteAnimation;
 	}
 
 }

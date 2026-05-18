@@ -15,4 +15,5 @@ enum class AssetType
 	Audio,
 	Prefab,
 	Effect,
+	SpriteAnimation,
 };

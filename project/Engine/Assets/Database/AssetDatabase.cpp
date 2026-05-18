@@ -70,6 +70,7 @@ AssetType AssetDatabase::GuessTypeFromExtension(const std::string& extIn) {
 	if(ext == ".mat") return AssetType::Material;
 	if(ext == ".prefab") return AssetType::Prefab;
 	if(ext == ".effect" || ext == ".fxasset") return AssetType::Effect;
+	if(ext == ".spriteanim") return AssetType::SpriteAnimation;
 	if(ext == ".wav" || ext == ".mp3" || ext == ".ogg") return AssetType::Audio;
 	return AssetType::Unknown;
 }
@@ -238,6 +239,11 @@ AssetGUID AssetDatabase::RegisterOrUpdate(const std::filesystem::path& absOrRelP
 	if(type == AssetType::Material) {
 		if(auto* manager = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()) {
 			manager->LoadMaterialAsset(abs, guid);
+		}
+	}
+	if(type == AssetType::SpriteAnimation) {
+		if(auto* manager = CalyxEngine::AssetManager::GetInstance()->GetDataAssetManager()) {
+			manager->LoadSpriteAnimationAsset(abs, guid);
 		}
 	}
 

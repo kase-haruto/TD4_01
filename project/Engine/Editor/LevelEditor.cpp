@@ -63,6 +63,7 @@ namespace CalyxEngine {
 		hierarchy_			= std::make_unique<HierarchyPanel>();
 		editor_				= std::make_unique<EditorPanel>();
 		inspector_			= std::make_unique<InspectorPanel>();
+		keyframePanel_		= std::make_unique<KeyframePanel>();
 		sceneEditor_		= std::make_unique<SceneObjectEditor>();
 		placeToolPanel_		= std::make_unique<PlaceToolPanel>();
 		splineEditor_		= std::make_unique<SplineEditorPanel>();
@@ -143,6 +144,9 @@ namespace CalyxEngine {
 			});
 
 		inspector_->SetSceneObjectEditor(sceneEditor_.get());
+		keyframePanel_->SetSelectionProvider([this]() {
+			return GetSelectedObjects();
+		});
 		selection_.Bind(hierarchy_.get(), inspector_.get(), sceneEditor_.get());
 
 		// ビューポートの初期化 ------------------------------------------------
@@ -164,6 +168,7 @@ namespace CalyxEngine {
 			manipulator->SetOnCtrlTranslateDuplicate([this]() {
 				return DuplicateSelectedObjects();
 			});
+			mainViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(performanceOverlay_.get());
 			debugViewport_->AddTool(debugOverlay_.get());
@@ -284,6 +289,7 @@ namespace CalyxEngine {
 		editorPanels_.push_back(hierarchy_.get());
 		editorPanels_.push_back(editor_.get());
 		editorPanels_.push_back(inspector_.get());
+		editorPanels_.push_back(keyframePanel_.get());
 		editorPanels_.push_back(placeToolPanel_.get());
 		editorPanels_.push_back(splineEditor_.get());
 		editorPanels_.push_back(assetPanel_.get());
@@ -636,6 +642,7 @@ namespace CalyxEngine {
 			}
 
 			const EngineEdit::EditToolMode modes[] = {
+				EngineEdit::EditToolMode::Object2D,
 				EngineEdit::EditToolMode::Prefab,
 				EngineEdit::EditToolMode::ParticleEffect,
 				EngineEdit::EditToolMode::PostEffect,
@@ -658,6 +665,8 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			return "Object";
+		case EngineEdit::EditToolMode::Object2D:
+			return "2D";
 		case EngineEdit::EditToolMode::Prefab:
 			return "Prefab";
 		case EngineEdit::EditToolMode::ParticleEffect:
@@ -679,6 +688,8 @@ namespace CalyxEngine {
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
 			return layoutDir + "ObjectEdit.ini";
+		case EngineEdit::EditToolMode::Object2D:
+			return layoutDir + "Object2DEdit.ini";
 		case EngineEdit::EditToolMode::Prefab:
 			return layoutDir + "PrefabEdit.ini";
 		case EngineEdit::EditToolMode::ParticleEffect:
@@ -700,7 +711,7 @@ namespace CalyxEngine {
 			return modeLayoutPath;
 		}
 
-		if(mode == EngineEdit::EditToolMode::Object) {
+		if(mode == EngineEdit::EditToolMode::Object || mode == EngineEdit::EditToolMode::Object2D) {
 			return "Resources/Assets/Configs/Editor/Layout/gameEngineDefault.ini";
 		}
 
@@ -804,7 +815,23 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);
+			setShow(keyframePanel_.get(), false);
 			setShow(placeToolPanel_.get(), true);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			break;
+		case EngineEdit::EditToolMode::Object2D:
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
+			if(mainViewport_) mainViewport_->SetShow(true);
+			if(debugViewport_) debugViewport_->SetShow(false);
+			if(mainViewport_) mainViewport_->SetOverlayToolsEnabled(true);
+			setShow(hierarchy_.get(), true);
+			setShow(editor_.get(), true);
+			setShow(inspector_.get(), true);
+			setShow(keyframePanel_.get(), true);
+			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
@@ -820,6 +847,7 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);
+			setShow(keyframePanel_.get(), false);
 			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
@@ -837,6 +865,7 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
+			setShow(keyframePanel_.get(), false);
 			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
@@ -848,6 +877,7 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), false);
+			setShow(keyframePanel_.get(), false);
 			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
@@ -859,6 +889,7 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
+			setShow(keyframePanel_.get(), false);
 			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
@@ -870,6 +901,7 @@ namespace CalyxEngine {
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
+			setShow(keyframePanel_.get(), false);
 			setShow(placeToolPanel_.get(), false);
 			setShow(splineEditor_.get(), true);
 			setShow(assetPanel_.get(), true);

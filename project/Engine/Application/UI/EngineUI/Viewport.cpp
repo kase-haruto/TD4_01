@@ -7,6 +7,7 @@
 #include <Engine/Application/Effects/Particle/Emitter/FxEmitter.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Application/Settings/EngineSettings.h>
+#include <Engine/Application/UI/EngineUI/Manipulator.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
 #include <Engine/Assets/System/AssetType.h>
@@ -555,7 +556,7 @@ void Viewport::Render(const ImTextureID& tex) {
     }
 
     // ---------------- Overlay tools / gizmo ----------------
-    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
+    if((type_ == ViewportType::VIEWPORT_DEBUG || type_ == ViewportType::VIEWPORT_MAIN) && overlayToolsEnabled_) {
         ImGuizmo::SetRect(imagePos.x, imagePos.y, size_.x, size_.y);
         ImGuizmo::SetDrawlist();
 
@@ -563,6 +564,11 @@ void Viewport::Render(const ImTextureID& tex) {
         for(auto* tool : tools_) {
             auto* base = dynamic_cast<BaseOnViewportTool*>(tool);
             if(!base) continue;
+
+            if(auto* manipulator = dynamic_cast<Manipulator*>(tool)) {
+                manipulator->SetActiveViewportType(type_);
+                manipulator->SetViewRect(imagePos, contentSize);
+            }
 
             const ImVec2 viewSize(size_.x, size_.y);
             const ImVec2 pos = base->CalcScreenPosition(imagePos, viewSize);

@@ -179,6 +179,9 @@ namespace CalyxEngine {
 			case AssetType::Prefab:
 				tname = "Prefab";
 				break;
+			case AssetType::SpriteAnimation:
+				tname = "SpriteAnimation";
+				break;
 			default:
 				break;
 			}
@@ -662,6 +665,10 @@ namespace CalyxEngine {
 				typeFilter_ = AssetType::Prefab;
 				scope_		= Scope::All;
 			}
+			if(ImGui::Selectable("All Sprite Animations")) {
+				typeFilter_ = AssetType::SpriteAnimation;
+				scope_		= Scope::All;
+			}
 			ImGui::TreePop();
 		}
 	}
@@ -687,6 +694,7 @@ namespace CalyxEngine {
 		case AssetType::Material: label = "Drop Material here"; break;
 		case AssetType::Model: label = "Drop Model here"; break;
 		case AssetType::Prefab: label = "Drop Prefab here"; break;
+		case AssetType::SpriteAnimation: label = "Drop Sprite Animation here"; break;
 		default: break;
 		}
 		ImGui::GetWindowDrawList()->AddText(

@@ -17,6 +17,7 @@
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Graphics/Camera/3d/Camera3d.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/2D/Object2d/SpriteSceneObject2d.h>
 #include <Engine/Objects/LightObject/DirectionalLight.h>
 #include <Engine/Objects/LightObject/PointLight.h>
 
@@ -205,6 +206,11 @@ namespace CalyxEngine {
 						ImGui::EndMenu();
 					}
 					if(ImGui::MenuItem("Mesh Object")) createRoot(std::make_shared<BaseGameObject>());
+					if(ImGui::BeginMenu("2D")) {
+						if(ImGui::MenuItem("Sprite 2D")) createRoot(std::make_shared<CalyxEngine::SpriteSceneObject2d>());
+						if(ImGui::MenuItem("Animated Sprite 2D")) createRoot(std::make_shared<CalyxEngine::AnimatedSpriteSceneObject2d>());
+						ImGui::EndMenu();
+					}
 					if(ImGui::MenuItem("Particle System")) createRoot(std::make_shared<CalyxEngine::ParticleSystemObject>());
 					ImGui::EndMenu();
 				}
@@ -429,6 +435,11 @@ namespace CalyxEngine {
 						ImGui::EndMenu();
 					}
 					if(ImGui::MenuItem("Mesh Object")) createChild(std::make_shared<BaseGameObject>());
+					if(ImGui::BeginMenu("2D")) {
+						if(ImGui::MenuItem("Sprite 2D")) createChild(std::make_shared<CalyxEngine::SpriteSceneObject2d>());
+						if(ImGui::MenuItem("Animated Sprite 2D")) createChild(std::make_shared<CalyxEngine::AnimatedSpriteSceneObject2d>());
+						ImGui::EndMenu();
+					}
 					if(ImGui::MenuItem("Particle System")) createChild(std::make_shared<CalyxEngine::ParticleSystemObject>());
 
 					ImGui::EndMenu();
@@ -540,6 +551,7 @@ namespace CalyxEngine {
 		case ObjectType::Light:
 			return iconLight_.tex;
 		case ObjectType::GameObject:
+		case ObjectType::Object2D:
 		case ObjectType::Event:
 			return iconGameObj_.tex;
 		case ObjectType::Effect:
@@ -557,6 +569,8 @@ namespace CalyxEngine {
 			return "Light";
 		case ObjectType::GameObject:
 			return "Mesh";
+		case ObjectType::Object2D:
+			return "2D";
 		case ObjectType::Effect:
 			return "Effect";
 		case ObjectType::Event:

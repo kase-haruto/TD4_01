@@ -7,6 +7,8 @@
 #include "Engine/Application/UI/EngineUI/ManipulatorSettings.h"
 
 #include <Engine/Application/UI/EngineUI/IOnViewportTool.h>
+#include <Engine/Foundation/Math/Vector2.h>
+#include <Engine/Graphics/Camera/Viewport/ViewportDetail.h>
 #include <Engine/System/Command/EditorCommand/GuizmoCommand/ScopedGizmoCommand.h>
 
 #include <externals/imgui/ImGuizmo.h>
@@ -51,6 +53,9 @@ namespace CalyxEngine {
 		void SetTargets(const std::vector<WorldTransform*>& targets);
 		void SetCamera(BaseCamera* camera);
 		void SetViewRect(const ImVec2& origin,const ImVec2& size);
+		void SetActiveViewportType(ViewportType type) { activeViewportType_ = type; }
+		void Set2DMode(bool enabled) { is2DMode_ = enabled; }
+		void Set2DAnchor(const CalyxEngine::Vector2& anchor) { anchor2D_ = anchor; }
 		void SetOnCtrlTranslateDuplicate(std::function<std::vector<WorldTransform*>()> callback) { onCtrlTranslateDuplicate_ = std::move(callback); }
 
 		void ApplySettings(const ManipulatorSettings& settings);
@@ -70,6 +75,8 @@ namespace CalyxEngine {
 		CalyxEngine::Matrix4x4 ColumnArrayToRow(const float in_[16]);
 		void                   ApplyWorldMatrix(WorldTransform* target,const CalyxEngine::Matrix4x4& worldEdited);
 		void                   RefreshPivot();
+		void                   Render2DOverlay(const ImVec2& basePos);
+		void                   RenderToolButtons(const ImVec2& basePos, bool allowUniversal, float& nextY);
 
 		/// <summary>
 		/// ImGuizmo による操作・描画処理
@@ -94,6 +101,15 @@ namespace CalyxEngine {
 
 		ImVec2 viewOrigin_ = {0,0};
 		ImVec2 viewSize_   = {0,0};
+		ViewportType activeViewportType_ = ViewportType::VIEWPORT_NONE;
+		bool is2DMode_ = false;
+		CalyxEngine::Vector2 anchor2D_{0.0f, 0.0f};
+		bool dragging2D_ = false;
+		int active2DHandle_ = 0;
+		ImVec2 dragStartMouse_{};
+		CalyxEngine::Vector3 dragStartTranslation_{};
+		CalyxEngine::Vector3 dragStartScale_{};
+		CalyxEngine::Vector3 dragStartEuler_{};
 
 		ManipulatorSettings settings_;
 
