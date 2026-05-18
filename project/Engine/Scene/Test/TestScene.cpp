@@ -52,6 +52,7 @@ void TestScene::Initialize(){
 
 	LoadAssets();
 
+	//std::string settingPath = "Resources/Params/Game/StagesSettings/" + std::to_string(stageNum_) + "_Setting.json";
 	stage_ = std::make_unique<Stage>();
 	stage_->Initialize(20.0f, 60.0f);
 
@@ -97,7 +98,9 @@ void TestScene::Update([[maybe_unused]]float dt){
 			ClockManager::GetInstance()->SetTimeScale(0.0f);
 			PauseOpen();
 		} else {
-			PauseClose();
+			if(currentOpeningTime_ >= openingTime_) {
+				PauseClose();
+			}
 		}
 	}
 
@@ -128,9 +131,11 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 
 	if (isPaused_) {
 		fanBg_->Draw(spriteRenderer_.get());
-		spriteRenderer_->Register(resumeBtn_.get());
-		spriteRenderer_->Register(toSelectBtn_.get());
-		spriteRenderer_->Register(toTitleBtn_.get());
+		if(currentOpeningTime_ > openingTime_) {
+			spriteRenderer_->Register(resumeBtn_.get());
+			spriteRenderer_->Register(toSelectBtn_.get());
+			spriteRenderer_->Register(toTitleBtn_.get());
+		}
 	}
 	
 	transitionControl_->Draw(spriteRenderer_.get());
