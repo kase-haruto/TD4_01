@@ -6,11 +6,11 @@
 // engine
 #include <Engine/Application/UI/Panels/HierarchyActions.h>
 #include <Engine/Application/UI/EngineUI/IEngineUI.h>
+#include <Engine/Application/UI/Panels/HierarchyTreeCache.h>
 
 // c++
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include <externals/imgui/imgui.h>
@@ -42,7 +42,7 @@ namespace CalyxEngine {
 		void ShowObjectRecursive(SceneObject* obj);
 		bool IsDescendantOf(SceneObject* parent, SceneObject* child);
 
-		void RefreshCache() { cacheDirty_ = true; }
+		void RefreshCache() { treeCache_.MarkDirty(); }
 
 		// accessors -------------------------------------------------------
 		const std::string& GetPanelName() const override;
@@ -91,9 +91,7 @@ namespace CalyxEngine {
 	private:
 		// runtime state
 		const SceneObjectLibrary* lib_ = nullptr;
-		// キャッシュ: 親オブジェクト(nullptrはルート) -> ソート済み子リスト
-		std::unordered_map<const SceneObject*, std::vector<std::shared_ptr<SceneObject>>> sortedCache_;
-		bool																			  cacheDirty_ = true;
+		HierarchyTreeCache treeCache_;
 
 		std::weak_ptr<SceneObject> selected_;
 		std::vector<std::weak_ptr<SceneObject>> selectedObjects_;

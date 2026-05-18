@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -85,6 +86,7 @@ public:
      * @return 検索結果のオブジェクト（見つからなければ nullptr）
      */
     std::shared_ptr<SceneObject> FindByName(const std::string& name) const;
+	std::vector<std::shared_ptr<SceneObject>> FindByClassName(std::string_view className) const;
     
     std::shared_ptr<SceneObject> FindSharedByPickingID(uint32_t pickingID) const;
 

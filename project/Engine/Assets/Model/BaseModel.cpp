@@ -33,6 +33,14 @@
 
 const std::string BaseModel::directoryPath_ = "Resource/models";
 
+namespace {
+	uint64_t gBaseModelUploadFrameGeneration = 1;
+}
+
+void BaseModel::BeginUploadFrame() {
+	++gBaseModelUploadFrameGeneration;
+}
+
 void BaseModel::Update(float deltaTime) {
 	// --- まだ modelData_ を取得していないなら、取得を試みる ---
 	if(!modelData_) {
@@ -96,6 +104,7 @@ void BaseModel::OnModelLoaded() {
 		instanceBuffer_.Initialize(device, instanceBufferCapacity_);
 		instanceBuffer_.CreateSrv(device);
 		instanceBufferCreated_ = true;
+		currentInstanceBuffer_ = &instanceBuffer_;
 	}
 }
 
@@ -425,24 +434,35 @@ void BaseModel::SetTex(const std::string& name) {
 }
 
 void BaseModel::EnsureInstanceCapacity(ID3D12Device* device, UINT needCount) {
-	if(!instanceBufferCreated_) {
-		instanceBufferCapacity_ = std::max<UINT>(1024, needCount);
-		instanceBuffer_.Initialize(device, instanceBufferCapacity_); // Upload
-		instanceBuffer_.CreateSrv(device);
-		instanceBufferCreated_ = true;
-		return;
+	if(uploadFrameGenerationSeen_ != gBaseModelUploadFrameGeneration) {
+		uploadFrameGenerationSeen_ = gBaseModelUploadFrameGeneration;
+		instanceUploadCursor_ = 0;
+		billboardUploadCursor_ = 0;
 	}
-	if(needCount <= instanceBufferCapacity_) return;
 
-	// 2倍拡張で再確保頻度を抑制
-	instanceBufferCapacity_ = std::max<UINT>(needCount, instanceBufferCapacity_ * 2);
-	instanceBuffer_.ReleaseSrv();
-	instanceBuffer_.Reset();
-	instanceBuffer_.Initialize(device, instanceBufferCapacity_);
-	instanceBuffer_.CreateSrv(device);
+	const size_t slot = instanceUploadCursor_++;
+	if(instanceUploadBuffers_.size() <= slot) {
+		instanceUploadBuffers_.push_back(std::make_unique<DxStructuredBuffer<TransformationMatrix>>());
+	}
+
+	auto& buffer = *instanceUploadBuffers_[slot];
+	if(!buffer.IsValid()) {
+		const UINT capacity = std::max<UINT>(1024, needCount);
+		buffer.Initialize(GraphicsGroup::GetInstance()->GetDevice(), capacity);
+		buffer.CreateSrv(device);
+	} else if(needCount > buffer.GetElementCount()) {
+		const UINT capacity = std::max<UINT>(needCount, buffer.GetElementCount() * 2);
+		buffer.ReleaseSrv();
+		buffer.Resize(GraphicsGroup::GetInstance()->GetDevice(), capacity);
+		buffer.CreateSrv(device);
+	}
+
+	currentInstanceBuffer_ = &buffer;
 }
 
 void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transforms) {
+	if(!currentInstanceBuffer_) return;
+
 	std::vector<TransformationMatrix> matrices;
 	matrices.reserve(transforms.size());
 	for(const auto& tf : transforms) {
@@ -451,10 +471,12 @@ void BaseModel::UploadInstanceMatrices(const std::vector<WorldTransform>& transf
 		m.WorldInverseTranspose = CalyxEngine::Matrix4x4::Transpose(CalyxEngine::Matrix4x4::Inverse(tf.matrix.world));
 		matrices.push_back(m);
 	}
-	instanceBuffer_.TransferVectorData(matrices);
+	currentInstanceBuffer_->TransferVectorData(matrices);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetInstanceSrv() const { return instanceBuffer_.GetGpuSrvHandle(); }
+D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetInstanceSrv() const {
+	return currentInstanceBuffer_ ? currentInstanceBuffer_->GetGpuSrvHandle() : instanceBuffer_.GetGpuSrvHandle();
+}
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv() const {
 	if(auto material = GetMaterialAsset()) {
 		if(material->objectTextureGuid.isValid()) {
@@ -573,26 +595,45 @@ void BaseModel::BindMaterialCB(ID3D12GraphicsCommandList* cmdList) const { mater
 
 // ================= billboard (VS:t1) =================
 void BaseModel::EnsureBillboardCapacity(ID3D12Device* device, UINT needCount) {
-	if(!billboardBuffer_.IsValid()) {
-		billboardCapacity_ = std::max<UINT>(needCount, 256u);
-		billboardBuffer_.Initialize(device, billboardCapacity_); // Upload
-		billboardBuffer_.CreateSrv(device);						 // VS:t1
-		return;
+	if(uploadFrameGenerationSeen_ != gBaseModelUploadFrameGeneration) {
+		uploadFrameGenerationSeen_ = gBaseModelUploadFrameGeneration;
+		instanceUploadCursor_ = 0;
+		billboardUploadCursor_ = 0;
 	}
-	if(needCount <= billboardCapacity_) return;
-	billboardCapacity_ = std::max<UINT>(needCount, billboardCapacity_ * 2);
-	billboardBuffer_.ReleaseSrv();
-	billboardBuffer_.Reset();
-	billboardBuffer_.Initialize(device, billboardCapacity_);
-	billboardBuffer_.CreateSrv(device);
+
+	const size_t slot = billboardUploadCursor_++;
+	if(billboardUploadBuffers_.size() <= slot) {
+		billboardUploadBuffers_.push_back(std::make_unique<DxStructuredBuffer<GpuBillboardParams>>());
+	}
+
+	auto& buffer = *billboardUploadBuffers_[slot];
+	if(!buffer.IsValid()) {
+		const UINT capacity = std::max<UINT>(needCount, 256u);
+		buffer.Initialize(GraphicsGroup::GetInstance()->GetDevice(), capacity);
+		buffer.CreateSrv(device);
+	} else if(needCount > buffer.GetElementCount()) {
+		const UINT capacity = std::max<UINT>(needCount, buffer.GetElementCount() * 2);
+		buffer.ReleaseSrv();
+		buffer.Resize(GraphicsGroup::GetInstance()->GetDevice(), capacity);
+		buffer.CreateSrv(device);
+	}
+
+	currentBillboardBuffer_ = &buffer;
 }
 
 void BaseModel::UploadBillboardParams(const std::vector<GpuBillboardParams>& params) {
-	if(!billboardBuffer_.IsValid() || params.empty()) return;
-	std::memcpy(billboardBuffer_.Data(), params.data(), sizeof(GpuBillboardParams) * params.size());
+	if(!currentBillboardBuffer_) return;
+	if(params.empty()) {
+		GpuBillboardParams defaultParam{};
+		std::memcpy(currentBillboardBuffer_->Data(), &defaultParam, sizeof(GpuBillboardParams));
+		return;
+	}
+	std::memcpy(currentBillboardBuffer_->Data(), params.data(), sizeof(GpuBillboardParams) * params.size());
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetBillboardSrv() const { return billboardBuffer_.GetGpuSrvHandle(); }
+D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetBillboardSrv() const {
+	return currentBillboardBuffer_ ? currentBillboardBuffer_->GetGpuSrvHandle() : billboardBuffer_.GetGpuSrvHandle();
+}
 
 void BaseModel::TransferMaterial() {
 	auto am = CalyxEngine::AssetManager::GetInstance();

@@ -21,7 +21,23 @@
 namespace CalyxEngine {
 	namespace {
 
+		std::string StripTrailingNumberSuffix(const std::string& name) {
+			if(name.size() < 3 || name.back() != ')') return name;
+
+			const auto open = name.find_last_of('(');
+			if(open == std::string::npos || open + 1 >= name.size() - 1) return name;
+
+			for(size_t i = open + 1; i < name.size() - 1; ++i) {
+				if(!std::isdigit(static_cast<unsigned char>(name[i]))) {
+					return name;
+				}
+			}
+
+			return name.substr(0, open);
+		}
+
 		std::string SanitizeAssetFileStem(std::string name) {
+			name = StripTrailingNumberSuffix(name);
 			if(name.empty()) name = "NewPrefab";
 			for(char& c : name) {
 				const unsigned char uc = static_cast<unsigned char>(c);
@@ -162,6 +178,9 @@ namespace CalyxEngine {
 				break;
 			case AssetType::Prefab:
 				tname = "Prefab";
+				break;
+			case AssetType::SpriteAnimation:
+				tname = "SpriteAnimation";
 				break;
 			default:
 				break;
@@ -646,6 +665,10 @@ namespace CalyxEngine {
 				typeFilter_ = AssetType::Prefab;
 				scope_		= Scope::All;
 			}
+			if(ImGui::Selectable("All Sprite Animations")) {
+				typeFilter_ = AssetType::SpriteAnimation;
+				scope_		= Scope::All;
+			}
 			ImGui::TreePop();
 		}
 	}
@@ -671,6 +694,7 @@ namespace CalyxEngine {
 		case AssetType::Material: label = "Drop Material here"; break;
 		case AssetType::Model: label = "Drop Model here"; break;
 		case AssetType::Prefab: label = "Drop Prefab here"; break;
+		case AssetType::SpriteAnimation: label = "Drop Sprite Animation here"; break;
 		default: break;
 		}
 		ImGui::GetWindowDrawList()->AddText(

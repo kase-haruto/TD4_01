@@ -17,6 +17,7 @@
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Graphics/Camera/3d/Camera3d.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/2D/Object2d/SpriteSceneObject2d.h>
 #include <Engine/Objects/LightObject/DirectionalLight.h>
 #include <Engine/Objects/LightObject/PointLight.h>
 
@@ -25,7 +26,6 @@
 
 #include <externals/imgui/ImGuiFileDialog.h>
 
-#include <algorithm>
 #include <unordered_set>
 #include <string>
 #include <vector>
@@ -36,31 +36,6 @@ namespace CalyxEngine {
 	 *  include space
 	 * ===================================================================== */
 	namespace {
-
-		inline int TypePriority(ObjectType t) {
-			switch(t) {
-			case ObjectType::Camera:
-				return 0;
-			case ObjectType::Light:
-				return 1;
-			case ObjectType::GameObject:
-				return 2;
-			case ObjectType::Effect:
-				return 3;
-			case ObjectType::Event:
-				return 4;
-			default:
-				return 9;
-			}
-		}
-
-		inline bool LessByTypeThenName(const std::shared_ptr<SceneObject>& a,
-									   const std::shared_ptr<SceneObject>& b) {
-			int pa = TypePriority(a->GetObjectType());
-			int pb = TypePriority(b->GetObjectType());
-			if(pa != pb) return pa < pb;
-			return a->GetName() < b->GetName();
-		}
 
 		inline const AssetDragPayload* ReadAssetPayload(const ImGuiPayload* payload) {
 			if(!payload || !payload->Data || payload->DataSize != (int)sizeof(AssetDragPayload)) {
@@ -109,10 +84,10 @@ namespace CalyxEngine {
 		// 追加/削除イベントにフックしてキャッシュ更新を促す
 		if(auto* ctx = SceneContext::Current()) {
 			ctx->AddOnObjectAddedListener([this](SceneObject*) {
-				cacheDirty_ = true;
+				RefreshCache();
 			});
 			ctx->AddOnObjectRemovedListener([this](SceneObject* removed) {
-				cacheDirty_ = true;
+				RefreshCache();
 				// 選択が削除対象ならクリア
 				if(IsSelected(removed)) {
 					selected_.reset();
@@ -185,36 +160,8 @@ namespace CalyxEngine {
 
 			ImGui::TableHeadersRow();
 
-			// --- root 探索 (キャッシュ使用) ---
-			if(cacheDirty_ || sortedCache_.find(nullptr) == sortedCache_.end()) {
-				// キャッシュ再構築（ルートのみ）
-				std::vector<std::shared_ptr<SceneObject>> roots;
-				const auto&								  objects = lib_->GetObjects();
-				roots.reserve(objects.size());
-
-				for(const auto& [id, sp] : objects) {
-					(void)id;
-					if(!sp || sp->IsTransient()) continue;
-					auto parent = sp->GetParent();
-					if(!parent || !lib_->Contains(parent)) {
-						roots.push_back(sp);
-					}
-				}
-				std::sort(roots.begin(), roots.end(), LessByTypeThenName);
-
-				if(cacheDirty_) {
-					sortedCache_.clear();
-					cacheDirty_ = false;
-				}
-				sortedCache_[nullptr] = std::move(roots);
-			}
-
-			// --- 描画 ---
-			auto it = sortedCache_.find(nullptr);
-			if(it != sortedCache_.end()) {
-				for(auto& sp : it->second) {
-					ShowObjectRecursive(sp.get());
-				}
+			for(auto& sp : treeCache_.GetRoots(*lib_)) {
+				ShowObjectRecursive(sp.get());
 			}
 
 			// 空白クリックで選択解除 (テーブル内の空白エリア)
@@ -259,6 +206,11 @@ namespace CalyxEngine {
 						ImGui::EndMenu();
 					}
 					if(ImGui::MenuItem("Mesh Object")) createRoot(std::make_shared<BaseGameObject>());
+					if(ImGui::BeginMenu("2D")) {
+						if(ImGui::MenuItem("Sprite 2D")) createRoot(std::make_shared<CalyxEngine::SpriteSceneObject2d>());
+						if(ImGui::MenuItem("Animated Sprite 2D")) createRoot(std::make_shared<CalyxEngine::AnimatedSpriteSceneObject2d>());
+						ImGui::EndMenu();
+					}
 					if(ImGui::MenuItem("Particle System")) createRoot(std::make_shared<CalyxEngine::ParticleSystemObject>());
 					ImGui::EndMenu();
 				}
@@ -343,20 +295,8 @@ namespace CalyxEngine {
 			const bool isRenamingThis = (renaming_ && renameSP.get() == obj);
 
 			if(!isRenamingThis) {
-				if(sortedCache_.find(obj) == sortedCache_.end()) {
-					std::vector<std::shared_ptr<SceneObject>> sortedChildren;
-					for(auto& ch : obj->GetChildren()) {
-						if(ch) sortedChildren.push_back(ch);
-					}
-					std::sort(sortedChildren.begin(), sortedChildren.end(), LessByTypeThenName);
-					sortedCache_[obj] = std::move(sortedChildren);
-				}
-
-				auto it = sortedCache_.find(obj);
-				if(it != sortedCache_.end()) {
-					for(auto& ch : it->second) {
-						ShowObjectRecursive(ch.get());
-					}
+				for(auto& child : treeCache_.GetChildren(*obj)) {
+					ShowObjectRecursive(child.get());
 				}
 			}
 
@@ -495,6 +435,11 @@ namespace CalyxEngine {
 						ImGui::EndMenu();
 					}
 					if(ImGui::MenuItem("Mesh Object")) createChild(std::make_shared<BaseGameObject>());
+					if(ImGui::BeginMenu("2D")) {
+						if(ImGui::MenuItem("Sprite 2D")) createChild(std::make_shared<CalyxEngine::SpriteSceneObject2d>());
+						if(ImGui::MenuItem("Animated Sprite 2D")) createChild(std::make_shared<CalyxEngine::AnimatedSpriteSceneObject2d>());
+						ImGui::EndMenu();
+					}
 					if(ImGui::MenuItem("Particle System")) createChild(std::make_shared<CalyxEngine::ParticleSystemObject>());
 
 					ImGui::EndMenu();
@@ -606,6 +551,7 @@ namespace CalyxEngine {
 		case ObjectType::Light:
 			return iconLight_.tex;
 		case ObjectType::GameObject:
+		case ObjectType::Object2D:
 		case ObjectType::Event:
 			return iconGameObj_.tex;
 		case ObjectType::Effect:
@@ -623,6 +569,8 @@ namespace CalyxEngine {
 			return "Light";
 		case ObjectType::GameObject:
 			return "Mesh";
+		case ObjectType::Object2D:
+			return "2D";
 		case ObjectType::Effect:
 			return "Effect";
 		case ObjectType::Event:

@@ -3,6 +3,7 @@
 // engine
 #include <Engine/Foundation/Math/Vector4.h>
 #include <Engine/Foundation/Utility/Guid/Guid.h>
+#include <Engine/Objects/2D/Animation/TransformKeyframeAnimation2d.h>
 #include <Engine/Objects/3D/Geometory/AABB.h>
 #include <Engine/objects/Transform/Transform.h>
 
@@ -10,6 +11,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // externals
@@ -19,6 +21,7 @@ enum class ObjectType {
 	Camera,		// カメラ
 	Light,		// ライト
 	GameObject, // ゲームオブジェクト
+	Object2D,   // 2Dオブジェクト
 	Effect,		// パーティクルシステム
 	Event,		// イベント
 	None,		// なし
@@ -96,6 +99,7 @@ public:
 	 */
 	virtual void ExtractDerivedConfigToJson([[maybe_unused]] nlohmann::json& root,
 											[[maybe_unused]] nlohmann::json& derived) const {}
+	virtual void RemapSceneObjectReferences([[maybe_unused]] const std::unordered_map<Guid, Guid>& guidMap) {}
 
 	// =======================
 	// Config I/O virtuals
@@ -118,6 +122,8 @@ public:
 	const std::vector<std::shared_ptr<SceneObject>>& GetChildren() const { return children_; }
 	const WorldTransform&							 GetWorldTransform() const { return worldTransform_; }
 	WorldTransform&									 GetWorldTransform() { return worldTransform_; }
+	CalyxEngine::TransformKeyframeAnimation2d&		 Get2DTransformAnimation() { return transformAnimation2d_; }
+	const CalyxEngine::TransformKeyframeAnimation2d& Get2DTransformAnimation() const { return transformAnimation2d_; }
 	std::shared_ptr<SceneObject>					 GetParent() const { return parent_.lock(); }
 	virtual std::string_view						 GetObjectClassName() const { return "SceneObject"; }
 	ObjectType										 GetObjectType() const { return objectType_; }
@@ -196,4 +202,5 @@ protected:
 	OutlineSettings outlineSettings_{};
 	uint32_t pickingID_		  = 0;
 	uint32_t duplicateNameIndex_ = 0; //< 表示用の同名識別番号。保存名には含めない
+	CalyxEngine::TransformKeyframeAnimation2d transformAnimation2d_;
 };

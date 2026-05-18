@@ -139,10 +139,13 @@ namespace CalyxEngine {
 		if(object) {
 			switch(object->GetObjectType()) {
 			case ObjectType::GameObject:
+			case ObjectType::Object2D:
 				add(ParamFilterSection::Object);
 				add(ParamFilterSection::Material);
 				add(ParamFilterSection::ParameterData);
-				add(ParamFilterSection::Collider);
+				if(object->GetObjectType() == ObjectType::GameObject) {
+					add(ParamFilterSection::Collider);
+				}
 				break;
 
 			case ObjectType::Effect:

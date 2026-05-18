@@ -18,6 +18,8 @@ static const char* ObjectTypeToString(ObjectType type) {
 		return "Light";
 	case ObjectType::GameObject:
 		return "GameObject";
+	case ObjectType::Object2D:
+		return "Object2D";
 	case ObjectType::Effect:
 		return "ParticleSystem";
 	case ObjectType::Event:

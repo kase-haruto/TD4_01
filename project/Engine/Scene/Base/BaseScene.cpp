@@ -11,6 +11,7 @@
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/2D/Object2d/SpriteSceneObject2d.h>
 #include <Engine/PostProcess/Manager/PostEffectManager.h>
 #include <Engine/Objects/Event/BaseEventObject.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
@@ -137,5 +138,12 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 
 void BaseScene::DrawSpritesOnly(ID3D12GraphicsCommandList* cmd,
 								PipelineService*		   pso) {
+	if(sceneContext_) {
+		for(auto* object : sceneContext_->GetObjectLibrary()->GetAllObjectsRaw()) {
+			if(auto* spriteObject = dynamic_cast<CalyxEngine::SpriteSceneObject2d*>(object)) {
+				spriteObject->DrawSprite(spriteRenderer_.get());
+			}
+		}
+	}
 	spriteRenderer_->Draw(cmd, pso, RenderTargetType::BackBuffer);
 }

@@ -285,7 +285,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Objects\2D\Hud\BaseHud.cpp" />
     <ClCompile Include="Engine\Objects\2D\Hud\HudMotion.cpp" />
     <ClCompile Include="Engine\Objects\2D\Hud\HudMotionSet.cpp" />
+    <ClCompile Include="Engine\Objects\2D\Animation\SpriteAnimator2d.cpp" />
+    <ClCompile Include="Engine\Objects\2D\Animation\TransformKeyframeAnimation2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Object2d\GameObject2d.cpp" />
+    <ClCompile Include="Engine\Objects\2D\Object2d\SpriteSceneObject2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Object2d\SpriteObject2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Renderer\Renderer2d.cpp" />
     <ClCompile Include="Engine\Objects\2D\Sprite\Component\SpriteComponent.cpp" />
@@ -312,9 +315,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Assets\Database\AssetDatabase.cpp" />
     <ClCompile Include="Engine\Assets\DataAsset\DataAssetManager.cpp" />
     <ClCompile Include="Engine\Assets\DataAsset\MaterialAsset.cpp" />
+    <ClCompile Include="Engine\Assets\DataAsset\SpriteAnimationAsset.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\AssetPanel.cpp" />
+    <ClCompile Include="Engine\Application\UI\Panels\KeyframePanel.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\PostEffectNodeEditorPanel.cpp" />
+    <ClCompile Include="Engine\Application\UI\Panels\SpriteAnimationEditorPanel.cpp" />
     <ClCompile Include="Engine\Editor\NodeEditor\NodeEditorCanvas.cpp" />
     <ClCompile Include="Engine\Editor\NodeEditor\NodeGraph.cpp" />
     <ClCompile Include="Engine\Objects\3D\Geometory\Spline\SplineData.cpp" />
@@ -425,6 +431,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Application\UI\EngineUI\IEngineUI.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\HierarchyPanel.cpp" />
+    <ClCompile Include="Engine\Application\UI\Panels\HierarchyTreeCache.cpp" />
     <ClCompile Include="Engine\Application\UI\Panels\InspectorPanel.cpp" />
     <ClCompile Include="Engine\Objects\3D\Actor\SceneObject.cpp" />
     <ClCompile Include="Engine\PostProcess\Interface\IPostEffectPass.cpp" />
@@ -444,8 +451,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\DebugCameraFocusController.cpp" />
     <ClCompile Include="Engine\Editor\EditorSelectionCoordinator.cpp" />
     <ClCompile Include="Engine\Editor\LevelEditor.cpp" />
+    <ClCompile Include="Engine\Editor\ParticlePreviewSession.cpp" />
+    <ClCompile Include="Engine\Editor\PrefabEditSession.cpp" />
     <ClCompile Include="Engine\Editor\Prefab\PrefabEditContextUtils.cpp" />
+    <ClCompile Include="Engine\Editor\SceneObjectEditCommands.cpp" />
     <ClCompile Include="Engine\Editor\SceneObjectDuplicator.cpp" />
+    <ClCompile Include="Engine\Editor\ViewportSelectionController.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Module\Velocity\GravityModule.cpp" />
     <ClCompile Include="Engine\Application\Effects\Particle\Emitter\GpuFxEmitter.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadEvent.cpp" />
@@ -615,6 +626,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Assets\DataAsset\DataAssetManager.h" />
     <ClInclude Include="Engine\Assets\DataAsset\MaterialAsset.h" />
     <ClInclude Include="Engine\Application\UI\Panels\AssetPanel.h" />
+    <ClInclude Include="Engine\Application\UI\Panels\KeyframePanel.h" />
     <ClInclude Include="Engine\Application\UI\Panels\MaterialNodeEditorPanel.h" />
     <ClInclude Include="Engine\Application\UI\Panels\PostEffectNodeEditorPanel.h" />
     <ClInclude Include="Engine\Editor\NodeEditor\NodeEditorCanvas.h" />
@@ -786,6 +798,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\IEngineUI.h" />
     <ClInclude Include="Engine\Application\UI\Panels\HierarchyPanel.h" />
+    <ClInclude Include="Engine\Application\UI\Panels\HierarchyTreeCache.h" />
     <ClInclude Include="Engine\Application\UI\Panels\InspectorPanel.h" />
     <ClInclude Include="Engine\Objects\3D\Actor\SceneObject.h" />
     <ClInclude Include="Engine\Graphics\Camera\Base\ICamera.h" />
@@ -825,7 +838,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Foundation\Json\JsonFileIO.h" />
     <ClInclude Include="Engine\Foundation\Json\JsonUtils.h" />
     <ClInclude Include="Engine\Editor\DebugCameraFocusController.h" />
+    <ClInclude Include="Engine\Editor\ParticlePreviewSession.h" />
+    <ClInclude Include="Engine\Editor\PrefabEditSession.h" />
+    <ClInclude Include="Engine\Editor\SceneObjectEditCommands.h" />
     <ClInclude Include="Engine\Editor\SceneObjectEditor.h" />
+    <ClInclude Include="Engine\Editor\ViewportSelectionController.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\TransformCommand\TransformSnapshot.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\GuizmoCommand\ScopedGizmoCommand.h" />
     <ClInclude Include="Engine\System\Command\EditorCommand\GuiCommand\SetValueCommand\SetValueCommand.h" />
@@ -880,6 +897,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClInclude>
     <ClInclude Include="Engine\Application\UI\Panels\SplineEditorPanel.h" />
     <ClInclude Include="Engine\Objects\2D\NumbersSprite\NumbersSprite.h" />
+    <ClInclude Include="Engine\Objects\2D\Animation\SpriteAnimator2d.h" />
+    <ClInclude Include="Engine\Objects\2D\Animation\TransformKeyframeAnimation2d.h" />
+    <ClInclude Include="Engine\Objects\2D\Object2d\SpriteSceneObject2d.h" />
+    <ClInclude Include="Engine\Assets\DataAsset\SpriteAnimationAsset.h" />
+    <ClInclude Include="Engine\Application\UI\Panels\SpriteAnimationEditorPanel.h" />
     <ClInclude Include="Engine\Application\UI\Panels\LivePPPanel.h" />
     <ClInclude Include="Game\StageGimmick\Base\StageGimmickEventBase.h" />
     <ClInclude Include="Game\StageGimmick\Base\StageGimmickObjectBase.h" />
