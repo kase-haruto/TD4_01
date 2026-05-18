@@ -4,6 +4,7 @@
 #include <Engine/Application/System/Environment.h>
 #include <Engine/Application/UI/EngineUI/Core/EngineUICore.h>
 #include <Engine/Application/UI/EngineUI/DebugTextManager.h>
+#include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 
 // uiPanel
@@ -36,6 +37,7 @@ namespace CalyxEngine {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	void EngineUICore::Update() {
 		DebugTextManager::Clear();
+		DebugTextManager::UpdatePopupTexts(ClockManager::GetInstance()->GetDeltaTime());
 		levelEditor_->Update();
 	}
 

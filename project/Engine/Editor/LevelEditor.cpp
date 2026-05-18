@@ -70,6 +70,7 @@ namespace CalyxEngine {
 		assetPanel_			= std::make_unique<AssetPanel>();
 		materialNodeEditorPanel_ = std::make_unique<MaterialNodeEditorPanel>();
 		postEffectNodeEditorPanel_ = std::make_unique<PostEffectNodeEditorPanel>();
+		spriteAnimationEditorPanel_ = std::make_unique<SpriteAnimationEditorPanel>();
 		livePPPanel_		= std::make_unique<LivePPPanel>();
 		sceneSwitchOverlay_ = std::make_unique<SceneSwitchOverlay>();
 		debugCameraFocus_	= std::make_unique<DebugCameraFocusController>();
@@ -162,6 +163,7 @@ namespace CalyxEngine {
 
 		performanceOverlay_ = std::make_unique<PerformanceOverlay>();
 		debugOverlay_		= std::make_unique<DebugOverlay>();
+		debugTextOverlay_	= std::make_unique<DebugTextOverlay>();
 
 		// Manipulator をツールとして登録
 		if(auto* manipulator = sceneEditor_->GetManipulator()) {
@@ -169,9 +171,11 @@ namespace CalyxEngine {
 				return DuplicateSelectedObjects();
 			});
 			mainViewport_->AddTool(manipulator);
+			mainViewport_->AddTool(debugTextOverlay_.get());
 			debugViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(performanceOverlay_.get());
 			debugViewport_->AddTool(debugOverlay_.get());
+			debugViewport_->AddTool(debugTextOverlay_.get());
 		}
 
 		// エディターメニューの初期化 ------------------------------------------
@@ -295,6 +299,7 @@ namespace CalyxEngine {
 		editorPanels_.push_back(assetPanel_.get());
 		editorPanels_.push_back(materialNodeEditorPanel_.get());
 		editorPanels_.push_back(postEffectNodeEditorPanel_.get());
+		editorPanels_.push_back(spriteAnimationEditorPanel_.get());
 		editorPanels_.push_back(livePPPanel_.get());
 
 		ApplyEditToolMode(editToolMode_, true);
@@ -643,6 +648,7 @@ namespace CalyxEngine {
 
 			const EngineEdit::EditToolMode modes[] = {
 				EngineEdit::EditToolMode::Object2D,
+				EngineEdit::EditToolMode::SpriteAnimation,
 				EngineEdit::EditToolMode::Prefab,
 				EngineEdit::EditToolMode::ParticleEffect,
 				EngineEdit::EditToolMode::PostEffect,
@@ -667,6 +673,8 @@ namespace CalyxEngine {
 			return "Object";
 		case EngineEdit::EditToolMode::Object2D:
 			return "2D";
+		case EngineEdit::EditToolMode::SpriteAnimation:
+			return "UV Animation";
 		case EngineEdit::EditToolMode::Prefab:
 			return "Prefab";
 		case EngineEdit::EditToolMode::ParticleEffect:
@@ -690,6 +698,8 @@ namespace CalyxEngine {
 			return layoutDir + "ObjectEdit.ini";
 		case EngineEdit::EditToolMode::Object2D:
 			return layoutDir + "Object2DEdit.ini";
+		case EngineEdit::EditToolMode::SpriteAnimation:
+			return layoutDir + "SpriteAnimationEdit.ini";
 		case EngineEdit::EditToolMode::Prefab:
 			return layoutDir + "PrefabEdit.ini";
 		case EngineEdit::EditToolMode::ParticleEffect:
@@ -822,6 +832,7 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Object2D:
 			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
@@ -838,6 +849,22 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), false);
+			break;
+		case EngineEdit::EditToolMode::SpriteAnimation:
+			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
+			if(mainViewport_) mainViewport_->SetShow(false);
+			if(debugViewport_) debugViewport_->SetShow(false);
+			setShow(hierarchy_.get(), false);
+			setShow(editor_.get(), false);
+			setShow(inspector_.get(), false);
+			setShow(keyframePanel_.get(), false);
+			setShow(placeToolPanel_.get(), false);
+			setShow(splineEditor_.get(), false);
+			setShow(assetPanel_.get(), true);
+			setShow(materialNodeEditorPanel_.get(), false);
+			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), true);
 			break;
 		case EngineEdit::EditToolMode::Prefab:
 			EnsurePrefabEditContext();
@@ -855,6 +882,7 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::ParticleEffect:
 			EnsureParticlePreviewContext();
@@ -873,6 +901,7 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::PostEffect:
 			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
@@ -885,6 +914,7 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), true);
+			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Material:
 			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
@@ -897,6 +927,7 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), true);
 			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Animation:
 			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
@@ -909,6 +940,7 @@ namespace CalyxEngine {
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
 			setShow(postEffectNodeEditorPanel_.get(), false);
+			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		default:
 			break;

@@ -1,6 +1,7 @@
 #pragma once
 // engine
 #include <Engine/Application/UI/EngineUI/DebugOverlay.h>
+#include <Engine/Application/UI/EngineUI/DebugTextOverlay.h>
 #include <Engine/Application/UI/EngineUI/EditorMenu.h>
 #include <Engine/Application/UI/EngineUI/IEngineUI.h>
 #include <Engine/Application/UI/EngineUI/Manipulator.h>
@@ -15,6 +16,7 @@
 #include <Engine/Application/UI/Panels/MaterialNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
 #include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
+#include <Engine/Application/UI/Panels/SpriteAnimationEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Editor/DebugCameraFocusController.h>
 #include <Engine/Editor/EditorSelectionCoordinator.h>
@@ -36,6 +38,7 @@ namespace EngineEdit {
 	enum class EditToolMode {
 		Object,
 		Object2D,
+		SpriteAnimation,
 		Prefab,
 		ParticleEffect,
 		PostEffect,
@@ -155,6 +158,7 @@ namespace CalyxEngine {
 		std::unique_ptr<AssetPanel>			 assetPanel_;
 		std::unique_ptr<MaterialNodeEditorPanel> materialNodeEditorPanel_;
 		std::unique_ptr<PostEffectNodeEditorPanel> postEffectNodeEditorPanel_;
+		std::unique_ptr<SpriteAnimationEditorPanel> spriteAnimationEditorPanel_;
 		std::unique_ptr<LivePPPanel>		 livePPPanel_;
 		std::unique_ptr<SceneSwitchOverlay>	 sceneSwitchOverlay_;
 		std::unique_ptr<ImGuiLayoutSwitcher> layoutSwitcher_;
@@ -174,6 +178,7 @@ namespace CalyxEngine {
 		int									startupDebugViewportFocusFrames_ = 3;
 		std::unique_ptr<PerformanceOverlay> performanceOverlay_; //< パフォーマンスオーバーレイ
 		std::unique_ptr<DebugOverlay>		debugOverlay_;		 //< デバッグオーバーレイ
+		std::unique_ptr<DebugTextOverlay>	debugTextOverlay_;	 //< ポップテキストオーバーレイ
 		std::unique_ptr<ParticlePreviewSession> particlePreview_;
 		std::unique_ptr<PrefabEditSession> prefabEdit_;
 		std::unique_ptr<ViewportSelectionController> viewportSelection_;
