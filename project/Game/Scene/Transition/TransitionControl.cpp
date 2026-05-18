@@ -235,6 +235,13 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 	// ゲームからタイトルに来た時は観音開きで開ける
 	else if(prev == SceneType::TEST && now == SceneType::TITLE) {
 		isDrawPlate2_ = true;
+		plate1_->SetSize({halfW, h});
+		plate2_->SetSize({halfW, h});
+
+		float offset = 0.0f;
+		offset		 = halfW;
+		plate1_->SetPosition({0.0f, 0});
+		plate2_->SetPosition({halfW, 0});
 		SetPresetSplit();
 	}
 	// その他、フェードで開ける
