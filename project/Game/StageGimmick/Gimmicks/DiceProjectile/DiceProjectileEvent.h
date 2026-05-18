@@ -104,5 +104,7 @@ private:
 	// パラメータ
 	DiceProjectileEventParam eventParam_;
 	AllDiceProjectileEventData eventData_;
+	bool hasSerializedEventParam_ = false;
+	bool hasSerializedEventData_ = false;
 
 };

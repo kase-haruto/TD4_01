@@ -68,4 +68,5 @@ private:
 
 	// 調整項目
 	BreakableFloorEventParam param_;
+	bool hasSerializedParam_ = false;
 };

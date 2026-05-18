@@ -35,7 +35,9 @@ void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
 
 void BreakableFloorEvent::EventInitialize() {
 
-	param_.LoadParams();
+	if(!hasSerializedParam_) {
+		param_.LoadParams();
+	}
 
 	if(!targetObject_.expired()) {
 		return;
@@ -44,13 +46,10 @@ void BreakableFloorEvent::EventInitialize() {
 	const std::string eventPrefix  = "BreakableFloorEvent";
 	const std::string objectPrefix = "BreakableFloorObject";
 
-	if(GetName() != eventPrefix) {
-		return;
-	}
-
 	auto object = ResolveLinkedObject<BreakableFloorObject>(targetObjectGuid_, objectPrefix);
 	if(!object) object = FindOwnedObjectByClassName<BreakableFloorObject>(objectPrefix);
 	if(object) {
+		targetObject_ = object;
 		object->SetName(objectPrefix);
 		SetTarget(object);
 		return;
@@ -64,14 +63,11 @@ void BreakableFloorEvent::EventInitialize() {
 	targetObject_.lock()->GetWorldTransform().inheritScale = false;
 }
 
-void BreakableFloorEvent::EventUpdate(float dt) {
+void BreakableFloorEvent::EventUpdate(float) {
 
 	if(!targetObject_.lock()) {
 		EventInitialize();
 	}
-
-
-	dt;
 }
 
 void BreakableFloorEvent::DerivativeGui() {
@@ -80,10 +76,15 @@ void BreakableFloorEvent::DerivativeGui() {
 
 void BreakableFloorEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
+	if(derived->contains("param")) {
+		param_.ApplyParamsFromJson(derived->at("param"));
+		hasSerializedParam_ = true;
+	}
 	targetObjectGuid_ = derived->value("targetObjectGuid", Guid{});
 }
 
 void BreakableFloorEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	param_.ExtractParamsToJson(derived["param"]);
 	if(auto target = targetObject_.lock()) {
 		derived["targetObjectGuid"] = target->GetGuid();
 	} else if(targetObjectGuid_.isValid()) {

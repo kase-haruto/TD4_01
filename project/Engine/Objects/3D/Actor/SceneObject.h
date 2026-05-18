@@ -28,6 +28,9 @@ enum class ObjectType {
 };
 
 class IConfigurable; // 前方宣言
+namespace CalyxEngine {
+	class SerializableObject;
+}
 
 struct OutlineSettings {
 	bool				   enabled	 = true;
@@ -100,6 +103,10 @@ public:
 	virtual void ExtractDerivedConfigToJson([[maybe_unused]] nlohmann::json& root,
 											[[maybe_unused]] nlohmann::json& derived) const {}
 	virtual void RemapSceneObjectReferences([[maybe_unused]] const std::unordered_map<Guid, Guid>& guidMap) {}
+	void BeginSerializableParamCapture(const nlohmann::json* overrides);
+	void EndSerializableParamCapture();
+	void AdoptPendingSerializableParamCapture(const nlohmann::json* overrides);
+	void ExtractSerializableParamsToJson(nlohmann::json& j) const;
 
 	// =======================
 	// Config I/O virtuals
@@ -163,6 +170,9 @@ public:
 	void		 SetParent(const std::shared_ptr<SceneObject>& newParentSp, bool inheritScale = true);
 	void		 SetEnableRaycast(bool enable) { isEnableRaycast_ = enable; }
 	void		 SetPickingID(uint32_t id) { pickingID_ = id; }
+	std::vector<CalyxEngine::SerializableObject*>& SerializableParamObjectsMutable() {
+		return serializableParamObjects_;
+	}
 
 	void AddChild(const std::shared_ptr<SceneObject>& child);
 
@@ -203,4 +213,5 @@ protected:
 	uint32_t pickingID_		  = 0;
 	uint32_t duplicateNameIndex_ = 0; //< 表示用の同名識別番号。保存名には含めない
 	CalyxEngine::TransformKeyframeAnimation2d transformAnimation2d_;
+	std::vector<CalyxEngine::SerializableObject*> serializableParamObjects_;
 };

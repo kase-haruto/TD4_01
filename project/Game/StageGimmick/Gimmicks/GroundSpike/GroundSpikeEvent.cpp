@@ -55,7 +55,9 @@ void GroundSpikeEvent::EventInitialize() {
 void GroundSpikeEvent::EventUpdate(float) {
 
 	if(!targetObject_.lock()) {
-		eventParam_.LoadParams();
+		if(!hasSerializedEventParam_) {
+			eventParam_.LoadParams();
+		}
 		EventInitialize();
 	}
 }
@@ -67,10 +69,18 @@ void GroundSpikeEvent::DerivativeGui() {
 
 void GroundSpikeEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
+	if(derived->contains("eventParam")) {
+		eventParam_.ApplyParamsFromJson(derived->at("eventParam"));
+		hasSerializedEventParam_ = true;
+	}
 	targetObjectGuid_ = derived->value("targetObjectGuid", Guid{});
+	if(auto target = targetObject_.lock()) {
+		target->SetParam(eventParam_.param_);
+	}
 }
 
 void GroundSpikeEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	eventParam_.ExtractParamsToJson(derived["eventParam"]);
 	if(auto target = targetObject_.lock()) {
 		derived["targetObjectGuid"] = target->GetGuid();
 	} else if(targetObjectGuid_.isValid()) {

@@ -43,6 +43,7 @@ void ProjectileFireEvent::EventInitialize() {
 	auto object = ResolveLinkedObject<ProjectileObject>(targetObjectGuid_, objectPrefix);
 	if(!object) object = FindOwnedObjectByClassName<ProjectileObject>(objectPrefix);
 	if(object) {
+		targetObject_ = object;
 		object->SetName(objectPrefix);
 		SetTarget(object);
 		return;
