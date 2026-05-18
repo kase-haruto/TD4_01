@@ -4,6 +4,7 @@
 /* ===================================================================== */
 // engine
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
+#include <Engine/Objects/2D/Object2d/SpriteSceneObject2d.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/graphics/Camera/Manager/CameraManager.h>
@@ -27,8 +28,15 @@ namespace CalyxEngine {
 		sceneObject_ = object;
 		if(object) {
 			manipulator_->SetTarget(&sceneObject_->GetWorldTransform());
+			manipulator_->Set2DMode(sceneObject_->GetObjectType() == ObjectType::Object2D);
+			if(auto* sprite2D = dynamic_cast<CalyxEngine::SpriteSceneObject2d*>(sceneObject_)) {
+				manipulator_->Set2DAnchor(sprite2D->GetAnchor());
+			} else {
+				manipulator_->Set2DAnchor({0.0f, 0.0f});
+			}
 		} else {
 			manipulator_->SetTarget(nullptr);
+			manipulator_->Set2DMode(false);
 		}
 	}
 
@@ -43,6 +51,15 @@ namespace CalyxEngine {
 		sceneObject_ = objects.empty() ? nullptr : objects.back();
 		multiSelection_ = objects.size() > 1;
 		manipulator_->SetTargets(targets);
+		const bool single2D = objects.size() == 1 && objects.front() && objects.front()->GetObjectType() == ObjectType::Object2D;
+		manipulator_->Set2DMode(single2D);
+		if(single2D) {
+			if(auto* sprite2D = dynamic_cast<CalyxEngine::SpriteSceneObject2d*>(objects.front())) {
+				manipulator_->Set2DAnchor(sprite2D->GetAnchor());
+			} else {
+				manipulator_->Set2DAnchor({0.0f, 0.0f});
+			}
+		}
 	}
 
 	void SceneObjectEditor::Update() {
@@ -55,6 +72,12 @@ namespace CalyxEngine {
 		// マニピュレーターの更新
 		if(!multiSelection_) {
 			manipulator_->SetTarget(&sceneObject_->GetWorldTransform());
+			manipulator_->Set2DMode(sceneObject_->GetObjectType() == ObjectType::Object2D);
+			if(auto* sprite2D = dynamic_cast<CalyxEngine::SpriteSceneObject2d*>(sceneObject_)) {
+				manipulator_->Set2DAnchor(sprite2D->GetAnchor());
+			} else {
+				manipulator_->Set2DAnchor({0.0f, 0.0f});
+			}
 		}
 	}
 
@@ -73,5 +96,6 @@ namespace CalyxEngine {
 		sceneObject_ = nullptr;
 		multiSelection_ = false;
 		manipulator_->SetTarget(nullptr);
+		manipulator_->Set2DMode(false);
 	}
 } // namespace CalyxEngine

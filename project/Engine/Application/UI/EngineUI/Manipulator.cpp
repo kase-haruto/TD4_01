@@ -3,6 +3,7 @@
 /* include space
 /* ===================================================================== */
 #include "Engine/Application/Settings/EngineSettings.h"
+#include "Engine/Application/System/Environment.h"
 #include "Engine/Assets/Manager/AssetManager.h"
 
 #include <Engine/Assets/Texture/TextureManager.h>
@@ -17,6 +18,7 @@
 #include <Engine/System/Command/Manager/CommandManager.h>
 
 #include <algorithm>
+#include <cmath>
 
 namespace CalyxEngine {
 
@@ -174,6 +176,7 @@ namespace CalyxEngine {
 	}
 
 	void Manipulator::Manipulate() {
+		if(is2DMode_) return;
 		if(camera_ != SceneContext::Current()->GetCameraMgr()->GetDebug()) { camera_ = SceneContext::Current()->GetCameraMgr()->GetDebug(); }
 
 		if(targets_.empty() || !camera_) return;
@@ -405,8 +408,7 @@ namespace CalyxEngine {
 	}
 
 
-	void Manipulator::RenderOverlay(const ImVec2& basePos) {
-		Manipulate();
+	void Manipulator::RenderToolButtons(const ImVec2& basePos, bool allowUniversal, float& nextY) {
 
 		ImVec2 iconSize = iconTranslate_.size;
 		float  spacing  = 10.0f;
@@ -424,6 +426,7 @@ namespace CalyxEngine {
 			{ImGuizmo::UNIVERSAL,"Universal",iconUniversal_}};
 
 		for(int i = 0; i < IM_ARRAYSIZE(buttons); ++i) {
+			if(!allowUniversal && buttons[i].op == ImGuizmo::UNIVERSAL) continue;
 			ImVec2 btnPos = ImVec2(basePos.x,basePos.y + i * (iconSize.y + spacing));
 			ImGui::SetCursorScreenPos(btnPos);
 
@@ -440,11 +443,116 @@ namespace CalyxEngine {
 			if(ImGui::IsItemHovered())
 				ImGui::SetTooltip("%s",buttons[i].tooltip);
 		}
+		nextY = basePos.y + (allowUniversal ? IM_ARRAYSIZE(buttons) : IM_ARRAYSIZE(buttons) - 1) * (iconSize.y + spacing);
+	}
+
+	void Manipulator::Render2DOverlay(const ImVec2& basePos) {
+		if(targets_.empty()) return;
+		target_ = targets_.front();
+		if(!target_) return;
+
+		float nextY = basePos.y;
+		RenderToolButtons(basePos, false, nextY);
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		target_->Update();
+		const float scaleX = viewSize_.x > 0.0f ? viewSize_.x / static_cast<float>(kGameWidth) : 1.0f;
+		const float scaleY = viewSize_.y > 0.0f ? viewSize_.y / static_cast<float>(kGameHeight) : 1.0f;
+		const ImVec2 pivot(
+			viewOrigin_.x + target_->translation.x * scaleX,
+			viewOrigin_.y + target_->translation.y * scaleY);
+		const ImVec2 size(
+			(std::max)(1.0f, target_->scale.x * scaleX),
+			(std::max)(1.0f, target_->scale.y * scaleY));
+		const ImVec2 rectMin(pivot.x - size.x * anchor2D_.x, pivot.y - size.y * anchor2D_.y);
+		const ImVec2 rectMax(rectMin.x + size.x, rectMin.y + size.y);
+
+		drawList->AddRect(rectMin, rectMax, IM_COL32(255, 174, 80, 255), 0.0f, 0, 2.0f);
+		drawList->AddCircleFilled(pivot, 4.0f, IM_COL32(255, 120, 64, 255));
+
+		ImGuizmo::OPERATION op = ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y;
+		if(operation_ & ImGuizmo::ROTATE) {
+			op = ImGuizmo::ROTATE_Z;
+		} else if(operation_ & ImGuizmo::SCALE) {
+			op = ImGuizmo::SCALE_X | ImGuizmo::SCALE_Y;
+		}
+
+		float view[16], proj[16], world[16];
+		Matrix4x4::Transpose(Matrix4x4::MakeIdentity()).CopyToArray(view);
+		Matrix4x4::Transpose(MakeOrthographicMatrixLH(
+			0.0f,
+			static_cast<float>(kGameWidth),
+			static_cast<float>(kGameHeight),
+			0.0f,
+			-1.0f,
+			1.0f)).CopyToArray(proj);
+		Matrix4x4::Transpose(target_->matrix.world).CopyToArray(world);
+
+		float snapValues[3] = {0.0f, 0.0f, 0.0f};
+		float* snapPtr = nullptr;
+		if(settings_.useSnap) {
+			if(op & (ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y)) {
+				snapValues[0] = settings_.snapTranslate[0];
+				snapValues[1] = settings_.snapTranslate[1];
+				snapValues[2] = 0.0f;
+				snapPtr = snapValues;
+			} else if(op & ImGuizmo::ROTATE_Z) {
+				snapValues[0] = settings_.snapRotate;
+				snapPtr = snapValues;
+			} else if(op & (ImGuizmo::SCALE_X | ImGuizmo::SCALE_Y)) {
+				snapValues[0] = settings_.snapScale[0];
+				snapValues[1] = settings_.snapScale[1];
+				snapValues[2] = 1.0f;
+				snapPtr = snapValues;
+			}
+		}
+
+		ImGuizmo::Manipulate(view, proj, op, ImGuizmo::LOCAL, world, nullptr, snapPtr, nullptr, nullptr);
+		if(ImGuizmo::IsUsing()) {
+			Matrix4x4 edited = ColumnArrayToRow(world);
+			float editedColumn[16];
+			RowToColumnArray(edited, editedColumn);
+			float pos[3], rot[3], scl[3];
+			ImGuizmo::DecomposeMatrixToComponents(editedColumn, pos, rot, scl);
+
+			if(op & (ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y)) {
+				target_->translation.x = pos[0];
+				target_->translation.y = pos[1];
+			}
+			if(op & (ImGuizmo::SCALE_X | ImGuizmo::SCALE_Y)) {
+				target_->scale.x = (std::max)(1.0f, scl[0]);
+				target_->scale.y = (std::max)(1.0f, scl[1]);
+			}
+			if(op & ImGuizmo::ROTATE_Z) {
+				target_->eulerRotation.x = 0.0f;
+				target_->eulerRotation.y = 0.0f;
+				target_->eulerRotation.z = ToRadians(rot[2]);
+				target_->rotationSource = RotationSource::Euler;
+			}
+			target_->Update();
+		}
+	}
+
+	void Manipulator::RenderOverlay(const ImVec2& basePos) {
+		if(is2DMode_) {
+			if(activeViewportType_ == ViewportType::VIEWPORT_MAIN) {
+				Render2DOverlay(basePos);
+			}
+			return;
+		}
+		if(activeViewportType_ != ViewportType::VIEWPORT_DEBUG) return;
+
+		Manipulate();
+
+		float nextY = basePos.y;
+		RenderToolButtons(basePos, true, nextY);
+
+		ImVec2 iconSize = iconTranslate_.size;
+		float  spacing  = 10.0f;
 
 		// ワールド/ローカル切り替えボタン
 		{
-			int    i      = IM_ARRAYSIZE(buttons);
-			ImVec2 btnPos = ImVec2(basePos.x,basePos.y + i * (iconSize.y + spacing));
+			ImVec2 btnPos = ImVec2(basePos.x,nextY);
 			ImGui::SetCursorScreenPos(btnPos);
 
 			bool isWorld = (mode_ == ImGuizmo::WORLD);
@@ -463,9 +571,8 @@ namespace CalyxEngine {
 
 		{
 			static bool showGrid = false;
-			int         i        = IM_ARRAYSIZE(buttons);
 			spacing += 15.0f;
-			ImVec2 btnPos = ImVec2(basePos.x,basePos.y + i * (iconSize.y + spacing));
+			ImVec2 btnPos = ImVec2(basePos.x,nextY + iconSize.y + spacing);
 			ImGui::SetCursorScreenPos(btnPos);
 
 			bool pushStyle = false;
@@ -484,8 +591,7 @@ namespace CalyxEngine {
 		}
 
 		{
-			const int snapIndex = IM_ARRAYSIZE(buttons) + 1;
-			ImVec2    snapPos   = ImVec2(basePos.x,basePos.y + snapIndex * (iconSize.y + spacing));
+			ImVec2    snapPos   = ImVec2(basePos.x,nextY + (iconSize.y + spacing) * 2.0f);
 			ImGui::SetCursorScreenPos(snapPos);
 			ImGui::PushID("ManipulatorSnap");
 			bool settingsChanged = false;

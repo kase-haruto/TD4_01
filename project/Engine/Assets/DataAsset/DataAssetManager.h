@@ -51,8 +51,10 @@ namespace CalyxEngine {
 		void UnregisterAsset(const Guid& guid);
 
 		std::shared_ptr<class MaterialAsset> LoadMaterialAsset(const std::filesystem::path& path, const Guid& guid);
+		std::shared_ptr<class SpriteAnimationAsset> LoadSpriteAnimationAsset(const std::filesystem::path& path, const Guid& guid);
 		bool SaveAsset(const DataAsset& asset, const std::filesystem::path& path) const;
 		std::shared_ptr<class MaterialAsset> CreateMaterialAsset(const std::filesystem::path& path, const Guid& guid, const std::string& name);
+		std::shared_ptr<class SpriteAnimationAsset> CreateSpriteAnimationAsset(const std::filesystem::path& path, const Guid& guid, const std::string& name);
 
 	private:
 		std::unordered_map<Guid, std::shared_ptr<DataAsset>> assets_;

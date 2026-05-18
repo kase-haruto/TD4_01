@@ -6,6 +6,8 @@
 #include <Engine/Application/Effects/FxSystem.h>
 #include <Engine/Application/Effects/Particle/Emitter/FxEmitter.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
+#include <Engine/Application/Settings/EngineSettings.h>
+#include <Engine/Application/UI/EngineUI/Manipulator.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
 #include <Engine/Assets/System/AssetType.h>
@@ -77,6 +79,27 @@ namespace {
             return nullptr;
         }
         return record;
+    }
+
+    inline float SnapAxis(float value, float step) {
+        const float absStep = std::fabs(step);
+        if(absStep <= 1e-5f) {
+            return value;
+        }
+        return std::round(value / absStep) * absStep;
+    }
+
+    inline CalyxEngine::Vector3 ApplyPlacementSnap(const CalyxEngine::Vector3& pos) {
+        const ManipulatorSettings& settings = EngineSettings::GetInstance()->GetData().manipulator;
+        if(!settings.useSnap) {
+            return pos;
+        }
+
+        return {
+            SnapAxis(pos.x, settings.snapTranslate[0]),
+            SnapAxis(pos.y, settings.snapTranslate[1]),
+            SnapAxis(pos.z, settings.snapTranslate[2]),
+        };
     }
 
     inline std::shared_ptr<BaseGameObject> CreateModelObjectFromAsset(
@@ -227,7 +250,7 @@ CalyxEngine::Vector3 Viewport::CalculateSpawnPosForPlace(const ImVec2& imagePos)
         }
     }
 
-    return spawnPos;
+    return ApplyPlacementSnap(spawnPos);
 }
 
 std::shared_ptr<SceneObject> Viewport::PickObjectAtLocalPoint(const CalyxEngine::Vector2& localPoint) const {
@@ -533,7 +556,7 @@ void Viewport::Render(const ImTextureID& tex) {
     }
 
     // ---------------- Overlay tools / gizmo ----------------
-    if(type_ == ViewportType::VIEWPORT_DEBUG && overlayToolsEnabled_) {
+    if((type_ == ViewportType::VIEWPORT_DEBUG || type_ == ViewportType::VIEWPORT_MAIN) && overlayToolsEnabled_) {
         ImGuizmo::SetRect(imagePos.x, imagePos.y, size_.x, size_.y);
         ImGuizmo::SetDrawlist();
 
@@ -541,6 +564,11 @@ void Viewport::Render(const ImTextureID& tex) {
         for(auto* tool : tools_) {
             auto* base = dynamic_cast<BaseOnViewportTool*>(tool);
             if(!base) continue;
+
+            if(auto* manipulator = dynamic_cast<Manipulator*>(tool)) {
+                manipulator->SetActiveViewportType(type_);
+                manipulator->SetViewRect(imagePos, contentSize);
+            }
 
             const ImVec2 viewSize(size_.x, size_.y);
             const ImVec2 pos = base->CalcScreenPosition(imagePos, viewSize);
