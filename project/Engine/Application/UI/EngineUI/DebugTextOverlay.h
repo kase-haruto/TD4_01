@@ -7,7 +7,7 @@
 /*-----------------------------------------------------------------------------------------
  * DebugTextOverlay
  * - デバッグテキストオーバーレイクラス
- * - ビューポート上に任意のデバッグテキストを表示するためのクラス
+ * - エンジン画面右下にデバッグトーストを表示するためのクラス
  *---------------------------------------------------------------------------------------*/
 namespace CalyxEngine {
 	class DebugTextOverlay final
@@ -19,11 +19,9 @@ namespace CalyxEngine {
 		DebugTextOverlay();
 		~DebugTextOverlay() override;
 
-		/**
-		 * ビューポート上にデバッグテキストを描画
-		 * - basePos: ビューポート左上のスクリーン座標
-		 */
 		void RenderOverlay(const ImVec2& basePos) override;
+		static void RenderGlobalPopups();
+		static void RenderFatalAssertWindow();
 
 	private:
 		//===================================================================*/

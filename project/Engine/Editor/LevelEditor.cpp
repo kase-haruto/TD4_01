@@ -163,7 +163,6 @@ namespace CalyxEngine {
 
 		performanceOverlay_ = std::make_unique<PerformanceOverlay>();
 		debugOverlay_		= std::make_unique<DebugOverlay>();
-		debugTextOverlay_	= std::make_unique<DebugTextOverlay>();
 
 		// Manipulator をツールとして登録
 		if(auto* manipulator = sceneEditor_->GetManipulator()) {
@@ -171,11 +170,9 @@ namespace CalyxEngine {
 				return DuplicateSelectedObjects();
 			});
 			mainViewport_->AddTool(manipulator);
-			mainViewport_->AddTool(debugTextOverlay_.get());
 			debugViewport_->AddTool(manipulator);
 			debugViewport_->AddTool(performanceOverlay_.get());
 			debugViewport_->AddTool(debugOverlay_.get());
-			debugViewport_->AddTool(debugTextOverlay_.get());
 		}
 
 		// エディターメニューの初期化 ------------------------------------------

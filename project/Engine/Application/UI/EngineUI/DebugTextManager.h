@@ -29,6 +29,14 @@ namespace CalyxEngine {
 			float				  rise	   = 24.0f;
 		};
 
+		struct FatalAssert {
+			std::string expression;
+			std::string message;
+			std::string file;
+			int			line = 0;
+			ImVec4		color = ImVec4(1.0f, 0.18f, 0.18f, 1.0f);
+		};
+
 		// メッセージの追加
 		static void AddMessage(const std::string& title, const std::string& body, const ImVec4& color = ImVec4(1, 1, 1, 1)) {
 			GetInstance().messages_.push_back({title, body, color});
@@ -51,6 +59,36 @@ namespace CalyxEngine {
 
 		static const std::vector<PopupText>& GetPopupTexts() {
 			return GetInstance().popupTexts_;
+		}
+
+		static void SetFatalAssert(const FatalAssert& fatal) {
+			auto& instance = GetInstance();
+			if(instance.hasFatalAssert_) return;
+			instance.fatalAssert_ = fatal;
+			instance.hasFatalAssert_ = true;
+			instance.breakRequested_ = false;
+		}
+
+		static bool HasFatalAssert() {
+			return GetInstance().hasFatalAssert_;
+		}
+
+		static const FatalAssert& GetFatalAssert() {
+			return GetInstance().fatalAssert_;
+		}
+
+		static void RequestBreak() {
+			GetInstance().breakRequested_ = true;
+		}
+
+		static bool ConsumeBreakRequest() {
+			auto& instance = GetInstance();
+			const bool requested = instance.breakRequested_;
+			instance.breakRequested_ = false;
+			if(requested) {
+				instance.hasFatalAssert_ = false;
+			}
+			return requested;
 		}
 
 		static void UpdatePopupTexts(float dt) {
@@ -83,6 +121,9 @@ namespace CalyxEngine {
 
 		std::vector<Message> messages_;
 		std::vector<PopupText> popupTexts_;
+		FatalAssert			   fatalAssert_;
+		bool				   hasFatalAssert_ = false;
+		bool				   breakRequested_ = false;
 	};
 
 } // namespace CalyxEngine

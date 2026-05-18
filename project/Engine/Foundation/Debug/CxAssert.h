@@ -9,21 +9,17 @@
 
 namespace CalyxEngine::Debug {
 
-	inline void ReportAssertFailure(const char* expression,
-									const char* message,
-									const char* file,
-									int			line,
-									const Vector2& position,
-									const ImVec4&  color) {
+	inline std::string MakeAssertText(const char* expression, const char* message) {
 		std::string text = "Assert failed: ";
 		text += expression ? expression : "";
 		if(message && message[0] != '\0') {
 			text += " | ";
 			text += message;
 		}
+		return text;
+	}
 
-		DebugTextManager::AddPopupText(position, color, text, 4.0f, 32.0f);
-
+	inline void OutputAssertDebugString(const std::string& text, const char* file, int line) {
 		std::string debug = text;
 		debug += " (";
 		debug += file ? file : "";
@@ -33,17 +29,44 @@ namespace CalyxEngine::Debug {
 		OutputDebugStringA(debug.c_str());
 	}
 
+	inline void ReportAssertWarning(const char* expression,
+									const char* message,
+									const char* file,
+									int			line,
+									const Vector2& position,
+									const ImVec4&  color) {
+		const std::string text = MakeAssertText(expression, message);
+
+		DebugTextManager::AddPopupText(position, color, text, 4.0f, 32.0f);
+		OutputAssertDebugString(text, file, line);
+	}
+
+	inline void ReportFatalAssert(const char* expression,
+								  const char* message,
+								  const char* file,
+								  int		  line,
+								  const ImVec4& color) {
+		const std::string text = MakeAssertText(expression, message);
+		DebugTextManager::SetFatalAssert(
+			DebugTextManager::FatalAssert{
+				expression ? expression : "",
+				message ? message : "",
+				file ? file : "",
+				line,
+				color});
+		OutputAssertDebugString(text, file, line);
+	}
+
 } // namespace CalyxEngine::Debug
 
 #if defined(_DEBUG) || defined(DEVELOP)
 #define CX_ENSURE_AT(expr, position, color, text) \
-	((expr) ? true : (::CalyxEngine::Debug::ReportAssertFailure(#expr, text, __FILE__, __LINE__, position, color), false))
+	((expr) ? true : (::CalyxEngine::Debug::ReportAssertWarning(#expr, text, __FILE__, __LINE__, position, color), false))
 
 #define CX_CHECK_AT(expr, position, color, text) \
 	do { \
 		if(!(expr)) { \
-			::CalyxEngine::Debug::ReportAssertFailure(#expr, text, __FILE__, __LINE__, position, color); \
-			__debugbreak(); \
+			::CalyxEngine::Debug::ReportFatalAssert(#expr, text, __FILE__, __LINE__, color); \
 		} \
 	} while(false)
 #else
