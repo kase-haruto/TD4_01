@@ -79,6 +79,7 @@ void TestScene::Initialize(){
 	isPaused_ = false;
 	isFanOpen_	   = false;
 	selectedIndex_ = 0;
+	ClockManager::GetInstance()->SetTimeScale(1.0f);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +99,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 			ClockManager::GetInstance()->SetTimeScale(0.0f);
 			PauseOpen();
 		} else {
-			if(currentOpeningTime_ >= openingTime_) {
+			if(currentOpeningTime_ >= openingTime_ && fanAnim_->IsFinished()) {
 				PauseClose();
 			}
 		}
@@ -131,7 +132,7 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 
 	if (isPaused_) {
 		fanBg_->Draw(spriteRenderer_.get());
-		if(currentOpeningTime_ > openingTime_) {
+		if(currentOpeningTime_ > openingTime_ && fanAnim_->IsFinished() && isFanOpen_) {
 			spriteRenderer_->Register(resumeBtn_.get());
 			spriteRenderer_->Register(toSelectBtn_.get());
 			spriteRenderer_->Register(toTitleBtn_.get());
@@ -192,8 +193,6 @@ void TestScene::InitPauseResource() {
 
 	isOncePlay_	   = false;
 	openingTime_   = 1.0f;
-	frameDuration_ = 0.6f / 7.0f;
-	frame_		   = 0;
 }
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
@@ -237,6 +236,10 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 
 void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 	// 入力による選択変更
+	if(currentOpeningTime_ < openingTime_ && !fanAnim_->IsFinished()) {
+		return;
+	}
+
 	if(CalyxFoundation::Input::TriggerKey(DIK_W) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_UP)) {
 		selectedIndex_ = (selectedIndex_ - 1 + 3) % 3;
 	}
@@ -285,17 +288,17 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 }
 
 void TestScene::PauseUIUpdate(float dt) {
-	currentOpeningTime_ += dt;
 	float t = (std::min)(currentOpeningTime_ / openingTime_, 1.0f);
+	currentOpeningTime_ += dt;
 
-	float h		= static_cast<float>(kWindowHeight) * 1.75f;
+	float h		= static_cast<float>(kWindowHeight);
 	float y		= 0.0f;
 	int	  frame = 0;
 
 	if(isFanOpen_) {
-		// t:0~0.4は下からfanBg_が登ってくる（ｙが720から０まで）
-		if(t <= 0.4f) {
-			float upT = (std::min)(t / 0.4f, 1.0f);
+		// t:0~0.7は下からfanBg_が登ってくる（ｙが720から０まで）
+		if(t <= 0.7f) {
+			float upT = (std::min)(t / 0.7f, 1.0f);
 			float easeT = std::sqrtf(1.0f - std::powf(upT - 1.0f, 2));
 			y			= h * (1.0f - easeT);
 			frame	  = 0;
@@ -309,22 +312,21 @@ void TestScene::PauseUIUpdate(float dt) {
 			fanAnim_->Update(dt);
 		}
 	} else {
-		// isFanOpen_じゃない時は
-		// t:0~0.6はfanBg_が閉じる（1280＊720の連番（横1280＊７、縦７２０））
-		if(t <= 0.6f) {
+		// isFanOpen_じゃない時
+		if(t <= 0.3f) {
 			if(!fanAnim_->IsPlaying() && !isOncePlay_) {
 				isOncePlay_ = true;
 				fanAnim_->SetReversed(true);
 				fanAnim_->Play("FanOpen");
 			}
-			fanAnim_->Update(dt);
 		} else {
-			// t:0.6~1はfanBg_が下がっていく（ｙが0から720まで）
-			float downT = (std::min)((t - 0.6f) / 0.4f, 1.0f);
+			// t:0.3~1はfanBg_が下がっていく（ｙが0から720まで）
+			float downT = (std::min)((t - 0.3f) / 0.7f, 1.0f);
 			float easeT = 1.0f - std::sqrtf(1.0f - std::powf(downT, 2));
 			y			= h * easeT;
 			frame		= 0;
 		}
+		fanAnim_->Update(dt);
 	}
 
 	fanBg_->SetPosition({0.0f, y});
@@ -339,7 +341,7 @@ void TestScene::PauseUIUpdate(float dt) {
 	if(isFanOpen_) {
 		return;
 	}
-	if(t >= 1.0f) {
+	if(t >= 1.0f && fanAnim_->IsFinished()) {
 		isPaused_ = false;
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 	}
