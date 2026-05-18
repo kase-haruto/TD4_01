@@ -19,11 +19,14 @@ namespace CalyxEngine {
 		void Update(float dt);
 		void ApplyFrame(int32_t frame);
 
+		void SetReversed(bool reversed) { reversed_ = reversed; }
+
 		bool IsPlaying() const { return playing_; }
 		bool IsFinished() const { return finished_; }
 		const std::string& GetCurrentClipName() const { return currentClipName_; }
 		int32_t GetCurrentFrame() const { return currentFrame_; }
 		std::shared_ptr<SpriteAnimationAsset> GetAnimationAsset() const { return asset_; }
+		bool IsReversed() const { return reversed_; }
 
 	private:
 		void ApplyTexture();
@@ -37,6 +40,7 @@ namespace CalyxEngine {
 		float frameTime_ = 0.0f;
 		bool playing_ = false;
 		bool finished_ = false;
+		bool reversed_ = false;
 	};
 
 } // namespace CalyxEngine

@@ -127,7 +127,7 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	stage_->Draw(spriteRenderer_.get());
 
 	if (isPaused_) {
-		spriteRenderer_->Register(fanBg_.get());
+		fanBg_->Draw(spriteRenderer_.get());
 		spriteRenderer_->Register(resumeBtn_.get());
 		spriteRenderer_->Register(toSelectBtn_.get());
 		spriteRenderer_->Register(toTitleBtn_.get());
@@ -163,11 +163,29 @@ void TestScene::InitPauseResource() {
 	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
 
-	fanBg_ = std::make_unique<Sprite>("Textures/Pause/fan.png");
-	fanBg_->Initialize({0.0f, 720.0f}, {1280.0f, 720.0f});
+	fanBg_	 = std::make_unique<CalyxEngine::SpriteObject2d>();
+	fanAnim_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
+	fanAnim_->Bind(fanBg_.get());
+	fanBg_->Initialize("Textures/Pause/fan.png");
+	fanBg_->SetPosition({0.0f, 720.0f});
+	fanBg_->SetScale({1280.0f, 720.0f});
 	fanBg_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-	fanBg_->SetUvScale({1.0f / 7.0f, 1.0f});
-	fanBg_->SetUvOffset({0.0f, 0.0f});
+
+	auto asset = std::make_shared<CalyxEngine::SpriteAnimationAsset>();
+	asset->division	   = {7, 1}; // 例: 4x4分割
+	asset->texturePath = "Textures/Pause/fan.png";
+
+	CalyxEngine::SpriteAnimationClip clip;
+	clip.name		  = "FanOpen";
+	clip.startFrame	  = 0;
+	clip.frameCount	  = 7;
+	clip.frameDuration = 0.6f / 7.0f;
+	clip.loop		  = false;
+	asset->clips.push_back(clip);
+
+	fanAnim_->SetAnimationAsset(asset);
+
+	isOncePlay_	   = false;
 	openingTime_   = 1.0f;
 	frameDuration_ = 0.6f / 7.0f;
 	frame_		   = 0;
@@ -276,21 +294,25 @@ void TestScene::PauseUIUpdate(float dt) {
 			float easeT = std::sqrtf(1.0f - std::powf(upT - 1.0f, 2));
 			y			= h * (1.0f - easeT);
 			frame	  = 0;
+			isOncePlay_ = false;
 		} else {
-			// t:0.4~1はfanBg_が開く（1280＊720の連番（横1280＊７、縦７２０））
-			y			= 0.0f;
-			float animT = (std::min)((t - 0.4f) / 0.6f, 1.0f);
-			frame		= static_cast<int>(animT * 7.0f);
-			if(frame > 6) frame = 6;
+			if(!fanAnim_->IsPlaying() && !isOncePlay_) {
+				isOncePlay_ = true;
+				fanAnim_->SetReversed(false);
+				fanAnim_->Play("FanOpen");
+			}
+			fanAnim_->Update(dt);
 		}
 	} else {
 		// isFanOpen_じゃない時は
 		// t:0~0.6はfanBg_が閉じる（1280＊720の連番（横1280＊７、縦７２０））
 		if(t <= 0.6f) {
-			y			= 0.0f;
-			float animT = (std::min)(t / 0.6f, 1.0f);
-			frame		= static_cast<int>((1.0f - animT) * 7.0f);
-			if(frame > 6) frame = 6;
+			if(!fanAnim_->IsPlaying() && !isOncePlay_) {
+				isOncePlay_ = true;
+				fanAnim_->SetReversed(true);
+				fanAnim_->Play("FanOpen");
+			}
+			fanAnim_->Update(dt);
 		} else {
 			// t:0.6~1はfanBg_が下がっていく（ｙが0から720まで）
 			float downT = (std::min)((t - 0.6f) / 0.4f, 1.0f);
@@ -302,12 +324,12 @@ void TestScene::PauseUIUpdate(float dt) {
 
 	fanBg_->SetPosition({0.0f, y});
 
-	// UVアニメーション (横1280*7の連番)
-	float frameWidth = 1.0f / 7.0f;
-	fanBg_->SetUvScale({frameWidth, 1.0f});
-	fanBg_->SetUvOffset({static_cast<float>(frame) * frameWidth, 0.0f});
+	//// UVアニメーション (横1280*7の連番)
+	//float frameWidth = 1.0f / 7.0f;
+	//fanBg_->SetUvScale({frameWidth, 1.0f});
+	//fanBg_->SetUvOffset({static_cast<float>(frame) * frameWidth, 0.0f});
 
-	fanBg_->Update();
+	fanBg_->Update(dt);
 	// 閉じきったらポーズ終了
 	if(isFanOpen_) {
 		return;
@@ -325,6 +347,7 @@ void TestScene::PauseOpen() {
 
 void TestScene::PauseClose() {
 	if(!isFanOpen_) return;
+	isOncePlay_			= false;
 	isFanOpen_			= false;
 	currentOpeningTime_ = 0.0f;
 }

@@ -7,6 +7,7 @@
 #include <Engine/scene/Base/BaseScene.h>
 #include <Engine/Renderer/Sprite/Sprite.h>
 #include <Engine/Objects/2D/Object2d/SpriteObject2d.h>
+#include <Engine/Objects/2D/Animation/SpriteAnimator2d.h>
 #include <Engine/Objects/3D/Actor/TestObject/CalyxHuman.h>
 /* c++ */
 #include <memory>
@@ -67,11 +68,13 @@ private:
 	std::shared_ptr<DemoPlayer>		player_;
 
 	bool isPaused_ = false;
-	std::unique_ptr<Sprite> fanBg_		 = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d> fanBg_		  = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteAnimator2d> fanAnim_		  = nullptr;
 	std::unique_ptr<Sprite> resumeBtn_ = nullptr;
 	std::unique_ptr<Sprite> toSelectBtn_ = nullptr;
 	std::unique_ptr<Sprite> toTitleBtn_ = nullptr;
 
+	bool	 isOncePlay_		 = false;
 	float openingTime_	 = 0.0f;
 	float currentOpeningTime_ = 0.0f;
 	float frameDuration_	  = 0.0f;

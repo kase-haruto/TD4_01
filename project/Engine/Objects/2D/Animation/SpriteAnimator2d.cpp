@@ -46,7 +46,12 @@ namespace CalyxEngine {
 
 		if(currentClipName_ != clipName || restart) {
 			currentClipName_ = clipName;
-			currentFrame_ = clip->startFrame;
+			const int32_t frameCount = std::max(1, clip->frameCount);
+			if(reversed_) {
+				currentFrame_ = clip->startFrame + frameCount - 1;
+			} else {
+				currentFrame_ = clip->startFrame;
+			}
 			frameTime_ = 0.0f;
 			ApplyTexture();
 			ApplyFrame(currentFrame_);
@@ -63,7 +68,12 @@ namespace CalyxEngine {
 
 	void SpriteAnimator2d::Reset() {
 		const SpriteAnimationClip* clip = GetCurrentClip();
-		currentFrame_ = clip ? clip->startFrame : 0;
+		if(clip) {
+			const int32_t frameCount = std::max(1, clip->frameCount);
+			currentFrame_ = reversed_ ? (clip->startFrame + frameCount - 1) : clip->startFrame;
+		} else {
+			currentFrame_ = 0;
+		}
 		frameTime_ = 0.0f;
 		playing_ = false;
 		finished_ = false;
@@ -79,17 +89,32 @@ namespace CalyxEngine {
 		frameTime_ += dt;
 		while(frameTime_ >= clip->frameDuration && playing_) {
 			frameTime_ -= clip->frameDuration;
-			currentFrame_++;
 
 			const int32_t frameCount = std::max(1, clip->frameCount);
-			const int32_t endFrame = clip->startFrame + frameCount;
-			if(currentFrame_ >= endFrame) {
-				if(clip->loop) {
-					currentFrame_ = clip->startFrame;
-				} else {
-					currentFrame_ = endFrame - 1;
-					playing_ = false;
-					finished_ = true;
+			const int32_t startFrame = clip->startFrame;
+			const int32_t endFrame = startFrame + frameCount;
+
+			if(reversed_) {
+				currentFrame_--;
+				if(currentFrame_ < startFrame) {
+					if(clip->loop) {
+						currentFrame_ = endFrame - 1;
+					} else {
+						currentFrame_ = startFrame;
+						playing_ = false;
+						finished_ = true;
+					}
+				}
+			} else {
+				currentFrame_++;
+				if(currentFrame_ >= endFrame) {
+					if(clip->loop) {
+						currentFrame_ = startFrame;
+					} else {
+						currentFrame_ = endFrame - 1;
+						playing_ = false;
+						finished_ = true;
+					}
 				}
 			}
 
