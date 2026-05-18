@@ -16,6 +16,7 @@ void DiceProjectileEvent::OnCollisionEnter(Collider* other) {
 	for(auto& target : targetObjects_) {
 		if(target.lock()) {
 			target.lock()->SetIsFlying(true);
+			target.lock()->SetIsFlying(true);
 		}
 	}
 }

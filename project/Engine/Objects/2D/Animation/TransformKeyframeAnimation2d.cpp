@@ -6,6 +6,7 @@
 #include <externals/imgui/imgui.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <cmath>
 
 namespace CalyxEngine {
@@ -140,6 +141,26 @@ namespace CalyxEngine {
 		SortKeys();
 		RecalculateDuration();
 		selectedKeyIndex_ = static_cast<int32_t>(keys_.size()) - 1;
+	}
+
+	bool TransformKeyframeAnimation2d::RemoveKeyChannel(float time, uint32_t channels, float epsilon) {
+		for(size_t i = 0; i < keys_.size(); ++i) {
+			auto& key = keys_[i];
+			if(std::abs(key.time - time) > epsilon) continue;
+
+			key.channels &= ~channels;
+			if(key.channels == 0) {
+				keys_.erase(keys_.begin() + static_cast<std::ptrdiff_t>(i));
+				if(selectedKeyIndex_ == static_cast<int32_t>(i)) {
+					selectedKeyIndex_ = -1;
+				} else if(selectedKeyIndex_ > static_cast<int32_t>(i)) {
+					--selectedKeyIndex_;
+				}
+			}
+			RecalculateDuration();
+			return true;
+		}
+		return false;
 	}
 
 	void TransformKeyframeAnimation2d::SortKeys() {

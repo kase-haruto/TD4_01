@@ -808,6 +808,7 @@ namespace CalyxEngine {
 		if(mainViewport_) mainViewport_->SetShow(true);
 		if(debugViewport_) debugViewport_->SetShow(true);
 		if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(true);
+		if(mainViewport_) mainViewport_->Set2DPlacementCanvasEnabled(false);
 
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
@@ -827,6 +828,7 @@ namespace CalyxEngine {
 			if(mainViewport_) mainViewport_->SetShow(true);
 			if(debugViewport_) debugViewport_->SetShow(false);
 			if(mainViewport_) mainViewport_->SetOverlayToolsEnabled(true);
+			if(mainViewport_) mainViewport_->Set2DPlacementCanvasEnabled(true);
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);

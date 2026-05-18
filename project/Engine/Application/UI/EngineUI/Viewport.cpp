@@ -7,6 +7,7 @@
 #include <Engine/Application/Effects/Particle/Emitter/FxEmitter.h>
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Application/Settings/EngineSettings.h>
+#include <Engine/Application/System/Environment.h>
 #include <Engine/Application/UI/EngineUI/Manipulator.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
@@ -31,12 +32,16 @@
 #include <externals/imgui/ImGuizmo.h>
 #include <externals/imgui/imgui.h>
 
+#include <algorithm>
 #include <cmath>
 #include <unordered_set>
 
 namespace CalyxEngine {
 
 namespace {
+    constexpr float kPlacementCanvasMinZoom = 0.15f;
+    constexpr float kPlacementCanvasMaxZoom = 4.0f;
+
     inline bool IsPointInRect(const CalyxEngine::Vector2& p, const CalyxEngine::Vector2& size) {
         return (p.x >= 0.0f && p.y >= 0.0f && p.x < size.x && p.y < size.y);
     }
@@ -100,6 +105,23 @@ namespace {
             SnapAxis(pos.y, settings.snapTranslate[1]),
             SnapAxis(pos.z, settings.snapTranslate[2]),
         };
+    }
+
+    void DrawPlacementCanvasGrid(ImDrawList* drawList, const ImVec2& min, const ImVec2& max, const ImVec2& origin, float scale) {
+        drawList->AddRectFilled(min, max, IM_COL32(24, 24, 26, 255));
+
+        const float gridStep = (std::max)(8.0f, 64.0f * scale);
+        float startX = min.x + std::fmod(origin.x - min.x, gridStep);
+        float startY = min.y + std::fmod(origin.y - min.y, gridStep);
+        if(startX < min.x) startX += gridStep;
+        if(startY < min.y) startY += gridStep;
+
+        for(float x = startX; x < max.x; x += gridStep) {
+            drawList->AddLine({x, min.y}, {x, max.y}, IM_COL32(44, 44, 48, 255), 1.0f);
+        }
+        for(float y = startY; y < max.y; y += gridStep) {
+            drawList->AddLine({min.x, y}, {max.x, y}, IM_COL32(44, 44, 48, 255), 1.0f);
+        }
     }
 
     inline std::shared_ptr<BaseGameObject> CreateModelObjectFromAsset(
@@ -386,22 +408,78 @@ void Viewport::Render(const ImTextureID& tex) {
     const ImVec2 contentSize = ImGui::GetContentRegionAvail();
     size_ = CalyxEngine::Vector2(contentSize.x, contentSize.y);
 
-    const ImVec2 imagePos = ImGui::GetCursorScreenPos();
+    const ImVec2 contentPos = ImGui::GetCursorScreenPos();
+    ImVec2 imagePos = contentPos;
+    ImVec2 imageSize = contentSize;
+    const bool usePlacementCanvas2D =
+        placementCanvas2DEnabled_ &&
+        type_ == ViewportType::VIEWPORT_MAIN &&
+        contentSize.x > 0.0f &&
+        contentSize.y > 0.0f;
+
+    if(usePlacementCanvas2D) {
+        const ImVec2 contentMin = contentPos;
+        const ImVec2 contentMax(contentPos.x + contentSize.x, contentPos.y + contentSize.y);
+        const float baseScale = (std::min)(
+            contentSize.x / static_cast<float>(kGameWidth),
+            contentSize.y / static_cast<float>(kGameHeight));
+        const float scale = (std::max)(0.01f, baseScale * placementCanvasZoom_);
+
+        if(ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
+            const ImGuiIO& io = ImGui::GetIO();
+            if(ImGui::IsMouseDragging(ImGuiMouseButton_Middle, 0.0f) ||
+               (ImGui::IsMouseDragging(ImGuiMouseButton_Right, 0.0f) && !ImGuizmo::IsUsing())) {
+                placementCanvasPan_.x += io.MouseDelta.x;
+                placementCanvasPan_.y += io.MouseDelta.y;
+            }
+            if(io.MouseWheel != 0.0f) {
+                placementCanvasZoom_ = std::clamp(
+                    placementCanvasZoom_ * (1.0f + io.MouseWheel * 0.10f),
+                    kPlacementCanvasMinZoom,
+                    kPlacementCanvasMaxZoom);
+            }
+        }
+
+        imageSize = {
+            static_cast<float>(kGameWidth) * scale,
+            static_cast<float>(kGameHeight) * scale};
+        imagePos = {
+            contentPos.x + contentSize.x * 0.5f - imageSize.x * 0.5f + placementCanvasPan_.x,
+            contentPos.y + contentSize.y * 0.5f - imageSize.y * 0.5f + placementCanvasPan_.y};
+
+        DrawPlacementCanvasGrid(ImGui::GetWindowDrawList(), contentMin, contentMax, imagePos, scale);
+        size_ = CalyxEngine::Vector2(imageSize.x, imageSize.y);
+    }
+
     viewOrigin_ = CalyxEngine::Vector2(imagePos.x, imagePos.y);
 
     if(size_.y > 0.0f && type_ != ViewportType::VIEWPORT_PICKING) {
-        camera_->SetAspectRatio(size_.x / size_.y);
+        const CalyxEngine::Vector2 renderSize = usePlacementCanvas2D
+            ? CalyxEngine::Vector2(contentSize.x, contentSize.y)
+            : size_;
+        camera_->SetAspectRatio(renderSize.x / renderSize.y);
         camera_->UpdateMatrix();
-        CameraManager::SetViewportSizeStatic(type_, size_);
+        CameraManager::SetViewportSizeStatic(type_, renderSize);
     }
 
     // ---------------- draw image ----------------
     ImGui::SetCursorScreenPos(imagePos);
-    ImGui::Image(textureID_, contentSize);
+    ImGui::Image(textureID_, imageSize);
+    if(usePlacementCanvas2D) {
+        ImGui::GetWindowDrawList()->AddRect(
+            imagePos,
+            {imagePos.x + imageSize.x, imagePos.y + imageSize.y},
+            IM_COL32(255, 186, 84, 255),
+            0.0f,
+            0,
+            2.0f);
+        ImGui::SetCursorScreenPos(contentPos);
+        ImGui::Dummy(contentSize);
+    }
 
     // 画像矩形（ホバー判定用）
     const ImVec2 imageMin = imagePos;
-    const ImVec2 imageMax = ImVec2(imagePos.x + contentSize.x, imagePos.y + contentSize.y);
+    const ImVec2 imageMax = ImVec2(imagePos.x + imageSize.x, imagePos.y + imageSize.y);
     const bool   hoverImageRect = ImGui::IsMouseHoveringRect(imageMin, imageMax, false);
 
     // ============================================================
@@ -567,7 +645,7 @@ void Viewport::Render(const ImTextureID& tex) {
 
             if(auto* manipulator = dynamic_cast<Manipulator*>(tool)) {
                 manipulator->SetActiveViewportType(type_);
-                manipulator->SetViewRect(imagePos, contentSize);
+                manipulator->SetViewRect(imagePos, imageSize);
             }
 
             const ImVec2 viewSize(size_.x, size_.y);
@@ -615,5 +693,12 @@ CalyxEngine::Vector2 Viewport::GetSize() const { return size_; }
 CalyxEngine::Vector2 Viewport::GetPosition() const { return viewOrigin_; }
 ViewportType Viewport::GetType() const { return type_; }
 void Viewport::SetCamera(BaseCamera* camera) { camera_ = camera; }
+
+void Viewport::Set2DPlacementCanvasEnabled(bool enabled) {
+    if(placementCanvas2DEnabled_ == enabled) return;
+    placementCanvas2DEnabled_ = enabled;
+    placementCanvasZoom_ = 1.0f;
+    placementCanvasPan_ = {0.0f, 0.0f};
+}
 
 } // namespace CalyxEngine
