@@ -121,19 +121,23 @@ namespace {
     // -------------------------
     if (!temp_input_is_active)
     {
-        if (hovered && (g.IO.MouseClicked[0] || g.NavActivateId == id))
+        const bool clicked = hovered && ImGui::IsMouseClicked(0, id);
+        const bool double_clicked = (hovered && g.IO.MouseClickedCount[0] == 2 && ImGui::TestKeyOwner(ImGuiKey_MouseLeft, id));
+        const bool make_active = (clicked || double_clicked || g.NavActivateId == id);
+
+        if (make_active && (clicked || double_clicked))
+            ImGui::SetKeyOwner(ImGuiKey_MouseLeft, id);
+
+        if (make_active && temp_input_allowed)
+            if ((clicked && g.IO.KeyCtrl) || double_clicked || (g.NavActivateId == id && (g.NavActivateFlags & ImGuiActivateFlags_PreferInput)))
+                temp_input_is_active = true;
+
+        if (make_active && !temp_input_is_active)
         {
             ImGui::SetActiveID(id, window);
             ImGui::SetFocusID(id, window);
             ImGui::FocusWindow(window);
-        }
-
-        // ★ ダブルクリックされたら入力モードへ移行
-        if (hovered && g.IO.MouseDoubleClicked[0])
-        {
-            ImGui::SetActiveID(id, window);
-            ImGui::SetFocusID(id, window);
-            temp_input_is_active = true;
+            g.ActiveIdUsingNavDirMask = (1 << ImGuiDir_Left) | (1 << ImGuiDir_Right);
         }
     }
 

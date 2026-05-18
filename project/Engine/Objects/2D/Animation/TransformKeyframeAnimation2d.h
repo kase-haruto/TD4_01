@@ -40,6 +40,7 @@ namespace CalyxEngine {
 		void ApplyAt(WorldTransform& target, float time) const;
 		void CaptureKey(WorldTransform& target, float time);
 		void CaptureKey(WorldTransform& target, float time, uint32_t channels);
+		bool RemoveKeyChannel(float time, uint32_t channels, float epsilon = 0.0001f);
 		void SortKeys();
 		void Clear();
 

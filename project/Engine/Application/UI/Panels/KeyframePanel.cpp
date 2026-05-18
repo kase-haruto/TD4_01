@@ -309,7 +309,8 @@ namespace CalyxEngine {
 
 		ImGui::SetCursorScreenPos({timelineX, origin.y});
 		ImGui::InvisibleButton("##timelineRuler", ImVec2(timelineWidth, rulerHeight));
-		if(ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+		if((ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) ||
+		   (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))) {
 			timelineTime_ = xToTime(ImGui::GetIO().MousePos.x);
 			applyTimeToAll();
 		}
@@ -340,7 +341,8 @@ namespace CalyxEngine {
 				ImGui::PushID(row);
 				ImGui::SetCursorScreenPos({timelineX, rowY});
 				ImGui::InvisibleButton("##timelineRow", ImVec2(timelineWidth, rowHeight));
-				if(ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+				if((ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) ||
+				   (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))) {
 					timelineTime_ = xToTime(ImGui::GetIO().MousePos.x);
 					applyTimeToAll();
 				}
@@ -353,11 +355,36 @@ namespace CalyxEngine {
 				ImGui::PopID();
 				ImGui::PopID();
 
-				const auto& keys = object->Get2DTransformAnimation().GetKeys();
-				for(const auto& key : keys) {
+				const auto keys = object->Get2DTransformAnimation().GetKeys();
+				for(size_t keyIndex = 0; keyIndex < keys.size(); ++keyIndex) {
+					const auto& key = keys[keyIndex];
 					if(!HasChannel(key, rows[row].channel)) continue;
 					const float keyX = timeToX(key.time);
-					DrawDiamond(drawList, {keyX, rowY + rowHeight * 0.5f}, 5.0f, IM_COL32(218, 218, 218, 255));
+					const ImVec2 keyCenter{keyX, rowY + rowHeight * 0.5f};
+					DrawDiamond(drawList, keyCenter, 5.0f, IM_COL32(218, 218, 218, 255));
+
+					ImGui::PushID(static_cast<int>(targetIndex));
+					ImGui::PushID(row);
+					ImGui::PushID(static_cast<int>(keyIndex));
+					ImGui::SetCursorScreenPos({keyCenter.x - 7.0f, keyCenter.y - 7.0f});
+					ImGui::InvisibleButton("##key", ImVec2(14.0f, 14.0f));
+					if(ImGui::IsItemHovered()) {
+						ImGui::SetTooltip("Left: move time / Right: delete key");
+					}
+					if(ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+						timelineTime_ = key.time;
+						applyTimeToAll();
+					}
+					if(ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+						object->Get2DTransformAnimation().RemoveKeyChannel(key.time, rows[row].channel);
+						ImGui::PopID();
+						ImGui::PopID();
+						ImGui::PopID();
+						break;
+					}
+					ImGui::PopID();
+					ImGui::PopID();
+					ImGui::PopID();
 				}
 
 				y += rowHeight;

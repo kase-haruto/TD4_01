@@ -62,6 +62,7 @@ namespace CalyxEngine {
 		void			   SetCamera(BaseCamera* camera);
 		void			   SetPickingPass(PickingPass* pickingPass) { pickingPass_ = pickingPass; }
 		void			   SetOverlayToolsEnabled(bool enabled) { overlayToolsEnabled_ = enabled; }
+		void			   Set2DPlacementCanvasEnabled(bool enabled);
 
 	private:
 		ImVec2 CalcToolPosition(IOnViewportTool* tool,
@@ -92,6 +93,9 @@ namespace CalyxEngine {
 		bool			   isClicked_	 = false;
 		bool			   wasTriggered_ = false;
 		bool			   overlayToolsEnabled_ = true;
+		bool			   placementCanvas2DEnabled_ = false;
+		float			   placementCanvasZoom_ = 1.0f;
+		ImVec2			   placementCanvasPan_{0.0f, 0.0f};
 
 		std::shared_ptr<SceneObject> ghost_		  = nullptr;
 		std::vector<std::shared_ptr<SceneObject>> prefabGhosts_;
