@@ -1,6 +1,7 @@
 #include "PrefabSerializer.h"
 #include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Foundation/Json/JsonUtils.h>
+#include <Engine/Foundation/Serialization/SerializableObject.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
@@ -12,6 +13,63 @@
 #include <unordered_set>
 
 namespace {
+
+	bool IsGuidString(const std::string& value) {
+		if(value.size() != 36) return false;
+		for(size_t i = 0; i < value.size(); ++i) {
+			const char c = value[i];
+			if(i == 8 || i == 13 || i == 18 || i == 23) {
+				if(c != '-') return false;
+				continue;
+			}
+
+			const bool isHex =
+				(c >= '0' && c <= '9') ||
+				(c >= 'a' && c <= 'f') ||
+				(c >= 'A' && c <= 'F');
+			if(!isHex) return false;
+		}
+		return true;
+	}
+
+	void RemapJsonGuidStrings(nlohmann::json& j, const std::unordered_map<Guid, Guid>& guidMap) {
+		if(j.is_object()) {
+			for(auto& item : j.items()) {
+				RemapJsonGuidStrings(item.value(), guidMap);
+			}
+			return;
+		}
+
+		if(j.is_array()) {
+			for(auto& item : j) {
+				RemapJsonGuidStrings(item, guidMap);
+			}
+			return;
+		}
+
+		if(!j.is_string()) return;
+
+		const std::string value = j.get<std::string>();
+		if(!IsGuidString(value)) return;
+
+		const Guid guid = Guid::FromString(value);
+		if(auto it = guidMap.find(guid); it != guidMap.end() && it->second.isValid()) {
+			j = it->second;
+		}
+	}
+
+	void CollectPrefabSourceGuidMap(SceneObject* obj, std::unordered_map<Guid, Guid>& out) {
+		if(!obj) return;
+
+		const Guid& sourceGuid = obj->GetPrefabSourceGuid();
+		if(obj->GetGuid().isValid() && sourceGuid.isValid()) {
+			out[obj->GetGuid()] = sourceGuid;
+		}
+
+		for(const auto& child : obj->GetChildren()) {
+			CollectPrefabSourceGuidMap(child.get(), out);
+		}
+	}
 
 	WorldTransformConfig MakePrefabRootTransformConfig(WorldTransform& transform) {
 		WorldTransformConfig config = transform.ExtractConfig();
@@ -82,8 +140,13 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 							const SaveOptions& options){
 	nlohmann::json jArray = nlohmann::json::array();
 	std::unordered_set<SceneObject*> prefabRoots;
+	std::unordered_map<Guid, Guid> prefabSourceGuidMap;
 	for(auto* root : roots) {
-		if(root) prefabRoots.insert(root);
+		if(!root) continue;
+		prefabRoots.insert(root);
+		if(options.usePrefabSourceGuids) {
+			CollectPrefabSourceGuidMap(root, prefabSourceGuidMap);
+		}
 	}
 
 	std::function<void(SceneObject*)> serializeRec;
@@ -95,6 +158,14 @@ bool PrefabSerializer::Save(const std::vector<SceneObject*>& roots,
 			cfg->ExtractConfigToJson(j);
 		}
 		WriteSceneObjectMetadata(*obj, j, prefabRoots, options.resetRootTransform, options.usePrefabSourceGuids);
+		nlohmann::json serializableParams;
+		obj->ExtractSerializableParamsToJson(serializableParams);
+		if(!serializableParams.empty()) {
+			j["serializableParams"] = std::move(serializableParams);
+		}
+		if(options.usePrefabSourceGuids && !prefabSourceGuidMap.empty()) {
+			RemapJsonGuidStrings(j, prefabSourceGuidMap);
+		}
 		jArray.push_back(std::move(j));
 
 		for (auto& childSp : obj->GetChildren()){
@@ -125,8 +196,16 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 		std::string typeName = j.value("type", "");
 		if (typeName.empty()) continue;
 
+		const nlohmann::json* paramOverrides = j.contains("serializableParams")
+			? &j.at("serializableParams")
+			: nullptr;
+		CalyxEngine::SerializableObject::BeginPendingCapture();
 		auto sp = SceneObjectRegistry::Get().Create(typeName);
-		if (!sp) continue;
+		if (!sp) {
+			CalyxEngine::SerializableObject::EndPendingCapture(nullptr, nullptr);
+			continue;
+		}
+		sp->AdoptPendingSerializableParamCapture(paramOverrides);
 
 		if (auto* cfg = dynamic_cast<IConfigurable*>(sp.get())) {
 			cfg->ApplyConfigFromJson(j);
@@ -144,7 +223,19 @@ std::vector<std::shared_ptr<SceneObject>> PrefabSerializer::Load(const std::stri
 		} else if(options.preserveGuids) {
 			sp->ClearPrefabLink();
 		}
+		sp->BeginSerializableParamCapture(paramOverrides);
 		sp->Initialize();
+		sp->EndSerializableParamCapture();
+		if (auto* cfg = dynamic_cast<IConfigurable*>(sp.get())) {
+			cfg->ApplyConfigFromJson(j);
+			ApplySceneObjectMetadata(*sp, j);
+			sp->SetGuid(newGuid);
+			if(options.prefabAssetGuid.isValid() && oldGuid.isValid()) {
+				sp->SetPrefabLink(options.prefabAssetGuid, oldGuid);
+			} else if(options.preserveGuids) {
+				sp->ClearPrefabLink();
+			}
+		}
 
 		oldToNewGuid[oldGuid] = newGuid;
 		oldToObject[oldGuid] = sp;

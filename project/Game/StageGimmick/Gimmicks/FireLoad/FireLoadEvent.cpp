@@ -36,7 +36,9 @@ void FireLoadEvent::SetTarget(const std::shared_ptr<FireLoadObject>& target) {
 
 void FireLoadEvent::EventInitialize() {
 
-	eventParam_.LoadParams();
+	if(!hasSerializedEventParam_) {
+		eventParam_.LoadParams();
+	}
 
 	worldTransform_.scale.x = 20.0f;
 	worldTransform_.scale.y = 6.0f;
@@ -127,10 +129,20 @@ void FireLoadEvent::DerivativeGui() {
 
 void FireLoadEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
+	if(derived->contains("eventParam")) {
+		eventParam_.ApplyParamsFromJson(derived->at("eventParam"));
+		hasSerializedEventParam_ = true;
+	}
 	targetObjectGuids_ = derived->value("targetObjectGuids", std::vector<Guid>{});
+	for(auto& target : targetObjects_) {
+		if(auto object = target.lock()) {
+			object->SetParam(eventParam_.param_);
+		}
+	}
 }
 
 void FireLoadEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	eventParam_.ExtractParamsToJson(derived["eventParam"]);
 	std::vector<Guid> guids;
 	guids.reserve(targetObjects_.size());
 	for(const auto& target : targetObjects_) {

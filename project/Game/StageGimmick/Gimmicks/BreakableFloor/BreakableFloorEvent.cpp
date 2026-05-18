@@ -35,7 +35,9 @@ void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
 
 void BreakableFloorEvent::EventInitialize() {
 
-	param_.LoadParams();
+	if(!hasSerializedParam_) {
+		param_.LoadParams();
+	}
 
 	if(!targetObject_.expired()) {
 		return;
@@ -80,10 +82,15 @@ void BreakableFloorEvent::DerivativeGui() {
 
 void BreakableFloorEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
+	if(derived->contains("param")) {
+		param_.ApplyParamsFromJson(derived->at("param"));
+		hasSerializedParam_ = true;
+	}
 	targetObjectGuid_ = derived->value("targetObjectGuid", Guid{});
 }
 
 void BreakableFloorEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	param_.ExtractParamsToJson(derived["param"]);
 	if(auto target = targetObject_.lock()) {
 		derived["targetObjectGuid"] = target->GetGuid();
 	} else if(targetObjectGuid_.isValid()) {

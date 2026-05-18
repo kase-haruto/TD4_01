@@ -11,6 +11,18 @@ DroolRainEvent::DroolRainEvent(const std::string& name) : StageGimmickEventBase(
 
 namespace {
 
+	void ApplyJson(const nlohmann::json& j, DroolRainParam& param) {
+		param.objectScale_ = j.value("objectScale", param.objectScale_);
+		param.velocityY_ = j.value("velocityY", param.velocityY_);
+		param.accelerationY_ = j.value("accelerationY", param.accelerationY_);
+		param.airScaleSpeed_ = j.value("airScaleSpeed", param.airScaleSpeed_);
+		param.groundLifeTime_ = j.value("groundLifeTime", param.groundLifeTime_);
+		if(j.contains("groundScaleSpeed")) {
+			param.groundScaleSpeed_ = j.at("groundScaleSpeed").get<CalyxEngine::Vector3>();
+		}
+		param.groundVelocityY_ = j.value("groundVelocityY", param.groundVelocityY_);
+	}
+
 	template <class TObject>
 	std::shared_ptr<TObject> FindDirectChildOfType(const SceneObject& parent) {
 		for(const auto& child : parent.GetChildren()) {
@@ -136,10 +148,14 @@ void DroolRainEvent::EventInitialize() {
 void DroolRainEvent::EventUpdate(float) {
 
 	if(targetObjects_.empty()) {
-		eventParam_.LoadParams();
-		eventData_.SetEventName(GetName());
-		eventData_.LoadParams();
-		objectCount_ = eventData_.objectCount;
+		if(!hasSerializedEventParam_) {
+			eventParam_.LoadParams();
+		}
+		if(!hasSerializedObjectCount_) {
+			eventData_.SetEventName(GetName());
+			eventData_.LoadParams();
+			objectCount_ = eventData_.objectCount;
+		}
 		EventInitialize();
 	} else {
 
@@ -221,11 +237,37 @@ void DroolRainEvent::DeleteDroolObject() {
 
 void DroolRainEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
+	if(derived->contains("eventParam")) {
+		const auto& eventParamJson = derived->at("eventParam");
+		if(eventParamJson.contains("fields")) {
+			eventParam_.ApplyParamsFromJson(eventParamJson);
+		} else {
+			ApplyJson(eventParamJson, eventParam_.param_);
+		}
+		hasSerializedEventParam_ = true;
+	}
 	targetObjectGuids_ = derived->value("targetObjectGuids", std::vector<Guid>{});
 	predictionCircleGuids_ = derived->value("predictionCircleGuids", std::vector<Guid>{});
+
+	if(derived->contains("objectCount")) {
+		objectCount_ = derived->value("objectCount", objectCount_);
+		hasSerializedObjectCount_ = true;
+	} else if(!targetObjectGuids_.empty()) {
+		objectCount_ = static_cast<uint32_t>(targetObjectGuids_.size());
+		hasSerializedObjectCount_ = true;
+	}
+	eventData_.objectCount = objectCount_;
+	for(auto& target : targetObjects_) {
+		if(auto object = target.lock()) {
+			object->SetParam(eventParam_.param_);
+		}
+	}
 }
 
 void DroolRainEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	eventParam_.ExtractParamsToJson(derived["eventParam"]);
+	derived["objectCount"] = objectCount_;
+
 	std::vector<Guid> targetGuids;
 	targetGuids.reserve(targetObjects_.size());
 	for(const auto& target : targetObjects_) {

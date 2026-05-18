@@ -105,4 +105,6 @@ private:
 
 	DroolRainEventParam eventParam_;
 	AllDroolRainEventData eventData_;
+	bool hasSerializedEventParam_ = false;
+	bool hasSerializedObjectCount_ = false;
 };
