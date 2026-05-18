@@ -36,6 +36,9 @@ struct GroundSpikeParam {
 
 };
 
+/// <summary>
+/// サイコロのイベントのパラメータ
+/// </summary>
 struct DiceProjectileParam {
 
 	// オブジェクトのスケール

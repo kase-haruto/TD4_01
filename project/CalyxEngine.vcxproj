@@ -227,6 +227,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallObject.cpp" />
     <ClCompile Include="Engine\Application\UI\EngineUI\ManipulatorSettingsUI.cpp" />
     <ClCompile Include="Game\Scene\Transition\TransitionControl.cpp" />
     <ClCompile Include="Game\Scene\Transition\TransitionPayload.cpp" />
@@ -529,6 +531,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallObject.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\ManipulatorSettings.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\ManipulatorSettingsUI.h" />
     <ClInclude Include="Game\Scene\Transition\TransitionControl.h" />
