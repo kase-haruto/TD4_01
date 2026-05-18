@@ -71,4 +71,5 @@ private:
 	std::vector<Guid> targetObjectGuids_;
 
 	FireLoadEventParam eventParam_;
+	bool hasSerializedEventParam_ = false;
 };

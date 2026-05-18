@@ -69,5 +69,6 @@ private:
 
 
 	GroundSpikeEventParam eventParam_;
+	bool hasSerializedEventParam_ = false;
 
 };
