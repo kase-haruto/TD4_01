@@ -22,7 +22,7 @@ void ShojiObject::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohma
 void ShojiObject::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
 	std::array<Guid, 12> guids = paperGuids_;
 	for(size_t i = 0; i < paperObjs_.size(); ++i) {
-		if(auto paper = paperObjs_[i].lock()) {
+		if(auto paper = paperObjs_[i]) {
 			guids[i] = paper->GetGuid();
 		}
 	}
@@ -86,7 +86,7 @@ void ShojiObject::CreatePaperObjects() {
 			continue;
 		}
 		for(size_t i = 0; i < paperObjs_.size(); ++i) {
-			if(paperObjs_[i].lock()) {
+			if(paperObjs_[i]) {
 				continue;
 			}
 			paperObjs_[i]  = paper;
@@ -98,7 +98,7 @@ void ShojiObject::CreatePaperObjects() {
 	for(size_t i = 0; i < paperObjs_.size(); ++i) {
 
 		// 既に存在している場合は生成しない
-		if(paperObjs_[i].lock()) {
+		if(paperObjs_[i]) {
 			continue;
 		}
 		auto paper = SceneAPI::Instantiate<ShojiPaperObject>("shojiPaper.obj", objectName);

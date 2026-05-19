@@ -104,7 +104,7 @@ private:
 private:
 
 	// 障子のオブジェクト
-	std::array<std::weak_ptr<ShojiObject>, 2> shojiObjs_;
+	std::array<std::shared_ptr<ShojiObject>, 2> shojiObjs_;
 	std::array<Guid, 2> shojiGuids_;
 
 	// 招き猫のオブジェクト

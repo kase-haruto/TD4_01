@@ -31,7 +31,7 @@ public:
 	void SetIsFlying(bool flag) {
 		isFlying_ = flag;
 	}
-	void SetShoji(std::array<std::weak_ptr<ShojiObject>,2> shojiObjs){
+	void SetShoji(std::array<std::shared_ptr<ShojiObject>, 2> shojiObjs) {
 		shojiObjs_ = shojiObjs;
 	}
 
@@ -63,18 +63,21 @@ private:
 private:
 
 	// 障子のポインタ
-	std::array<std::weak_ptr<ShojiObject>, 2> shojiObjs_;
+	std::array<std::shared_ptr<ShojiObject>, 2> shojiObjs_;
 	// パラメータ
 	ShojiParam param_;
 
 	// 飛んでいく座標
 	CalyxEngine::Vector3 targetPos_;
+	uint32_t shojiIndex_;
+	uint32_t randIndex_;
 	// Parry用の曲線移動状態
 	bool				 parryCurveInit_ = false;
 	float				 parryT_		 = 0.0f;
 	CalyxEngine::Vector3 parryP0_{}; // 開始点
 	CalyxEngine::Vector3 parryP1_{}; // 制御点
 	CalyxEngine::Vector3 parryP2_{}; // 終点（target）
+	CalyxEngine::Vector3 parryOffsetP2_{};
 
 	// 飛んでいるか
 	bool isFlying_ = false;

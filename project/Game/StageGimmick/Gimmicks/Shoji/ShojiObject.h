@@ -27,7 +27,7 @@ public:
 	void SetPaperGuids(const std::array<Guid,12>& guids) {
 		paperGuids_ = guids;
 	}
-	const std::array<std::weak_ptr<ShojiPaperObject>,12>& GetPaperObject() {
+	const std::array<std::shared_ptr<ShojiPaperObject>,12>& GetPaperObject() {
 		return paperObjs_;
 	}
 
@@ -51,7 +51,7 @@ protected:
 private:
 
 	// 障子の配列
-	std::array<std::weak_ptr<ShojiPaperObject>, 12> paperObjs_;
+	std::array<std::shared_ptr<ShojiPaperObject>, 12> paperObjs_;
 	// 障子紙のGUID
 	std::array<Guid, 12> paperGuids_{};
 

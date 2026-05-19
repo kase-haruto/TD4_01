@@ -161,7 +161,7 @@ void ShojiEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohman
 	luckyCatGuids_ = derived->value("luckyCatGuids", std::vector<Guid>{});
 
 	for(auto& shoji : shojiObjs_) {
-		if(auto object = shoji.lock()) {
+		if(auto object = shoji) {
 			object->SetParam(eventParam_.param_);
 		}
 	}
@@ -174,7 +174,7 @@ void ShojiEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& der
 
 	std::array<Guid, 2> shojiGuids = shojiGuids_;
 	for(size_t i = 0; i < shojiObjs_.size(); ++i) {
-		if(auto object = shojiObjs_[i].lock()) {
+		if(auto object = shojiObjs_[i]) {
 			shojiGuids[i] = object->GetGuid();
 		}
 	}
