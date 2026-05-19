@@ -1,7 +1,6 @@
 #pragma once
 // engine
 #include <Engine/Application/UI/EngineUI/DebugOverlay.h>
-#include <Engine/Application/UI/EngineUI/DebugTextOverlay.h>
 #include <Engine/Application/UI/EngineUI/EditorMenu.h>
 #include <Engine/Application/UI/EngineUI/IEngineUI.h>
 #include <Engine/Application/UI/EngineUI/Manipulator.h>
@@ -178,7 +177,6 @@ namespace CalyxEngine {
 		int									startupDebugViewportFocusFrames_ = 3;
 		std::unique_ptr<PerformanceOverlay> performanceOverlay_; //< パフォーマンスオーバーレイ
 		std::unique_ptr<DebugOverlay>		debugOverlay_;		 //< デバッグオーバーレイ
-		std::unique_ptr<DebugTextOverlay>	debugTextOverlay_;	 //< ポップテキストオーバーレイ
 		std::unique_ptr<ParticlePreviewSession> particlePreview_;
 		std::unique_ptr<PrefabEditSession> prefabEdit_;
 		std::unique_ptr<ViewportSelectionController> viewportSelection_;

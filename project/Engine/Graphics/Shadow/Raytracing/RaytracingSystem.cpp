@@ -5,7 +5,7 @@
 /* ===================================================================== */
 #include "RaytracingScene.h"
 
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 namespace CalyxEngine {
 
@@ -46,7 +46,7 @@ namespace CalyxEngine {
 				nullptr,
 				IID_PPV_ARGS(&res));
 			if(FAILED(hr)) {
-				assert(false); // デバッグ時に失敗を検出
+				CX_CHECK(false, "Assertion failed"); // デバッグ時に失敗を検出
 			}
 			return res; // 空の ComPtr を返す（呼び出し側でチェック）
 		}
@@ -57,12 +57,12 @@ namespace CalyxEngine {
 	//  初期化処理
 	/////////////////////////////////////////////////////////////////////////////////
 	void RaytracingSystem::Initialize(ID3D12Device5* device) {
-		assert(device && "RaytracingSystem::Initialize: device is null");
+		CX_CHECK(device && "RaytracingSystem::Initialize: device is null", "Assertion failed");
 		device_ = device;
 
 		// TLAS用SRVディスクリプタの確保
 		tlasSrv_ = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
-		assert(tlasSrv_.IsValid() && "RaytracingSystem::Initialize: Failed to allocate TLAS SRV descriptor");
+		CX_CHECK(tlasSrv_.IsValid() && "RaytracingSystem::Initialize: Failed to allocate TLAS SRV descriptor", "Assertion failed");
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ namespace CalyxEngine {
 	void RaytracingSystem::BuildTLAS(
 		ID3D12GraphicsCommandList4* cmd,
 		const RaytracingScene&		scene) {
-		assert(device_ && cmd);
+		CX_CHECK(device_ && cmd, "Assertion failed");
 
 		// インスタンス数の取得
 		const uint32_t instanceCount = scene.GetInstanceCount();
@@ -93,8 +93,8 @@ namespace CalyxEngine {
 			&inputs, &prebuild);
 
 		// サイズのアサート
-		assert(prebuild.ResultDataMaxSizeInBytes > 0);
-		assert(prebuild.ScratchDataSizeInBytes > 0);
+		CX_CHECK(prebuild.ResultDataMaxSizeInBytes > 0, "Assertion failed");
+		CX_CHECK(prebuild.ScratchDataSizeInBytes > 0, "Assertion failed");
 
 		// TLASとスクラッチバッファの生成
 		if(!tlas_ || tlasCapacity_ < instanceCount) {

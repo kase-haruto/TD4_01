@@ -8,7 +8,7 @@
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Graphics/Descriptor/DescriptorAllocator.h>
 // c++
-#include<cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include<cmath>
 #include<fstream>
 #include <numbers>
@@ -85,10 +85,10 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 		}
 	}
 
-	assert(!filePath.empty() && "モデルファイル（.obj/.gltf）が見つかりません");
+	CX_CHECK(!filePath.empty() && "モデルファイル（.obj/.gltf）が見つかりません", "Assertion failed");
 	// Assimpによるシーンの読み込み
 	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-	assert(scene && scene->HasMeshes()); // 読み込みエラーやメッシュの有無を確認
+	CX_CHECK(scene && scene->HasMeshes(), "Assertion failed"); // 読み込みエラーやメッシュの有無を確認
 
 	ModelData modelData;
 	const aiMesh* mesh = scene->mMeshes[0]; // 最初のメッシュを取得
@@ -124,7 +124,7 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 	// インデックスデータの読み込み
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 		const aiFace& face = mesh->mFaces[i];
-		assert(face.mNumIndices == 3); // 三角形のみを想定
+		CX_CHECK(face.mNumIndices == 3, "Assertion failed"); // 三角形のみを想定
 
 		modelData.meshResource.Indices().push_back(face.mIndices[0]);
 		modelData.meshResource.Indices().push_back(face.mIndices[1]);
@@ -180,7 +180,7 @@ MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const st
 
 	// ファイルを開く
 	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());// 失敗したらアサート
+	CX_CHECK(file.is_open(), "Assertion failed");// 失敗したらアサート
 
 	MaterialData materialData;
 	std::string line;
@@ -271,7 +271,7 @@ DirectX::ScratchImage LoadTextureImage(const std::string& filePath) {
 	} else {
 		hr = LoadFromWICFile(filePathW.c_str(), WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	}
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 	// ミップマップ生成
 	const TexMetadata& meta = image.GetMetadata();
@@ -287,7 +287,7 @@ DirectX::ScratchImage LoadTextureImage(const std::string& filePath) {
 				0,
 				mipImages
 			);
-			assert(SUCCEEDED(hr));
+			CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 			return mipImages;
 		}
 	}
@@ -315,7 +315,7 @@ Animation LoadAnimationFile(const std::string& directoryPath, const std::string&
 		+ filename;
 
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
-	assert(scene->mNumAnimations);// アニメーションがない場合はアサート
+	CX_CHECK(scene->mNumAnimations, "Assertion failed");// アニメーションがない場合はアサート
 	aiAnimation* animationAssimp = scene->mAnimations[0];// 最初のアニメーションを取得
 	animation.duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);// アニメーションの長さを取得
 

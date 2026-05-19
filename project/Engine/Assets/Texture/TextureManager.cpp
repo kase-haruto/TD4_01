@@ -4,7 +4,7 @@
 #include <Engine/Application/UI/GUI/ImGuiManager.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 /* c++ */
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <system_error>
 
 using Microsoft::WRL::ComPtr;

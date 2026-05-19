@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Engine/Application/Effects/EffectAsset.h>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <Engine/Application/Effects/EffectPlayer.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
@@ -11,7 +12,7 @@ namespace SceneAPI{
 	template<class T, class... Args>
 	std::shared_ptr<T> Instantiate(Args&&... args){
 		auto ctx = SceneContext::Current();
-		assert(ctx && "No active SceneContext!");
+		CX_CHECK(ctx && "No active SceneContext!", "Assertion failed");
 		return ctx->Instantiate<T>(std::forward<Args>(args)...);
 	}
 }
@@ -19,7 +20,7 @@ namespace SceneAPI{
 namespace EffectAPI {
 	inline CalyxEngine::EffectPlayer* Player() {
 		auto ctx = SceneContext::Current();
-		assert(ctx && "No active SceneContext!");
+		CX_CHECK(ctx && "No active SceneContext!", "Assertion failed");
 		return ctx->GetEffectPlayer();
 	}
 

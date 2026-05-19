@@ -1,4 +1,5 @@
 #include "ShaderCompiler.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <Engine/Foundation/Utility/Converter/ConvertString.h>
 #include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
 
@@ -33,20 +34,20 @@ void ShaderCompiler::InitializeDXC() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	if(FAILED(hr)) {
 		Log("Failed to create DXC Utils");
-		assert(false && "Failed to create DXC Utils");
+		CX_CHECK(false && "Failed to create DXC Utils", "Assertion failed");
 	}
 
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
 	if(FAILED(hr)) {
 		Log("Failed to create DXC Compiler");
-		assert(false && "Failed to create DXC Compiler");
+		CX_CHECK(false && "Failed to create DXC Compiler", "Assertion failed");
 	}
 
 	// Include handlerを設定
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandle);
 	if(FAILED(hr)) {
 		Log("Failed to create default include handler");
-		assert(false && "Failed to create default include handler");
+		CX_CHECK(false && "Failed to create default include handler", "Assertion failed");
 	}
 }
 
@@ -84,7 +85,7 @@ void ShaderCompiler::LoadHLSL(const std::wstring& filePath,[[maybe_unused]] cons
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(),nullptr,shaderSource.GetAddressOf());
 	if(FAILED(hr)) {
 		Log(ConvertString(std::format(L"Failed to load HLSL file: {}\n",filePath)));
-		assert(false && "Failed to load HLSL file");
+		CX_CHECK(false && "Failed to load HLSL file", "Assertion failed");
 	}
 
 	//========================================================================
@@ -126,7 +127,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileSource(
 	ShaderCompileResult result = TryCompileSource(sourceName, source, profile);
 	if(!result.succeeded) {
 		if(!result.errors.empty()) Log(result.errors.c_str());
-		assert(false && "DXC CompileSource failed");
+		CX_CHECK(false && "DXC CompileSource failed", "Assertion failed");
 	}
 	return result.bytecode;
 }
@@ -240,7 +241,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShaderByName(
 	if (fullPath.empty()) {
 		// 見つからない場合はエラーログを出して止める
 		Log(ConvertString(std::format(L"[Error] Shader not found in {}: {}\n", shaderRootPath, shaderName)));
-		assert(false && "Shader file not found");
+		CX_CHECK(false && "Shader file not found", "Assertion failed");
 		return nullptr;
 	}
 
@@ -366,7 +367,7 @@ void ShaderCompiler::Compile(const std::wstring& filePath,
 
 	if(FAILED(hr)) {
 		Log("Failed to compile HLSL shader (DXC invocation failed)");
-		assert(false && "DXC Compile failed");
+		CX_CHECK(false && "DXC Compile failed", "Assertion failed");
 	}
 }
 
@@ -381,7 +382,7 @@ void ShaderCompiler::CheckNoError() {
 		// warning だけならログだけにする
 		if(msg.find("warning") != std::string::npos) { Log(msg.c_str()); } else {
 			Log(msg.c_str());
-			assert(false && "Shader compile error");
+			CX_CHECK(false && "Shader compile error", "Assertion failed");
 		}
 	}
 }
@@ -395,7 +396,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::GetCompileResult(const std::wst
 	HRESULT                          hr         = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(shaderBlob.GetAddressOf()),nullptr);
 	if(FAILED(hr)) {
 		Log("Failed to get shader bytecode");
-		assert(false && "Failed to get shader bytecode");
+		CX_CHECK(false && "Failed to get shader bytecode", "Assertion failed");
 	}
 
 	//========================================================================

@@ -1,4 +1,5 @@
 #include "PostEffectManager.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 // engine
 #include <Engine/Graphics/Pipeline/Service/PipelineService.h>
@@ -92,7 +93,7 @@ namespace {
 }
 
 void PostEffectManager::Initialize(PipelineService* service,bool enableAll){
-	assert(service);
+	CX_CHECK(service, "Assertion failed");
 	collection_.Initialize(service);
 	collection_.BuildInitialSlots(enableAll);
 
