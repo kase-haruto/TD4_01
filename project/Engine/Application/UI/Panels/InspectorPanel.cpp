@@ -5,6 +5,7 @@
 #include <Engine/Editor/BaseEditor.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Foundation/Utility/Converter/EnumConverter.h>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <Engine/Application/UI/Panels/AssetPanel.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/Model/BaseModel.h>
@@ -278,9 +279,32 @@ namespace CalyxEngine {
 			}
 		};
 
+		auto countObjectsWithModel = [&]() {
+			size_t count = 0;
+			for(const auto& weak : targets) {
+				auto object = weak.lock();
+				if(object && object->GetModel()) {
+					++count;
+				}
+			}
+			return count;
+		};
+
 		if(ImGui::TreeNodeEx("Material Asset (Bulk)", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
 			Guid droppedGuid = Guid::Empty();
 			if(AssetPanel::DrawAssetDropTarget(AssetType::Material, &droppedGuid)) {
+				const size_t modelCount = countObjectsWithModel();
+				if(modelCount == 0) {
+					CX_WARN("Material cannot be applied because selected objects have no model.");
+					ImGui::TreePop();
+					GuiCmd::EndSection();
+					ImGui::Unindent(8.0f);
+					return;
+				}
+				if(modelCount < targets.size()) {
+					CX_WARN("Material was applied only to selected objects that have a model.");
+				}
+
 				auto before = collectMaterialGuids();
 				auto after = before;
 				for(auto& guid : after) {
@@ -301,6 +325,18 @@ namespace CalyxEngine {
 		if(ImGui::TreeNodeEx("Texture Asset (Bulk)", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 			Guid droppedGuid = Guid::Empty();
 			if(AssetPanel::DrawAssetDropTarget(AssetType::Texture, &droppedGuid)) {
+				const size_t modelCount = countObjectsWithModel();
+				if(modelCount == 0) {
+					CX_WARN("Texture cannot be applied because selected objects have no model.");
+					ImGui::TreePop();
+					GuiCmd::EndSection();
+					ImGui::Unindent(8.0f);
+					return;
+				}
+				if(modelCount < targets.size()) {
+					CX_WARN("Texture was applied only to selected objects that have a model.");
+				}
+
 				auto before = collectTextureGuids();
 				auto after = before;
 				for(auto& guid : after) {

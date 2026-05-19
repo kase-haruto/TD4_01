@@ -1,4 +1,5 @@
 #include "ShaderManager.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 // lib
 #include <Engine/Foundation/Utility/Converter/ConvertString.h>
@@ -17,13 +18,13 @@ ShaderManager::~ShaderManager() {
 void ShaderManager::InitializeDXC() {
 	// DXC Compilerを初期化
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 	// Include handlerを設定
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 }
 
 void ShaderManager::InitializeShaderCache(const std::wstring& shaderRootDir) {
@@ -44,7 +45,7 @@ IDxcBlob* ShaderManager::CompileShader(const std::wstring& filePath, const wchar
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource = nullptr;
 	hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	//読めなければ止める
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 	//読み込んだファイルの内容を設定する
 	DxcBuffer shaderSourceBuffer;
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
@@ -75,7 +76,7 @@ IDxcBlob* ShaderManager::CompileShader(const std::wstring& filePath, const wchar
 		IID_PPV_ARGS(&shaderResult)//コンパイル結果
 	);
 	//コンパイルエラーではなくdxcが起動できないなど致命的な状況
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 	//==============================
 	//警告、エラーが出ていないか確認
@@ -86,7 +87,7 @@ IDxcBlob* ShaderManager::CompileShader(const std::wstring& filePath, const wchar
 
 	if (SUCCEEDED(hr) && shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		Log(shaderError->GetStringPointer());
-		assert(false); // エラーがあった場合は止める
+		CX_CHECK(false, "Assertion failed"); // エラーがあった場合は止める
 	}
 
 
@@ -97,7 +98,7 @@ IDxcBlob* ShaderManager::CompileShader(const std::wstring& filePath, const wchar
 	//コンパイル結果から実行用のバイナリ部分を取得
 	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 	//成功したログを出す
 	Log(ConvertString(std::format(L"Compile Succeded,path:{},profile:{}\n", filePath, profile)));
 
@@ -131,7 +132,7 @@ IDxcBlob* ShaderManager::CompileShaderByName(const std::wstring& shaderName, con
 		// ファイルが存在するか確認
 		if (!std::filesystem::exists(fullPath)) {
 			Log(ConvertString(std::format(L"Failed to find shader file: {} (resolved to: {})\n", shaderName, fullPath)));
-			assert(false && "Shader file not found");
+			CX_CHECK(false && "Shader file not found", "Assertion failed");
 			return nullptr;
 		}
 	} else {
@@ -148,7 +149,7 @@ IDxcBlob* ShaderManager::CompileShaderByName(const std::wstring& shaderName, con
 				shaderCache[normalizedName] = fullPath;
 			} else {
 				Log(ConvertString(std::format(L"Failed to find shader file: {}\n", shaderName)));
-				assert(false && "Shader file not found");
+				CX_CHECK(false && "Shader file not found", "Assertion failed");
 				return nullptr;
 			}
 		}

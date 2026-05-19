@@ -3,7 +3,7 @@
 #include <Engine/PostProcess/Blend/BlendEffect.h>
 #include <Engine/Graphics/RenderTarget/Interface/IRenderTarget.h>
 #include <Engine/Graphics/Device/DxCore.h>
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <algorithm>
 #include <vector>
 
@@ -24,7 +24,7 @@ void PostEffectGraph::SetPassesFromList(const std::vector<PostEffectSlot>& slots
 	}
 
 	/*if (enabledCount > 1){
-		assert(enabledCount <= 2 && "PostEffectGraph currently supports only up to 2 enabled passes for ping-pong rendering.");
+		CX_CHECK(enabledCount <= 2 && "PostEffectGraph currently supports only up to 2 enabled passes for ping-pong rendering.", "Assertion failed");
 	}*/
 }
 

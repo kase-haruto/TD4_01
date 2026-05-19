@@ -1,4 +1,5 @@
 #include"DxSwapChain.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 /* ========================================================================
 /* include space
@@ -34,10 +35,10 @@ void DxSwapChain::Initialize(
 		nullptr,
 		&tempSwapChain
 	);
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 	hr = tempSwapChain.As(&swapChain_);
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 	// 1 = VSyncあり。現在のモニターリフレッシュレートに同期してティアリングを防ぐ。
 	syncInterval_ = 1;
@@ -45,7 +46,7 @@ void DxSwapChain::Initialize(
 	// バックバッファリソースを取得
 	for (UINT i = 0; i < swapChainDesc_.BufferCount; ++i) {
 		hr = swapChain_->GetBuffer(i, IID_PPV_ARGS(&backBuffers_[i]));
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 	}
 }
 
@@ -68,7 +69,7 @@ void DxSwapChain::Resize(uint32_t width, uint32_t height) {
 		swapChainDesc_.Format,
 		swapChainDesc_.Flags
 	);
-	assert(SUCCEEDED(hr));
+	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 	swapChainDesc_.Width = width;
 	swapChainDesc_.Height = height;
@@ -76,6 +77,6 @@ void DxSwapChain::Resize(uint32_t width, uint32_t height) {
 	// リソースを再取得
 	for (UINT i = 0; i < swapChainDesc_.BufferCount; ++i) {
 		hr = swapChain_->GetBuffer(i, IID_PPV_ARGS(&backBuffers_[i]));
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 	}
 }

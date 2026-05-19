@@ -6,6 +6,7 @@
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/DataAsset/MaterialAsset.h>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 
 #include <externals/imgui/ImGuiFileDialog.h>
@@ -68,6 +69,40 @@ namespace CalyxEngine {
 			for(const auto& child : object->GetChildren()) {
 				SetPrefabLinkRecursive(child.get(), prefabGuid);
 			}
+		}
+
+		const char* AssetTypeName(AssetType type) {
+			switch(type) {
+			case AssetType::Texture: return "Texture";
+			case AssetType::Model: return "Model";
+			case AssetType::Shader: return "Shader";
+			case AssetType::Material: return "Material";
+			case AssetType::Audio: return "Audio";
+			case AssetType::Prefab: return "Prefab";
+			case AssetType::Effect: return "Effect";
+			case AssetType::SpriteAnimation: return "Sprite Animation";
+			case AssetType::Unknown:
+			default:
+				return "Unknown";
+			}
+		}
+
+		void WarnRejectedAssetDrop(AssetType expected, const AssetDragPayload& payload) {
+			std::string name = "(unknown asset)";
+			if(auto* db = AssetDatabase::GetInstance()) {
+				if(const AssetRecord* record = db->Get(payload.guid)) {
+					name = record->sourcePath.filename().string();
+				}
+			}
+
+			std::string message;
+			if(payload.type == AssetType::Unknown) {
+				message = "Unsupported asset extension: " + name;
+			} else {
+				message = "Cannot drop " + std::string(AssetTypeName(payload.type)) +
+						  " into " + AssetTypeName(expected) + " slot: " + name;
+			}
+			CX_WARN(message.c_str());
 		}
 
 	} // namespace
@@ -710,6 +745,8 @@ namespace CalyxEngine {
 				if(payload.type == expect) {
 					*inoutGuid = payload.guid;
 					changed = true;
+				} else {
+					WarnRejectedAssetDrop(expect, payload);
 				}
 			}
 			ImGui::EndDragDropTarget();

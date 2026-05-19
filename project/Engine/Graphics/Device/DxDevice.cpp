@@ -1,4 +1,5 @@
 #include "DxDevice.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 /* ========================================================================
 /*	include space
 /* ===================================================================== */
@@ -49,7 +50,7 @@ namespace CalyxEngine {
 		HRESULT hr;
 		// dxgiファクトリーの生成
 		hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory_));
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 		// よい順にアダプタをたのむ
 		for(UINT i = 0; dxgiFactory_->EnumAdapterByGpuPreference(i,
 																 DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter_)) !=
@@ -58,7 +59,7 @@ namespace CalyxEngine {
 			// アダプターの情報を取得する
 			DXGI_ADAPTER_DESC3 adapterDesc{};
 			hr = adapter_->GetDesc3(&adapterDesc);
-			assert(SUCCEEDED(hr));
+			CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 			// ソフトウェアアダプタでなければ採用
 			if(!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 				// 採用したアダプタの情報をログに出力。wstringのほうなので注意
@@ -85,7 +86,7 @@ namespace CalyxEngine {
 			}
 		}
 		// デバイスの生成がうまくいかなかったので起動できない
-		assert(device_ != nullptr);
+		CX_CHECK(device_ != nullptr, "Assertion failed");
 		Log("Complete create D3D12Device!!!\n"); // 初期化完了のログを出す
 
 #if defined(_DEBUG)
@@ -121,16 +122,16 @@ namespace CalyxEngine {
 	//  レイトレーシング機能確認
 	///////////////////////////////////////////////////////////////////////////////
 	void DxDevice::QueryCapabilities() {
-		assert(device_ && "Device must be created before QueryCapabilities().");
+		CX_CHECK(device_ && "Device must be created before QueryCapabilities().", "Assertion failed");
 
 		// ---- Device5 取得（DXRで必須）----
 		HRESULT hr = device_->QueryInterface(IID_PPV_ARGS(&device5_));
-		assert(SUCCEEDED(hr) && device5_ && "Failed to get ID3D12Device5 (DXR requires it).");
+		CX_CHECK(SUCCEEDED(hr) && device5_ && "Failed to get ID3D12Device5 (DXR requires it).", "Assertion failed");
 
 		// ---- DXR Tier（Options5）----
 		D3D12_FEATURE_DATA_D3D12_OPTIONS5 opt5{};
 		hr = device_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &opt5, sizeof(opt5));
-		assert(SUCCEEDED(hr) && "CheckFeatureSupport OPTIONS5 failed.");
+		CX_CHECK(SUCCEEDED(hr) && "CheckFeatureSupport OPTIONS5 failed.", "Assertion failed");
 		caps_.raytracingTier = opt5.RaytracingTier;
 
 		// ---- Shader Model 6.5（RayQueryに必要）----

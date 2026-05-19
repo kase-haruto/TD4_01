@@ -1,4 +1,5 @@
 #include "AnimationModel.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 #include <Engine/Assets/Model/ModelData.h>
 #include <Engine/Foundation/Math/Vector4.h>
@@ -309,7 +310,7 @@ namespace CalyxEngine {
 
 	void AnimationModel::SkinClusterUpdate() {
 		for(size_t jointIndex = 0; jointIndex < modelData_->skeleton.joints.size(); ++jointIndex) {
-			assert(jointIndex < skinCluster_.inverseBindPoseMatrices.size());
+			CX_CHECK(jointIndex < skinCluster_.inverseBindPoseMatrices.size(), "Assertion failed");
 			skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix =
 				skinCluster_.inverseBindPoseMatrices[jointIndex] * modelData_->skeleton.joints[jointIndex].skeletonSpaceMatrix;
 			skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix =
