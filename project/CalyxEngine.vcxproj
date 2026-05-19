@@ -227,6 +227,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileTarget.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallObject.cpp" />
     <ClCompile Include="Engine\Application\UI\EngineUI\ManipulatorSettingsUI.cpp" />
@@ -531,8 +535,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileObject.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileTarget.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallObject.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\ManipulatorSettings.h" />
