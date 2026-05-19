@@ -16,6 +16,7 @@ void DiceProjectileEvent::OnCollisionEnter(Collider* other) {
 	for(auto& target : targetObjects_) {
 		if(target.lock()) {
 			target.lock()->SetIsFlying(true);
+			target.lock()->SetIsFlying(true);
 		}
 	}
 }
@@ -90,9 +91,13 @@ void DiceProjectileEvent::EventInitialize() {
 void DiceProjectileEvent::EventUpdate(float) {
 
 	if(targetObjects_.empty()) {
-		eventParam_.LoadParams();
-		eventData_.SetEventName(GetName());
-		eventData_.LoadParams();
+		if(!hasSerializedEventParam_) {
+			eventParam_.LoadParams();
+		}
+		if(!hasSerializedEventData_) {
+			eventData_.SetEventName(GetName());
+			eventData_.LoadParams();
+		}
 		objectCount_ = eventData_.objectCount;
 		EventInitialize();
 	}
@@ -148,11 +153,27 @@ void DiceProjectileEvent::DeleteDroolObject() {
 
 void DiceProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
+	if(derived->contains("eventParam")) {
+		eventParam_.ApplyParamsFromJson(derived->at("eventParam"));
+		hasSerializedEventParam_ = true;
+	}
+	if(derived->contains("eventData")) {
+		eventData_.ApplyParamsFromJson(derived->at("eventData"));
+		objectCount_ = eventData_.objectCount;
+		hasSerializedEventData_ = true;
+	}
 	socketGuid_ = derived->value("socketGuid", Guid{});
 	targetObjectGuids_ = derived->value("targetObjectGuids", std::vector<Guid>{});
+	for(auto& target : targetObjects_) {
+		if(auto object = target.lock()) {
+			object->SetParam(eventParam_.param_);
+		}
+	}
 }
 
 void DiceProjectileEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
+	eventParam_.ExtractParamsToJson(derived["eventParam"]);
+	eventData_.ExtractParamsToJson(derived["eventData"]);
 	if(auto socket = socket_.lock()) {
 		derived["socketGuid"] = socket->GetGuid();
 	} else if(socketGuid_.isValid()) {

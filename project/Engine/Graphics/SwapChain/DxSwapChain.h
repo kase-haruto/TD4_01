@@ -3,7 +3,7 @@
 #include <dxgi1_6.h>
 #include <wrl.h>
 #include <array>
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 /*-----------------------------------------------------------------------------------------
  * DxSwapChain

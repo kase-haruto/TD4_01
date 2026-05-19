@@ -1,4 +1,5 @@
 #include <Engine/Foundation/Math/Vector3.h>
+#include <Engine/Foundation/Debug/CxAssert.h>
 /* ========================================================================
 /* include space
 /* ===================================================================== */
@@ -268,12 +269,12 @@ namespace CalyxEngine {
 	}
 
 	float& Vector3::operator[](int index) {
-		assert(index >= 0 && index < 3);
+		CX_CHECK(index >= 0 && index < 3, "Assertion failed");
 		return *(&x + index);
 	}
 
 	const float& Vector3::operator[](int index) const {
-		assert(index >= 0 && index < 3);
+		CX_CHECK(index >= 0 && index < 3, "Assertion failed");
 		return *(&x + index);
 	}
 

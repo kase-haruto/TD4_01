@@ -1,4 +1,5 @@
 #include "PipelineService.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 #include <Engine/Graphics/Pipeline/Presets/PipelinePresets.h>
 
@@ -151,7 +152,7 @@ PipelineSet PipelineService::GetPipelineSet(PipelineTag::Object tag, BlendMode b
 	if (it != objCache_.end()){
 		return it->second;
 	}
-	assert(false && "Pipeline not found!");
+	CX_CHECK(false && "Pipeline not found!", "Assertion failed");
 	return {};
 }
 

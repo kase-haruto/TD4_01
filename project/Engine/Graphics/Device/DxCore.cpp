@@ -6,7 +6,7 @@
 #include <Engine/Graphics/RenderTarget/SwapChainRT/SwapChainRenderTarget.h>
 #include <Engine/PostProcess/FullscreenDrawer.h>
 
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <d3dx12.h>
 #include <dxgidebug.h>
 #include <externals/imgui/imgui.h>

@@ -155,6 +155,7 @@ void SelectScene::PhaseUpdate(float) {
 std::unique_ptr<GameTransitionPayload> SelectScene::BuildGamePayload(int num) {
 	auto payload = std::make_unique<GameTransitionPayload>();
 	payload->stageNum_ = num;
+	payload->type_ = SceneType::SELECT;
 	return payload;
 }
 

@@ -15,6 +15,7 @@
 #include <Engine/Application/UI/Panels/MaterialNodeEditorPanel.h>
 #include <Engine/Application/UI/Panels/PlaceToolPanel.h>
 #include <Engine/Application/UI/Panels/PostEffectNodeEditorPanel.h>
+#include <Engine/Application/UI/Panels/SpriteAnimationEditorPanel.h>
 #include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Editor/DebugCameraFocusController.h>
 #include <Engine/Editor/EditorSelectionCoordinator.h>
@@ -36,6 +37,7 @@ namespace EngineEdit {
 	enum class EditToolMode {
 		Object,
 		Object2D,
+		SpriteAnimation,
 		Prefab,
 		ParticleEffect,
 		PostEffect,
@@ -155,6 +157,7 @@ namespace CalyxEngine {
 		std::unique_ptr<AssetPanel>			 assetPanel_;
 		std::unique_ptr<MaterialNodeEditorPanel> materialNodeEditorPanel_;
 		std::unique_ptr<PostEffectNodeEditorPanel> postEffectNodeEditorPanel_;
+		std::unique_ptr<SpriteAnimationEditorPanel> spriteAnimationEditorPanel_;
 		std::unique_ptr<LivePPPanel>		 livePPPanel_;
 		std::unique_ptr<SceneSwitchOverlay>	 sceneSwitchOverlay_;
 		std::unique_ptr<ImGuiLayoutSwitcher> layoutSwitcher_;

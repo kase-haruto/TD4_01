@@ -97,7 +97,7 @@ namespace CalyxEngine {
 			if(reversed_) {
 				currentFrame_--;
 				if(currentFrame_ < startFrame) {
-					if(clip->loop) {
+					if(ShouldLoop(*clip)) {
 						currentFrame_ = endFrame - 1;
 					} else {
 						currentFrame_ = startFrame;
@@ -108,7 +108,7 @@ namespace CalyxEngine {
 			} else {
 				currentFrame_++;
 				if(currentFrame_ >= endFrame) {
-					if(clip->loop) {
+					if(ShouldLoop(*clip)) {
 						currentFrame_ = startFrame;
 					} else {
 						currentFrame_ = endFrame - 1;
@@ -120,6 +120,15 @@ namespace CalyxEngine {
 
 			ApplyFrame(currentFrame_);
 		}
+	}
+
+	void SpriteAnimator2d::SetLoopOverride(bool loop) {
+		useLoopOverride_ = true;
+		loopOverride_ = loop;
+	}
+
+	void SpriteAnimator2d::ClearLoopOverride() {
+		useLoopOverride_ = false;
 	}
 
 	void SpriteAnimator2d::ApplyFrame(int32_t frame) {
@@ -150,6 +159,10 @@ namespace CalyxEngine {
 	const SpriteAnimationClip* SpriteAnimator2d::GetCurrentClip() const {
 		if(!asset_ || currentClipName_.empty()) return nullptr;
 		return asset_->FindClip(currentClipName_);
+	}
+
+	bool SpriteAnimator2d::ShouldLoop(const SpriteAnimationClip& clip) const {
+		return useLoopOverride_ ? loopOverride_ : clip.loop;
 	}
 
 } // namespace CalyxEngine

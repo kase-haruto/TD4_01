@@ -8,6 +8,7 @@
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 #include <Engine/Objects/ConfigurableObject/IConfigurable.h>
+#include <Engine/Foundation/Serialization/SerializableObject.h>
 #include <Engine/Objects/LightObject/DirectionalLight.h>
 #include <Engine/Objects/LightObject/PointLight.h>
 #include <Engine/Scene/Context/SceneContext.h>
@@ -44,6 +45,11 @@ namespace CalyxEngine {
 				for(auto it = inlineConfig.begin(); it != inlineConfig.end(); ++it) {
 					j[it.key()] = it.value();
 				}
+			}
+			nlohmann::json serializableParams;
+			object->ExtractSerializableParamsToJson(serializableParams);
+			if(!serializableParams.empty()) {
+				j["serializableParams"] = std::move(serializableParams);
 			}
 			return j;
 		}
@@ -157,8 +163,16 @@ namespace CalyxEngine {
 					std::string typeName = j.value("type", "");
 					if(typeName.empty()) continue;
 
+					const nlohmann::json* paramOverrides = j.contains("serializableParams")
+						? &j.at("serializableParams")
+						: nullptr;
+					SerializableObject::BeginPendingCapture();
 					auto object = SceneObjectRegistry::Get().Create(typeName);
-					if(!object) continue;
+					if(!object) {
+						SerializableObject::EndPendingCapture(nullptr, nullptr);
+						continue;
+					}
+					object->AdoptPendingSerializableParamCapture(paramOverrides);
 
 					if(j.contains("configPath")) {
 						object->SetConfigPath(j.at("configPath").get<std::string>());
@@ -173,7 +187,9 @@ namespace CalyxEngine {
 					}
 
 					ctx_->AddObject(object);
+					object->BeginSerializableParamCapture(paramOverrides);
 					object->Initialize();
+					object->EndSerializableParamCapture();
 					object->SetName(j.value("name", object->GetName()), object->GetObjectType());
 					RegisterRestoredObject(ctx_, object);
 

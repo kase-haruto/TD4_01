@@ -51,7 +51,7 @@ void FireLoadObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(false);
 	}
 
-	defaultScale_ = worldTransform_.scale;
+	defaultScale_ = {1.0f, 1.0f, 1.0f};
 }
 
 void FireLoadObject::ObjectUpdate(float dt) {

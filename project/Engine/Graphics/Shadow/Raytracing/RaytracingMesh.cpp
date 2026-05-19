@@ -3,7 +3,7 @@
 #include "Engine/Assets/Model/ModelData.h"
 
 #include <algorithm>
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <cstring>
 
 namespace CalyxEngine {
@@ -42,7 +42,7 @@ namespace CalyxEngine {
 				nullptr,
 				IID_PPV_ARGS(&res));
 			if(FAILED(hr)) {
-				assert(false); // デバッグ時に失敗を検出
+				CX_CHECK(false, "Assertion failed"); // デバッグ時に失敗を検出
 			}
 			return res; // 空の ComPtr を返す（呼び出し側でチェック）
 		}
@@ -72,11 +72,11 @@ namespace CalyxEngine {
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr,
 				IID_PPV_ARGS(&res));
-			assert(SUCCEEDED(hr));
+			CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 			void* mapped = nullptr;
 			hr = res->Map(0, nullptr, &mapped);
-			assert(SUCCEEDED(hr) && mapped);
+			CX_CHECK(SUCCEEDED(hr) && mapped, "Assertion failed");
 			std::memcpy(mapped, data, bytes);
 			res->Unmap(0, nullptr);
 
@@ -94,7 +94,7 @@ namespace CalyxEngine {
 			Microsoft::WRL::ComPtr<ID3D12Resource>& blas,
 			Microsoft::WRL::ComPtr<ID3D12Resource>& scratch,
 			bool update) {
-			assert(device && cmd);
+			CX_CHECK(device && cmd, "Assertion failed");
 
 			D3D12_RAYTRACING_GEOMETRY_DESC geom{};
 			geom.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
@@ -122,8 +122,8 @@ namespace CalyxEngine {
 
 			D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO prebuild{};
 			device->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &prebuild);
-			assert(prebuild.ResultDataMaxSizeInBytes > 0);
-			assert(prebuild.ScratchDataSizeInBytes > 0);
+			CX_CHECK(prebuild.ResultDataMaxSizeInBytes > 0, "Assertion failed");
+			CX_CHECK(prebuild.ScratchDataSizeInBytes > 0, "Assertion failed");
 
 			bool createdScratch = false;
 
@@ -178,7 +178,7 @@ namespace CalyxEngine {
 		ID3D12Device5*				device,
 		ID3D12GraphicsCommandList4* cmd,
 		const ModelData&			model) {
-		assert(device && cmd);
+		CX_CHECK(device && cmd, "Assertion failed");
 
 		const auto& vb = model.meshResource.VertexBuffer();
 		const auto& ib = model.meshResource.IndexBuffer();
@@ -222,7 +222,7 @@ namespace CalyxEngine {
 		ID3D12GraphicsCommandList4* cmd,
 		const std::vector<VertexPosUvN>& vertices,
 		const std::vector<uint32_t>& indices) {
-		assert(device && cmd);
+		CX_CHECK(device && cmd, "Assertion failed");
 		if(vertices.empty() || indices.empty()) return;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> newVertexUpload = CreateUploadBuffer(

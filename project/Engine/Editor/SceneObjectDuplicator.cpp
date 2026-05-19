@@ -4,6 +4,7 @@
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 #include <Engine/Objects/ConfigurableObject/IConfigurable.h>
+#include <Engine/Foundation/Serialization/SerializableObject.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
 #include <algorithm>
@@ -52,14 +53,28 @@ namespace CalyxEngine {
 					snapshot[it.key()] = it.value();
 				}
 			}
+			nlohmann::json serializableParams;
+			source->ExtractSerializableParamsToJson(serializableParams);
+			if(!serializableParams.empty()) {
+				snapshot["serializableParams"] = std::move(serializableParams);
+			}
 
 			std::shared_ptr<SceneObject> clone;
+			const nlohmann::json* paramOverrides = snapshot.contains("serializableParams")
+				? &snapshot.at("serializableParams")
+				: nullptr;
 			try {
+				SerializableObject::BeginPendingCapture();
 				clone = SceneObjectRegistry::Get().Create(snapshot.value("type", ""));
 			} catch(...) {
+				SerializableObject::EndPendingCapture(nullptr, nullptr);
 				return nullptr;
 			}
-			if(!clone || !SceneObjectDuplicator::IsDuplicatable(clone.get())) return nullptr;
+			if(!clone || !SceneObjectDuplicator::IsDuplicatable(clone.get())) {
+				SerializableObject::EndPendingCapture(nullptr, nullptr);
+				return nullptr;
+			}
+			clone->AdoptPendingSerializableParamCapture(paramOverrides);
 
 			if(auto* cfg = dynamic_cast<IConfigurable*>(clone.get())) {
 				cfg->ApplyConfigFromJson(snapshot);
@@ -68,7 +83,9 @@ namespace CalyxEngine {
 			clone->SetGuid(Guid::New());
 			clone->ClearPrefabLink();
 			clone->SetPickingID(0);
+			clone->BeginSerializableParamCapture(paramOverrides);
 			clone->Initialize();
+			clone->EndSerializableParamCapture();
 			return clone;
 		}
 

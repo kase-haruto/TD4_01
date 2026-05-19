@@ -1,5 +1,6 @@
 #include "SceneObject.h"
 #include <Engine/Foundation/Json/JsonUtils.h>
+#include <Engine/Foundation/Serialization/SerializableObject.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Objects/ConfigurableObject/IConfigurable.h>
@@ -61,6 +62,30 @@ bool SceneObject::Save() const { return false; }
 //		ロード
 /////////////////////////////////////////////////////////////////////////////////////////
 bool SceneObject::Load() { return false; }
+
+void SceneObject::BeginSerializableParamCapture(const nlohmann::json* overrides) {
+	serializableParamObjects_.clear();
+	CalyxEngine::SerializableObject::BeginCapture(&serializableParamObjects_, overrides);
+}
+
+void SceneObject::EndSerializableParamCapture() {
+	CalyxEngine::SerializableObject::EndCapture();
+}
+
+void SceneObject::AdoptPendingSerializableParamCapture(const nlohmann::json* overrides) {
+	CalyxEngine::SerializableObject::EndPendingCapture(&serializableParamObjects_, overrides);
+}
+
+void SceneObject::ExtractSerializableParamsToJson(nlohmann::json& j) const {
+	for(const auto* param : serializableParamObjects_) {
+		if(!param) continue;
+		if(!CalyxEngine::SerializableObject::IsAlive(param)) continue;
+
+		nlohmann::json paramJson;
+		param->ExtractParamsToJson(paramJson);
+		j[param->GetParamStorageKey()] = std::move(paramJson);
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //		トランスフォームからaabbを構築して返す

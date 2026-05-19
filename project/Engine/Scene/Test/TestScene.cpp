@@ -52,6 +52,7 @@ void TestScene::Initialize(){
 
 	LoadAssets();
 
+	//std::string settingPath = "Resources/Params/Game/StagesSettings/" + std::to_string(stageNum_) + "_Setting.json";
 	stage_ = std::make_unique<Stage>();
 	stage_->Initialize(20.0f, 60.0f);
 
@@ -73,11 +74,14 @@ void TestScene::Initialize(){
 	transitionControl_->StartOpening(0.5f, [this]() {
 		IsOpening_ = false;
 	});
-	IsOpening_ = true;
-	IsPhase_   = false;
-	isPaused_ = false;
+	IsOpening_	   = true;
+	IsPhase_	   = false;
+	isPaused_	   = false;
 	isFanOpen_	   = false;
+	isFadeFinish_  = false;
 	selectedIndex_ = 0;
+	fadeTime_	   = 0.2f;
+	ClockManager::GetInstance()->SetTimeScale(1.0f);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +101,9 @@ void TestScene::Update([[maybe_unused]]float dt){
 			ClockManager::GetInstance()->SetTimeScale(0.0f);
 			PauseOpen();
 		} else {
-			PauseClose();
+			if(currentOpeningTime_ >= openingTime_ && fanAnim_->IsFinished()) {
+				PauseClose();
+			}
 		}
 	}
 
@@ -126,11 +132,11 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	//========================================================//
 	stage_->Draw(spriteRenderer_.get());
 
-	if (isPaused_) {
+	if(isPaused_) {
 		fanBg_->Draw(spriteRenderer_.get());
-		spriteRenderer_->Register(resumeBtn_.get());
-		spriteRenderer_->Register(toSelectBtn_.get());
-		spriteRenderer_->Register(toTitleBtn_.get());
+		resumeBtn_->Draw(spriteRenderer_.get());
+		toSelectBtn_->Draw(spriteRenderer_.get());
+		toTitleBtn_->Draw(spriteRenderer_.get());
 	}
 	
 	transitionControl_->Draw(spriteRenderer_.get());
@@ -148,20 +154,26 @@ void TestScene::CleanUp(){
 
 void TestScene::InitPauseResource() {
 	const std::string whiteTex = "Textures/white1x1.dds";
-	resumeBtn_				   = std::make_unique<Sprite>(whiteTex);
-	resumeBtn_->Initialize({640.0f, 200.0f}, {300.0f, 60.0f});
+	resumeBtn_				   = std::make_unique<CalyxEngine::SpriteObject2d>();
+	resumeBtn_->Initialize(whiteTex);
+	resumeBtn_->SetPosition({640.0f, 200.0f});
+	resumeBtn_->SetScale({300.0f, 60.0f});
 	resumeBtn_->SetAnchorPoint({0.5f, 0.5f});
-	resumeBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+	resumeBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
-	toSelectBtn_ = std::make_unique<Sprite>(whiteTex);
-	toSelectBtn_->Initialize({640.0f, 350.0f}, {300.0f, 60.0f});
+	toSelectBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
+	toSelectBtn_->Initialize(whiteTex);
+	toSelectBtn_->SetPosition({640.0f, 350.0f});
+	toSelectBtn_->SetScale({300.0f, 60.0f});
 	toSelectBtn_->SetAnchorPoint({0.5f, 0.5f});
-	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
-	toTitleBtn_ = std::make_unique<Sprite>(whiteTex);
-	toTitleBtn_->Initialize({640.0f, 500.0f}, {300.0f, 60.0f});
+	toTitleBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
+	toTitleBtn_->Initialize(whiteTex);
+	toTitleBtn_->SetPosition({640.0f, 500.0f});
+	toTitleBtn_->SetScale({300.0f, 60.0f});
 	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
-	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
+	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
 	fanBg_	 = std::make_unique<CalyxEngine::SpriteObject2d>();
 	fanAnim_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
@@ -187,8 +199,6 @@ void TestScene::InitPauseResource() {
 
 	isOncePlay_	   = false;
 	openingTime_   = 1.0f;
-	frameDuration_ = 0.6f / 7.0f;
-	frame_		   = 0;
 }
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
@@ -232,6 +242,10 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 
 void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 	// 入力による選択変更
+	if(!isFanOpen_ || !isFadeFinish_) {
+		return;
+	}
+
 	if(CalyxFoundation::Input::TriggerKey(DIK_W) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_UP)) {
 		selectedIndex_ = (selectedIndex_ - 1 + 3) % 3;
 	}
@@ -242,7 +256,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 	bool isConfirmed = CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A);
 
 	// ボタンの更新処理
-	auto updateBtn = [&](std::unique_ptr<Sprite>& btn, int index, std::function<void()> onClick) {
+	auto updateBtn = [&](std::unique_ptr<CalyxEngine::SpriteObject2d>& btn, int index, std::function<void()> onClick) {
 		if(selectedIndex_ == index) {
 			btn->SetColor({0.8f, 0.8f, 0.3f, 1.0f}); // 選択中は黄色っぽく
 			if(isConfirmed) {
@@ -251,7 +265,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		} else {
 			btn->SetColor({0.3f, 0.3f, 0.3f, 1.0f});
 		}
-		btn->Update(); 
+		btn->Update(dt); 
 	};
 
 	updateBtn(resumeBtn_, 0, [&]() {
@@ -260,11 +274,11 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 
 	updateBtn(toSelectBtn_, 1, [&]() {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
-		payload_ = BuildNowTypePayload(SceneType::TEST);
+		payload_ = BuildGamePayload(stageNum_);
 		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::SELECT);
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::TEST);
 		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(payload_));
 		});
 	});
 
@@ -280,17 +294,28 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 }
 
 void TestScene::PauseUIUpdate(float dt) {
-	currentOpeningTime_ += dt;
-	float t = (std::min)(currentOpeningTime_ / openingTime_, 1.0f);
+	if(isFanOpen_) {
+		if(currentOpeningTime_ >= openingTime_ && fanAnim_->IsFinished()) {
+			ButtonFadeIn(dt);
+		}
+	} else {
+		if(!isFadeFinish_) {
+			ButtonFadeOut(dt);
+			return;
+		}
+	}
 
-	float h		= static_cast<float>(kWindowHeight) * 1.75f;
+	float t = (std::min)(currentOpeningTime_ / openingTime_, 1.0f);
+	currentOpeningTime_ += dt;
+
+	float h		= static_cast<float>(kWindowHeight);
 	float y		= 0.0f;
 	int	  frame = 0;
 
 	if(isFanOpen_) {
-		// t:0~0.4は下からfanBg_が登ってくる（ｙが720から０まで）
-		if(t <= 0.4f) {
-			float upT = (std::min)(t / 0.4f, 1.0f);
+		// t:0~0.7は下からfanBg_が登ってくる（ｙが720から０まで）
+		if(t <= 0.7f) {
+			float upT = (std::min)(t / 0.7f, 1.0f);
 			float easeT = std::sqrtf(1.0f - std::powf(upT - 1.0f, 2));
 			y			= h * (1.0f - easeT);
 			frame	  = 0;
@@ -304,22 +329,21 @@ void TestScene::PauseUIUpdate(float dt) {
 			fanAnim_->Update(dt);
 		}
 	} else {
-		// isFanOpen_じゃない時は
-		// t:0~0.6はfanBg_が閉じる（1280＊720の連番（横1280＊７、縦７２０））
-		if(t <= 0.6f) {
+		// isFanOpen_じゃない時
+		if(t <= 0.3f) {
 			if(!fanAnim_->IsPlaying() && !isOncePlay_) {
 				isOncePlay_ = true;
 				fanAnim_->SetReversed(true);
 				fanAnim_->Play("FanOpen");
 			}
-			fanAnim_->Update(dt);
 		} else {
-			// t:0.6~1はfanBg_が下がっていく（ｙが0から720まで）
-			float downT = (std::min)((t - 0.6f) / 0.4f, 1.0f);
+			// t:0.3~1はfanBg_が下がっていく（ｙが0から720まで）
+			float downT = (std::min)((t - 0.3f) / 0.7f, 1.0f);
 			float easeT = 1.0f - std::sqrtf(1.0f - std::powf(downT, 2));
 			y			= h * easeT;
 			frame		= 0;
 		}
+		fanAnim_->Update(dt);
 	}
 
 	fanBg_->SetPosition({0.0f, y});
@@ -334,27 +358,74 @@ void TestScene::PauseUIUpdate(float dt) {
 	if(isFanOpen_) {
 		return;
 	}
-	if(t >= 1.0f) {
+	if(t >= 1.0f && fanAnim_->IsFinished()) {
 		isPaused_ = false;
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 	}
 }
 
 void TestScene::PauseOpen() {
-	isFanOpen_ = true;
+	isFanOpen_			= true;
+	isFadeFinish_		= false;
 	currentOpeningTime_ = 0.0f;
+	currentFadeTime_	= 0.0f;
 }
 
 void TestScene::PauseClose() {
 	if(!isFanOpen_) return;
 	isOncePlay_			= false;
 	isFanOpen_			= false;
+	isFadeFinish_		= false;
 	currentOpeningTime_ = 0.0f;
+	currentFadeTime_	= 0.0f;
+}
+
+void TestScene::ButtonFadeIn(float dt) {
+	if(isFadeFinish_) return;
+	float t = (std::min)(currentFadeTime_ / fadeTime_, 1.0f);
+	currentFadeTime_ += dt;
+
+	float alpha = t;
+	resumeBtn_->SetAlpha(alpha);
+	toSelectBtn_->SetAlpha(alpha);
+	toTitleBtn_->SetAlpha(alpha);
+	resumeBtn_->Update(dt);
+	toSelectBtn_->Update(dt);
+	toTitleBtn_->Update(dt);
+
+	if(t >= 1.0f) {
+		isFadeFinish_ = true;
+	}
+}
+
+void TestScene::ButtonFadeOut(float dt) {
+	if(isFadeFinish_) return;
+	float t = (std::min)(currentFadeTime_ / fadeTime_, 1.0f);
+	currentFadeTime_ += dt;
+
+	float alpha = 1.0f - t;
+	resumeBtn_->SetAlpha(alpha);
+	toSelectBtn_->SetAlpha(alpha);
+	toTitleBtn_->SetAlpha(alpha);
+	resumeBtn_->Update(dt);
+	toSelectBtn_->Update(dt);
+	toTitleBtn_->Update(dt);
+
+	if(t >= 1.0f) {
+		isFadeFinish_ = true;
+	}
 }
 
 std::unique_ptr<TransitionPayload> TestScene::BuildNowTypePayload(SceneType Type) {
 	auto payload  = std::make_unique<TransitionPayload>();
 	payload->type = Type;
+	return payload;
+}
+
+std::unique_ptr<GameTransitionPayload> TestScene::BuildGamePayload(int num) {
+	auto payload	   = std::make_unique<GameTransitionPayload>();
+	payload->stageNum_ = num;
+	payload->type_	   = SceneType::TEST;
 	return payload;
 }
 
@@ -364,5 +435,6 @@ void TestScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
 	// 自分が知っている型にだけキャストする
 	if(auto* p = static_cast<GameTransitionPayload*>(payload.get())) {
 		stageNum_ = p->stageNum_;
+		preType_ = p->type_;
 	}
 }

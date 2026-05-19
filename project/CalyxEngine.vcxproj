@@ -531,6 +531,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileObject.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallObject.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\ManipulatorSettings.h" />
@@ -560,6 +562,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Application\UI\EngineUI\DebugTextManager.h" />
     <ClInclude Include="Engine\Application\UI\EngineUI\DebugTextOverlay.h" />
     <ClInclude Include="Engine\Application\UI\GUI\ImGuiJapaneaseFonts.h" />
+    <ClInclude Include="Engine\Foundation\Debug\CxAssert.h" />
     <ClInclude Include="Engine\Assets\File\AssetChange.h" />
     <ClInclude Include="Engine\Assets\File\IAssetChangeHandler.h" />
     <ClInclude Include="Engine\Assets\Manager\AssetManager.h" />
