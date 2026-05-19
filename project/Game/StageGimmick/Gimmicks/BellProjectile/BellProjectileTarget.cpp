@@ -24,7 +24,13 @@ void BellProjectileTarget::ObjectInitialize() {
 	isRing_ = false;
 }
 
-void BellProjectileTarget::ObjectUpdate(float) {
+void BellProjectileTarget::ObjectUpdate(float dt) {
 	ChangeScale();
+
+	if (isRing_) {
+		if(worldTransform_.translation.y <= 30.0f) {
+			worldTransform_.translation.y += param_.moveSpeed * dt;
+		}
+	}
 }
 

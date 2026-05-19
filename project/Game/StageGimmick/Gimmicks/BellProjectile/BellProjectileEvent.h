@@ -56,6 +56,7 @@ private:
 
 			AddField("targetScale", targetParam_.scale).Category("BellProjectileTarget");
 			AddField("targetHitScale", targetParam_.hitScale).Category("BellProjectileTarget");
+			AddField("targetMoveSpeed", targetParam_.moveSpeed).Category("BellProjectileTarget");
 
 			AddField("doorScale", doorParam_.scale).Category("BellProjectileDoor");
 			AddField("doorSpeed", doorParam_.speed).Category("BellProjectileDoor");

@@ -90,6 +90,8 @@ struct BellProjectileTargetParam {
 	CalyxEngine::Vector3 scale = {2.0f, 4.0f, 2.0f};
 	// 鳴った時のスケール
 	CalyxEngine::Vector3 hitScale = {2.5f, 4.0f, 2.5f};
+	// 鳴った後に上に上がるスピード
+	float moveSpeed = 5.0f;
 };
 
 struct BellProjectileDoorParam {

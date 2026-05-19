@@ -11,10 +11,9 @@ BellProjectileEvent::BellProjectileEvent(const std::string& name) : StageGimmick
 void BellProjectileEvent::OnCollisionEnter(Collider* other) {
 	// プレイヤー以外の衝突は無視する
 	if(other->GetType() != ColliderType::Type_Player) return;
-	eventParam_.doorParam_.scale = 100.0f;
+
 	// プレイヤーがイベント内に入ったら飛ばす
 	if(auto target = targetObject_.lock()) {
-		target->SetIsFlying(true);
 		target->SetIsFlying(true);
 	}
 }
@@ -43,6 +42,7 @@ void BellProjectileEvent::EventInitialize() {
 		newTarget->SetParent(shared_from_this(), false);
 		newTarget->SetParam(eventParam_.targetParam_);
 		newTarget->Initialize();
+		newTarget->SetTranslate({0.0f, 10.0f, 25.0f});
 		bell_ = newTarget;
 		bellGuid_ = newTarget->GetGuid();
 	}
@@ -63,7 +63,8 @@ void BellProjectileEvent::EventInitialize() {
 		newObj->SetParam(eventParam_.param_);
 		newObj->SetTarget(bell_.lock().get());
 		newObj->Initialize();
-		targetObject_ = newObj;
+		newObj->SetTranslate({0.0f, 0.5f, 15.0f});
+		targetObject_	  = newObj;
 		targetObjectGuid_ = newObj->GetGuid();
 	}
 
@@ -83,7 +84,8 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		door_ = newDoor;
+		newDoor->SetTranslate({0.0f, 2.0f, 30.0f});
+		door_	  = newDoor;
 		doorGuid_ = newDoor->GetGuid();
 	}
 }
