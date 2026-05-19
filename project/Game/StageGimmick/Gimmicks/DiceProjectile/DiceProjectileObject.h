@@ -1,6 +1,5 @@
 #pragma once
 #define NOMINMAX
-
 #include <numbers>
 
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"

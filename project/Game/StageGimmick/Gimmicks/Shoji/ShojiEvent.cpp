@@ -7,7 +7,17 @@ REGISTER_SCENE_OBJECT(ShojiEvent)
 
 ShojiEvent::ShojiEvent(const std::string& name) : StageGimmickEventBase(name) {}
 
-void ShojiEvent::OnCollisionEnter(Collider*) {
+void ShojiEvent::OnCollisionEnter(Collider* other) {
+
+	// プレイヤー以外の衝突は無視する
+	if(other->GetType() != ColliderType::Type_Player) return;
+
+	// 全ての招き猫を飛ばす
+	for(auto& luckyCat : luckyCatObjs_) {
+		if(luckyCat.lock()) {
+			luckyCat.lock()->SetIsFlying(true);
+		}
+	}
 }
 
 void ShojiEvent::EventInitialize() {
@@ -33,19 +43,25 @@ void ShojiEvent::EventInitialize() {
 
 	for(size_t i = 0; i < shojiObjs_.size(); ++i) {
 		std::shared_ptr<ShojiObject> shoji;
+		bool isExistingShoji = false;
 
 		if(i < shojiObjects.size()) {
 			shoji = shojiObjects[i];
+			isExistingShoji = true;
 		} else {
 			shoji = SceneAPI::Instantiate<ShojiObject>("shoji.obj", shojiName);
 		}
 
 		if(!shoji) continue;
-
+		float posX = eventParam_.param_.shojiInterval;
+		if(i == 1) { posX *= -1; }
+		auto pos = shoji->GetWorldTransform().translation;
+		shoji->SetTranslate({posX, pos.y, pos.z});
 		shoji->SetName(shojiName);
 		shoji->SetParent(shared_from_this());
 		shoji->SetParam(eventParam_.param_);
 		shoji->Initialize();
+		shoji->CreatePaperObjects();
 
 		shojiObjs_[i]  = shoji;
 		shojiGuids_[i] = shoji->GetGuid();
@@ -67,6 +83,7 @@ void ShojiEvent::EventInitialize() {
 			childTargets[i]->SetName(catName);
 			childTargets[i]->SetParent(shared_from_this());
 			childTargets[i]->SetParam(eventParam_.param_);
+			childTargets[i]->SetShoji(shojiObjs_);
 			childTargets[i]->Initialize();
 
 			luckyCatObjs_[i]  = childTargets[i];
@@ -85,6 +102,7 @@ void ShojiEvent::EventInitialize() {
 
 		luckyCat->SetParent(shared_from_this());
 		luckyCat->SetParam(eventParam_.param_);
+		luckyCat->SetShoji(shojiObjs_);
 		luckyCat->Initialize();
 
 		luckyCatObjs_[i]  = luckyCat;

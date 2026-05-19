@@ -54,12 +54,16 @@ private:
 
 		ShojiEventParam() {
 			AddField("centerPos", param_.centerPos).Speed(0.01f).Category("ShojiEvent");
-			AddField("interval", param_.interval).Speed(0.01f).Category("ShojiEvent");
+			AddField("shojiInterval", param_.shojiInterval).Speed(0.01f).Category("ShojiEvent");
+			AddField("wInterval", param_.wInterval).Speed(0.01f).Category("ShojiEvent");
+			AddField("hInterval", param_.hInterval).Speed(0.01f).Category("ShojiEvent");
 
 			AddField("shojiScale", param_.shojiScale).Category("ShojiEvent");
 			AddField("luckyCatScale", param_.luckyCatScale).Category("ShojiEvent");
+			AddField("hitScale", param_.hitScale).Category("ShojiEvent");
 			AddField("direction", param_.direction).Category("ShojiEvent");
 			AddField("speed", param_.speed).Category("ShojiEvent");
+			AddField("parryDuration", param_.parryDuration).Category("ShojiEvent");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

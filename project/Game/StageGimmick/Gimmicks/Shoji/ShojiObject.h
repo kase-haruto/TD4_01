@@ -24,6 +24,15 @@ public:
 	void SetParam(const ShojiParam& param) {
 		param_ = param;
 	}	
+	void SetPaperGuids(const std::array<Guid,12>& guids) {
+		paperGuids_ = guids;
+	}
+	const std::array<std::weak_ptr<ShojiPaperObject>,12>& GetPaperObject() {
+		return paperObjs_;
+	}
+
+
+	void CreatePaperObjects();
 
 protected:
 
@@ -33,10 +42,19 @@ protected:
 	// 更新
 	void ObjectUpdate(float dt) override;
 
+	void ApplyDerivedConfigFromJson(const nlohmann::json& root,
+									const nlohmann::json* derived) override;
+	void ExtractDerivedConfigToJson(nlohmann::json& root,
+									nlohmann::json& derived) const override;
+	void RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) override;
+
 private:
 
 	// 障子の配列
 	std::array<std::weak_ptr<ShojiPaperObject>, 12> paperObjs_;
+	// 障子紙のGUID
+	std::array<Guid, 12> paperGuids_{};
+
 	// パラメータ
 	ShojiParam param_;
 

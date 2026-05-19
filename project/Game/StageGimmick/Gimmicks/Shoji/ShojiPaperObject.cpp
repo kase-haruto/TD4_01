@@ -11,6 +11,10 @@ ShojiPaperObject::ShojiPaperObject(
 }
 
 void ShojiPaperObject::ObjectInitialize() {
+	
+	if(collider_) {
+		collider_->SetCollisionEnabled(false);
+	}
 }
 
 void ShojiPaperObject::ObjectUpdate(float) {
