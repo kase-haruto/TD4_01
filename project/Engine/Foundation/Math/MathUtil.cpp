@@ -1,4 +1,5 @@
 #include "MathUtil.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 // math
 #include <Engine/Foundation/Math/Vector2.h>
@@ -221,7 +222,7 @@ float farClip
 	}
 
 	Vector3 CatmullRomPosition(const std::vector<Vector3>& points, float t) {
-		assert(points.size() >= 4 && "制御点は最低4つ必要です。");
+		CX_CHECK(points.size() >= 4 && "制御点は最低4つ必要です。", "Assertion failed");
 
 		size_t division = points.size() - 1;
 		float areaWidth = 1.0f / division;

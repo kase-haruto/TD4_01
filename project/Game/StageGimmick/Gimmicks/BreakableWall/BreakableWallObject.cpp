@@ -1,5 +1,6 @@
 #include "BreakableWallObject.h"
 
+#include "Engine/Objects/Collider/BoxCollider.h"
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
 REGISTER_SCENE_OBJECT(BreakableWallObject)
@@ -38,6 +39,9 @@ void BreakableWallObject::ObjectInitialize() {
 		collider_->SetTargetType(ColliderType::Type_Player);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
+		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
+			radius->SetSize(worldTransform_.scale);
+		}
 	}
 	isBroken_ = false;
 }

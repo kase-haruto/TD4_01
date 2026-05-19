@@ -6,7 +6,7 @@
 #include <Engine/Graphics/Pipeline/PipelineType.h>
 
 // lib
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <d3d12.h>
 #include <dxcapi.h>
 #include <string>

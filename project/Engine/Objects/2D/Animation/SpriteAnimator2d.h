@@ -20,6 +20,8 @@ namespace CalyxEngine {
 		void ApplyFrame(int32_t frame);
 
 		void SetReversed(bool reversed) { reversed_ = reversed; }
+		void SetLoopOverride(bool loop);
+		void ClearLoopOverride();
 
 		bool IsPlaying() const { return playing_; }
 		bool IsFinished() const { return finished_; }
@@ -27,10 +29,13 @@ namespace CalyxEngine {
 		int32_t GetCurrentFrame() const { return currentFrame_; }
 		std::shared_ptr<SpriteAnimationAsset> GetAnimationAsset() const { return asset_; }
 		bool IsReversed() const { return reversed_; }
+		bool HasLoopOverride() const { return useLoopOverride_; }
+		bool GetLoopOverride() const { return loopOverride_; }
 
 	private:
 		void ApplyTexture();
 		const SpriteAnimationClip* GetCurrentClip() const;
+		bool ShouldLoop(const SpriteAnimationClip& clip) const;
 
 	private:
 		SpriteObject2d* target_ = nullptr;
@@ -41,6 +46,8 @@ namespace CalyxEngine {
 		bool playing_ = false;
 		bool finished_ = false;
 		bool reversed_ = false;
+		bool useLoopOverride_ = false;
+		bool loopOverride_ = true;
 	};
 
 } // namespace CalyxEngine

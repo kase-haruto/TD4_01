@@ -55,6 +55,7 @@ namespace CalyxEngine {
 		~AnimatedSpriteSceneObject2d() override = default;
 
 		void Initialize() override;
+		void Update(float dt) override;
 		void AlwaysUpdate(float dt) override;
 		void ShowGui() override;
 		void ApplyConfigFromJson(const nlohmann::json& j) override;
@@ -66,6 +67,8 @@ namespace CalyxEngine {
 		void SetAnimationGuid(const Guid& guid);
 		void RefreshAnimationAsset();
 		void PlayCurrentClip(bool restart);
+		void UpdateAnimatedSprite(float dt, bool updateAnimation);
+		void ApplyLoopSettings();
 		void DrawAnimationAssetEditor(SpriteAnimationAsset& asset);
 		void SaveAnimationAsset(const SpriteAnimationAsset& asset);
 		void CreateAnimationAsset();
@@ -76,6 +79,8 @@ namespace CalyxEngine {
 		Guid boundAnimationGuid_;
 		std::string clipName_;
 		bool autoPlay_ = true;
+		bool useLoopOverride_ = false;
+		bool loopOverride_ = true;
 		int selectedClipIndex_ = 0;
 	};
 

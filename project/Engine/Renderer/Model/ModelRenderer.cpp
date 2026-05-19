@@ -1,4 +1,5 @@
 #include "ModelRenderer.h"
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 /* ========================================================================
 /* include space
@@ -482,7 +483,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 
 				const UINT need = static_cast<UINT>(item.billboards.size());
 				if(need == 0) continue;
-				assert(item.transforms.size() == item.billboards.size());
+				CX_CHECK(item.transforms.size() == item.billboards.size(), "Assertion failed");
 
 				model->EnsureBillboardCapacity(device, need);
 				model->UploadBillboardParams(item.billboards);

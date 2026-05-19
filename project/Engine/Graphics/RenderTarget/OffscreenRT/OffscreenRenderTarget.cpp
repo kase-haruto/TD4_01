@@ -2,7 +2,7 @@
 #include <Engine/Application/System/Environment.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 #include <d3dx12.h>
 #include <stdexcept>
 

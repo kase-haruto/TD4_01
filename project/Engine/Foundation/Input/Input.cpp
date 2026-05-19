@@ -6,7 +6,7 @@
 
 // c++
 #include <algorithm>
-#include <cassert>
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 // externals
 #include <externals/imgui/imgui.h>
@@ -89,23 +89,23 @@ namespace CalyxFoundation {
 			IID_IDirectInput8,
 			reinterpret_cast<void**>(directInput_.GetAddressOf()),
 			nullptr);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 		// キーボード
 		hr = directInput_->CreateDevice(GUID_SysKeyboard, &keyboard_, NULL);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 		hr = keyboard_->SetDataFormat(&c_dfDIKeyboard);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 		hr = keyboard_->SetCooperativeLevel(CalyxEngine::CalyxCore::GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 
 		// マウス
 		hr = directInput_->CreateDevice(GUID_SysMouse, &mouse_, NULL);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 		hr = mouse_->SetDataFormat(&c_dfDIMouse);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 		hr = mouse_->SetCooperativeLevel(CalyxEngine::CalyxCore::GetHWND(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-		assert(SUCCEEDED(hr));
+		CX_CHECK(SUCCEEDED(hr), "Assertion failed");
 	}
 
 	//-----------------------------------------------------------------------------
@@ -133,12 +133,12 @@ namespace CalyxFoundation {
 	//-----------------------------------------------------------------------------
 
 	bool Input::PushKey(uint32_t keyNum) {
-		assert(keyNum < 256);
+		CX_CHECK(keyNum < 256, "Assertion failed");
 		return instance_->key_[keyNum] & 0x80;
 	}
 
 	bool Input::TriggerKey(uint32_t keyNum) {
-		assert(keyNum < 256);
+		CX_CHECK(keyNum < 256, "Assertion failed");
 		return (instance_->key_[keyNum] & 0x80) && !(instance_->keyPre_[keyNum] & 0x80);
 	}
 
