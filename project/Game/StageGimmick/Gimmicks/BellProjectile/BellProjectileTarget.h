@@ -20,7 +20,7 @@ public:
 		param_ = param;
 	}
 
-	void SetIsRing(bool ring) { isRing_ = ring; }
+	void SetIsRing(bool ring);
 	bool GetIsRing() const { return isRing_; }
 	// 鐘部分の座標を取得
 	const CalyxEngine::Vector3 GetTargetPos() const;
@@ -35,8 +35,17 @@ protected:
 private:
 	void ChangeScale() {
 		CalyxEngine::Vector3 targetScale = isRing_ ? param_.hitScale : param_.scale;
+
+		// 鳴った瞬間に少し伸縮させる (Squash and Stretch)
+		if(isRing_ && wobbleT_ < 0.5f) {
+			float squash = 1.0f + std::sin(wobbleT_ * 30.0f) * 0.2f * std::exp(-wobbleT_ * 10.0f);
+			targetScale.y *= (1.0f / squash);
+			targetScale.x *= squash;
+			targetScale.z *= squash;
+		}
+
 		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
-			worldTransform_.scale, targetScale, 0.1f);
+			worldTransform_.scale, targetScale, 0.2f);
 	}
 
 private:
@@ -46,4 +55,6 @@ private:
 	// 鐘がなったか（扉が開くか）
 	bool isRing_ = false;
 
+	// 揺れのタイマー
+	float wobbleT_ = 0.0f;
 };

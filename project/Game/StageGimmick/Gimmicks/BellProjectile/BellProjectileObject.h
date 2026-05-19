@@ -1,6 +1,7 @@
 #pragma once
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
+#include "Engine\Foundation\Utility\Ease\CxEase.h"
 
 
 class BellProjectileTarget;

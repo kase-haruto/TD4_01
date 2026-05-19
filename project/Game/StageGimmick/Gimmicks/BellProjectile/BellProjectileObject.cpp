@@ -23,10 +23,12 @@ void BellProjectileObject::OnCollisionEnter(Collider* other) {
 	// ターゲットの座標を取得する
 	if (target_) {
 		targetPos_ = target_->GetTargetPos();
+		targetPos_.y -= target_->GetWorldTransform().scale.y * 0.8f;
 	}
 	
 	worldTransform_.scale = param_.hitScale;
 	parryStartPos_ = worldTransform_.translation;
+
 	isParry_ = true;
 	parryT_ = 0.0f;
 }
@@ -65,8 +67,11 @@ void BellProjectileObject::ObjectUpdate(float dt) {
 		parryT_ += (dt / (std::max)(0.0001f, param_.parryDuration));
 		float t = std::clamp(parryT_, 0.0f, 1.0f);
 
+		// イージング
+		float easedT = CalyxEngine::ApplyEase(CalyxEngine::EaseType::EaseOutSine, t);
+
 		// 直線移動
-		worldTransform_.translation = CalyxEngine::Vector3::Lerp(parryStartPos_, targetPos_, t);
+		worldTransform_.translation = CalyxEngine::Vector3::Lerp(parryStartPos_, targetPos_, easedT);
 
 		// 到達
 		if(t >= 1.0f) {
