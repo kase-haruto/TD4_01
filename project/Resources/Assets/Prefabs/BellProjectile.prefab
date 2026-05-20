@@ -1,0 +1,408 @@
+[
+    {
+        "BellProjectileEvent": {
+            "bellGuid": "554f407d-44fb-4e3e-af92-0c613472a03d",
+            "doorGuid": "b1ce082d-f5da-4200-aa98-2aa0b9f84700",
+            "eventParam": {
+                "fields": {
+                    "direction": [
+                        -0.0,
+                        -0.0,
+                        -1.0
+                    ],
+                    "doorScale": [
+                        18.100000381469727,
+                        8.0,
+                        1.0
+                    ],
+                    "doorSpeed": 2.0,
+                    "hitScale": [
+                        1.5,
+                        1.5,
+                        2.0
+                    ],
+                    "parryDuration": 0.5,
+                    "scale": [
+                        1.0,
+                        1.0,
+                        2.0
+                    ],
+                    "speed": 6.599999904632568,
+                    "targetHitScale": [
+                        2.5,
+                        4.0,
+                        2.5
+                    ],
+                    "targetMoveSpeed": 5.0,
+                    "targetScale": [
+                        2.0,
+                        4.0,
+                        2.0
+                    ]
+                }
+            },
+            "targetObjectGuid": "405f9ac3-54a3-46d8-80db-5c0db24be771"
+        },
+        "castShadow": false,
+        "colliderConfig": {
+            "colliderType": 32,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 10.0,
+                "y": 5.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "9ece38bd-bb3d-4353-be1e-2628de0fbaf1",
+        "name": "BellProjectileEvent",
+        "objectType": 5,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": false,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "00000000-0000-0000-0000-000000000000",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 10.0,
+                "y": 5.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.47046947479248047,
+                "y": -0.008233711123466492,
+                "z": 33.027809143066406
+            }
+        },
+        "type": "BellProjectileEvent",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 10.0,
+                "y": 5.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 64,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "554f407d-44fb-4e3e-af92-0c613472a03d",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "cone.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "BellProjectileTarget",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9ece38bd-bb3d-4353-be1e-2628de0fbaf1",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 2.0,
+                "y": 4.0,
+                "z": 2.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 10.0,
+                "z": 25.0
+            }
+        },
+        "type": "BellProjectileTarget",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 2.0,
+                "y": 4.0,
+                "z": 2.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 10.0,
+                "z": 25.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 16,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "405f9ac3-54a3-46d8-80db-5c0db24be771",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "debugCube.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "BellProjectileObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9ece38bd-bb3d-4353-be1e-2628de0fbaf1",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 0.9004471302032471,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.4349655210971832
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 2.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 0.5,
+                "z": 15.0
+            }
+        },
+        "type": "BellProjectileObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 0.9004471302032471,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.4349655210971832
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 2.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 0.5,
+                "z": 15.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 128,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "b1ce082d-f5da-4200-aa98-2aa0b9f84700",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "debugCube.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "BellProjectileDoor",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9ece38bd-bb3d-4353-be1e-2628de0fbaf1",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 18.100000381469727,
+                "y": 8.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 2.0,
+                "z": 30.0
+            }
+        },
+        "type": "BellProjectileDoor",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 18.100000381469727,
+                "y": 8.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 2.0,
+                "z": 30.0
+            }
+        }
+    }
+]
