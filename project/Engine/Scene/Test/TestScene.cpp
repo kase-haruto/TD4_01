@@ -220,7 +220,7 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
 		});
 	}
-	if(CalyxFoundation::Input::TriggerKey(DIK_9)) {
+	if(CalyxFoundation::Input::PushKey(DIK_LCONTROL) && CalyxFoundation::Input::TriggerKey(DIK_9)) {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
@@ -229,7 +229,7 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR), std::move(payload_));
 		});
 	}
-	if(CalyxFoundation::Input::TriggerKey(DIK_8)) {
+	if(CalyxFoundation::Input::PushKey(DIK_LCONTROL) && CalyxFoundation::Input::TriggerKey(DIK_8)) {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;

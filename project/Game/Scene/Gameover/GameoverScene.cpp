@@ -59,7 +59,7 @@ void GameoverScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 void GameoverScene::Update([[maybe_unused]] float dt) {
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
+	if(CalyxFoundation::Input::TriggerKey(DIK_LCONTROL) && CalyxFoundation::Input::TriggerKey(DIK_7)) {
 		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
 	}
 
