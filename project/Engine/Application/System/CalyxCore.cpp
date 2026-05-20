@@ -347,6 +347,14 @@ namespace CalyxEngine {
 		if(!pipelineStateManager_->CreatePipelineState(Line, L"Fragment.VS.hlsl", L"Fragment.PS.hlsl", rootSignatureDesc, psoDesc, blendMode)) {
 			return;
 		}
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC bonePsoDesc = psoDesc;
+		bonePsoDesc.DepthStencilState.DepthEnable = FALSE;
+		bonePsoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		bonePsoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+		if(!pipelineStateManager_->CreatePipelineState(BoneLine, L"Fragment.VS.hlsl", L"Fragment.PS.hlsl", rootSignatureDesc, bonePsoDesc, blendMode)) {
+			return;
+		}
 	}
 
 	void CalyxCore::EffectPipeline() {

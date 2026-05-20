@@ -3,6 +3,8 @@
 #include "AnimationStruct.h"
 #include <Engine/Graphics/Descriptor/DescriptorAllocator.h>
 #include <externals/imgui/imgui.h>
+#include <memory>
+#include <unordered_map>
 
 class PipelineService;
 
@@ -21,13 +23,14 @@ namespace CalyxEngine {
 		//===================================================================*/
 		AnimationModel() = default;
 		AnimationModel(const std::string& fileName);
-		~AnimationModel() override = default;
+		~AnimationModel() override;
 
 		void Initialize() override;
 		void Update(float dt) override;
 		void Draw(const WorldTransform& transform) override;
 		void BindVertexIndexBuffers(ID3D12GraphicsCommandList* cmdList)const override;
 		void ShowImGuiInterface() override;
+		void ShowImGui(BaseModelConfig& config) override;
 
 		// モデル読み込み時処理
 		void OnModelLoaded() override;
@@ -54,6 +57,7 @@ namespace CalyxEngine {
 		void SkeletonUpdate();
 		void SkinClusterUpdate();
 		void DrawSkeleton();
+		void DrawSkeletonDebug(const WorldTransform& transform);
 
 		// アニメーションを追加（名前ベース・従来 API）
 		void AddAnimation(const std::string& animName,const std::string& fileName);
@@ -65,6 +69,9 @@ namespace CalyxEngine {
 		float                               GetAnimationSpeed() const { return animationSpeed_; }
 		std::vector<std::string>            GetAnimationNodeNames() const;
 		std::optional<CalyxEngine::Matrix4x4> GetJointMatrix(const std::string& name) const;
+		BaseTransform*                      GetBoneParentTransform(const std::string& jointName, WorldTransform& modelWorldTransform);
+		bool                                SetBonej
+		void                                ClearBoneParent(WorldTransform& childTransform);
 		D3D12_GPU_DESCRIPTOR_HANDLE         GetJointMatrixSrv() const;
 		bool                                HasSkinnedVertexBuffer() const;
 		void                                SetAnimationSpeed(float speed) { animationSpeed_ = speed; }
@@ -92,8 +99,12 @@ namespace CalyxEngine {
 
 		/// スケルトン計算
 		void SkinningStep();
+		void DrawSkeletonInspector();
+		void DrawJointTreeNode(int32_t jointIndex);
 
 	private:
+		class BoneParentTransform;
+
 		//===================================================================*/
 		//                    private variables
 		//===================================================================*/
@@ -128,6 +139,7 @@ namespace CalyxEngine {
 		std::unordered_map<int16_t,std::string> animIdTable_;
 		bool                                    isOneShot_     = false;
 		int16_t                                 oneShotReturn_ = 0;
+		std::unordered_map<std::string, std::unique_ptr<BoneParentTransform>> boneParentTransforms_;
 	};
 
 }

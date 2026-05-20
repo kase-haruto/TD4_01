@@ -24,8 +24,48 @@
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <d3dx12.h>
 #include <filesystem>
+#include <utility>
 
 namespace CalyxEngine {
+	class AnimationModel::BoneParentTransform : public BaseTransform {
+	public:
+		BoneParentTransform(AnimationModel& owner, std::string jointName, WorldTransform& modelWorldTransform)
+			: owner_(&owner), jointName_(std::move(jointName)), modelWorldTransform_(&modelWorldTransform) {
+			scale.Initialize(1.0f);
+			rotation.Initialize();
+			translation = {};
+			matrix.world = Matrix4x4::MakeIdentity();
+			matrix.WorldInverseTranspose = Matrix4x4::MakeIdentity();
+		}
+
+		void SetModelWorldTransform(WorldTransform& modelWorldTransform) {
+			modelWorldTransform_ = &modelWorldTransform;
+			++revision_;
+		}
+
+		void Update() override {
+			if(!owner_ || !owner_->modelData_ || !modelWorldTransform_) return;
+
+			modelWorldTransform_->Update();
+
+			const Skeleton& skeleton = owner_->modelData_->skeleton;
+			auto			it		 = skeleton.jointMap.find(jointName_);
+			if(it == skeleton.jointMap.end()) return;
+
+			const Joint& joint = skeleton.joints[it->second];
+			matrix.world = joint.skeletonSpaceMatrix * modelWorldTransform_->matrix.world;
+			matrix.WorldInverseTranspose = Matrix4x4::Transpose(Matrix4x4::Inverse(matrix.world));
+			++revision_;
+		}
+
+	private:
+		AnimationModel* owner_ = nullptr;
+		std::string		jointName_;
+		WorldTransform* modelWorldTransform_ = nullptr;
+	};
+
+	AnimationModel::~AnimationModel() = default;
+
 	/* =====================================================================
 	   ctor – 最初に読み込んだファイルを初期アニメとして登録
 	   ===================================================================*/
@@ -320,6 +360,18 @@ namespace CalyxEngine {
 
 	void AnimationModel::DrawSkeleton() { modelData_->skeleton.Draw(); }
 
+	void AnimationModel::DrawSkeletonDebug(const WorldTransform& transform) {
+		if(!modelData_ || !isDrawSkeleton_) return;
+
+		CalyxEngine::Vector4 col = {
+			jointHighlightCol_.x,
+			jointHighlightCol_.y,
+			jointHighlightCol_.z,
+			jointHighlightCol_.w};
+
+		modelData_->skeleton.Draw(transform.matrix.world, selectedJoint_, col);
+	}
+
 	std::string AnimationModel::GetCurrentAnimationName() const {
 		if(currentAnimation_) {
 			return currentAnimation_->name;
@@ -586,12 +638,7 @@ namespace CalyxEngine {
 			}
 		}
 
-		if(isDrawSkeleton_) {
-			CalyxEngine::Vector4 col = {jointHighlightCol_.x, jointHighlightCol_.y,
-									  jointHighlightCol_.z, jointHighlightCol_.w};
-
-			modelData_->skeleton.Draw(transform.matrix.world, selectedJoint_, col);
-		}
+		DrawSkeletonDebug(transform);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -601,39 +648,114 @@ namespace CalyxEngine {
 #if defined(_DEBUG) || defined(DEVELOP)
 		GuiCmd::CheckBox("Draw Skeleton", isDrawSkeleton_);
 		BaseModel::ShowImGuiInterface();
+		DrawSkeletonInspector();
 
-		// ------ ジョイントリスト ---------------------------------
-		if(ImGui::CollapsingHeader("Skeleton##header")) {
-			// 名前配列を一度だけ作る
-			static std::vector<const char*> jointNames;
-			if(jointNames.empty() && modelData_) {
-				jointNames.reserve(modelData_->skeleton.joints.size());
-				for(auto& j : modelData_->skeleton.joints) {
-					jointNames.push_back(j.name.c_str());
-				}
-			}
+#endif
+	}
 
-			if(ImGui::ListBox("Joints", &selectedJoint_,
-							  jointNames.data(),
-							  static_cast<int>(jointNames.size()), 10)) {
-			}
+	void AnimationModel::ShowImGui(BaseModelConfig& config) {
+#if defined(_DEBUG) || defined(DEVELOP)
+		GuiCmd::CheckBox("Draw Skeleton", isDrawSkeleton_);
+		BaseModel::ShowImGui(config);
+		DrawSkeletonInspector();
+#else
+		BaseModel::ShowImGui(config);
+#endif
+	}
 
-			// 色を変える UI
-			ImGui::ColorEdit4("Highlight", (float*)&jointHighlightCol_,
-							  ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueBar);
+	void AnimationModel::DrawSkeletonInspector() {
+#if defined(_DEBUG) || defined(DEVELOP)
+		if(!ImGui::CollapsingHeader("Skeleton##header")) return;
+
+		if(!modelData_) {
+			ImGui::TextDisabled("No skeleton data.");
+			return;
 		}
 
-		// 選択中ジョイントの情報表示
-		if(selectedJoint_ >= 0 && modelData_) {
-			const Joint& j = modelData_->skeleton.joints[selectedJoint_];
-			ImGui::Text("Index: %d  Parent: %d", j.index,
-						j.parent ? *j.parent : -1);
-			ImGui::Text("Local Pos :  %.3f, %.3f, %.3f",
-						j.transform.translate.x,
-						j.transform.translate.y,
-						j.transform.translate.z);
+		Skeleton& skeleton = modelData_->skeleton;
+		if(skeleton.joints.empty()) {
+			ImGui::TextDisabled("No joints.");
+			return;
 		}
 
+		if(selectedJoint_ >= static_cast<int>(skeleton.joints.size())) {
+			selectedJoint_ = -1;
+		}
+
+		ImGui::Text("Joints: %d", static_cast<int>(skeleton.joints.size()));
+		ImGui::ColorEdit4("Highlight", (float*)&jointHighlightCol_,
+						  ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueBar);
+
+		if(ImGui::BeginChild("BoneHierarchy##AnimationModel", ImVec2(0.0f, 240.0f), true)) {
+			if(skeleton.root >= 0 && skeleton.root < static_cast<int32_t>(skeleton.joints.size())) {
+				DrawJointTreeNode(skeleton.root);
+			}
+
+			for(const Joint& joint : skeleton.joints) {
+				if(joint.parent || joint.index == skeleton.root) continue;
+				DrawJointTreeNode(joint.index);
+			}
+		}
+		ImGui::EndChild();
+
+		if(selectedJoint_ >= 0 && selectedJoint_ < static_cast<int>(skeleton.joints.size())) {
+			const Joint& joint = skeleton.joints[selectedJoint_];
+			const int	parentIndex = joint.parent ? *joint.parent : -1;
+
+			ImGui::SeparatorText("Selected Bone");
+			ImGui::Text("Name: %s", joint.name.c_str());
+			ImGui::Text("Index: %d  Parent: %d  Children: %d",
+						joint.index,
+						parentIndex,
+						static_cast<int>(joint.children.size()));
+			ImGui::Text("Local Pos: %.3f, %.3f, %.3f",
+						joint.transform.translate.x,
+						joint.transform.translate.y,
+						joint.transform.translate.z);
+
+			if(ImGui::SmallButton("Copy Bone Name")) {
+				ImGui::SetClipboardText(joint.name.c_str());
+			}
+		}
+#endif
+	}
+
+	void AnimationModel::DrawJointTreeNode(int32_t jointIndex) {
+#if defined(_DEBUG) || defined(DEVELOP)
+		if(!modelData_) return;
+
+		Skeleton& skeleton = modelData_->skeleton;
+		if(jointIndex < 0 || jointIndex >= static_cast<int32_t>(skeleton.joints.size())) return;
+
+		Joint& joint = skeleton.joints[jointIndex];
+		ImGuiTreeNodeFlags flags =
+			ImGuiTreeNodeFlags_OpenOnArrow |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		if(joint.children.empty()) {
+			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+		}
+		if(selectedJoint_ == jointIndex) {
+			flags |= ImGuiTreeNodeFlags_Selected;
+		}
+
+		const bool opened = ImGui::TreeNodeEx(
+			reinterpret_cast<void*>(static_cast<intptr_t>(jointIndex)),
+			flags,
+			"%s",
+			joint.name.c_str());
+
+		if(ImGui::IsItemClicked()) {
+			selectedJoint_ = jointIndex;
+			isDrawSkeleton_ = true;
+		}
+
+		if(opened && !joint.children.empty()) {
+			for(int32_t childIndex : joint.children) {
+				DrawJointTreeNode(childIndex);
+			}
+			ImGui::TreePop();
+		}
 #endif
 	}
 
@@ -673,6 +795,41 @@ namespace CalyxEngine {
 
 		const Joint& j = modelData_->skeleton.joints[it->second];
 		return j.skeletonSpaceMatrix;
+	}
+
+	BaseTransform* AnimationModel::GetBoneParentTransform(const std::string& jointName, WorldTransform& modelWorldTransform) {
+		if(!modelData_) return nullptr;
+		if(modelData_->skeleton.jointMap.find(jointName) == modelData_->skeleton.jointMap.end()) return nullptr;
+
+		auto it = boneParentTransforms_.find(jointName);
+		if(it == boneParentTransforms_.end()) {
+			auto boneParent = std::make_unique<BoneParentTransform>(*this, jointName, modelWorldTransform);
+			it = boneParentTransforms_.emplace(jointName, std::move(boneParent)).first;
+		} else {
+			it->second->SetModelWorldTransform(modelWorldTransform);
+		}
+
+		it->second->Update();
+		return it->second.get();
+	}
+
+	bool AnimationModel::SetBoneParent(WorldTransform& childTransform, const std::string& jointName, WorldTransform& modelWorldTransform, bool inheritScale) {
+		BaseTransform* boneParent = GetBoneParentTransform(jointName, modelWorldTransform);
+		if(!boneParent) return false;
+
+		childTransform.parent = boneParent;
+		childTransform.inheritScale = inheritScale;
+		return true;
+	}
+
+	void AnimationModel::ClearBoneParent(WorldTransform& childTransform) {
+		for(const auto& [_, boneParent] : boneParentTransforms_) {
+			if(childTransform.parent == boneParent.get()) {
+				childTransform.parent = nullptr;
+				childTransform.inheritScale = true;
+				return;
+			}
+		}
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE AnimationModel::GetJointMatrixSrv() const { return skinCluster_.paletteSrvHandle.second; }

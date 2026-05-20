@@ -6,6 +6,7 @@ enum PipelineType{
 	Object2D,
 	StructuredObject,
 	Line,
+	BoneLine,
 	copyImage,
 	GrayScale,
 	RadialBlur,

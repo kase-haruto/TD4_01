@@ -19,6 +19,9 @@ void PrimitiveDrawer::Initialize(){
 	lineDrawer_ = std::make_unique<LineDrawer>();
 	lineDrawer_->Initialize();
 
+	boneLineDrawer_ = std::make_unique<LineDrawer>();
+	boneLineDrawer_->Initialize();
+
 	boxDrawer_ = std::make_unique<BoxDrawer>();
 	boxDrawer_->Initialize();
 }
@@ -28,6 +31,11 @@ void PrimitiveDrawer::Finalize(){
 		lineDrawer_->Clear();
 	}
 	lineDrawer_.reset();
+
+	if(boneLineDrawer_) {
+		boneLineDrawer_->Clear();
+	}
+	boneLineDrawer_.reset();
 
 	if (boxDrawer_) {
 		boxDrawer_->Clear();
@@ -39,6 +47,12 @@ void PrimitiveDrawer::Finalize(){
 void PrimitiveDrawer::DrawLine3d(const CalyxEngine::Vector3& start, const CalyxEngine::Vector3& end, const CalyxEngine::Vector4& color){
 	if (lineDrawer_){
 		lineDrawer_->DrawLine(start, end, color);
+	}
+}
+
+void PrimitiveDrawer::DrawBoneLine3d(const CalyxEngine::Vector3& start, const CalyxEngine::Vector3& end, const CalyxEngine::Vector4& color) {
+	if(boneLineDrawer_) {
+		boneLineDrawer_->DrawLine(start, end, color);
 	}
 }
 
@@ -183,9 +197,21 @@ void PrimitiveDrawer::Render(){
 	
 }
 
+void PrimitiveDrawer::RenderBone() {
+#if defined(_DEBUG) || defined(DEVELOP)
+	if(boneLineDrawer_) {
+		boneLineDrawer_->Render();
+	}
+#endif
+}
+
 void PrimitiveDrawer::ClearMesh(){
 	if (lineDrawer_){
 		lineDrawer_->Clear();
+	}
+
+	if(boneLineDrawer_) {
+		boneLineDrawer_->Clear();
 	}
 
 	if (boxDrawer_) {

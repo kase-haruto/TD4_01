@@ -54,7 +54,7 @@ public:
 	//--------- config -----------------------------------------------------
 	void ApplyConfig(const BaseModelConfig& config);
 	BaseModelConfig ExtractConfig() const;
-	void ShowImGui(BaseModelConfig& config);
+	virtual void ShowImGui(BaseModelConfig& config);
 	bool LoadTextureByGuid(const Guid& g);
 	void SetTextureGuid(const Guid& g);
 	void SetMaterialGuid(const Guid& g);

@@ -231,6 +231,7 @@ public:
 	void SetTexture(const std::string& texName);
 	bool SetModelByGuid(const Guid& guid);
 	bool SetModelFileNameForEditor(const std::string& modelName);
+	bool SetBoneParent(WorldTransform& childTransform, const std::string& boneName, bool inheritScale = true);
 	const std::string& GetModelFileName() const { return config_.GetConfig().modelConfig.modelName; }
 	/**
 	 * \brief UVスケールを設定

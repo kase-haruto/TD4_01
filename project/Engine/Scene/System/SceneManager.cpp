@@ -249,6 +249,10 @@ namespace CalyxEngine {
 				GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
 				cam->SetCommand(cmd, PipelineType::Line);
 				PrimitiveDrawer::GetInstance()->Render();
+
+				GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::BoneLine, BlendMode::NORMAL);
+				cam->SetCommand(cmd, PipelineType::BoneLine);
+				PrimitiveDrawer::GetInstance()->RenderBone();
 			}
 		}
 		PrimitiveDrawer::GetInstance()->ClearMesh();

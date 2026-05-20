@@ -340,6 +340,13 @@ bool BaseGameObject::SetModelFileNameForEditor(const std::string& modelName) {
 	return true;
 }
 
+bool BaseGameObject::SetBoneParent(WorldTransform& childTransform, const std::string& boneName, bool inheritScale) {
+	auto* animModel = AnimationModel();
+	if(!animModel) return false;
+
+		return animModel->SetBoneParent(childTransform, boneName, worldTransform_, inheritScale);
+}
+
 bool BaseGameObject::SetModelFromFileName(const std::string& modelName) {
 	if(modelName.empty()) return false;
 

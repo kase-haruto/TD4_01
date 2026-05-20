@@ -636,6 +636,12 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 						cmdList->DrawIndexedInstanced(subMesh.indexCount, need, subMesh.indexStart, 0, 0);
 					}
 				}
+
+#if defined(_DEBUG) || defined(DEVELOP)
+				for(const auto& transform : visible) {
+					model->DrawSkeletonDebug(transform);
+				}
+#endif
 			}
 		}
 	}
