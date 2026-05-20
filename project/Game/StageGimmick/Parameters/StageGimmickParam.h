@@ -99,3 +99,35 @@ struct FireLoadParam {
 	// 列の数 (奥行き)
 	int depth = 2;
 };
+
+struct BellProjectileParam {
+
+	// オブジェクトのスケール
+	CalyxEngine::Vector3 scale = {1.0f, 1.0f, 2.0f};
+	// 判定を取った際のスケール
+	CalyxEngine::Vector3 hitScale = {1.5f, 1.5f, 2.0f};
+	// 飛んでいく方向
+	CalyxEngine::Vector3 direction = -CalyxEngine::Vector3::Forward();
+	// 撞木の速度
+	float speed = 1.5f;
+	// 撞木が鐘に向かっていく時間
+	float parryDuration = 0.7f;
+};
+
+struct BellProjectileTargetParam {
+
+	// オブジェクトのスケール
+	CalyxEngine::Vector3 scale = {2.0f, 4.0f, 2.0f};
+	// 鳴った時のスケール
+	CalyxEngine::Vector3 hitScale = {2.5f, 4.0f, 2.5f};
+	// 鳴った後に上に上がるスピード
+	float moveSpeed = 5.0f;
+};
+
+struct BellProjectileDoorParam {
+
+	// オブジェクトのスケール
+	CalyxEngine::Vector3 scale = {17.0f, 5.0f, 1.0f};
+	// 開く時の速さ
+	float speed = 2.0f;
+};
