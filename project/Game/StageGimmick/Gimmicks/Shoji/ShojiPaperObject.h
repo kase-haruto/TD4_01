@@ -15,11 +15,20 @@ public:
 		return "ShojiPaperObject";
 	}
 
+	const bool GetIsGetPosition() const { return isGetPosition_; }
+	void SetIsGetPosition(bool flag) {
+		isGetPosition_ = flag;
+	}
+
 protected:
+	
 	// 初期化
 	void ObjectInitialize() override;
 
 	// 更新
 	void ObjectUpdate(float dt) override;
 
+private:
+
+	bool isGetPosition_ = false;
 };
