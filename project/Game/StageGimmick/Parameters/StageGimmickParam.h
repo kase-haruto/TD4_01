@@ -56,6 +56,36 @@ struct DiceProjectileParam {
 
 };
 
+struct ShojiParam {
+
+	// 障子の紙の中心座標
+	CalyxEngine::Vector3 centerPos;
+	// 障子同士の間隔
+	float shojiInterval;
+	// 障子の紙の間隔
+	float wInterval;
+	float hInterval;
+	// 障子の開く速度
+	float openVelocityX	 = -0.2f;
+	float openAccelerationX = -1.5f;
+	// 開く幅
+	float wOpen;
+
+	// 障子のスケール
+	float shojiScale = 1.0f;
+	// 招き猫のスケール
+	float luckyCatScale = 1.0f;
+	// 判定を取った際のスケール
+	float hitScale = 1.0f;
+	// 飛んでいく方向
+	CalyxEngine::Vector3 direction = -CalyxEngine::Vector3::Forward();
+	// 招き猫の速度
+	float speed;
+	//招き猫が障子に向かっていく時間
+	float parryDuration;
+
+};
+
 /// <summary>
 /// 炎のパラメーター
 /// </summary>

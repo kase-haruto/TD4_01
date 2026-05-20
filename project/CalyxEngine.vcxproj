@@ -469,6 +469,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\LuckyCatObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\ShojiEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\ShojiObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\ShojiPaperObject.cpp" />
     <ClCompile Include="Game\Stage\Stage.cpp" />
     <ClCompile Include="main.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</MultiProcessorCompilation>
@@ -897,6 +901,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\StageGimmick\Gimmicks\FireLoad\FireLoadObject.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\Shoji\LuckyCatObject.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\Shoji\ShojiEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\Shoji\ShojiObject.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\Shoji\ShojiPaperObject.h" />
     <ClInclude Include="Game\StageGimmick\Parameters\StageGimmickParam.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h" />
