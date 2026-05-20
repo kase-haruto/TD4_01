@@ -3,7 +3,7 @@
         "ShojiEvent": {
             "eventData": {
                 "fields": {
-                    "ClearCount": 1,
+                    "ClearCount": 4,
                     "ObjectCount": 4
                 }
             },
@@ -20,13 +20,16 @@
                         -1.0
                     ],
                     "hInterval": 1.399999976158142,
-                    "hitScale": 0.800000011920929,
+                    "hitScale": 0.6000000238418579,
                     "luckyCatScale": 0.5,
-                    "parryDuration": 0.30000001192092896,
+                    "openAccelerationX": 4.0,
+                    "openVelocityX": 3.0,
+                    "parryDuration": 0.25,
                     "shojiInterval": 2.8399999141693115,
                     "shojiScale": 1.0,
                     "speed": 5.0,
-                    "wInterval": 1.75
+                    "wInterval": 1.75,
+                    "wOpen": 7.199999809265137
                 }
             },
             "luckyCatGuids": [
@@ -121,100 +124,6 @@
         }
     },
     {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 16,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "d94d8d9a-50d3-4ecc-9aac-d218761d5e46",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "manekineko.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "LuckyCatObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "e7605df8-8733-4fae-8d65-4a61f6406b9a",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": -0.011829975061118603,
-                "x": 0.0,
-                "y": 0.9999300241470337,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 0.5
-            },
-            "translation": {
-                "x": -2.20615816116333,
-                "y": -2.404029369354248,
-                "z": 23.976224899291992
-            }
-        },
-        "type": "LuckyCatObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": -0.011829975061118603,
-                "x": 0.0,
-                "y": 0.9999300241470337,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 0.5
-            },
-            "translation": {
-                "x": -2.20615816116333,
-                "y": -2.404029369354248,
-                "z": 23.976224899291992
-            }
-        }
-    },
-    {
         "ShojiObject": {
             "paperGuids": [
                 "e06ab30f-5715-42bc-9d47-9e0676fd4fb5",
@@ -298,7 +207,7 @@
             "translation": {
                 "x": -2.8399999141693115,
                 "y": 1.6854548454284668,
-                "z": 28.71222686767578
+                "z": 9.95498275756836
             }
         },
         "type": "ShojiObject",
@@ -320,7 +229,7 @@
             "translation": {
                 "x": -2.8399999141693115,
                 "y": 1.6854548454284668,
-                "z": 28.71222686767578
+                "z": 9.95498275756836
             }
         }
     },
@@ -819,6 +728,100 @@
             "targetType": 0
         },
         "drawEnable": true,
+        "guid": "d7a4201f-655c-483d-bf9d-027371c25147",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiPaper.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "ShojiPaperObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "5cd2855c-42a1-4e0f-be00-42c5573e017d",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 1.75,
+                "y": 1.6799999475479126,
+                "z": 0.0
+            }
+        },
+        "type": "ShojiPaperObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 1.75,
+                "y": 1.6799999475479126,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
         "guid": "c4198dc2-ed17-40fe-aff0-47f4639754d4",
         "modelConfig": {
             "blendMode": 5,
@@ -977,100 +980,6 @@
             },
             "translation": {
                 "x": 0.0,
-                "y": 1.6799999475479126,
-                "z": 0.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "d7a4201f-655c-483d-bf9d-027371c25147",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "shojiPaper.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "ShojiPaperObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "5cd2855c-42a1-4e0f-be00-42c5573e017d",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 1.75,
-                "y": 1.6799999475479126,
-                "z": 0.0
-            }
-        },
-        "type": "ShojiPaperObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 1.75,
                 "y": 1.6799999475479126,
                 "z": 0.0
             }
@@ -1453,6 +1362,194 @@
         }
     },
     {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 16,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "f5dfc2b9-ee49-47b7-b03d-4d10e2bf155f",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "manekineko.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "LuckyCatObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "e7605df8-8733-4fae-8d65-4a61f6406b9a",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": -0.011829976923763752,
+                "x": 0.0,
+                "y": 0.9999300241470337,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4999999403953552,
+                "y": 0.5,
+                "z": 0.4999999403953552
+            },
+            "translation": {
+                "x": 1.9504399299621582,
+                "y": -2.404029369354248,
+                "z": 5.149539470672607
+            }
+        },
+        "type": "LuckyCatObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": -0.011829976923763752,
+                "x": 0.0,
+                "y": 0.9999300241470337,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4999999403953552,
+                "y": 0.5,
+                "z": 0.4999999403953552
+            },
+            "translation": {
+                "x": 1.9504399299621582,
+                "y": -2.404029369354248,
+                "z": 5.149539470672607
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 16,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "d94d8d9a-50d3-4ecc-9aac-d218761d5e46",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "manekineko.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "LuckyCatObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "e7605df8-8733-4fae-8d65-4a61f6406b9a",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": -0.011829976923763752,
+                "x": 0.0,
+                "y": 0.9999300241470337,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4999999403953552,
+                "y": 0.5,
+                "z": 0.4999999403953552
+            },
+            "translation": {
+                "x": -2.20615816116333,
+                "y": -2.404029369354248,
+                "z": 5.218978404998779
+            }
+        },
+        "type": "LuckyCatObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": -0.011829976923763752,
+                "x": 0.0,
+                "y": 0.9999300241470337,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4999999403953552,
+                "y": 0.5,
+                "z": 0.4999999403953552
+            },
+            "translation": {
+                "x": -2.20615816116333,
+                "y": -2.404029369354248,
+                "z": 5.218978404998779
+            }
+        }
+    },
+    {
         "ShojiObject": {
             "paperGuids": [
                 "942dacb9-28b8-4e35-a751-b4e46fc6f855",
@@ -1536,7 +1633,7 @@
             "translation": {
                 "x": 2.8399999141693115,
                 "y": 1.6854548454284668,
-                "z": 28.71222686767578
+                "z": 9.95498275756836
             }
         },
         "type": "ShojiObject",
@@ -1558,7 +1655,289 @@
             "translation": {
                 "x": 2.8399999141693115,
                 "y": 1.6854548454284668,
-                "z": 28.71222686767578
+                "z": 9.95498275756836
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "51b25a9e-8bbf-448c-b85a-3b804892bfe3",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiPaper.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "ShojiPaperObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "4f5e5f22-7241-46b7-ad02-070f224c8612",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 1.6799999475479126,
+                "z": 0.0
+            }
+        },
+        "type": "ShojiPaperObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": 1.6799999475479126,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "5bbb6a83-0fd4-43d2-9257-83d631ba51ef",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiPaper.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "ShojiPaperObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "4f5e5f22-7241-46b7-ad02-070f224c8612",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 1.75,
+                "y": 1.6799999475479126,
+                "z": 0.0
+            }
+        },
+        "type": "ShojiPaperObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 1.75,
+                "y": 1.6799999475479126,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "17f64128-3eee-49fb-9830-c295d2ce686c",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiPaper.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "ShojiPaperObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "4f5e5f22-7241-46b7-ad02-070f224c8612",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": -1.119999885559082,
+                "z": 0.0
+            }
+        },
+        "type": "ShojiPaperObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 0.0,
+                "y": -1.119999885559082,
+                "z": 0.0
             }
         }
     },
@@ -2057,194 +2436,6 @@
             "targetType": 0
         },
         "drawEnable": true,
-        "guid": "51b25a9e-8bbf-448c-b85a-3b804892bfe3",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "shojiPaper.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "ShojiPaperObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "4f5e5f22-7241-46b7-ad02-070f224c8612",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 1.6799999475479126,
-                "z": 0.0
-            }
-        },
-        "type": "ShojiPaperObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 1.6799999475479126,
-                "z": 0.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "5bbb6a83-0fd4-43d2-9257-83d631ba51ef",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "shojiPaper.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "ShojiPaperObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "4f5e5f22-7241-46b7-ad02-070f224c8612",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 1.75,
-                "y": 1.6799999475479126,
-                "z": 0.0
-            }
-        },
-        "type": "ShojiPaperObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 1.75,
-                "y": 1.6799999475479126,
-                "z": 0.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
         "guid": "3e3049cf-dce8-45c8-8535-31ddd1a65c3a",
         "modelConfig": {
             "blendMode": 5,
@@ -2527,100 +2718,6 @@
             "targetType": 0
         },
         "drawEnable": true,
-        "guid": "17f64128-3eee-49fb-9830-c295d2ce686c",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "shojiPaper.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "ShojiPaperObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "4f5e5f22-7241-46b7-ad02-070f224c8612",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": -1.119999885559082,
-                "z": 0.0
-            }
-        },
-        "type": "ShojiPaperObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": true,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": -1.119999885559082,
-                "z": 0.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
         "guid": "73ddd116-db46-48b2-8b33-60175a0a0dd3",
         "modelConfig": {
             "blendMode": 5,
@@ -2745,9 +2842,9 @@
             "inheritScale": false,
             "inheritTranslate": true,
             "rotation": {
-                "w": 0.020794875919818878,
+                "w": -0.020794875919818878,
                 "x": 0.0,
-                "y": -0.9997837543487549,
+                "y": 0.9997837543487549,
                 "z": 0.0
             },
             "scale": {
@@ -2758,7 +2855,7 @@
             "translation": {
                 "x": 1.1920928955078125e-07,
                 "y": -2.303260564804077,
-                "z": 18.288488388061523
+                "z": 5.065049648284912
             }
         },
         "type": "LuckyCatObject",
@@ -2767,9 +2864,9 @@
             "inheritScale": false,
             "inheritTranslate": true,
             "rotation": {
-                "w": 0.020794875919818878,
+                "w": -0.020794875919818878,
                 "x": 0.0,
-                "y": -0.9997837543487549,
+                "y": 0.9997837543487549,
                 "z": 0.0
             },
             "scale": {
@@ -2780,101 +2877,7 @@
             "translation": {
                 "x": 1.1920928955078125e-07,
                 "y": -2.303260564804077,
-                "z": 18.288488388061523
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 16,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "f5dfc2b9-ee49-47b7-b03d-4d10e2bf155f",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "manekineko.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "LuckyCatObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "e7605df8-8733-4fae-8d65-4a61f6406b9a",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": -0.011829975061118603,
-                "x": 0.0,
-                "y": 0.9999300241470337,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 0.5
-            },
-            "translation": {
-                "x": 1.9504399299621582,
-                "y": -2.404029369354248,
-                "z": 23.90678596496582
-            }
-        },
-        "type": "LuckyCatObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": -0.011829975061118603,
-                "x": 0.0,
-                "y": 0.9999300241470337,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 0.5
-            },
-            "translation": {
-                "x": 1.9504399299621582,
-                "y": -2.404029369354248,
-                "z": 23.90678596496582
+                "z": 5.065049648284912
             }
         }
     },
@@ -2933,20 +2936,20 @@
             "inheritScale": false,
             "inheritTranslate": true,
             "rotation": {
-                "w": -0.011829975061118603,
+                "w": -0.011829976923763752,
                 "x": 0.0,
                 "y": 0.9999300241470337,
                 "z": 0.0
             },
             "scale": {
-                "x": 0.5,
+                "x": 0.4999999403953552,
                 "y": 0.5,
-                "z": 0.5
+                "z": 0.4999999403953552
             },
             "translation": {
                 "x": -0.03599369525909424,
                 "y": -2.404029369354248,
-                "z": 14.209981918334961
+                "z": 3.2542262077331543
             }
         },
         "type": "LuckyCatObject",
@@ -2955,20 +2958,20 @@
             "inheritScale": false,
             "inheritTranslate": true,
             "rotation": {
-                "w": -0.011829975061118603,
+                "w": -0.011829976923763752,
                 "x": 0.0,
                 "y": 0.9999300241470337,
                 "z": 0.0
             },
             "scale": {
-                "x": 0.5,
+                "x": 0.4999999403953552,
                 "y": 0.5,
-                "z": 0.5
+                "z": 0.4999999403953552
             },
             "translation": {
                 "x": -0.03599369525909424,
                 "y": -2.404029369354248,
-                "z": 14.209981918334961
+                "z": 3.2542262077331543
             }
         }
     }

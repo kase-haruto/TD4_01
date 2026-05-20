@@ -61,6 +61,9 @@ void LuckyCatObject::ObjectUpdate(float dt) {
 
 	// 障子に付いたら更新を切る
 	if(isShoji_) {
+		const auto& paperObj = shojiObjs_[shojiIndex_]->GetPaperObject()[randIndex_];
+		worldTransform_.translation = (paperObj->GetWorldTransform().translation * shojiObjs_[shojiIndex_]->GetWorldTransform().scale) +
+					 shojiObjs_[shojiIndex_]->GetWorldTransform().translation + CalyxEngine::Vector3{0.0f, 0.0f, -0.5f};
 		return;
 	}
 
@@ -114,6 +117,7 @@ void LuckyCatObject::ObjectUpdate(float dt) {
 		if(t >= 1.0f) {
 			const auto& paperObj = shojiObjs_[shojiIndex_]->GetPaperObject()[randIndex_];
 			paperObj->SetModelFileNameForEditor("shojiTearPaper.obj");
+			shojiObjs_[shojiIndex_]->AddClearCount();
 			worldTransform_.scale = param_.hitScale;
 			worldTransform_.translation = parryP2_ + CalyxEngine::Vector3{0.0f, 0.0f, -0.5f};
 			isShoji_			  = true;

@@ -65,6 +65,11 @@ struct ShojiParam {
 	// 障子の紙の間隔
 	float wInterval;
 	float hInterval;
+	// 障子の開く速度
+	float openVelocityX	 = -0.2f;
+	float openAccelerationX = -1.5f;
+	// 開く幅
+	float wOpen;
 
 	// 障子のスケール
 	float shojiScale = 1.0f;

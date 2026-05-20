@@ -50,11 +50,35 @@ void ShojiObject::ObjectInitialize() {
 	}
 	worldTransform_.scale = CalyxEngine::Vector3::One() * param_.shojiScale;
 	worldTransform_.inheritScale = false;
+
+	offsetX_   = worldTransform_.translation.x;
+	velocityX_ = param_.openVelocityX;
 }
 
-void ShojiObject::ObjectUpdate(float) {
+void ShojiObject::ObjectUpdate(float dt) {
 
+	if(isOpen_ && !isStop_) {
+		float w = param_.wOpen;
+		if(worldTransform_.translation.x > 0.0f) {
+			velocityX_ += param_.openAccelerationX;
+		} else {
+			velocityX_ -= param_.openAccelerationX;
+			w *= -1.0f;
+		}
+		worldTransform_.translation.x += velocityX_ * dt;
 
+		if(worldTransform_.translation.x > 0.0f) {
+			if(worldTransform_.translation.x > w) {
+				worldTransform_.translation.x = w;
+				isStop_ = true;
+			}
+		} else {
+			if(worldTransform_.translation.x < w) {
+				worldTransform_.translation.x = w;
+				isStop_ = true;
+			}
+		}
+	}
 }
 
 void ShojiObject::CreatePaperObjects() {

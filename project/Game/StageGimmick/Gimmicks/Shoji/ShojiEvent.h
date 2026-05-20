@@ -57,6 +57,9 @@ private:
 			AddField("shojiInterval", param_.shojiInterval).Speed(0.01f).Category("ShojiEvent");
 			AddField("wInterval", param_.wInterval).Speed(0.01f).Category("ShojiEvent");
 			AddField("hInterval", param_.hInterval).Speed(0.01f).Category("ShojiEvent");
+			AddField("openVelocityX", param_.openVelocityX).Speed(0.01f).Category("ShojiEvent");
+			AddField("openAccelerationX", param_.openAccelerationX).Speed(0.01f).Category("ShojiEvent");
+			AddField("wOpen", param_.wOpen).Speed(0.01f).Category("ShojiEvent");
 
 			AddField("shojiScale", param_.shojiScale).Category("ShojiEvent");
 			AddField("luckyCatScale", param_.luckyCatScale).Category("ShojiEvent");
@@ -116,4 +119,5 @@ private:
 	bool hasSerializedEventParam_ = false;
 	bool hasSerializedEventData_  = false;
 
+	bool isOpen_ = false;
 };

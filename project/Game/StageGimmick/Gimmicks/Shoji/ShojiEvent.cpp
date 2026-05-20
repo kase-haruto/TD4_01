@@ -123,6 +123,19 @@ void ShojiEvent::EventUpdate(float) {
 		objectCount_ = eventData_.objectCount;
 		EventInitialize();
 	}
+
+	if(!isOpen_) {
+		int count = 0;
+		for(const auto& shoji : shojiObjs_) {
+			count += shoji->GetClearCount();
+		}
+		if(count >= eventData_.clearCount) {
+			for(const auto& shoji : shojiObjs_) {
+				shoji->SetIsOpen(true);
+			}
+			isOpen_ = true;
+		}
+	}
 }
 
 void ShojiEvent::DerivativeGui() {

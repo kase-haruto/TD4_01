@@ -30,8 +30,14 @@ public:
 	const std::array<std::shared_ptr<ShojiPaperObject>,12>& GetPaperObject() {
 		return paperObjs_;
 	}
+	void SetIsOpen(bool flag) { isOpen_ = flag; }
+	const bool GetIsOpen() const { return isOpen_; }
 
+	const uint32_t GetClearCount() const { return clearCount_; }
 
+	// 障子のクリアカウントを加算
+	void AddClearCount() { ++clearCount_; }
+	// 障子の紙を作成
 	void CreatePaperObjects();
 
 protected:
@@ -42,10 +48,9 @@ protected:
 	// 更新
 	void ObjectUpdate(float dt) override;
 
-	void ApplyDerivedConfigFromJson(const nlohmann::json& root,
-									const nlohmann::json* derived) override;
-	void ExtractDerivedConfigToJson(nlohmann::json& root,
-									nlohmann::json& derived) const override;
+	// gui
+	void ApplyDerivedConfigFromJson(const nlohmann::json& root, const nlohmann::json* derived) override;
+	void ExtractDerivedConfigToJson(nlohmann::json& root, nlohmann::json& derived) const override;
 	void RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) override;
 
 private:
@@ -54,8 +59,16 @@ private:
 	std::array<std::shared_ptr<ShojiPaperObject>, 12> paperObjs_;
 	// 障子紙のGUID
 	std::array<Guid, 12> paperGuids_{};
-
 	// パラメータ
 	ShojiParam param_;
 
+	// 障子が開いているか
+	bool isOpen_ = false;
+	bool isStop_ = false;
+	// 障子が開くのに必要な数
+	uint32_t clearCount_ = 0;
+	// 障子の最初の座標
+	float offsetX_ = 0.0f;
+	// 障子の速度
+	float velocityX_ = 0.0f;
 };
