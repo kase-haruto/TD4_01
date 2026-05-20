@@ -25,15 +25,24 @@ void LuckyCatObject::OnCollisionEnter(Collider* other) {
 		return;
 	}
 	// 障子の紙の座標を取得する
-	shojiIndex_ = 0;
-	randIndex_ = static_cast<uint32_t>(rand() % 24);
-	if(randIndex_ >= 12) {
-		++shojiIndex_;
-		randIndex_ -= 12u;
+	int	 count = 0;
+	bool isHit = false;
+	while(!isHit) {
+		shojiIndex_ = 0;
+		randIndex_	= static_cast<uint32_t>(rand() % 24);
+		if(randIndex_ >= 12) {
+			++shojiIndex_;
+			randIndex_ -= 12u;
+		}
+		const auto& paperObj = shojiObjs_[shojiIndex_]->GetPaperObject()[randIndex_];
+		if(!paperObj->GetIsGetPosition() || count > 50) {
+			isHit = true;
+		}
+		paperObj->SetIsGetPosition(true);
+		targetPos_ = (paperObj->GetWorldTransform().translation * shojiObjs_[shojiIndex_]->GetWorldTransform().scale) +
+					 shojiObjs_[shojiIndex_]->GetWorldTransform().translation;
+		++count;
 	}
-	const auto& paperObj = shojiObjs_[shojiIndex_]->GetPaperObject()[randIndex_];
-	targetPos_ = (paperObj->GetWorldTransform().translation * shojiObjs_[shojiIndex_]->GetWorldTransform().scale) + 
-		shojiObjs_[shojiIndex_]->GetWorldTransform().translation;
 	// 収納箱の数をプラスする
 	worldTransform_.scale = param_.hitScale;
 	isParry_			  = true;
@@ -60,7 +69,7 @@ void LuckyCatObject::ObjectUpdate(float dt) {
 	ChangeScale();
 
 	// 障子に付いたら更新を切る
-	if(isShoji_) {
+	if(isShoji_) {		
 		const auto& paperObj = shojiObjs_[shojiIndex_]->GetPaperObject()[randIndex_];
 		worldTransform_.translation = (paperObj->GetWorldTransform().translation * shojiObjs_[shojiIndex_]->GetWorldTransform().scale) +
 					 shojiObjs_[shojiIndex_]->GetWorldTransform().translation + CalyxEngine::Vector3{0.0f, 0.0f, -0.5f};
