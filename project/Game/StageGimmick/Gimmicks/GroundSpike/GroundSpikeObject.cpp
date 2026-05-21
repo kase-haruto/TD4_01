@@ -26,11 +26,9 @@ void GroundSpikeObject::OnCollisionEnter(Collider* other) {
 
 	if(!isSpike_ || isBreak_) return;
 	isBreak_ = true;
+	isBuried_ = true;
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
-	}
-	if(model_) {
-		BaseGameObject::SetDrawEnable(false);
 	}
 }
 
@@ -44,6 +42,8 @@ void GroundSpikeObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(true);
 	}
 	isSpike_ = false;
+	isBreak_ = false;
+	isBuried_ = false;
 
 	worldTransform_.inheritScale = false;
 }
@@ -51,10 +51,18 @@ void GroundSpikeObject::ObjectInitialize() {
 void GroundSpikeObject::ObjectUpdate(float dt) {
 
 	// 飛び出す時の処理
-	if(isSpike_ && param_.popUpHeight > worldTransform_.GetWorldPosition().y) {
+	if(isSpike_ && !isBuried_ && param_.popUpHeight > worldTransform_.GetWorldPosition().y) {
 		float y = worldTransform_.translation.y;
 		y += param_.popUpSpeed * dt;
 		worldTransform_.translation.y = y;
+	}
+
+	// 埋まる時の処理
+	if (isBuried_) {
+		worldTransform_.translation.y -= (param_.popUpSpeed * 0.5f) * dt;
+		if (worldTransform_.translation.y < -5.0f) {
+			BaseGameObject::SetDrawEnable(false);
+		}
 	}
 
 }
