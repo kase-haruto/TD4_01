@@ -26,6 +26,7 @@
 // c++
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace EngineEdit {
@@ -128,6 +129,11 @@ namespace CalyxEngine {
 		void ToggleMode();
 		void DrawEditModeCombo();
 		void ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout);
+		void SaveActiveModeSelection();
+		void RestoreModeSelection(EngineEdit::EditToolMode mode);
+		SceneContext* ResolveModeContext(EngineEdit::EditToolMode mode) const;
+		SceneContext* ResolvePreviewContext(EngineEdit::EditToolMode mode) const;
+		void ActivateModeContext(EngineEdit::EditToolMode mode);
 		const char* GetEditToolModeName(EngineEdit::EditToolMode mode) const;
 		std::string GetEditToolModeLayoutPath(EngineEdit::EditToolMode mode) const;
 		std::string GetEditToolModeLoadLayoutPath(EngineEdit::EditToolMode mode) const;
@@ -185,6 +191,8 @@ namespace CalyxEngine {
 		bool		  lastPlaying_	  = false;
 		SceneContext* prevCtx_		  = nullptr;
 		EditorSelectionCoordinator selection_;
+		std::unordered_map<EngineEdit::EditToolMode, EditorSelectionCoordinator::Snapshot> modeSelections_;
+		EngineEdit::EditToolMode activeSelectionMode_ = EngineEdit::EditToolMode::Object;
 		nlohmann::json			   livePPSnapshot_;
 		// シーン保存のポップアップ表示
 		float		  sceneSavedPopupTimer_ = 0.0f;

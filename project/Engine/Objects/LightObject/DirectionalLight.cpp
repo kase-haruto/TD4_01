@@ -237,7 +237,6 @@ void DirectionalLight::ShowGui() {
 	ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
 	if(GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::ParameterData)) {
-		config_.ShowGui();
 		ImGui::Separator();
 		GuiCmd::EndSection();
 	}

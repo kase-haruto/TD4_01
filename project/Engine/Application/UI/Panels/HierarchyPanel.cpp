@@ -4,6 +4,7 @@
 /* ===================================================================== */
 
 #include <Data/Engine/Prefab/Serializer/PrefabSerializer.h>
+#include <Engine/Application/Effects/FxObject.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/System/AssetDragPayload.h>
@@ -211,7 +212,11 @@ namespace CalyxEngine {
 						if(ImGui::MenuItem("Animated Sprite 2D")) createRoot(std::make_shared<CalyxEngine::AnimatedSpriteSceneObject2d>());
 						ImGui::EndMenu();
 					}
-					if(ImGui::MenuItem("Particle System")) createRoot(std::make_shared<CalyxEngine::ParticleSystemObject>());
+					if(ImGui::BeginMenu("Effect")) {
+						if(ImGui::MenuItem("Fx Object")) createRoot(std::make_shared<CalyxEngine::FxObject>());
+						if(ImGui::MenuItem("Particle System")) createRoot(std::make_shared<CalyxEngine::ParticleSystemObject>());
+						ImGui::EndMenu();
+					}
 					ImGui::EndMenu();
 				}
 				ImGui::Separator();
@@ -440,7 +445,11 @@ namespace CalyxEngine {
 						if(ImGui::MenuItem("Animated Sprite 2D")) createChild(std::make_shared<CalyxEngine::AnimatedSpriteSceneObject2d>());
 						ImGui::EndMenu();
 					}
-					if(ImGui::MenuItem("Particle System")) createChild(std::make_shared<CalyxEngine::ParticleSystemObject>());
+					if(ImGui::BeginMenu("Effect")) {
+						if(ImGui::MenuItem("Fx Object")) createChild(std::make_shared<CalyxEngine::FxObject>());
+						if(ImGui::MenuItem("Particle System")) createChild(std::make_shared<CalyxEngine::ParticleSystemObject>());
+						ImGui::EndMenu();
+					}
 
 					ImGui::EndMenu();
 				}

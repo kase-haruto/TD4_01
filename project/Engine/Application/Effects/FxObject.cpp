@@ -7,6 +7,8 @@
 #include <Engine/Application/Effects/Particle/Emitter/GpuFxEmitter.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
+#include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
+#include <Engine/Foundation/Debug/CxAssert.h>
 
 namespace CalyxEngine {
 
@@ -54,7 +56,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::AlwaysUpdate(float) {
 		// 行列の更新
-		worldTransform_.Update();
+		SyncChildrenFromWorldTransform();
 	}
 
 	void FxObject::Destroy() {
@@ -127,9 +129,17 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::ShowGui() {
 
-		// コンフィグのセーブ・ロード
-		config_.ShowGui("Effect/" + GetName());
-
+		// コンフィグのセーブ・ローど
+		if(ImGui::Button("Load Effect")) {
+			IGFD::FileDialogConfig config;
+			config.path = kConfigRoot_.string();
+			ImGuiFileDialog::Instance()->OpenDialog(
+				"EffectLoadDialog",
+				"load effect",
+				".effect",
+				config);
+		}
+		LoadConfig();
 		// ルート Transform
 		worldTransform_.ShowImGui();
 
@@ -355,6 +365,20 @@ namespace CalyxEngine {
 
 	void FxObject::SetWorldPosition(const CalyxEngine::Vector3& pos) {
 		worldTransform_.translation = pos;
+		SyncChildrenFromWorldTransform();
+	}
+
+	void FxObject::SyncChildrenFromWorldTransform() {
+		worldTransform_.Update();
+
+		for(auto it = emitters_.begin(); it != emitters_.end();) {
+			if(auto sp = it->lock()) {
+				sp->SyncEmitterFromWorldTransform();
+				++it;
+			} else {
+				it = emitters_.erase(it);
+			}
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -403,6 +427,24 @@ namespace CalyxEngine {
 				// 期限切れを掃除
 				it = emitters_.erase(it);
 			}
+		}
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//		コンフィグのロード
+	/////////////////////////////////////////////////////////////////////////////////////////
+	void FxObject::LoadConfig() {
+		// asset/effect配下に.effect拡張子のファイルがあるか
+		if(FileSystemHelper::HasExtensionFile(kConfigRoot_,".effect")) {
+			if(ImGuiFileDialog::Instance()->Display("EffectLoadDialog")) {
+				if(ImGuiFileDialog::Instance()->IsOk()) {
+					std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+					LoadEffectAsset(filePath);
+				}
+				ImGuiFileDialog::Instance()->Close();
+			}
+		} else {
+			CX_CHECK(false, "Assertion failed");
 		}
 	}
 

@@ -4,6 +4,7 @@
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
 #include <Engine/Editor/BaseEditor.h>
 #include <Engine/Editor/SceneObjectEditor.h>
+#include <Engine/Objects/3D/Actor/Library/SceneObjectLibrary.h>
 #include <Engine/Objects/3D/Actor/SceneObject.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
@@ -78,6 +79,50 @@ namespace CalyxEngine {
 
 	void EditorSelectionCoordinator::Clear() {
 		SetSelectedObjects({});
+	}
+
+	void EditorSelectionCoordinator::ClearSceneContextSelection() {
+		if(auto* ctx = SceneContext::Current()) {
+			ctx->SetDebugSelectedObjects({});
+		}
+	}
+
+	void EditorSelectionCoordinator::PruneToContext(SceneContext* context) {
+		if(!context || !context->GetObjectLibrary()) {
+			Clear();
+			return;
+		}
+
+		std::vector<std::shared_ptr<SceneObject>> validObjects;
+		for(const auto& object : GetSelectedObjects()) {
+			if(object && context->GetObjectLibrary()->Contains(object)) {
+				validObjects.push_back(object);
+			}
+		}
+		SetSelectedObjects(validObjects);
+	}
+
+	EditorSelectionCoordinator::Snapshot EditorSelectionCoordinator::Capture() const {
+		Snapshot snapshot;
+		snapshot.selectedEditor = selectedEditor_;
+		snapshot.selectedObjects = selectedObjects_;
+		return snapshot;
+	}
+
+	void EditorSelectionCoordinator::Restore(const Snapshot& snapshot) {
+		if(snapshot.selectedEditor) {
+			SetSelectedEditor(snapshot.selectedEditor);
+			return;
+		}
+
+		std::vector<std::shared_ptr<SceneObject>> validObjects;
+		validObjects.reserve(snapshot.selectedObjects.size());
+		for(const auto& weak : snapshot.selectedObjects) {
+			if(auto object = weak.lock()) {
+				validObjects.push_back(object);
+			}
+		}
+		SetSelectedObjects(validObjects);
 	}
 
 	bool EditorSelectionCoordinator::HasSelection() const {

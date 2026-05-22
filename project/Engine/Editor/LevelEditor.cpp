@@ -404,15 +404,10 @@ namespace CalyxEngine {
 
 		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect) {
 			UpdateParticlePreviewContext(dt);
-			if(particlePreview_ && particlePreview_->Context()) {
-				particlePreview_->Context()->MakeCurrent();
-			}
 		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab) {
 			UpdatePrefabEditContext(dt);
-			if(prefabEdit_ && prefabEdit_->Context()) {
-				prefabEdit_->Context()->MakeCurrent();
-			}
 		}
+		ActivateModeContext(editToolMode_);
 
 		SceneContext* ctx = SceneContext::Current();
 
@@ -437,8 +432,7 @@ namespace CalyxEngine {
 			debugCam->SetInputEnabled(overDebugViewport && !focusMoving);
 		}
 
-		if(editToolMode_ != EngineEdit::EditToolMode::ParticleEffect &&
-		   debugViewport_ && debugViewport_->IsShow() && !guizmoActive && !uiBlocksClick) {
+		if(debugViewport_ && debugViewport_->IsShow() && !guizmoActive && !uiBlocksClick) {
 			if(viewportSelection_) viewportSelection_->UpdateInput();
 		} else if(!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
 			if(viewportSelection_) viewportSelection_->CancelRangeSelection();
@@ -501,12 +495,12 @@ namespace CalyxEngine {
 		NotifySceneContextChanged();
 		prevCtx_ = SceneContext::Current();
 		if(editToolMode_ == EngineEdit::EditToolMode::ParticleEffect && particlePreview_ && particlePreview_->Object()) {
-			if(particlePreview_->Context()) {
-				particlePreview_->Context()->MakeCurrent();
+			ActivateModeContext(editToolMode_);
+			if(!selection_.HasSelection()) {
+				SetSelectedObject(particlePreview_->Object());
 			}
-			SetSelectedObject(particlePreview_->Object());
 		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab && prefabEdit_ && prefabEdit_->Context()) {
-			prefabEdit_->Context()->MakeCurrent();
+			ActivateModeContext(editToolMode_);
 		}
 
 		// PlaySession 状態と EditorMode の同期 ------------------------------
@@ -796,15 +790,70 @@ namespace CalyxEngine {
 		if(prefabEdit_) prefabEdit_->Update(dt);
 	}
 
-	void LevelEditor::ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout) {
-		editToolMode_ = mode;
-		if(mode != EngineEdit::EditToolMode::ParticleEffect &&
-		   mode != EngineEdit::EditToolMode::Prefab &&
-		   sceneManager_) {
-			if(auto* active = sceneManager_->ActiveCtx()) {
-				active->MakeCurrent();
+	void LevelEditor::SaveActiveModeSelection() {
+		modeSelections_[activeSelectionMode_] = selection_.Capture();
+		selection_.ClearSceneContextSelection();
+	}
+
+	void LevelEditor::RestoreModeSelection(EngineEdit::EditToolMode mode) {
+		auto it = modeSelections_.find(mode);
+		if(it != modeSelections_.end()) {
+			selection_.Restore(it->second);
+			if(!it->second.selectedEditor) {
+				selection_.PruneToContext(ResolveModeContext(mode));
+			}
+			return;
+		} else {
+			ClearSelection();
+			if(mode == EngineEdit::EditToolMode::ParticleEffect &&
+			   particlePreview_ &&
+			   particlePreview_->Object()) {
+				SetSelectedObject(particlePreview_->Object());
 			}
 		}
+
+		selection_.PruneToContext(ResolveModeContext(mode));
+	}
+
+	SceneContext* LevelEditor::ResolveModeContext(EngineEdit::EditToolMode mode) const {
+		switch(mode) {
+		case EngineEdit::EditToolMode::ParticleEffect:
+			return particlePreview_ ? particlePreview_->Context() : nullptr;
+		case EngineEdit::EditToolMode::Prefab:
+			return prefabEdit_ ? prefabEdit_->Context() : nullptr;
+		default:
+			return sceneManager_ ? sceneManager_->ActiveCtx() : SceneContext::Current();
+		}
+	}
+
+	SceneContext* LevelEditor::ResolvePreviewContext(EngineEdit::EditToolMode mode) const {
+		switch(mode) {
+		case EngineEdit::EditToolMode::ParticleEffect:
+			return particlePreview_ ? particlePreview_->Context() : nullptr;
+		case EngineEdit::EditToolMode::Prefab:
+			return prefabEdit_ ? prefabEdit_->Context() : nullptr;
+		default:
+			return nullptr;
+		}
+	}
+
+	void LevelEditor::ActivateModeContext(EngineEdit::EditToolMode mode) {
+		SceneContext* context = ResolveModeContext(mode);
+		if(context) {
+			context->MakeCurrent();
+		}
+		if(sceneManager_) {
+			sceneManager_->SetEditorPreviewContext(ResolvePreviewContext(mode));
+		}
+	}
+
+	void LevelEditor::ApplyEditToolMode(EngineEdit::EditToolMode mode, bool applyLayout) {
+		const bool modeChanged = mode != editToolMode_;
+		if(modeChanged) {
+			SaveActiveModeSelection();
+		}
+
+		editToolMode_ = mode;
 
 		auto setShow = [](IEngineUI* panel, bool show) {
 			if(panel) {
@@ -819,7 +868,6 @@ namespace CalyxEngine {
 
 		switch(mode) {
 		case EngineEdit::EditToolMode::Object:
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);
@@ -832,7 +880,6 @@ namespace CalyxEngine {
 			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Object2D:
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			if(mainViewport_) mainViewport_->SetShow(true);
 			if(debugViewport_) debugViewport_->SetShow(false);
 			if(mainViewport_) mainViewport_->SetOverlayToolsEnabled(true);
@@ -849,7 +896,6 @@ namespace CalyxEngine {
 			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::SpriteAnimation:
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			if(mainViewport_) mainViewport_->SetShow(false);
 			if(debugViewport_) debugViewport_->SetShow(false);
 			setShow(hierarchy_.get(), false);
@@ -865,8 +911,6 @@ namespace CalyxEngine {
 			break;
 		case EngineEdit::EditToolMode::Prefab:
 			EnsurePrefabEditContext();
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(prefabEdit_ ? prefabEdit_->Context() : nullptr);
-			if(prefabEdit_ && prefabEdit_->Context()) prefabEdit_->Context()->MakeCurrent();
 			if(mainViewport_) mainViewport_->SetShow(false);
 			if(debugViewport_) debugViewport_->SetShow(true);
 			if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(true);
@@ -883,17 +927,14 @@ namespace CalyxEngine {
 			break;
 		case EngineEdit::EditToolMode::ParticleEffect:
 			EnsureParticlePreviewContext();
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(particlePreview_ ? particlePreview_->Context() : nullptr);
-			if(particlePreview_ && particlePreview_->Context()) particlePreview_->Context()->MakeCurrent();
-			if(particlePreview_ && particlePreview_->Object()) SetSelectedObject(particlePreview_->Object());
 			if(mainViewport_) mainViewport_->SetShow(false);
 			if(debugViewport_) debugViewport_->SetShow(true);
-			if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(false);
-			setShow(hierarchy_.get(), false);
-			setShow(editor_.get(), false);
+			if(debugViewport_) debugViewport_->SetOverlayToolsEnabled(true);
+			setShow(hierarchy_.get(), true);
+			setShow(editor_.get(), true);
 			setShow(inspector_.get(), true);
 			setShow(keyframePanel_.get(), false);
-			setShow(placeToolPanel_.get(), false);
+			setShow(placeToolPanel_.get(), true);
 			setShow(splineEditor_.get(), false);
 			setShow(assetPanel_.get(), true);
 			setShow(materialNodeEditorPanel_.get(), false);
@@ -901,7 +942,6 @@ namespace CalyxEngine {
 			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::PostEffect:
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), false);
@@ -914,7 +954,6 @@ namespace CalyxEngine {
 			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Material:
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), false);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
@@ -927,7 +966,6 @@ namespace CalyxEngine {
 			setShow(spriteAnimationEditorPanel_.get(), false);
 			break;
 		case EngineEdit::EditToolMode::Animation:
-			if(sceneManager_) sceneManager_->SetEditorPreviewContext(nullptr);
 			setShow(hierarchy_.get(), true);
 			setShow(editor_.get(), false);
 			setShow(inspector_.get(), true);
@@ -941,6 +979,15 @@ namespace CalyxEngine {
 			break;
 		default:
 			break;
+		}
+
+		ActivateModeContext(mode);
+		if(modeChanged) {
+			activeSelectionMode_ = mode;
+			RestoreModeSelection(mode);
+			NotifySceneContextChanged();
+		} else {
+			selection_.PruneToContext(ResolveModeContext(mode));
 		}
 
 		if(applyLayout && layoutSwitcher_) {
@@ -1112,12 +1159,11 @@ namespace CalyxEngine {
 	//=============================================================================
 	void LevelEditor::RenderViewport(ViewportType type, const ImTextureID& tex) {
 		SceneContext* previousContext = nullptr;
-		if(type == ViewportType::VIEWPORT_DEBUG &&
-		   editToolMode_ == EngineEdit::EditToolMode::Prefab &&
-		   prefabEdit_ &&
-		   prefabEdit_->Context()) {
-			previousContext = SceneContext::Current();
-			prefabEdit_->Context()->MakeCurrent();
+		if(type == ViewportType::VIEWPORT_DEBUG) {
+			if(SceneContext* previewContext = ResolvePreviewContext(editToolMode_)) {
+				previousContext = SceneContext::Current();
+				previewContext->MakeCurrent();
+			}
 		}
 
 		auto restoreContext = [&]() {
@@ -1251,7 +1297,7 @@ namespace CalyxEngine {
 			hierarchy_->RefreshCache();
 		}
 
-		ClearSelection();
+		selection_.PruneToContext(current);
 
 		if(current) {
 			current->AddOnObjectRemovedListener(

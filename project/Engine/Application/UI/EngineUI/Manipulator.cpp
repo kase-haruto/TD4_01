@@ -6,12 +6,15 @@
 #include "Engine/Application/System/Environment.h"
 #include "Engine/Assets/Manager/AssetManager.h"
 
+#include <Engine/Application/Effects/FxObject.h>
+#include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Editor/SceneObjectEditor.h>
 #include <Engine/Foundation/Math/Matrix4x4.h>
 #include <Engine/Foundation/Math/MathUtil.h>
 #include <Engine/Foundation/Utility/Func/CxUtils.h>
 #include <Engine/Graphics/Camera/Base/BaseCamera.h>
+#include <Engine/Objects/3D/Actor/Library/SceneObjectLibrary.h>
 #include <Engine/Objects/Transform/Transform.h>
 #include <Engine/Renderer/Primitive/PrimitiveDrawer.h>
 #include <Engine/Scene/Context/SceneContext.h>
@@ -21,6 +24,26 @@
 #include <cmath>
 
 namespace CalyxEngine {
+
+	namespace {
+		void SyncEffectTransformTarget(WorldTransform* target) {
+			if(!target) return;
+
+			auto* context = SceneContext::Current();
+			if(!context || !context->GetObjectLibrary()) return;
+
+			for(const auto& object : context->GetObjectLibrary()->GetAllObjectsShared()) {
+				if(!object || &object->GetWorldTransform() != target) continue;
+
+				if(auto fx = std::dynamic_pointer_cast<FxObject>(object)) {
+					fx->SyncChildrenFromWorldTransform();
+				} else if(auto ps = std::dynamic_pointer_cast<ParticleSystemObject>(object)) {
+					ps->SyncEmitterFromWorldTransform();
+				}
+				return;
+			}
+		}
+	}
 
 	Manipulator::Manipulator() {
 		iconTranslate_.texture = reinterpret_cast<ImTextureID>(AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/translate.dds").ptr);
@@ -173,6 +196,7 @@ namespace CalyxEngine {
 
 		target->rotationSource = RotationSource::Quaternion;
 		target->Update();
+		SyncEffectTransformTarget(target);
 	}
 
 	void Manipulator::Manipulate() {
@@ -392,6 +416,11 @@ namespace CalyxEngine {
 		}
 
 		// Undoコマンド管理
+		if(usingNow && !groupMode && target_) {
+			target_->Update();
+			SyncEffectTransformTarget(target_);
+		}
+
 		if(!usingNow && wasUsing && scopedCmd) {
 			scopedCmd->CaptureAfter();
 			if(!scopedCmd->IsTrivial())

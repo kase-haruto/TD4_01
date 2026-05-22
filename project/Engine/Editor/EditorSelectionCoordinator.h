@@ -15,6 +15,11 @@ namespace CalyxEngine {
 
 	class EditorSelectionCoordinator {
 	public:
+		struct Snapshot {
+			BaseEditor* selectedEditor = nullptr;
+			std::vector<std::weak_ptr<SceneObject>> selectedObjects;
+		};
+
 		void Bind(HierarchyPanel* hierarchy,
 				  InspectorPanel* inspector,
 				  SceneObjectEditor* sceneEditor);
@@ -24,6 +29,10 @@ namespace CalyxEngine {
 		void ToggleSelectedObject(const std::shared_ptr<SceneObject>& object);
 		void SetSelectedObjects(const std::vector<std::shared_ptr<SceneObject>>& objects);
 		void Clear();
+		void ClearSceneContextSelection();
+		void PruneToContext(SceneContext* context);
+		Snapshot Capture() const;
+		void Restore(const Snapshot& snapshot);
 
 		bool HasSelection() const;
 		bool IsSelected(const SceneObject* object) const;
