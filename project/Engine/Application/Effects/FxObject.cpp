@@ -7,8 +7,7 @@
 #include <Engine/Application/Effects/Particle/Emitter/GpuFxEmitter.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
-#include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
-#include <Engine/Foundation/Debug/CxAssert.h>
+#include <filesystem>
 
 namespace CalyxEngine {
 
@@ -131,6 +130,7 @@ namespace CalyxEngine {
 
 		// コンフィグのセーブ・ローど
 		if(ImGui::Button("Load Effect")) {
+			std::filesystem::create_directories(kConfigRoot_);
 			IGFD::FileDialogConfig config;
 			config.path = kConfigRoot_.string();
 			ImGuiFileDialog::Instance()->OpenDialog(
@@ -139,7 +139,12 @@ namespace CalyxEngine {
 				".effect",
 				config);
 		}
-		LoadConfig();
+		if(ImGuiFileDialog::Instance()->Display("EffectLoadDialog")) {
+			if(ImGuiFileDialog::Instance()->IsOk()) {
+				LoadEffectAsset(ImGuiFileDialog::Instance()->GetFilePathName());
+			}
+			ImGuiFileDialog::Instance()->Close();
+		}
 		// ルート Transform
 		worldTransform_.ShowImGui();
 
@@ -150,6 +155,7 @@ namespace CalyxEngine {
 		ImGui::SameLine();
 		if(ImGui::Button("Reset All")) RestartAll();
 		if(ImGui::Button("Save Effect Asset")) {
+			std::filesystem::create_directories(kConfigRoot_);
 			SaveEffectAsset("Resources/Assets/Effects/" + GetName() + ".effect");
 		}
 
@@ -430,23 +436,6 @@ namespace CalyxEngine {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//		コンフィグのロード
-	/////////////////////////////////////////////////////////////////////////////////////////
-	void FxObject::LoadConfig() {
-		// asset/effect配下に.effect拡張子のファイルがあるか
-		if(FileSystemHelper::HasExtensionFile(kConfigRoot_,".effect")) {
-			if(ImGuiFileDialog::Instance()->Display("EffectLoadDialog")) {
-				if(ImGuiFileDialog::Instance()->IsOk()) {
-					std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-					LoadEffectAsset(filePath);
-				}
-				ImGuiFileDialog::Instance()->Close();
-			}
-		} else {
-			CX_CHECK(false, "Assertion failed");
-		}
-	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//		エミッター単位
