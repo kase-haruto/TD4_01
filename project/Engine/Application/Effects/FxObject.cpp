@@ -277,9 +277,10 @@ namespace CalyxEngine {
 			// 予約削除を実行
 			if(removeIndex >= 0 && removeIndex < static_cast<int>(emitters_.size())) {
 				if(auto sp = emitters_[removeIndex].lock()) {
-					sp->SetParent(nullptr);
+					RemoveEmitterByGuid(sp->GetGuid());
+				} else {
+					emitters_.erase(emitters_.begin() + removeIndex);
 				}
-				emitters_.erase(emitters_.begin() + removeIndex);
 			}
 
 			ImGui::EndTabBar();
@@ -393,13 +394,24 @@ namespace CalyxEngine {
 	void FxObject::RebuildChildrenFromConfig() {
 		++emitterRevision_;
 
-		// 既存の子（このFxObject直下の ParticleSystemObject）を外す
+		std::vector<std::shared_ptr<ParticleSystemObject>> oldEmitters;
+		oldEmitters.reserve(emitters_.size());
 		for(auto& wp : emitters_) {
 			if(auto sp = wp.lock()) {
-				sp->SetParent(nullptr);
+				oldEmitters.push_back(sp);
 			}
 		}
 		emitters_.clear();
+
+		if(auto* ctx = SceneContext::Current()) {
+			for(auto& sp : oldEmitters) {
+				ctx->RemoveObject(sp);
+			}
+		} else {
+			for(auto& sp : oldEmitters) {
+				sp->SetParent(nullptr);
+			}
+		}
 
 		// Config から再構築
 		const auto& cfg = config_.GetConfig();
@@ -480,9 +492,13 @@ namespace CalyxEngine {
 				continue;
 			}
 			if(sp->GetGuid() == id) {
-				sp->SetParent(nullptr);
 				it = emitters_.erase(it);
 				++emitterRevision_;
+				if(auto* ctx = SceneContext::Current()) {
+					ctx->RemoveObject(sp);
+				} else {
+					sp->SetParent(nullptr);
+				}
 			} else {
 				++it;
 			}
