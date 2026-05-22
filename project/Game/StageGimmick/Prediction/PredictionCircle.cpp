@@ -26,7 +26,7 @@ void PredictionCircle::Initialize() {
 	SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 }
 
-void PredictionCircle::Update(float) {
+void PredictionCircle::Update(float dt) {
 
 	if(targetObjectY_ == 0.0f && worldTransform_.parent) {
 		targetObjectY_ = worldTransform_.parent->GetWorldPosition().y;
@@ -36,6 +36,9 @@ void PredictionCircle::Update(float) {
 	const auto& parent = worldTransform_.parent;
 	if(parent) {
 		float scale = parent->GetWorldPosition().y / targetObjectY_;
-		worldTransform_.scale = CalyxEngine::Vector3::One() * scale;
+		worldTransform_.scale = CalyxEngine::Vector3::One() * scale * objectScale_;
+
+		radian_ += dt;
+		worldTransform_.rotation = CalyxEngine::Quaternion::MakeRotateY(radian_);
 	}
 }
