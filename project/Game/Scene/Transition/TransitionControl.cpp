@@ -175,34 +175,38 @@ void TransitionControl::SetPresetUpDownSlide() {
 	plate1_->Update(0.0f);
 	plate2_->Update(0.0f);
 	plate3_->Update(0.0f);
-	plateAnim1_->Play("Wave");
-	plateAnim2_->Play("Wave");
-	plateAnim3_->Play("Wave");
+	if(plateAnim1_) plateAnim1_->Play("Wave");
+	if(plateAnim2_) plateAnim2_->Play("Wave");
+	if(plateAnim3_) plateAnim3_->Play("Wave");
+
 	SetUpdateFunc([this](float progress, CalyxEngine::SpriteObject2d* p1, CalyxEngine::SpriteObject2d* p2, CalyxEngine::SpriteObject2d* p3) {
-		if(!p2) return;
-		if(!p3) return;
+		if(!p1 || !p2 || !p3) return;
 		float w	 = static_cast<float>(kWindowWidth);
 		float h = static_cast<float>(kWindowHeight);
-		//float halfH = static_cast<float>(kWindowHeight) * 0.5f;
-		float x1	= 0.0f;
-		float x2	= 0.0f;
 
-		p1->SetScale({w, h * 1.75f});
-		p2->SetScale({w, h * 1.75f});
-		p3->SetScale({w, h * 1.75f});
+		p1->SetScale({w, h * 1.5f});
+		p2->SetScale({w, h * 1.5f});
+		p3->SetScale({w, h * 1.5f});
 
 		if(state_ == TransitionState::Closing) {
-			// 画面外から画面内へ
-			x1 = w - w * progress;
-			x2 = -w + w * progress;
+			// 1: 0.0-0.5, 2: 0.25-0.75, 3: 0.5-1.0
+			float p1_local = std::clamp((progress - 0.00f) / 0.5f, 0.0f, 1.0f);
+			float p2_local = std::clamp((progress - 0.25f) / 0.5f, 0.0f, 1.0f);
+			float p3_local = std::clamp((progress - 0.50f) / 0.5f, 0.0f, 1.0f);
+
+			p1->SetPosition({0.0f, h + (-360.0f - h) * p1_local});
+			p2->SetPosition({0.0f, h + (-540.0f - h) * p2_local});
+			p3->SetPosition({0.0f, h + (-720.0f - h) * p3_local});
 		} else {
-			// 画面内から画面外へ
-			x1 = -w * progress;
-			x2 = w * progress;
+			// 3: 0.0-0.5, 2: 0.25-0.75, 1: 0.5-1.0
+			float p3_local = std::clamp((progress - 0.00f) / 0.5f, 0.0f, 1.0f);
+			float p2_local = std::clamp((progress - 0.25f) / 0.5f, 0.0f, 1.0f);
+			float p1_local = std::clamp((progress - 0.50f) / 0.5f, 0.0f, 1.0f);
+
+			p3->SetPosition({0.0f, -720.0f + (h - (-720.0f)) * p3_local});
+			p2->SetPosition({0.0f, -540.0f + (h - (-540.0f)) * p2_local});
+			p1->SetPosition({0.0f, -360.0f + (h - (- 360.0f)) * p1_local});
 		}
-		p1->SetPosition({x1, -h * 0.75f});
-		p2->SetPosition({x2, -h * 1.05f});
-		p3->SetPosition({x1, -h * 1.35f});
 	});
 }
 
@@ -268,12 +272,12 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 		isDrawPlate2_ = true;
 		isDrawPlate3_ = true;
 		InitAnim();
-		plate1_->SetScale({w, h * 1.75f});
-		plate2_->SetScale({w, h * 1.75f});
-		plate3_->SetScale({w, h * 1.75f});
-		plate1_->SetPosition({0.0f, -h * 0.75f});
-		plate2_->SetPosition({0.0f, -h * 1.05f});
-		plate3_->SetPosition({0.0f, -h * 1.35f});
+		plate1_->SetScale({w, h * 1.5f});
+		plate2_->SetScale({w, h * 1.5f});
+		plate3_->SetScale({w, h * 1.5f});
+		plate1_->SetPosition({0.0f, -360.0f});
+		plate2_->SetPosition({0.0f, -540.0f});
+		plate3_->SetPosition({0.0f, -720.0f});
 		SetPresetUpDownSlide();
 	}
 	// ゲームからセレクトに来た時は観音開きで開ける
