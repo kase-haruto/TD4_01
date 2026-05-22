@@ -94,7 +94,7 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({0.0f, 2.0f, 30.0f});
+		newDoor->SetTranslate({0.0f, 0.0f, 35.0f});
 		doorL_	  = newDoor;
 		doorLGuid_ = newDoor->GetGuid();
 	}
@@ -119,13 +119,13 @@ void BellProjectileEvent::EventInitialize() {
 		doorR_ = doorR;
 		doorRGuid_ = doorR->GetGuid();
 	} else {
-		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorRName);
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoorR.obj", doorRName);
 		newDoor->SetParent(shared_from_this(), false);
 		newDoor->SetLR(1);
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({0.0f, 2.0f, 30.0f});
+		newDoor->SetTranslate({0.0f, 0.0f, 35.0f});
 		doorR_	  = newDoor;
 		doorRGuid_ = newDoor->GetGuid();
 	}
