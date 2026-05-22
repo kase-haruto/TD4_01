@@ -135,7 +135,6 @@ void BaseEventObject::DerivativeGui() {
 }
 
 void BaseEventObject::ConfigGUi() {
-	baseConfig_.ShowGui("Event/" + GetName());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -198,7 +198,7 @@ void BaseGameObject::ShowGui() {
 	}
 }
 
-void BaseGameObject::HeaderGui() { config_.ShowGui(); }
+void BaseGameObject::HeaderGui() {}
 
 void BaseGameObject::DerivativeGui() { ImGui::SeparatorText("derivative"); }
 

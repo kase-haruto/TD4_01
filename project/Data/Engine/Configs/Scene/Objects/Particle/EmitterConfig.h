@@ -72,6 +72,7 @@ namespace CalyxEngine {
 		cameraDitherEnabled = j.value("cameraDitherEnabled", false);
 		cameraDitherNear = j.value("cameraDitherNear", 0.0f);
 		cameraDitherFar = j.value("cameraDitherFar", 20.0f);
+		billboardMode = j.value("billboardMode", BillboardMode::Full);
 		emitterShape   = j.value("emitterShape", EmitterShape::Point);
 		shapeSize      = j.value("shapeSize", CalyxEngine::Vector3{1.0f, 1.0f, 1.0f});
 		shapeRadius    = j.value("shapeRadius", 1.0f);
@@ -131,6 +132,7 @@ namespace CalyxEngine {
 		j["cameraDitherEnabled"] = cameraDitherEnabled;
 		j["cameraDitherNear"] = cameraDitherNear;
 		j["cameraDitherFar"] = cameraDitherFar;
+		j["billboardMode"] = billboardMode;
 		j["blendMode"]		= blendMode;
 		j["emitterShape"]  = emitterShape;
 		j["shapeSize"]     = shapeSize;

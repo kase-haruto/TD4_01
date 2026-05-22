@@ -82,6 +82,7 @@ namespace CalyxEngine {
 		//===================================================================*/
 		void RebuildChildrenFromConfig(); // Config 子ノード再構築
 		void SyncConfigFromChildren();	  // 子ノード Config 反映
+		void LoadConfig();
 
 		//--------- add remove ------------------------------------------------
 		void RemoveEmitterByGuid(const Guid& id);
@@ -92,6 +93,7 @@ namespace CalyxEngine {
 		//===================================================================*/
 		//					private methods
 		//===================================================================*/
+		const std::filesystem::path kConfigRoot_ = "Resources/Assets/Effects/";
 		ConfigurableObject<EffectObjectConfig>			 config_;
 		std::vector<std::weak_ptr<ParticleSystemObject>> emitters_;
 		uint64_t										 emitterRevision_ = 0;
