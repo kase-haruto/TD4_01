@@ -30,7 +30,8 @@ namespace CalyxEngine {
 	EffectAsset::EffectAsset(EffectAssetData data)
 		: data_(std::move(data)) {}
 
-	bool EffectAsset::Load(const std::string& name) {
+	bool EffectAsset::Load(const std::filesystem::path& path) {
+		const std::string name = path.stem().string();
 		const std::filesystem::path& fullPath = "Resources/Assets/Effects/" + name + ".effect";
 		nlohmann::json root;
 		if(!ReadJson(fullPath, root)) return false;

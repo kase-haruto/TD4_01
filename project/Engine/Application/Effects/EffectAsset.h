@@ -22,7 +22,7 @@ namespace CalyxEngine {
 		const std::string& GetName() const { return data_.name; }
 		void			   SetName(const std::string& name) { data_.name = name; }
 
-		bool Load(const std::string& path);
+		bool Load(const std::filesystem::path& path);
 		bool Save(const std::filesystem::path& path) const;
 
 		static EffectAsset FromObjectConfig(const EffectObjectConfig& config);
