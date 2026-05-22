@@ -156,21 +156,21 @@ void TestScene::InitPauseResource() {
 	const std::string whiteTex = "Textures/white1x1.dds";
 	resumeBtn_				   = std::make_unique<CalyxEngine::SpriteObject2d>();
 	resumeBtn_->Initialize(whiteTex);
-	resumeBtn_->SetPosition({640.0f, 200.0f});
+	resumeBtn_->SetPosition({640.0f, 125.0f});
 	resumeBtn_->SetScale({300.0f, 60.0f});
 	resumeBtn_->SetAnchorPoint({0.5f, 0.5f});
 	resumeBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
 	toSelectBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
 	toSelectBtn_->Initialize(whiteTex);
-	toSelectBtn_->SetPosition({640.0f, 350.0f});
+	toSelectBtn_->SetPosition({640.0f, 250.0f});
 	toSelectBtn_->SetScale({300.0f, 60.0f});
 	toSelectBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
 	toTitleBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
 	toTitleBtn_->Initialize(whiteTex);
-	toTitleBtn_->SetPosition({640.0f, 500.0f});
+	toTitleBtn_->SetPosition({640.0f, 375.0f});
 	toTitleBtn_->SetScale({300.0f, 60.0f});
 	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
@@ -184,14 +184,14 @@ void TestScene::InitPauseResource() {
 	fanBg_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	auto asset = std::make_shared<CalyxEngine::SpriteAnimationAsset>();
-	asset->division	   = {7, 1}; // 例: 4x4分割
+	asset->division	   = {6, 1}; // 例: 4x4分割
 	asset->texturePath = "Textures/Pause/fan.png";
 
 	CalyxEngine::SpriteAnimationClip clip;
 	clip.name		  = "FanOpen";
 	clip.startFrame	  = 0;
-	clip.frameCount	  = 7;
-	clip.frameDuration = 0.6f / 7.0f;
+	clip.frameCount	  = 6;
+	clip.frameDuration = 0.6f / 6.0f;
 	clip.loop		  = false;
 	asset->clips.push_back(clip);
 

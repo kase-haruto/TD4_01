@@ -87,7 +87,7 @@ void TitleScene::Update([[maybe_unused]] float dt) {
 		IsPhase_ = true;
 		payload_ = BuildNowTypePayload(SceneType::TITLE);
 		transitionControl_->SetAutoPreset(SceneType::TITLE, SceneType::SELECT);
-		transitionControl_->StartClosing(0.5f, [this]() {
+		transitionControl_->StartClosing(0.75f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
 		});
 	}

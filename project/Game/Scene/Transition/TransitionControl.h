@@ -105,12 +105,16 @@ public:
 	void SetTexturePlate3(const std::string& texPath3);
 
 private:
+	void InitAnim();
+
 	TransitionState state_ = TransitionState::Idle;
 
 	std::unique_ptr<CalyxEngine::SpriteObject2d> plate1_ = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteObject2d> plate2_ = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteObject2d> plate3_ = nullptr;
-	std::unique_ptr<CalyxEngine::SpriteAnimator2d> plateAnim_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteAnimator2d> plateAnim1_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteAnimator2d> plateAnim2_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteAnimator2d> plateAnim3_ = nullptr;
 
 	float timer_	= 0.0f;
 	float duration_ = 1.0f;
