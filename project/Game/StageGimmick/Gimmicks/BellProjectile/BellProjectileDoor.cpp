@@ -26,7 +26,7 @@ void BellProjectileDoor::ObjectInitialize() {
 	worldTransform_.scale = param_.scale;
 	worldTransform_.rotationSource = RotationSource::Euler;
 	if (lr_ == 1) {
-		worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f);
+		//worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f);
 	} else {
 		worldTransform_.eulerRotation.y = 0.0f;
 	}
@@ -51,9 +51,9 @@ void BellProjectileDoor::ObjectUpdate(float dt) {
 
 		float angle = openRate_ * CalyxEngine::ToRadians(90.0f);
 		if (lr_ == 0) {
-			worldTransform_.eulerRotation.y = angle;
+			worldTransform_.eulerRotation.y = -angle;
 		} else {
-			worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f) + angle;
+			worldTransform_.eulerRotation.y = angle;
 		}
 	}
 }

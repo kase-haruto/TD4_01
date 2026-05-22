@@ -63,7 +63,7 @@ void BellProjectileEvent::EventInitialize() {
 		newObj->SetParam(eventParam_.param_);
 		newObj->SetTarget(bell_.lock().get());
 		newObj->Initialize();
-		newObj->SetTranslate({0.0f, 0.5f, 15.0f});
+		newObj->SetTranslate({0.0f, 1.0f, 15.0f});
 		targetObject_	  = newObj;
 		targetObjectGuid_ = newObj->GetGuid();
 	}
@@ -94,7 +94,7 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({0.0f, 0.0f, 35.0f});
+		newDoor->SetTranslate({-12.0f, 0.0f, 35.0f});
 		doorL_	  = newDoor;
 		doorLGuid_ = newDoor->GetGuid();
 	}
@@ -125,7 +125,7 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({0.0f, 0.0f, 35.0f});
+		newDoor->SetTranslate({12.0f, 0.0f, 35.0f});
 		doorR_	  = newDoor;
 		doorRGuid_ = newDoor->GetGuid();
 	}
