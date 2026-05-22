@@ -57,6 +57,7 @@ private:
 			AddField("scale", param.scale).Category("ProjectileFireEvent");
 			AddField("speed", param.speed).Category("ProjectileFireEvent");
 			AddField("targetTime", param.targetTime).Category("ProjectileFireEvent");
+			AddField("parryPositionY", param.parryPositionY).Category("ProjectileFireEvent");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

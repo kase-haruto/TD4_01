@@ -23,9 +23,11 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 		return;
 	}
 	// コライダーとモデルを無効化
-	isFlying_ = false;
 	isHit_		= isPlayer;
 	isParry_	= isPlayerAttack;
+	if(isHit_) {
+		isFlying_ = false;
+	}
 	targetTime_ = 0.0f;
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
@@ -46,6 +48,10 @@ void ProjectileObject::ObjectInitialize() {
 
 void ProjectileObject::ObjectUpdate(float dt) {
 
+	if(worldTransform_.translation.y > param_.parryPositionY) {
+		return;
+	}
+
 	if(!isFlying_) {
 		if(targetTime_< 1.0f && isHit_) {
 			targetTime_ += dt;
@@ -55,13 +61,27 @@ void ProjectileObject::ObjectUpdate(float dt) {
 			}
 		}
 	} else {
-		if(param_.targetTime > targetTime_) {
+		if(param_.targetTime > targetTime_ && !isParry_) {
 			targetTime_ += dt;
 			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
 			velocity_	= player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
 		}
+		if(isParry_) {
+			velocity_ = CalyxEngine::Vector3::Forward() + CalyxEngine::Vector3::Up();
+		}
 	}
 
-	velocity_ = velocity_.Normalize() * param_.speed * dt;
-	worldTransform_.translation += velocity_;
+	if(velocity_.Length() != 0.0f) {
+		// 移動処理
+		velocity_ = velocity_.Normalize() * param_.speed * dt;
+		CalyxEngine::Vector3 prePos = worldTransform_.translation;
+		worldTransform_.translation += velocity_;
+		// 回転処理
+		auto rotation = CalyxEngine::Quaternion::LookAt(
+			prePos,
+			worldTransform_.translation,
+			-CalyxEngine::Vector3::Up());
+		worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
+			worldTransform_.rotation, rotation, 0.2f);
+	}
 }
