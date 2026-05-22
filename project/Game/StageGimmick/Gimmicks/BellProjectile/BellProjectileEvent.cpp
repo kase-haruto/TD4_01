@@ -38,7 +38,7 @@ void BellProjectileEvent::EventInitialize() {
 		bell_ = target;
 		bellGuid_ = target->GetGuid();
 	} else {
-		auto newTarget = SceneAPI::Instantiate<BellProjectileTarget>("cone.obj", targetName);
+		auto newTarget = SceneAPI::Instantiate<BellProjectileTarget>("bell.obj", targetName);
 		newTarget->SetParent(shared_from_this(), false);
 		newTarget->SetParam(eventParam_.targetParam_);
 		newTarget->Initialize();
@@ -58,7 +58,7 @@ void BellProjectileEvent::EventInitialize() {
 		targetObject_ = obj;
 		targetObjectGuid_ = obj->GetGuid();
 	} else {
-		auto newObj = SceneAPI::Instantiate<BellProjectileObject>("debugCube.obj", objectName);
+		auto newObj = SceneAPI::Instantiate<BellProjectileObject>("woodenBellHammer.obj", objectName);
 		newObj->SetParent(shared_from_this(), false);
 		newObj->SetParam(eventParam_.param_);
 		newObj->SetTarget(bell_.lock().get());
@@ -79,7 +79,7 @@ void BellProjectileEvent::EventInitialize() {
 		door_ = door;
 		doorGuid_ = door->GetGuid();
 	} else {
-		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("debugCube.obj", doorName);
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorName);
 		newDoor->SetParent(shared_from_this(), false);
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());

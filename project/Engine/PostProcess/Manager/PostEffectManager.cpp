@@ -100,8 +100,13 @@ void PostEffectManager::Initialize(PipelineService* service,bool enableAll){
 	// CopyImage と Blend はグラフ内の専用ノードとして扱う
 	for (auto& s : collection_.GetSlots()){ if (s.name == kCopyImageName || s.name == kBlendName) s.enabled = false; }
 
+	//defaultのeffectを使用する
+
+
 	dirty_ = true;
 	initialized_ = true;
+
+	LoadPreset(kDefaultPaht);
 }
 
 // ---------- Toggle ----------

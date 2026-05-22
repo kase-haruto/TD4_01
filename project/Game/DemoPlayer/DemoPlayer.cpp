@@ -1,8 +1,12 @@
 #include "DemoPlayer.h"
+
+#include "Engine/Assets/Manager/AssetManager.h"
 #include "Engine/Foundation/Input/Input.h"
 #include "Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h"
 #include "Engine/Scene/Utility/SceneUtility.h"
 #include "Engine/Objects/Collider/BoxCollider.h"
+#include "Engine/PostProcess/Manager/PostEffectManager.h"
+
 #include <Game/DemoShockwave/ShockwaveManager.h>
 #include <algorithm>
 #include <cmath>
@@ -87,7 +91,15 @@ void DemoPlayer::Update(float dt) {
 	moveSpeed_ = param_.moveSpeed;
 
 	Move(dt);
-	ApplyGravity(dt);
+	LandingEvents landingEvents = ApplyGravity(dt);
+	if(landingEvents.hardLanded) {
+		//強い衝撃時の処理
+		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale);
+		//カメラシェイク
+		CameraManager::GetMain3d()->StartShake(param_.shakeParm.duration, param_.shakeParm.intensity);
+		PostEffectManager::Get()->PlayTriggeredEffect("PlayerShock");
+
+	}
 	UpdatePopScale(dt);
 	HammerControl(dt);
 
@@ -183,10 +195,26 @@ void DemoPlayer::Move(float dt) {
 		}
 	}
 
+	JumpEvents jumpEvents = HandleJump(dt);
+	if(jumpEvents.jumpStart) {
+		// ジャンプ時の処理
+		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.defaultShockScale);
+	}
+
 	// 速度の更新（水平成分のみ上書き、垂直成分は維持）
 	velocity_.x = horizonVelocity.x * moveSpeed_;
 	velocity_.z = horizonVelocity.z * moveSpeed_;
 
+
+	// 最終的な回転を適用 (向き + ジャンプ回転 + 傾き)
+	CalyxEngine::Quaternion flipRotation = CalyxEngine::Quaternion::MakeRotateX(jumpRotation_);
+	worldTransform_.rotation			 = baseRotation_ * flipRotation;
+
+	worldTransform_.translation += velocity_ * dt;
+}
+
+DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
+	JumpEvents events{};
 	// ジャンプ入力
 	bool jumpTrigger = CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A);
 
@@ -203,6 +231,8 @@ void DemoPlayer::Move(float dt) {
 			jumpRotationSpeed_	   = (2.0f * pi) / airTime;
 			jumpRotationRemaining_ = 2.0f * pi;
 
+			events.jumpStart = true;
+
 			// ジャンプ時に縦に伸びる
 			worldTransform_.scale = param_.jumpScale;
 			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
@@ -214,15 +244,14 @@ void DemoPlayer::Move(float dt) {
 				hammer_->GetWorldTransform().scale.z = hammerInitialScale_.z * param_.hammerSwingScale.z;
 				hammerScaleVelocity_				 = {0.0f, 0.0f, 0.0f};
 			}
-
-			// 衝撃波を発生（ハンマー振り下ろし）
-			ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.defaultShockScale);
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
 			velocity_.y = param_.jumpForce;
 			isDiving_	= true;
 			// 2回追加で回る
 			jumpRotationSpeed_	   = (4.0f * pi) / param_.diveRotationTime;
 			jumpRotationRemaining_ = 4.0f * pi;
+
+			events.diveStart = true;
 		}
 	}
 
@@ -279,14 +308,11 @@ void DemoPlayer::Move(float dt) {
 		}
 	}
 
-	// 最終的な回転を適用 (向き + ジャンプ回転 + 傾き)
-	CalyxEngine::Quaternion flipRotation = CalyxEngine::Quaternion::MakeRotateX(jumpRotation_);
-	worldTransform_.rotation			 = baseRotation_ * flipRotation;
-
-	worldTransform_.translation += velocity_ * dt;
+	return events;
 }
 
-void DemoPlayer::ApplyGravity(float dt) {
+DemoPlayer::LandingEvents DemoPlayer::ApplyGravity(float dt) {
+	LandingEvents events{};
 	// 可変ジャンプ：上昇中にボタンを離していたら重力を強くする
 	float gravity = param_.gravity;
 	bool  isJumpPush =
@@ -302,9 +328,10 @@ void DemoPlayer::ApplyGravity(float dt) {
 	if(worldTransform_.translation.y <= 0.0f) {
 		// 着地した瞬間
 		if(isJumping_) {
+			events.landed = true;
 			// 着地衝撃波（急降下中なら大きく、通常なら少し大きめ）
 			if(isDiving_) {
-				ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale);
+				events.hardLanded = true;
 				// リカバリー開始
 				isRecovering_  = true;
 				recoveryTimer_ = 0.0f;
@@ -316,11 +343,13 @@ void DemoPlayer::ApplyGravity(float dt) {
 
 		worldTransform_.translation.y = 0.0f;
 		velocity_.y					  = 0.0f;
-		isJumping_					  = false;
-		isDiving_					  = false;
-		jumpRotation_				  = 0.0f;
-		jumpRotationRemaining_		  = 0.0f;
+		isJumping_				  = false;
+		isDiving_				  = false;
+		jumpRotation_			  = 0.0f;
+		jumpRotationRemaining_  = 0.0f;
 	}
+
+	return events;
 }
 
 void DemoPlayer::UpdatePopScale(float dt) {

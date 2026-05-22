@@ -44,6 +44,7 @@ private:
 	// 飛び出しているか
 	bool isSpike_ = false;
 	bool isBreak_ = false;
+	bool isBuried_ = false;
 
 	float time_ = 0.0f;
 
