@@ -26,7 +26,8 @@ public:
 	/// </summary>
 	/// <param name="texPath1">1枚目</param>
 	/// <param name="texPath2">2枚目分割(スライド等)</param>
-	void Initialize(const std::string& texPath1, const std::string& texPath2 = "");
+	/// <param name="texPath3">3枚目分割(スライド等)</param>
+	void Initialize(const std::string& texPath1, const std::string& texPath2 = "", const std::string& texPath3 = "");
 	void Update(float dt);
 	void Draw(class SpriteRenderer* renderer);
 
@@ -48,7 +49,7 @@ public:
 	/// カスタム演出用の更新関数をセット
 	/// </summary>
 	/// <param name="func">(progress[0-1], plate1, plate2) </param>
-	void SetUpdateFunc(std::function<void(float progress, Sprite* plate1, Sprite* plate2)> func) {
+	void SetUpdateFunc(std::function<void(float progress, Sprite* plate1, Sprite* plate2, Sprite* plate3)> func) {
 		updateFunc_ = func;
 	}
 
@@ -99,17 +100,20 @@ public:
 
 	void SetTexturePlate1(const std::string& texPath1);
 	void SetTexturePlate2(const std::string& texPath2);
+	void SetTexturePlate3(const std::string& texPath3);
 
 private:
 	TransitionState state_ = TransitionState::Idle;
 
 	std::unique_ptr<Sprite> plate1_ = nullptr;
 	std::unique_ptr<Sprite> plate2_ = nullptr;
+	std::unique_ptr<Sprite> plate3_ = nullptr;
 
 	float timer_	= 0.0f;
 	float duration_ = 1.0f;
 	bool  isDrawPlate2_ = false;
+	bool  isDrawPlate3_ = false;
 
-	std::function<void(float progress, Sprite* plate1, Sprite* plate2)> updateFunc_;
+	std::function<void(float progress, Sprite* plate1, Sprite* plate2, Sprite* plate3)> updateFunc_;
 	std::function<void()>												onFinishedCallback_ = nullptr;
 };
