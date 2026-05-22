@@ -184,14 +184,14 @@ void TestScene::InitPauseResource() {
 	fanBg_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 
 	auto asset = std::make_shared<CalyxEngine::SpriteAnimationAsset>();
-	asset->division	   = {7, 1}; // 例: 4x4分割
+	asset->division	   = {6, 1}; // 例: 4x4分割
 	asset->texturePath = "Textures/Pause/fan.png";
 
 	CalyxEngine::SpriteAnimationClip clip;
 	clip.name		  = "FanOpen";
 	clip.startFrame	  = 0;
-	clip.frameCount	  = 7;
-	clip.frameDuration = 0.6f / 7.0f;
+	clip.frameCount	  = 6;
+	clip.frameDuration = 0.6f / 6.0f;
 	clip.loop		  = false;
 	asset->clips.push_back(clip);
 
