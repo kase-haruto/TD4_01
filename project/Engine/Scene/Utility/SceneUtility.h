@@ -38,11 +38,11 @@ namespace EffectAPI {
 		return Player()->Play(data, position, rotation, scale);
 	}
 
-	inline CalyxEngine::EffectHandle PlayFromPath(const std::filesystem::path& path,
+	inline CalyxEngine::EffectHandle PlayFromName(const std::string& name,
 												  const CalyxEngine::Vector3& position,
 												  const CalyxEngine::Quaternion& rotation = CalyxEngine::Quaternion::MakeIdentity(),
 												  const CalyxEngine::Vector3& scale = {1.0f, 1.0f, 1.0f}) {
-		return Player()->PlayFromPath(path, position, rotation, scale);
+		return Player()->PlayFromName(name, position, rotation, scale);
 	}
 
 	inline void Stop(CalyxEngine::EffectHandle handle) {

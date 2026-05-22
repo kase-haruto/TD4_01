@@ -91,12 +91,13 @@ namespace CalyxEngine {
 		return handle;
 	}
 
-	EffectHandle EffectPlayer::PlayFromPath(const std::filesystem::path& path,
+	EffectHandle EffectPlayer::PlayFromName(const std::string& name,
 											const Vector3&			   position,
 											const Quaternion&		   rotation,
 											const Vector3&			   scale) {
 		EffectAsset asset;
-		if(!asset.Load(path)) return {};
+		//パスから名前を抜き出す
+		if(!asset.Load(name)) return {};
 		return Play(asset, position, rotation, scale);
 	}
 
