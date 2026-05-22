@@ -31,8 +31,19 @@ public:
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoPlayer"; }
 private:
+	struct JumpEvents {
+		bool jumpStart = false;
+		bool diveStart = false;
+	};
+
+	struct LandingEvents {
+		bool landed = false;
+		bool hardLanded = false;
+	};
+
 	void Move(float dt);
-	void ApplyGravity(float dt);
+	JumpEvents HandleJump(float dt);
+	LandingEvents ApplyGravity(float dt);
 	void UpdatePopScale(float dt);
 	void HammerControl(float dt);
 	void DamageFlash(float dt);
@@ -67,6 +78,11 @@ private:
 
 		CalyxEngine::Vector3 hammerSwingScale = {2.5f, 1.5f, 2.5f};
 
+		struct ShockParm {
+			float duration = 0.2f;
+			float intensity = 0.5f;
+		}shakeParm;
+
 		PlayerParameter() {
 			AddField("HP", playerHP).Category("Base Param").Tooltip("体力");
 			AddField("Move Speed", moveSpeed).Category("Move Param").Tooltip("移動速度");
@@ -85,6 +101,9 @@ private:
 			AddField("Dive Scale", diveScale).Category("Pop Scale");
 			AddField("Land Scale", landScale).Category("Pop Scale");
 			AddField("Hammer Swing Scale", hammerSwingScale).Category("Pop Scale");
+
+			AddField("cameraShakeDuration",shakeParm.duration).Category("Shock Power").Tooltip("カメラシェイクの時間");
+			AddField("cameraShakeIntensity",shakeParm.intensity).Category("Shock Power").Tooltip("カメラシェイクの強さ");
 		}
 		
 		CalyxEngine::ParamPath GetParamPath() const override {
