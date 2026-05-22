@@ -68,7 +68,7 @@ void TestScene::Initialize(){
 	InitPauseResource();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
-	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds", "Textures/uvChecker.dds");
 	// シーンタイプに基づいて自動で演出をセット
 	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TEST);
 	transitionControl_->StartOpening(0.5f, [this]() {

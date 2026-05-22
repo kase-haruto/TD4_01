@@ -1,6 +1,8 @@
 #pragma once
 #include <Engine/Renderer/Sprite/Sprite.h>
 #include <Game/Scene/Details/SceneType.h>
+#include <Engine/Objects/2D/Object2d/SpriteObject2d.h>
+#include <Engine/Objects/2D/Animation/SpriteAnimator2d.h>
 #include <functional>
 #include <memory>
 #include <string>
@@ -49,7 +51,7 @@ public:
 	/// カスタム演出用の更新関数をセット
 	/// </summary>
 	/// <param name="func">(progress[0-1], plate1, plate2) </param>
-	void SetUpdateFunc(std::function<void(float progress, Sprite* plate1, Sprite* plate2, Sprite* plate3)> func) {
+	void SetUpdateFunc(std::function<void(float progress, CalyxEngine::SpriteObject2d* plate1, CalyxEngine::SpriteObject2d* plate2, CalyxEngine::SpriteObject2d* plate3)> func) {
 		updateFunc_ = func;
 	}
 
@@ -95,8 +97,8 @@ public:
 	bool			IsClosing() const { return state_ == TransitionState::Closing; }
 	bool			IsFull() const { return state_ == TransitionState::Full; }
 
-	Sprite* GetPlate1() const { return plate1_.get(); }
-	Sprite* GetPlate2() const { return plate2_.get(); }
+	CalyxEngine::SpriteObject2d* GetPlate1() const { return plate1_.get(); }
+	CalyxEngine::SpriteObject2d* GetPlate2() const { return plate2_.get(); }
 
 	void SetTexturePlate1(const std::string& texPath1);
 	void SetTexturePlate2(const std::string& texPath2);
@@ -105,15 +107,16 @@ public:
 private:
 	TransitionState state_ = TransitionState::Idle;
 
-	std::unique_ptr<Sprite> plate1_ = nullptr;
-	std::unique_ptr<Sprite> plate2_ = nullptr;
-	std::unique_ptr<Sprite> plate3_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d> plate1_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d> plate2_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d> plate3_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteAnimator2d> plateAnim_ = nullptr;
 
 	float timer_	= 0.0f;
 	float duration_ = 1.0f;
 	bool  isDrawPlate2_ = false;
 	bool  isDrawPlate3_ = false;
 
-	std::function<void(float progress, Sprite* plate1, Sprite* plate2, Sprite* plate3)> updateFunc_;
+	std::function<void(float progress, CalyxEngine::SpriteObject2d* plate1, CalyxEngine::SpriteObject2d* plate2, CalyxEngine::SpriteObject2d* plate3)> updateFunc_;
 	std::function<void()>												onFinishedCallback_ = nullptr;
 };

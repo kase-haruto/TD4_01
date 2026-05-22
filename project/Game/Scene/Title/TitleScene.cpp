@@ -56,15 +56,17 @@ void TitleScene::Initialize() {
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	if(preType_ == SceneType::SELECT) {
-		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/Transition/wave.png");
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/Transition/wave.png", "Textures/uvChecker.dds");
 	} else {
-		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds", "Textures/uvChecker.dds");
 	}
 	// シーンタイプに基づいて自動で演出をセット
 	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TITLE);
 	transitionControl_->StartOpening(0.5f, [this]() {
 		IsOpening_ = false;
 		transitionControl_->SetTexturePlate1("Textures/Transition/wave.png");
+		transitionControl_->SetTexturePlate2("Textures/Transition/wave.png");
+		transitionControl_->SetTexturePlate3("Textures/Transition/wave.png");
 	});
 	IsOpening_ = true;
 	IsPhase_ = false;
