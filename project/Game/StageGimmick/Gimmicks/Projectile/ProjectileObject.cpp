@@ -17,7 +17,7 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();
-	if(otherObj && (other->GetType() != ColliderType::Type_PlayerAttack || other->GetType() != ColliderType::Type_Player)) {
+	if(otherObj && (other->GetType() == ColliderType::Type_PlayerAttack || other->GetType() == ColliderType::Type_Player)) {
 		return;
 	}
 	// コライダーとモデルを無効化
@@ -42,15 +42,13 @@ void ProjectileObject::ObjectInitialize() {
 void ProjectileObject::ObjectUpdate(float dt) {
 
 	if(!isFlying_) {
-		if(isHoming_) {
-			auto player	  = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
-			velocity_ = player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
-		} else {
-			velocity_ = CalyxEngine::Vector3(0.0f, -0.5f, -1.0f);
+		if(param_.targetTime > targetTime_) {
+			targetTime_ += dt;
+			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
+			velocity_	= player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
 		}
-		return;
 	}
 
-	velocity_ = velocity_.Normalize() * speed_ * dt;
+	velocity_ = velocity_.Normalize() * param_.speed * dt;
 	worldTransform_.translation += velocity_;
 }

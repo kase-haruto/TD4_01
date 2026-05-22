@@ -100,6 +100,21 @@ struct FireLoadParam {
 	int depth = 2;
 };
 
+/// <summary>
+/// 鶴が飛んでくるギミックのパラメータ
+/// </summary>
+struct CraneProjectileParam {
+
+	// オブジェクトのスケール
+	float scale = 1.0f;
+	// 鶴の速度
+	float speed = 1.0f;
+	// プレイヤーをターゲットしている時間
+	float targetTime = 0.0f;
+
+
+};
+
 struct BellProjectileParam {
 
 	// オブジェクトのスケール
