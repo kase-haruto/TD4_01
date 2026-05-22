@@ -41,6 +41,8 @@ private:
 
 	// 飛んでいるか
 	bool isFlying_ = false;
+	bool isHit_	   = false;
+	bool isParry_  = false;
 
 	// 調整するパラメーター
 	CalyxEngine::Vector3 velocity_;

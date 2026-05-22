@@ -17,11 +17,16 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();
-	if(otherObj && (other->GetType() == ColliderType::Type_PlayerAttack || other->GetType() == ColliderType::Type_Player)) {
+	bool isPlayerAttack = other->GetType() == ColliderType::Type_PlayerAttack;
+	bool isPlayer = other->GetType() == ColliderType::Type_Player;
+	if(otherObj && !isPlayerAttack && !isPlayer) {
 		return;
 	}
 	// コライダーとモデルを無効化
 	isFlying_ = false;
+	isHit_		= isPlayer;
+	isParry_	= isPlayerAttack;
+	targetTime_ = 0.0f;
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
 	}
@@ -42,6 +47,14 @@ void ProjectileObject::ObjectInitialize() {
 void ProjectileObject::ObjectUpdate(float dt) {
 
 	if(!isFlying_) {
+		if(targetTime_< 1.0f && isHit_) {
+			targetTime_ += dt;
+			if(targetTime_ >= 1.0f) {
+				SetDrawEnable(false);
+				velocity_ = CalyxEngine::Vector3::Zero();
+			}
+		}
+	} else {
 		if(param_.targetTime > targetTime_) {
 			targetTime_ += dt;
 			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
