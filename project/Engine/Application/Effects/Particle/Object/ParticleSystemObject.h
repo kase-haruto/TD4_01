@@ -44,6 +44,7 @@ namespace CalyxEngine {
 
 		void SetAlphaMultiplier(float a);
 		void SetCameraFade(float nearZ, float farZ);
+		void SyncEmitterFromWorldTransform();
 
 		/* -------- config -------- */
 		void ApplyConfig();

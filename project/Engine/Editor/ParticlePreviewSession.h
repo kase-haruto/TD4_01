@@ -2,8 +2,10 @@
 
 #include <cstdint>
 #include <memory>
+#include <unordered_map>
 
 class SceneContext;
+class SceneObject;
 
 namespace CalyxEngine {
 
@@ -15,12 +17,15 @@ namespace CalyxEngine {
 		void Update(float dt);
 
 		SceneContext* Context() const { return context_.get(); }
-		std::shared_ptr<FxObject> Object() const { return fx_; }
+		std::shared_ptr<FxObject> Object() const;
 
 	private:
+		void EnsureDefaultObject();
+		void UpdateEmitterPlayback();
+
 		std::unique_ptr<SceneContext> context_;
 		std::shared_ptr<FxObject> fx_;
-		uint64_t playedEmitterRevision_ = 0;
+		std::unordered_map<SceneObject*, uint64_t> playedEmitterRevisions_;
 	};
 
 } // namespace CalyxEngine

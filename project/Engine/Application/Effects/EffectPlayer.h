@@ -40,7 +40,7 @@ namespace CalyxEngine {
 						  const Quaternion&	  rotation = Quaternion::MakeIdentity(),
 						  const Vector3&		  scale	   = {1.0f, 1.0f, 1.0f});
 
-		EffectHandle PlayFromPath(const std::filesystem::path& path,
+		EffectHandle PlayFromName(const std::string& name,
 								  const Vector3&			 position,
 								  const Quaternion&			 rotation = Quaternion::MakeIdentity(),
 								  const Vector3&			 scale	  = {1.0f, 1.0f, 1.0f});

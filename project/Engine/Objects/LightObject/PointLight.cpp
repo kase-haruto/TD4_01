@@ -60,7 +60,6 @@ void PointLight::ShowGui(){
 	
 	// コンフィグ
 	if (GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::ParameterData)) {
-		config_.ShowGui();
 		ImGui::Separator();
 		GuiCmd::EndSection();
 	}

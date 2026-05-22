@@ -68,6 +68,7 @@ void DemoPlayer::Initialize() {
 
 	// 衝撃波マネージャーの初期化（プール作成）
 	ShockwaveManager::GetInstance()->Initialize(10);
+
 }
 
 void DemoPlayer::Update(float dt) {
@@ -98,7 +99,7 @@ void DemoPlayer::Update(float dt) {
 		//カメラシェイク
 		CameraManager::GetMain3d()->StartShake(param_.shakeParm.duration, param_.shakeParm.intensity);
 		PostEffectManager::Get()->PlayTriggeredEffect("PlayerShock");
-
+		EffectAPI::PlayFromName("shockwave", worldTransform_.GetWorldPosition());
 	}
 	UpdatePopScale(dt);
 	HammerControl(dt);

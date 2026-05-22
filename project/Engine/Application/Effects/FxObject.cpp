@@ -7,6 +7,7 @@
 #include <Engine/Application/Effects/Particle/Emitter/GpuFxEmitter.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
+#include <filesystem>
 
 namespace CalyxEngine {
 
@@ -54,7 +55,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::AlwaysUpdate(float) {
 		// 行列の更新
-		worldTransform_.Update();
+		SyncChildrenFromWorldTransform();
 	}
 
 	void FxObject::Destroy() {
@@ -127,9 +128,23 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::ShowGui() {
 
-		// コンフィグのセーブ・ロード
-		config_.ShowGui("Effect/" + GetName());
-
+		// コンフィグのセーブ・ローど
+		if(ImGui::Button("Load Effect")) {
+			std::filesystem::create_directories(kConfigRoot_);
+			IGFD::FileDialogConfig config;
+			config.path = kConfigRoot_.string();
+			ImGuiFileDialog::Instance()->OpenDialog(
+				"EffectLoadDialog",
+				"load effect",
+				".effect",
+				config);
+		}
+		if(ImGuiFileDialog::Instance()->Display("EffectLoadDialog")) {
+			if(ImGuiFileDialog::Instance()->IsOk()) {
+				LoadEffectAsset(ImGuiFileDialog::Instance()->GetFilePathName());
+			}
+			ImGuiFileDialog::Instance()->Close();
+		}
 		// ルート Transform
 		worldTransform_.ShowImGui();
 
@@ -140,6 +155,7 @@ namespace CalyxEngine {
 		ImGui::SameLine();
 		if(ImGui::Button("Reset All")) RestartAll();
 		if(ImGui::Button("Save Effect Asset")) {
+			std::filesystem::create_directories(kConfigRoot_);
 			SaveEffectAsset("Resources/Assets/Effects/" + GetName() + ".effect");
 		}
 
@@ -355,6 +371,20 @@ namespace CalyxEngine {
 
 	void FxObject::SetWorldPosition(const CalyxEngine::Vector3& pos) {
 		worldTransform_.translation = pos;
+		SyncChildrenFromWorldTransform();
+	}
+
+	void FxObject::SyncChildrenFromWorldTransform() {
+		worldTransform_.Update();
+
+		for(auto it = emitters_.begin(); it != emitters_.end();) {
+			if(auto sp = it->lock()) {
+				sp->SyncEmitterFromWorldTransform();
+				++it;
+			} else {
+				it = emitters_.erase(it);
+			}
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -405,6 +435,7 @@ namespace CalyxEngine {
 			}
 		}
 	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//		エミッター単位
