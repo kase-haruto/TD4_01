@@ -44,6 +44,8 @@ void ProjectileObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(true);
 	}
 	isFlying_ = false;
+
+	worldTransform_.inheritScale = false;
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {
@@ -78,9 +80,9 @@ void ProjectileObject::ObjectUpdate(float dt) {
 		worldTransform_.translation += velocity_;
 		// 回転処理
 		auto rotation = CalyxEngine::Quaternion::LookAt(
-			prePos,
 			worldTransform_.translation,
-			-CalyxEngine::Vector3::Up());
+			prePos,
+			CalyxEngine::Vector3::Up());
 		worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
 			worldTransform_.rotation, rotation, 0.2f);
 	}

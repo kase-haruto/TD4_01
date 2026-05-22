@@ -113,11 +113,11 @@ void LuckyCatObject::ObjectUpdate(float dt) {
 		CalyxEngine::Quaternion rotation = worldTransform_.rotation;
 		if(velocity.Length() > 0.0001f) {
 			rotation =	CalyxEngine::Quaternion::LookAt(
-					prevPos,
 					currentPos,
+					prevPos,
 					CalyxEngine::Vector3::Up()
 			);
-			rotation = rotation * CalyxEngine::Quaternion::MakeRotateX(std::numbers::pi_v<float> / 2.0f);
+			rotation = rotation * CalyxEngine::Quaternion::MakeRotateX(-std::numbers::pi_v<float> / 2.0f);
 		}
 		worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
 			worldTransform_.rotation, rotation, 0.5f);

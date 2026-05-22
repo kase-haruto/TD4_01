@@ -1,7 +1,13 @@
 [
     {
-        "ProjectileFireEvent": {
-            "targetObjectGuid": "4cd0c35c-993c-4280-b1fe-e0420f54d863"
+        "GroundSpikeEvent": {
+            "eventParam": {
+                "fields": {
+                    "popUpHeight": 0.0,
+                    "popUpSpeed": 15.0
+                }
+            },
+            "targetObjectGuid": "cdaa5527-79fd-44dd-9360-584923e6538c"
         },
         "castShadow": false,
         "colliderConfig": {
@@ -27,8 +33,8 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "a3f56279-3476-45fa-b6cd-3d39e0786678",
-        "name": "ProjectileFireEvent",
+        "guid": "beeec212-a688-420b-9665-556e93f5181d",
+        "name": "GroundSpikeEvent",
         "objectType": 5,
         "outlineColor": {
             "w": 1.0,
@@ -55,12 +61,12 @@
                 "z": 1.0
             },
             "translation": {
-                "x": 0.17359411716461182,
-                "y": 2.3995349407196045,
-                "z": 3.3648126125335693
+                "x": -12.42135238647461,
+                "y": 0.39341235160827637,
+                "z": 24.342742919921875
             }
         },
-        "type": "ProjectileFireEvent",
+        "type": "GroundSpikeEvent",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": true,
@@ -108,11 +114,11 @@
             "targetType": 3
         },
         "drawEnable": true,
-        "guid": "4cd0c35c-993c-4280-b1fe-e0420f54d863",
+        "guid": "cdaa5527-79fd-44dd-9360-584923e6538c",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "crane.obj",
+            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
+            "modelName": "backTeeth.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -122,7 +128,7 @@
                 }
             }
         },
-        "name": "ProjectileObject",
+        "name": "GroundSpikeObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -132,7 +138,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a3f56279-3476-45fa-b6cd-3d39e0786678",
+        "parentGuid": "beeec212-a688-420b-9665-556e93f5181d",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -150,11 +156,11 @@
             },
             "translation": {
                 "x": 0.0,
-                "y": 5.625263214111328,
-                "z": 14.700772285461426
+                "y": -5.0,
+                "z": 4.239738464355469
             }
         },
-        "type": "ProjectileObject",
+        "type": "GroundSpikeObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -172,8 +178,8 @@
             },
             "translation": {
                 "x": 0.0,
-                "y": 5.625263214111328,
-                "z": 14.700772285461426
+                "y": -5.0,
+                "z": 4.239738464355469
             }
         }
     }

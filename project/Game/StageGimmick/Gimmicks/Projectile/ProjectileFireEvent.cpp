@@ -44,12 +44,13 @@ void ProjectileFireEvent::EventInitialize() {
 	if(object) {
 		targetObject_ = object;
 		object->SetParam(param_.param);
+		object->SetParent(shared_from_this());
 		object->SetName(objectPrefix);
 		SetTarget(object);
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<ProjectileObject>("debugCube.obj", objectPrefix);
+	targetObject_ = SceneAPI::Instantiate<ProjectileObject>("crane.obj", objectPrefix);
 	targetObject_.lock()->SetParent(shared_from_this());
 	targetObject_.lock()->SetParam(param_.param);
 	targetObjectGuid_ = targetObject_.lock()->GetGuid();
