@@ -45,6 +45,10 @@ void TransitionControl::Update(float dt) {
 		updateFunc_(progress, plate1_.get(), plate2_.get(), plate3_.get());
 	}
 
+
+	if(plateAnim1_) plateAnim1_->Update(dt);
+	if(plateAnim2_) plateAnim2_->Update(dt);
+	if(plateAnim3_) plateAnim3_->Update(dt);
 	if(plate1_) plate1_->Update(dt);
 	if(plate2_) plate2_->Update(dt);
 	if(plate3_) plate3_->Update(dt);
@@ -171,18 +175,21 @@ void TransitionControl::SetPresetUpDownSlide() {
 	plate1_->Update(0.0f);
 	plate2_->Update(0.0f);
 	plate3_->Update(0.0f);
+	plateAnim1_->Play("Wave");
+	plateAnim2_->Play("Wave");
+	plateAnim3_->Play("Wave");
 	SetUpdateFunc([this](float progress, CalyxEngine::SpriteObject2d* p1, CalyxEngine::SpriteObject2d* p2, CalyxEngine::SpriteObject2d* p3) {
 		if(!p2) return;
 		if(!p3) return;
 		float w	 = static_cast<float>(kWindowWidth);
 		float h = static_cast<float>(kWindowHeight);
-		float halfH = static_cast<float>(kWindowHeight) * 0.5f;
+		//float halfH = static_cast<float>(kWindowHeight) * 0.5f;
 		float x1	= 0.0f;
 		float x2	= 0.0f;
 
-		p1->SetScale({w, h * 1.5f});
-		p2->SetScale({w, h * 1.5f});
-		p3->SetScale({w, h * 1.5f});
+		p1->SetScale({w, h * 1.75f});
+		p2->SetScale({w, h * 1.75f});
+		p3->SetScale({w, h * 1.75f});
 
 		if(state_ == TransitionState::Closing) {
 			// 画面外から画面内へ
@@ -193,9 +200,9 @@ void TransitionControl::SetPresetUpDownSlide() {
 			x1 = -w * progress;
 			x2 = w * progress;
 		}
-		p1->SetPosition({x1, -halfH * 0.5f});
-		p2->SetPosition({x2, -h * 0.75f});
-		p3->SetPosition({x1, -h * 0.5f});
+		p1->SetPosition({x1, -h * 0.75f});
+		p2->SetPosition({x2, -h * 1.05f});
+		p3->SetPosition({x1, -h * 1.35f});
 	});
 }
 
@@ -215,6 +222,7 @@ void TransitionControl::SetAutoPreset(SceneType now, SceneType next) {
 	if(now == SceneType::TITLE && next == SceneType::SELECT) {
 		isDrawPlate2_ = true;
 		isDrawPlate3_ = true;
+		InitAnim();
 		SetPresetUpDownSlide();
 	}
 	// テスト（ゲーム)からセレクトへは観音開き
@@ -254,17 +262,18 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 	float w		= static_cast<float>(kWindowWidth);
 	float halfW = w * 0.5f;
 	float h		= static_cast<float>(kWindowHeight);
-	float halfH = h * 0.5f;
+	//float halfH = h * 0.5f;
 	// タイトルからセレクトに来た時はスライドで開ける
 	if(prev == SceneType::TITLE && now == SceneType::SELECT) {
 		isDrawPlate2_ = true;
 		isDrawPlate3_ = true;
-		plate1_->SetScale({w, h * 1.5f});
-		plate2_->SetScale({w, h * 1.5f});
-		plate3_->SetScale({w, h * 1.5f});
-		plate1_->SetPosition({0.0f, -halfH * 0.5f});
-		plate2_->SetPosition({0.0f, -h * 0.75f});
-		plate3_->SetPosition({0.0f, -halfH});
+		InitAnim();
+		plate1_->SetScale({w, h * 1.75f});
+		plate2_->SetScale({w, h * 1.75f});
+		plate3_->SetScale({w, h * 1.75f});
+		plate1_->SetPosition({0.0f, -h * 0.75f});
+		plate2_->SetPosition({0.0f, -h * 1.05f});
+		plate3_->SetPosition({0.0f, -h * 1.35f});
 		SetPresetUpDownSlide();
 	}
 	// ゲームからセレクトに来た時は観音開きで開ける
@@ -307,4 +316,30 @@ void TransitionControl::SetTexturePlate2(const std::string& texPath2) {
 
 void TransitionControl::SetTexturePlate3(const std::string& texPath3) {
 	plate3_->SetTexture(texPath3);
+}
+
+void TransitionControl::InitAnim() {
+	plateAnim1_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
+	plateAnim1_->Bind(plate1_.get());
+	plateAnim2_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
+	plateAnim2_->Bind(plate2_.get());
+	plateAnim3_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
+	plateAnim3_->Bind(plate3_.get());
+
+
+	auto asset		   = std::make_shared<CalyxEngine::SpriteAnimationAsset>();
+	asset->division	   = {5, 2}; // 例: 4x4分割
+	asset->texturePath = "Textures/Transition/wave.png";
+
+	CalyxEngine::SpriteAnimationClip clip;
+	clip.name		   = "Wave";
+	clip.startFrame	   = 0;
+	clip.frameCount	   = 10;
+	clip.frameDuration = 0.1f;
+	clip.loop		   = true;
+	asset->clips.push_back(clip);
+
+	plateAnim1_->SetAnimationAsset(asset);
+	plateAnim2_->SetAnimationAsset(asset);
+	plateAnim3_->SetAnimationAsset(asset);
 }
