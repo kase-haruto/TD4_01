@@ -56,7 +56,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::AlwaysUpdate(float) {
 		// 行列の更新
-		worldTransform_.Update();
+		SyncChildrenFromWorldTransform();
 	}
 
 	void FxObject::Destroy() {
@@ -365,6 +365,20 @@ namespace CalyxEngine {
 
 	void FxObject::SetWorldPosition(const CalyxEngine::Vector3& pos) {
 		worldTransform_.translation = pos;
+		SyncChildrenFromWorldTransform();
+	}
+
+	void FxObject::SyncChildrenFromWorldTransform() {
+		worldTransform_.Update();
+
+		for(auto it = emitters_.begin(); it != emitters_.end();) {
+			if(auto sp = it->lock()) {
+				sp->SyncEmitterFromWorldTransform();
+				++it;
+			} else {
+				it = emitters_.erase(it);
+			}
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////

@@ -75,6 +75,7 @@ namespace CalyxEngine {
 		//--------- accessor --------------------------------------------------
 		std::string_view GetObjectClassName() const override;
 		void			 SetWorldPosition(const CalyxEngine::Vector3& pos);
+		void			 SyncChildrenFromWorldTransform();
 
 	private:
 		//===================================================================*/

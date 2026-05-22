@@ -79,11 +79,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void ParticleSystemObject::AlwaysUpdate([[maybe_unused]] float dt) {
 		// Gizmo操作中/停止中でも見た目と発生位置を一致させるため常時同期する
-		worldTransform_.Update();
-		emitter_->SetPosition(worldTransform_.GetWorldPosition());
-		const auto worldScale = ExtractWorldScale(worldTransform_.matrix.world);
-		emitter_->SetWorldScale(worldScale);
-		emitter_->SetWorldRotation(ExtractWorldRotation(worldTransform_.matrix.world, worldScale));
+		SyncEmitterFromWorldTransform();
 
 		emitter_->Update(dt);
 		emitter_->DrawEmitterShape(worldTransform_);
@@ -208,6 +204,16 @@ namespace CalyxEngine {
 				ps->SetCameraFade(nearZ, farZ);
 			}
 		}
+	}
+
+	void ParticleSystemObject::SyncEmitterFromWorldTransform() {
+		if(!emitter_) return;
+
+		worldTransform_.Update();
+		emitter_->SetPosition(worldTransform_.GetWorldPosition());
+		const auto worldScale = ExtractWorldScale(worldTransform_.matrix.world);
+		emitter_->SetWorldScale(worldScale);
+		emitter_->SetWorldRotation(ExtractWorldRotation(worldTransform_.matrix.world, worldScale));
 	}
 
 } // namespace CalyxEngine

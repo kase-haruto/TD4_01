@@ -1159,12 +1159,11 @@ namespace CalyxEngine {
 	//=============================================================================
 	void LevelEditor::RenderViewport(ViewportType type, const ImTextureID& tex) {
 		SceneContext* previousContext = nullptr;
-		if(type == ViewportType::VIEWPORT_DEBUG &&
-		   editToolMode_ == EngineEdit::EditToolMode::Prefab &&
-		   prefabEdit_ &&
-		   prefabEdit_->Context()) {
-			previousContext = SceneContext::Current();
-			prefabEdit_->Context()->MakeCurrent();
+		if(type == ViewportType::VIEWPORT_DEBUG) {
+			if(SceneContext* previewContext = ResolvePreviewContext(editToolMode_)) {
+				previousContext = SceneContext::Current();
+				previewContext->MakeCurrent();
+			}
 		}
 
 		auto restoreContext = [&]() {
