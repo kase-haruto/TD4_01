@@ -146,15 +146,19 @@ namespace {
     // -------------------------
     if (temp_input_is_active)
     {
+        const bool is_clamp_input =
+            p_min != nullptr && p_max != nullptr &&
+            ImGui::DataTypeCompare(data_type, p_min, p_max) < 0;
+
         return ImGui::TempInputScalar(
-            value_bb,      // 入力エリア（必ず value_bb）
+            frame_bb,
             id,
             label_id,
             data_type,
             p_data,
             format,
-            p_min,
-            p_max
+            is_clamp_input ? p_min : nullptr,
+            is_clamp_input ? p_max : nullptr
         );
     }
 
