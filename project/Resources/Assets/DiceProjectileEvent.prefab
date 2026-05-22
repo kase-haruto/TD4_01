@@ -1,36 +1,35 @@
 [
     {
-        "DroolRainEvent": {
-            "eventParam": {
+        "DiceProjectileEvent": {
+            "eventData": {
                 "fields": {
-                    "AccelerationY": -12.699999809265137,
-                    "AirScaleSpeed": 0.20000000298023224,
-                    "GroundLifeTime": 1.5,
-                    "GroundScaleSpeed": [
-                        1.100000023841858,
-                        -0.5,
-                        1.100000023841858
-                    ],
-                    "GroundVelocityY": -0.10000000149011612,
-                    "VelocityY": -0.20000000298023224
+                    "ClearCount": 7,
+                    "ObjectCount": 7
                 }
             },
-            "objectCount": 6,
-            "predictionCircleGuids": [
-                "c8d9440e-000a-4447-b5de-571fb1851a1f",
-                "de41623b-178c-4fa8-a897-e6ce46a29057",
-                "c902db4d-66c6-4144-8e62-71d0e84bdfc6",
-                "00648d4d-f48d-46e8-9b7f-b05b51912503",
-                "2a14258a-4734-485e-8d55-9c6d1846a1a2",
-                "18dbdce0-72cb-479c-8311-0095895c0a28"
-            ],
+            "eventParam": {
+                "fields": {
+                    "direction": [
+                        -0.0,
+                        0.0,
+                        -1.0
+                    ],
+                    "hitScale": 0.699999988079071,
+                    "parryDuration": 0.4000000059604645,
+                    "rotateSpeed": 10.0,
+                    "scale": 0.4000000059604645,
+                    "speed": 8.5
+                }
+            },
+            "socketGuid": "687e3444-7fdc-4023-a098-93ee41acc34e",
             "targetObjectGuids": [
-                "2cca6676-9cfc-4730-8fa3-2540cdb13efc",
-                "6951a049-650b-4d17-99de-f119b5bf54bb",
-                "92fa09ab-8919-4198-b762-11eeabb35447",
-                "b85cff66-5399-4774-ac3b-0df687c858b8",
-                "d94432f4-49b4-48ce-807b-94e0b5707c10",
-                "f2968c69-a095-412a-a24e-df22a2a4adab"
+                "03450a6c-ae03-4feb-965a-46c0b9d975aa",
+                "04e113c5-7e87-4933-8c17-91af008e47f3",
+                "29f49f52-9fdf-4d4b-9d8e-ce4f6b648a31",
+                "2abc48c2-e362-4394-a0a4-b38ab2f14842",
+                "3c154739-8ec3-4658-ae13-b7f3b81436c7",
+                "5c1c9176-e4b8-422e-b95c-f5166c6af3d6",
+                "ef92fa19-a3ca-41ba-9cb3-08b1755404d1"
             ]
         },
         "castShadow": false,
@@ -57,8 +56,8 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
-        "name": "DroolRainEvent",
+        "guid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "name": "DiceProjectileEvent",
         "objectType": 5,
         "outlineColor": {
             "w": 1.0,
@@ -85,12 +84,12 @@
                 "z": 1.0
             },
             "translation": {
-                "x": -25.345626831054688,
-                "y": 2.542525291442871,
-                "z": 29.27799415588379
+                "x": -13.284727096557617,
+                "y": 1.8831787109375,
+                "z": 33.141273498535156
             }
         },
-        "type": "DroolRainEvent",
+        "type": "DiceProjectileEvent",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": true,
@@ -138,11 +137,11 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "92fa09ab-8919-4198-b762-11eeabb35447",
+        "guid": "ef92fa19-a3ca-41ba-9cb3-08b1755404d1",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "waterDrop.obj",
+            "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -152,7 +151,7 @@
                 }
             }
         },
-        "name": "DroolRainObject",
+        "name": "DiceProjectileObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -162,7 +161,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -174,17 +173,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": -4.677040100097656,
-                "y": 12.142928123474121,
-                "z": 9.054973602294922
+                "x": 0.6154816150665283,
+                "y": 0.5675784349441528,
+                "z": 6.922389984130859
             }
         },
-        "type": "DroolRainObject",
+        "type": "DiceProjectileObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -196,108 +195,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": -4.677040100097656,
-                "y": 12.142928123474121,
-                "z": 9.054973602294922
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "c902db4d-66c6-4144-8e62-71d0e84bdfc6",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "PredictionCircle.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "PredictionCircle",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "92fa09ab-8919-4198-b762-11eeabb35447",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -30.022666931152344,
-                "y": 0.009999999776482582,
-                "z": 38.332969665527344
-            }
-        },
-        "type": "PredictionCircle",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -30.022666931152344,
-                "y": 0.009999999776482582,
-                "z": 38.332969665527344
+                "x": 0.6154816150665283,
+                "y": 0.5675784349441528,
+                "z": 6.922389984130859
             }
         }
     },
@@ -326,11 +231,11 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "f2968c69-a095-412a-a24e-df22a2a4adab",
+        "guid": "29f49f52-9fdf-4d4b-9d8e-ce4f6b648a31",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "waterDrop.obj",
+            "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -340,7 +245,7 @@
                 }
             }
         },
-        "name": "DroolRainObject",
+        "name": "DiceProjectileObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -350,7 +255,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -362,17 +267,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": 3.075498580932617,
-                "y": 13.090234756469727,
-                "z": 5.655403137207031
+                "x": -1.178688645362854,
+                "y": 0.3867371082305908,
+                "z": 12.139148712158203
             }
         },
-        "type": "DroolRainObject",
+        "type": "DiceProjectileObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -384,108 +289,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": 3.075498580932617,
-                "y": 13.090234756469727,
-                "z": 5.655403137207031
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "18dbdce0-72cb-479c-8311-0095895c0a28",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "PredictionCircle.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "PredictionCircle",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "f2968c69-a095-412a-a24e-df22a2a4adab",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -22.27012825012207,
-                "y": 0.009999999776482582,
-                "z": 34.93339538574219
-            }
-        },
-        "type": "PredictionCircle",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -22.27012825012207,
-                "y": 0.009999999776482582,
-                "z": 34.93339538574219
+                "x": -1.178688645362854,
+                "y": 0.3867371082305908,
+                "z": 12.139148712158203
             }
         }
     },
@@ -514,11 +325,11 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "d94432f4-49b4-48ce-807b-94e0b5707c10",
+        "guid": "687e3444-7fdc-4023-a098-93ee41acc34e",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "waterDrop.obj",
+            "materialGuid": "0a40d1c6-6091-4ce9-a352-1a8f69b2fae3",
+            "modelName": "debugCube.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -528,7 +339,7 @@
                 }
             }
         },
-        "name": "DroolRainObject",
+        "name": "DiceSocketObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -538,7 +349,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -550,17 +361,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
+                "x": 8.0,
                 "y": 1.0,
                 "z": 1.0
             },
             "translation": {
-                "x": -2.779040813446045,
-                "y": 12.142928123474121,
-                "z": 14.79880142211914
+                "x": 0.0,
+                "y": 4.379960536956787,
+                "z": 15.058597564697266
             }
         },
-        "type": "DroolRainObject",
+        "type": "DiceSocketObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -572,108 +383,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
+                "x": 8.0,
                 "y": 1.0,
                 "z": 1.0
             },
             "translation": {
-                "x": -2.779040813446045,
-                "y": 12.142928123474121,
-                "z": 14.79880142211914
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
                 "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "2a14258a-4734-485e-8d55-9c6d1846a1a2",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "PredictionCircle.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "PredictionCircle",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "d94432f4-49b4-48ce-807b-94e0b5707c10",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -28.12466812133789,
-                "y": 0.009999999776482582,
-                "z": 44.07679748535156
-            }
-        },
-        "type": "PredictionCircle",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -28.12466812133789,
-                "y": 0.009999999776482582,
-                "z": 44.07679748535156
+                "y": 4.379960536956787,
+                "z": 15.058597564697266
             }
         }
     },
@@ -702,11 +419,11 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "2cca6676-9cfc-4730-8fa3-2540cdb13efc",
+        "guid": "04e113c5-7e87-4933-8c17-91af008e47f3",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "waterDrop.obj",
+            "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -716,7 +433,7 @@
                 }
             }
         },
-        "name": "DroolRainObject",
+        "name": "DiceProjectileObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -726,7 +443,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -738,17 +455,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": -4.532676696777344,
-                "y": 12.142928123474121,
-                "z": 2.618896484375
+                "x": 0.4566526412963867,
+                "y": 0.5675784349441528,
+                "z": 10.600345611572266
             }
         },
-        "type": "DroolRainObject",
+        "type": "DiceProjectileObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -760,108 +477,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": -4.532676696777344,
-                "y": 12.142928123474121,
-                "z": 2.618896484375
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "c8d9440e-000a-4447-b5de-571fb1851a1f",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "PredictionCircle.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "PredictionCircle",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "2cca6676-9cfc-4730-8fa3-2540cdb13efc",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -29.87830352783203,
-                "y": 0.009999999776482582,
-                "z": 31.89689064025879
-            }
-        },
-        "type": "PredictionCircle",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -29.87830352783203,
-                "y": 0.009999999776482582,
-                "z": 31.89689064025879
+                "x": 0.4566526412963867,
+                "y": 0.5675784349441528,
+                "z": 10.600345611572266
             }
         }
     },
@@ -890,11 +513,11 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "b85cff66-5399-4774-ac3b-0df687c858b8",
+        "guid": "2abc48c2-e362-4394-a0a4-b38ab2f14842",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "waterDrop.obj",
+            "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -904,7 +527,7 @@
                 }
             }
         },
-        "name": "DroolRainObject",
+        "name": "DiceProjectileObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -914,7 +537,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -926,17 +549,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": 1.4980335235595703,
-                "y": 12.142928123474121,
-                "z": 10.224193572998047
+                "x": -1.1330496072769165,
+                "y": 0.5793263912200928,
+                "z": 10.600688934326172
             }
         },
-        "type": "DroolRainObject",
+        "type": "DiceProjectileObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -948,108 +571,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": 1.4980335235595703,
-                "y": 12.142928123474121,
-                "z": 10.224193572998047
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "00648d4d-f48d-46e8-9b7f-b05b51912503",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "PredictionCircle.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "PredictionCircle",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "b85cff66-5399-4774-ac3b-0df687c858b8",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -23.847593307495117,
-                "y": 0.009999999776482582,
-                "z": 39.50218963623047
-            }
-        },
-        "type": "PredictionCircle",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": false,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -23.847593307495117,
-                "y": 0.009999999776482582,
-                "z": 39.50218963623047
+                "x": -1.1330496072769165,
+                "y": 0.5793263912200928,
+                "z": 10.600688934326172
             }
         }
     },
@@ -1078,11 +607,11 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "6951a049-650b-4d17-99de-f119b5bf54bb",
+        "guid": "5c1c9176-e4b8-422e-b95c-f5166c6af3d6",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "waterDrop.obj",
+            "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -1092,7 +621,7 @@
                 }
             }
         },
-        "name": "DroolRainObject",
+        "name": "DiceProjectileObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -1102,7 +631,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "a27ca3cd-0900-45d6-975e-b145d13dc023",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -1114,17 +643,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": 0.0,
-                "y": 12.142928123474121,
-                "z": 4.197223663330078
+                "x": 0.4575967788696289,
+                "y": 0.5675784349441528,
+                "z": 12.244075775146484
             }
         },
-        "type": "DroolRainObject",
+        "type": "DiceProjectileObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -1136,22 +665,22 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": 0.0,
-                "y": 12.142928123474121,
-                "z": 4.197223663330078
+                "x": 0.4575967788696289,
+                "y": 0.5675784349441528,
+                "z": 12.244075775146484
             }
         }
     },
     {
         "castShadow": true,
         "colliderConfig": {
-            "colliderType": 0,
-            "isCollisionEnabled": false,
+            "colliderType": 16,
+            "isCollisionEnabled": true,
             "isDraw": true,
             "offset": {
                 "x": 0.0,
@@ -1169,14 +698,14 @@
                 "y": 1.0,
                 "z": 1.0
             },
-            "targetType": 0
+            "targetType": 1
         },
         "drawEnable": true,
-        "guid": "de41623b-178c-4fa8-a897-e6ce46a29057",
+        "guid": "3c154739-8ec3-4658-ae13-b7f3b81436c7",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "PredictionCircle.obj",
+            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
+            "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -1186,7 +715,7 @@
                 }
             }
         },
-        "name": "PredictionCircle",
+        "name": "DiceProjectileObject",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -1196,11 +725,11 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "6951a049-650b-4d17-99de-f119b5bf54bb",
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
-            "inheritTranslate": false,
+            "inheritTranslate": true,
             "rotation": {
                 "w": 1.0,
                 "x": 0.0,
@@ -1208,21 +737,21 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
             },
             "translation": {
-                "x": -25.345626831054688,
-                "y": 0.009999999776482582,
-                "z": 33.4752197265625
+                "x": -1.3705604076385498,
+                "y": 0.5675784349441528,
+                "z": 6.902790069580078
             }
         },
-        "type": "PredictionCircle",
+        "type": "DiceProjectileObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": false,
-            "inheritTranslate": false,
+            "inheritTranslate": true,
             "rotation": {
                 "w": 1.0,
                 "x": 0.0,
@@ -1230,14 +759,108 @@
                 "z": 0.0
             },
             "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": -1.3705604076385498,
+                "y": 0.5675784349441528,
+                "z": 6.902790069580078
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 16,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
             },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "03450a6c-ae03-4feb-965a-46c0b9d975aa",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
+            "modelName": "dice.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "DiceProjectileObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
             "translation": {
-                "x": -25.345626831054688,
-                "y": 0.009999999776482582,
-                "z": 33.4752197265625
+                "x": -0.24264919757843018,
+                "y": 0.3716733455657959,
+                "z": 15.498249053955078
+            }
+        },
+        "type": "DiceProjectileObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": -0.24264919757843018,
+                "y": 0.3716733455657959,
+                "z": 15.498249053955078
             }
         }
     }

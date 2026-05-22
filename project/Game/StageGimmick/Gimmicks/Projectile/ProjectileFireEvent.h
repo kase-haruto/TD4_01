@@ -2,6 +2,8 @@
 
 #include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Game\StageGimmick\Parameters\StageGimmickParam.h"
+
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
 #include "Engine/Foundation/Serialization/SerializableObject.h"
 
@@ -49,11 +51,13 @@ private:
 	/// </summary>
 	struct ProjectileFireEventParam : public CalyxEngine::SerializableObject {
 
-		// ホーミングするか
-		bool isHoming = true;
+		CraneProjectileParam param;
 
 		ProjectileFireEventParam() {
-			AddField("isHoming", isHoming).Category("ProjectileFireEvent");
+			AddField("scale", param.scale).Category("ProjectileFireEvent");
+			AddField("speed", param.speed).Category("ProjectileFireEvent");
+			AddField("targetTime", param.targetTime).Category("ProjectileFireEvent");
+			AddField("parryPositionY", param.parryPositionY).Category("ProjectileFireEvent");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

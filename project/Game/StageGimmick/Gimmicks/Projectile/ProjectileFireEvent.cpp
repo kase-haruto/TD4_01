@@ -22,7 +22,6 @@ void ProjectileFireEvent::OnCollisionEnter(Collider* other) {
 	// プレイヤーがイベント内に入ったら飛んでくる
 	if(auto target = targetObject_.lock()) {
 		target->SetIsFlying(true);
-		target->SetIsHoming(param_.isHoming);
 	}
 }
 
@@ -44,13 +43,16 @@ void ProjectileFireEvent::EventInitialize() {
 	if(!object) object = FindOwnedObjectByClassName<ProjectileObject>(objectPrefix);
 	if(object) {
 		targetObject_ = object;
+		object->SetParam(param_.param);
+		object->SetParent(shared_from_this());
 		object->SetName(objectPrefix);
 		SetTarget(object);
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<ProjectileObject>("debugCube.obj", objectPrefix);
+	targetObject_ = SceneAPI::Instantiate<ProjectileObject>("crane.obj", objectPrefix);
 	targetObject_.lock()->SetParent(shared_from_this());
+	targetObject_.lock()->SetParam(param_.param);
 	targetObjectGuid_ = targetObject_.lock()->GetGuid();
 	targetObject_.lock()->Initialize();
 	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;

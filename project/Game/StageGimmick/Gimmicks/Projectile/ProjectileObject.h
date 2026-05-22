@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/StageGimmick/Base/StageGimmickObjectBase.h"
+#include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
 /// <summary>
 /// 飛んでくる弾のオブジェクトクラス
@@ -19,7 +20,9 @@ public:
 	}
 
 	void SetIsFlying(bool isFlying) { isFlying_ = isFlying; }
-	void SetIsHoming(bool isHoming) { isHoming_ = isHoming; }
+	void SetParam(const CraneProjectileParam& param) {
+		param_ = param;
+	}
 
 	void OnCollisionEnter(Collider* other) override;
 
@@ -33,15 +36,17 @@ protected:
 
 private:
 
+	// パラメータ
+	CraneProjectileParam param_;
+
 	// 飛んでいるか
 	bool isFlying_ = false;
-
-	// ホーミングするか
-	bool isHoming_ = false;
+	bool isHit_	   = false;
+	bool isParry_  = false;
 
 	// 調整するパラメーター
 	CalyxEngine::Vector3 velocity_;
-	float speed_ = 5.0f;
+	float targetTime_ = 0.0f;
 
 
 };

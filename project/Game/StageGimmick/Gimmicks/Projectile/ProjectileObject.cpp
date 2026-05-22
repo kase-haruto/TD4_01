@@ -17,11 +17,18 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();
-	if(otherObj && (other->GetType() != ColliderType::Type_PlayerAttack || other->GetType() != ColliderType::Type_Player)) {
+	bool isPlayerAttack = other->GetType() == ColliderType::Type_PlayerAttack;
+	bool isPlayer = other->GetType() == ColliderType::Type_Player;
+	if(otherObj && !isPlayerAttack && !isPlayer) {
 		return;
 	}
 	// コライダーとモデルを無効化
-	isFlying_ = false;
+	isHit_		= isPlayer;
+	isParry_	= isPlayerAttack;
+	if(isHit_) {
+		isFlying_ = false;
+	}
+	targetTime_ = 0.0f;
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
 	}
@@ -37,20 +44,46 @@ void ProjectileObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(true);
 	}
 	isFlying_ = false;
+
+	worldTransform_.inheritScale = false;
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {
 
-	if(!isFlying_) {
-		if(isHoming_) {
-			auto player	  = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
-			velocity_ = player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
-		} else {
-			velocity_ = CalyxEngine::Vector3(0.0f, -0.5f, -1.0f);
-		}
+	if(worldTransform_.translation.y > param_.parryPositionY) {
 		return;
 	}
 
-	velocity_ = velocity_.Normalize() * speed_ * dt;
-	worldTransform_.translation += velocity_;
+	if(!isFlying_) {
+		if(targetTime_< 1.0f && isHit_) {
+			targetTime_ += dt;
+			if(targetTime_ >= 1.0f) {
+				SetDrawEnable(false);
+				velocity_ = CalyxEngine::Vector3::Zero();
+			}
+		}
+	} else {
+		if(param_.targetTime > targetTime_ && !isParry_) {
+			targetTime_ += dt;
+			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
+			velocity_	= player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
+		}
+		if(isParry_) {
+			velocity_ = CalyxEngine::Vector3::Forward() + CalyxEngine::Vector3::Up();
+		}
+	}
+
+	if(velocity_.Length() != 0.0f) {
+		// 移動処理
+		velocity_ = velocity_.Normalize() * param_.speed * dt;
+		CalyxEngine::Vector3 prePos = worldTransform_.translation;
+		worldTransform_.translation += velocity_;
+		// 回転処理
+		auto rotation = CalyxEngine::Quaternion::LookAt(
+			worldTransform_.translation,
+			prePos,
+			CalyxEngine::Vector3::Up());
+		worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
+			worldTransform_.rotation, rotation, 0.2f);
+	}
 }

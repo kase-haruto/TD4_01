@@ -23,9 +23,15 @@ public:
 
 	std::string_view GetObjectClassName() const override { return "PredictionCircle"; }
 
+	void SetObjectScale(float scale) { objectScale_ = scale; }
+
 private:
 
 	// よだれのオブジェクト
 	float targetObjectY_ = 0.0f;
+
+	// 回転
+	float radian_ = 0.0f;
+	float objectScale_ = 1.0f;
 
 };

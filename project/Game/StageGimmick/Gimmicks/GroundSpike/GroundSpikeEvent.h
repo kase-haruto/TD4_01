@@ -2,6 +2,8 @@
 
 #include "Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Game\StageGimmick\Prediction\PredictionCircle.h"
+
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
@@ -66,6 +68,8 @@ private:
 	// ターゲットの地面スパイクオブジェクト
 	std::weak_ptr<GroundSpikeObject> targetObject_;
 	Guid targetObjectGuid_;
+	std::weak_ptr<PredictionCircle> predictionObject_;
+	Guid predictionObjectGuid_;
 
 
 	GroundSpikeEventParam eventParam_;
