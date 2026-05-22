@@ -78,8 +78,10 @@ private:
 	Guid								targetObjectGuid_;
 
 	// 扉
-	std::weak_ptr<BellProjectileDoor> door_;
-	Guid							doorGuid_;
+	std::weak_ptr<BellProjectileDoor> doorL_;
+	Guid							doorLGuid_;
+	std::weak_ptr<BellProjectileDoor> doorR_;
+	Guid							doorRGuid_;
 
 	// パラメータ
 	BellProjectileEventParam   eventParam_;

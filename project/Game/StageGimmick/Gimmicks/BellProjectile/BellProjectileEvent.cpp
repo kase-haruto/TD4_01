@@ -28,7 +28,7 @@ void BellProjectileEvent::EventInitialize() {
 		return;
 	}
 
-	// 鐘（ターゲット）の解決
+	// 鐘（ターゲット）
 	auto target = ResolveLinkedObject<BellProjectileTarget>(bellGuid_, targetName);
 	if(!target) target = FindOwnedObjectByClassName<BellProjectileTarget>(targetName);
 	if(target) {
@@ -47,7 +47,7 @@ void BellProjectileEvent::EventInitialize() {
 		bellGuid_ = newTarget->GetGuid();
 	}
 
-	// 撞木（オブジェクト）の解決
+	// 撞木（オブジェクト）
 	auto obj = ResolveLinkedObject<BellProjectileObject>(targetObjectGuid_, objectName);
 	if(!obj) obj = FindOwnedObjectByClassName<BellProjectileObject>(objectName);
 	if(obj) {
@@ -68,25 +68,66 @@ void BellProjectileEvent::EventInitialize() {
 		targetObjectGuid_ = newObj->GetGuid();
 	}
 
-	// 扉の解決
-	auto door = ResolveLinkedObject<BellProjectileDoor>(doorGuid_, doorName);
-	if(!door) door = FindOwnedObjectByClassName<BellProjectileDoor>(doorName);
-	if(door) {
-		door->SetName(doorName);
-		door->SetParam(eventParam_.doorParam_);
-		door->SetTarget(bell_.lock().get());
-		door->Initialize();
-		door_ = door;
-		doorGuid_ = door->GetGuid();
+	// 扉(左)
+	const std::string doorLName = "BellProjectileDoorL";
+	auto doorL = ResolveLinkedObject<BellProjectileDoor>(doorLGuid_, doorLName);
+	if(!doorL) {
+		for(const auto& child : GetChildren()) {
+			if(child && child->GetName() == doorLName) {
+				doorL = std::dynamic_pointer_cast<BellProjectileDoor>(child);
+				break;
+			}
+		}
+	}
+	if(doorL) {
+		doorL->SetName(doorLName);
+		doorL->SetLR(0);
+		doorL->SetParam(eventParam_.doorParam_);
+		doorL->SetTarget(bell_.lock().get());
+		doorL->Initialize();
+		doorL_ = doorL;
+		doorLGuid_ = doorL->GetGuid();
 	} else {
-		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorName);
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorLName);
 		newDoor->SetParent(shared_from_this(), false);
+		newDoor->SetLR(0);
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
 		newDoor->SetTranslate({0.0f, 2.0f, 30.0f});
-		door_	  = newDoor;
-		doorGuid_ = newDoor->GetGuid();
+		doorL_	  = newDoor;
+		doorLGuid_ = newDoor->GetGuid();
+	}
+
+	// 扉(右)
+	const std::string doorRName = "BellProjectileDoorR";
+	auto doorR = ResolveLinkedObject<BellProjectileDoor>(doorRGuid_, doorRName);
+	if(!doorR) {
+		for(const auto& child : GetChildren()) {
+			if(child && child->GetName() == doorRName) {
+				doorR = std::dynamic_pointer_cast<BellProjectileDoor>(child);
+				break;
+			}
+		}
+	}
+	if(doorR) {
+		doorR->SetName(doorRName);
+		doorR->SetLR(1);
+		doorR->SetParam(eventParam_.doorParam_);
+		doorR->SetTarget(bell_.lock().get());
+		doorR->Initialize();
+		doorR_ = doorR;
+		doorRGuid_ = doorR->GetGuid();
+	} else {
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorRName);
+		newDoor->SetParent(shared_from_this(), false);
+		newDoor->SetLR(1);
+		newDoor->SetParam(eventParam_.doorParam_);
+		newDoor->SetTarget(bell_.lock().get());
+		newDoor->Initialize();
+		newDoor->SetTranslate({0.0f, 2.0f, 30.0f});
+		doorR_	  = newDoor;
+		doorRGuid_ = newDoor->GetGuid();
 	}
 }
 
@@ -111,7 +152,8 @@ void BellProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, cons
 	}
 	bellGuid_ = derived->value("bellGuid", Guid{});
 	targetObjectGuid_ = derived->value("targetObjectGuid", Guid{});
-	doorGuid_ = derived->value("doorGuid", Guid{});
+	doorLGuid_ = derived->value("doorLGuid", Guid{});
+	doorRGuid_ = derived->value("doorRGuid", Guid{});
 	
 	if(auto obj = targetObject_.lock()) {
 		obj->SetParam(eventParam_.param_);
@@ -119,8 +161,11 @@ void BellProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, cons
 	if(auto target = bell_.lock()) {
 		target->SetParam(eventParam_.targetParam_);
 	}
-	if(auto door = door_.lock()) {
-		door->SetParam(eventParam_.doorParam_);
+	if(auto doorL = doorL_.lock()) {
+		doorL->SetParam(eventParam_.doorParam_);
+	}
+	if(auto doorR = doorR_.lock()) {
+		doorR->SetParam(eventParam_.doorParam_);
 	}
 }
 
@@ -138,15 +183,22 @@ void BellProjectileEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::
 		derived["targetObjectGuid"] = targetObjectGuid_;
 	}
 
-	if(auto door = door_.lock()) {
-		derived["doorGuid"] = door->GetGuid();
-	} else if(doorGuid_.isValid()) {
-		derived["doorGuid"] = doorGuid_;
+	if(auto doorL = doorL_.lock()) {
+		derived["doorLGuid"] = doorL->GetGuid();
+	} else if(doorLGuid_.isValid()) {
+		derived["doorLGuid"] = doorLGuid_;
+	}
+
+	if(auto doorR = doorR_.lock()) {
+		derived["doorRGuid"] = doorR->GetGuid();
+	} else if(doorRGuid_.isValid()) {
+		derived["doorRGuid"] = doorRGuid_;
 	}
 }
 
 void BellProjectileEvent::RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) {
 	RemapGuid(bellGuid_, guidMap);
 	RemapGuid(targetObjectGuid_, guidMap);
-	RemapGuid(doorGuid_, guidMap);
+	RemapGuid(doorLGuid_, guidMap);
+	RemapGuid(doorRGuid_, guidMap);
 }

@@ -1,11 +1,16 @@
 #include "BellProjectileDoor.h"
 #include "BellProjectileTarget.h"
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include <Engine/Foundation/Math/MathUtil.h>
 
 REGISTER_SCENE_OBJECT(BellProjectileDoor)
 
 BellProjectileDoor::BellProjectileDoor(const std::string& modelName, std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
+}
+
+void BellProjectileDoor::SetLR(int lr) {
+	lr_ = lr;
 }
 
 void BellProjectileDoor::ObjectInitialize() {
@@ -19,6 +24,13 @@ void BellProjectileDoor::ObjectInitialize() {
 	}
 
 	worldTransform_.scale = param_.scale;
+	worldTransform_.rotationSource = RotationSource::Euler;
+	if (lr_ == 1) {
+		worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f);
+	} else {
+		worldTransform_.eulerRotation.y = 0.0f;
+	}
+
 	startPos_ = worldTransform_.translation;
 	isOpened_ = false;
 	openRate_ = 0.0f;
@@ -37,7 +49,11 @@ void BellProjectileDoor::ObjectUpdate(float dt) {
 			}
 		}
 
-		// 上に開く例（必要に応じて調整）
-		worldTransform_.translation.y = startPos_.y + (openRate_ * 10.0f);
+		float angle = openRate_ * CalyxEngine::ToRadians(90.0f);
+		if (lr_ == 0) {
+			worldTransform_.eulerRotation.y = angle;
+		} else {
+			worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f) + angle;
+		}
 	}
 }

@@ -25,6 +25,9 @@ public:
 		target_ = target;
 	}
 
+	// 0:左、1:右
+	void SetLR(int lr);
+
 protected:
 	// 初期化
 	void ObjectInitialize() override;
@@ -38,6 +41,7 @@ private:
 	// パラメータ
 	BellProjectileDoorParam param_;
 
+	int lr_ = 0;
 	// 開ききったか
 	bool isOpened_ = false;
 	// 開くアニメーション用
