@@ -22,7 +22,6 @@ void BellProjectileEvent::EventInitialize() {
 	const std::string eventPrefix = "BellProjectileEvent";
 	const std::string objectName = "BellProjectileObject";
 	const std::string targetName = "BellProjectileTarget";
-	const std::string doorName = "BellProjectileDoor";
 
 	if(GetName().find(eventPrefix) == std::string::npos) {
 		return;
@@ -42,7 +41,7 @@ void BellProjectileEvent::EventInitialize() {
 		newTarget->SetParent(shared_from_this(), false);
 		newTarget->SetParam(eventParam_.targetParam_);
 		newTarget->Initialize();
-		newTarget->SetTranslate({0.0f, 10.0f, 25.0f});
+		newTarget->SetTranslate({0.0f, 8.5f, 30.0f});
 		bell_ = newTarget;
 		bellGuid_ = newTarget->GetGuid();
 	}
@@ -63,7 +62,7 @@ void BellProjectileEvent::EventInitialize() {
 		newObj->SetParam(eventParam_.param_);
 		newObj->SetTarget(bell_.lock().get());
 		newObj->Initialize();
-		newObj->SetTranslate({0.0f, 1.0f, 15.0f});
+		newObj->SetTranslate({0.0f, 1.0f, 20.0f});
 		targetObject_	  = newObj;
 		targetObjectGuid_ = newObj->GetGuid();
 	}
@@ -94,7 +93,7 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({-12.0f, 0.0f, 35.0f});
+		newDoor->SetTranslate({-12.0f, 0.0f, 40.0f});
 		doorL_	  = newDoor;
 		doorLGuid_ = newDoor->GetGuid();
 	}
@@ -125,9 +124,28 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({12.0f, 0.0f, 35.0f});
+		newDoor->SetTranslate({12.0f, 0.0f, 40.0f});
 		doorR_	  = newDoor;
 		doorRGuid_ = newDoor->GetGuid();
+	}
+
+	// 建物
+	const std::string gateName = "BellProjectileGate";
+	auto			  gate	   = ResolveLinkedObject<GeneralObject>(gateGuid_, gateName);
+	if(!gate) gate = FindOwnedObjectByClassName<GeneralObject>(gateName);
+	if(gate) {
+		gate->SetName(gateName);
+		gate->Initialize();
+		gate_	  = gate;
+		gateGuid_ = gate->GetGuid();
+	} else {
+		auto newGate = SceneAPI::Instantiate<GeneralObject>("sanmon.obj", gateName);
+		newGate->SetParent(shared_from_this(), false);
+		newGate->Initialize();
+		newGate->SetScale({1.95f, 2.0f, 2.25f});
+		newGate->SetTranslate({0.0f, 0.0f, 32.5f});
+		gate_	  = newGate;
+		gateGuid_	  = newGate->GetGuid();
 	}
 }
 

@@ -227,6 +227,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\StageGimmick\Base\GeneralObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileObject.cpp" />
@@ -539,6 +540,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\StageGimmick\Base\GeneralObject.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileObject.h" />
