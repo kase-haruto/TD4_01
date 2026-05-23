@@ -149,7 +149,9 @@ namespace CalyxEngine {
 			if(fx.followEmitter) { fx.position = position_ + fx.followOffset; } else { fx.position += fx.velocity * deltaTime; }
 
 			// スピン
-			fx.rotationEuler.z += fx.spinSpeed * deltaTime;
+			fx.rotationEuler.x += fx.spinSpeed.x * deltaTime;
+			fx.rotationEuler.y += fx.spinSpeed.y * deltaTime;
+			fx.rotationEuler.z += fx.spinSpeed.z * deltaTime;
 
 			fx.age += deltaTime;
 			if(fx.age >= fx.lifetime) fx.alive = false;
@@ -201,7 +203,7 @@ namespace CalyxEngine {
 			data.position = fx.position;
 			data.scale    = fx.scale;
 			data.color    = fx.color;
-			data.rotation = fx.rotationEuler.z;
+			data.rotation = fx.rotationEuler;
 
 			gpuUnits.push_back(data);
 		}
@@ -250,7 +252,16 @@ namespace CalyxEngine {
 		fx.alive        = true;
 		fx.uvTransform.Initialize();
 		fx.spinSpeed = spin_.Get();
-		if(HasFlag(RandomSpinEmit)) { fx.rotationEuler.z = Random::Generate<float>(-CalyxEngine::kPi,CalyxEngine::kPi); } else { fx.rotationEuler.z = 0.0f; }
+		fx.rotationEuler = CalyxEngine::Vector3(0.0f, 0.0f, 0.0f);
+		if(HasFlag(RandomSpinEmit)) {
+			const CalyxEngine::Vector3 spinAxes{
+				randomSpinAxes_.x != 0.0f ? 1.0f : 0.0f,
+				randomSpinAxes_.y != 0.0f ? 1.0f : 0.0f,
+				randomSpinAxes_.z != 0.0f ? 1.0f : 0.0f};
+			if(spinAxes.x != 0.0f) fx.rotationEuler.x = Random::Generate<float>(-CalyxEngine::kPi,CalyxEngine::kPi);
+			if(spinAxes.y != 0.0f) fx.rotationEuler.y = Random::Generate<float>(-CalyxEngine::kPi,CalyxEngine::kPi);
+			if(spinAxes.z != 0.0f) fx.rotationEuler.z = Random::Generate<float>(-CalyxEngine::kPi,CalyxEngine::kPi);
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -435,6 +446,23 @@ namespace CalyxEngine {
 					bool rse = HasFlag(RandomSpinEmit);
 					if(GuiCmd::CheckBox("##randspin",rse)) SetFlag(RandomSpinEmit,rse);
 				}
+				FxGui::RowLabel("Random Init Axes");
+				{
+					bool axisX = randomSpinAxes_.x != 0.0f;
+					bool axisY = randomSpinAxes_.y != 0.0f;
+					bool axisZ = randomSpinAxes_.z != 0.0f;
+					bool changed = ImGui::Checkbox("X##randspin_axis_x",&axisX);
+					ImGui::SameLine();
+					changed |= ImGui::Checkbox("Y##randspin_axis_y",&axisY);
+					ImGui::SameLine();
+					changed |= ImGui::Checkbox("Z##randspin_axis_z",&axisZ);
+					if(changed) {
+						randomSpinAxes_ = CalyxEngine::Vector3(axisX ? 1.0f : 0.0f, axisY ? 1.0f : 0.0f, axisZ ? 1.0f : 0.0f);
+						if(randomSpinAxes_.x == 0.0f && randomSpinAxes_.y == 0.0f && randomSpinAxes_.z == 0.0f) {
+							randomSpinAxes_.z = 1.0f;
+						}
+					}
+				}
 			}
 
 			// ================= Camera Dither =================
@@ -465,7 +493,7 @@ namespace CalyxEngine {
 				FxGui::DrawParam("Scale",scale_);
 				FxGui::DrawParam("Velocity",velocity_);
 				FxGui::DrawParam("Lifetime",lifetime_);
-				FxGui::DrawParam("spin",spin_);
+				FxGui::DrawParam("Spin",spin_);
 			}
 
 			// ================= Playback =================
@@ -604,6 +632,11 @@ namespace CalyxEngine {
 		velocity_.FromConfig(config.velocity);
 		lifetime_.FromConfig(config.lifetime);
 		scale_.FromConfig(config.scale);
+		spin_.FromConfig(config.spin);
+		randomSpinAxes_ = config.randomSpinAxes;
+		if(randomSpinAxes_.x == 0.0f && randomSpinAxes_.y == 0.0f && randomSpinAxes_.z == 0.0f) {
+			randomSpinAxes_.z = 1.0f;
+		}
 		emitRate_  = config.emitRate;
 		modelPath  = config.modelPath;
 		modelGuid_ = config.modelGuid;
@@ -646,6 +679,8 @@ namespace CalyxEngine {
 		config.velocity       = Vector3ParamConfig{velocity_.ToConfig()};
 		config.lifetime       = FxFloatParamConfig{lifetime_.ToConfig()};
 		config.scale          = Vector3ParamConfig{scale_.ToConfig()};
+		config.spin           = Vector3ParamConfig{spin_.ToConfig()};
+		config.randomSpinAxes = randomSpinAxes_;
 		config.emitRate       = emitRate_;
 		config.modelPath      = modelPath;
 		config.modelGuid      = modelGuid_;

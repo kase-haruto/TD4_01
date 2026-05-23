@@ -17,7 +17,7 @@ namespace CalyxEngine {
 	struct FxUnit {
 		CalyxEngine::Vector3 position;                        //< 座標
 		CalyxEngine::Vector3 rotationEuler;                   //< オイラー回転
-		float              spinSpeed;                       // < スピン速度
+		CalyxEngine::Vector3 spinSpeed;                       // < スピン速度
 		CalyxEngine::Vector3 velocity;                        //< 速度
 		CalyxEngine::Vector3 initialScale = {1.0f,1.0f,1.0f}; // 初期スケール
 		CalyxEngine::Vector3 scale;                           //< スケール

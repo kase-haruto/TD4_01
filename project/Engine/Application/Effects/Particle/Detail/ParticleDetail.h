@@ -10,6 +10,6 @@ namespace CalyxEngine {
 		CalyxEngine::Vector3 position;
 		CalyxEngine::Vector3 scale;
 		CalyxEngine::Vector4 color;
-		float			rotation = 0.0f;
+		CalyxEngine::Vector3 rotation{0.0f, 0.0f, 0.0f};
 	};
 }

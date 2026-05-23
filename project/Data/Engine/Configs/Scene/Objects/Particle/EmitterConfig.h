@@ -14,12 +14,38 @@
 #include <vector>
 
 namespace CalyxEngine {
+	inline Vector3ParamConfig MakeDefaultSpinConfig() {
+		Vector3ParamConfig config{};
+		config.constant = CalyxEngine::Vector3(0.0f, 0.0f, 0.0f);
+		config.min = CalyxEngine::Vector3(0.0f, 0.0f, 0.0f);
+		config.max = CalyxEngine::Vector3(0.0f, 0.0f, 0.0f);
+		return config;
+	}
+
+	inline Vector3ParamConfig ReadSpinConfig(const nlohmann::json& j) {
+		if(!j.contains("spin") || j["spin"].is_null()) return MakeDefaultSpinConfig();
+
+		const auto& spinJson = j["spin"];
+		if(spinJson.is_object() && spinJson.contains("constant") && spinJson["constant"].is_number()) {
+			FxFloatParamConfig oldSpin = spinJson.get<FxFloatParamConfig>();
+			Vector3ParamConfig converted{};
+			converted.mode = oldSpin.mode;
+			converted.constant = CalyxEngine::Vector3(0.0f, 0.0f, oldSpin.constant);
+			converted.min = CalyxEngine::Vector3(0.0f, 0.0f, oldSpin.min);
+			converted.max = CalyxEngine::Vector3(0.0f, 0.0f, oldSpin.max);
+			return converted;
+		}
+
+		return spinJson.get<Vector3ParamConfig>();
+	}
+
 	struct EmitterConfig {
 		CalyxEngine::Vector3 position{};
 		CalyxEngine::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
 		Vector3ParamConfig scale;
 		Vector3ParamConfig velocity;
 		FxFloatParamConfig lifetime;
+		Vector3ParamConfig spin = MakeDefaultSpinConfig();
 
 		float		emitRate	= 0.1f;
 		std::string modelPath	= "plane.obj";
@@ -32,6 +58,7 @@ namespace CalyxEngine {
 		bool		  followOneShot	 = false;
 		bool		  isComplement	 = true;
 		bool		  randomSpinEmit = false;
+		CalyxEngine::Vector3 randomSpinAxes{0.0f, 0.0f, 1.0f};
 		bool          cameraDitherEnabled = false;
 		BillboardMode billboardMode	 = BillboardMode::Full;
 		BlendMode	  blendMode		 = BlendMode::ADD;
@@ -62,12 +89,14 @@ namespace CalyxEngine {
 		color		   = j.value("color", CalyxEngine::Vector4{1, 1, 1, 1});
 		velocity	   = j.value("velocity", Vector3ParamConfig{});
 		lifetime	   = j.value("lifetime", FxFloatParamConfig{});
+		spin		   = ReadSpinConfig(j);
 		emitRate	   = j.value("emitRate", 1.0f);
 		modelPath	   = j.value("modelPath", "plane.obj");
 		texturePath	   = j.value("texturePath", "Textures/white1x1.dds");
 		isDrawEnable   = j.value("isDrawEnable", true);
 		isComplement   = j.value("isComplement", true);
 		randomSpinEmit = j.value("randomSpinEmit", false);
+		randomSpinAxes = j.value("randomSpinAxes", CalyxEngine::Vector3{0.0f, 0.0f, 1.0f});
 		followOneShot  = j.value("followOneShot", false);
 		cameraDitherEnabled = j.value("cameraDitherEnabled", false);
 		cameraDitherNear = j.value("cameraDitherNear", 0.0f);
@@ -122,12 +151,14 @@ namespace CalyxEngine {
 		j["velocity"]		= velocity;
 		j["scale"]			= scale;
 		j["lifetime"]		= lifetime;
+		j["spin"]			= spin;
 		j["emitRate"]		= emitRate;
 		j["modelPath"]		= modelPath;
 		j["texturePath"]	= texturePath;
 		j["isDrawEnable"]	= isDrawEnable;
 		j["isComplement"]	= isComplement;
 		j["randomSpinEmit"] = randomSpinEmit;
+		j["randomSpinAxes"] = randomSpinAxes;
 		j["followOneShot"]	= followOneShot;
 		j["cameraDitherEnabled"] = cameraDitherEnabled;
 		j["cameraDitherNear"] = cameraDitherNear;

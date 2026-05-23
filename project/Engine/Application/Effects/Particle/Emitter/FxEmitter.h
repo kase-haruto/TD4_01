@@ -124,7 +124,8 @@ namespace CalyxEngine {
 		FxParam<CalyxEngine::Vector3> scale_;	   //< パーティクルのスケール（定数またはランダム）
 		FxParam<CalyxEngine::Vector3> velocity_; //< パーティクルの速度（定数またはランダム）
 		FxParam<float>				lifetime_; //< パーティクルの寿命（定数またはランダム）
-		FxParam<float>				spin_;	   //< パーティクルのスピン（定数またはランダム）
+		FxParam<CalyxEngine::Vector3> spin_;	   //< パーティクルのスピン（定数またはランダム）
+		CalyxEngine::Vector3		randomSpinAxes_{0.0f, 0.0f, 1.0f};
 
 	protected:
 		//===================================================================*/

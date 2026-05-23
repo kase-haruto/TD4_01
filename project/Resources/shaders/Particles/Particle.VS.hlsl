@@ -22,7 +22,7 @@ struct ParticleData {
 	float3 position;
 	float3 scale;
 	float4 color;
-	float rotation; // Z軸スピン角
+	float3 rotation; // XYZスピン角
 };
 
 struct Camera {
@@ -98,28 +98,30 @@ VertexShaderOutput main(VertexShaderInput input,
 	}
 
 	// ==========================================================
-	//  Z軸スピン回転（ローカル平面上で right/up を回転）
-	// ==========================================================
-	float s = sin(p.rotation);
-	float c = cos(p.rotation);
-
-	// 回転後の基底ベクトルを計算
-	float3 rotatedRight = right * c + up * s;
-	float3 rotatedUp = up * c - right * s;
-	float3 rotatedForward = normalize(cross(rotatedRight, rotatedUp)); // Z軸回転なのでForwardは原則変わらないが、直交性を維持
-
-	// ==========================================================
 	//  頂点計算
 	// ==========================================================
 	// inputのローカル座標にスケールを適用
 	// (input.position.xyz はモデルの頂点データ)
 	float3 offset = input.position.xyz * p.scale;
+	float3 rotatedOffset = offset;
 
-	// パーティクルの中心位置 + 回転した基底ベクトルに沿ったオフセット
+	float sx = sin(p.rotation.x);
+	float cx = cos(p.rotation.x);
+	rotatedOffset = float3(rotatedOffset.x, rotatedOffset.y * cx - rotatedOffset.z * sx, rotatedOffset.y * sx + rotatedOffset.z * cx);
+
+	float sy = sin(p.rotation.y);
+	float cy = cos(p.rotation.y);
+	rotatedOffset = float3(rotatedOffset.x * cy + rotatedOffset.z * sy, rotatedOffset.y, -rotatedOffset.x * sy + rotatedOffset.z * cy);
+
+	float sz = sin(p.rotation.z);
+	float cz = cos(p.rotation.z);
+	rotatedOffset = float3(rotatedOffset.x * cz - rotatedOffset.y * sz, rotatedOffset.x * sz + rotatedOffset.y * cz, rotatedOffset.z);
+
+	// パーティクルの中心位置 + ビルボード基底に沿ったオフセット
 	float3 worldPos = p.position
-					+ rotatedRight * offset.x
-					+ rotatedUp * offset.y
-					+ rotatedForward * offset.z;
+					+ right * rotatedOffset.x
+					+ up * rotatedOffset.y
+					+ forward * rotatedOffset.z;
 
 	// ==========================================================
 	//  出力
