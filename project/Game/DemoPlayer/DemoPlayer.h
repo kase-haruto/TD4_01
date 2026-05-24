@@ -27,10 +27,10 @@ public:
 
 	void TakeDamage(int32_t damage);
 
-	//--------- config ------------------------------------------------
-
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoPlayer"; }
+	int32_t			 GetLife() const { return life_; }
+	int32_t			 GetMaxHP() const { return param_.playerHP; }
 private:
 	struct JumpEvents {
 		bool jumpStart = false;
@@ -52,7 +52,7 @@ private:
 private:
 
 	struct PlayerParameter : public CalyxEngine::SerializableObject {
-		int	  playerHP = 10;
+		int	  playerHP = 4;
 		float moveSpeed = 2.0f;
 		float jumpForce = 15.0f;
 		float diveForce = -30.0f;

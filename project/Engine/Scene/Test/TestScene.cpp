@@ -59,6 +59,14 @@ void TestScene::Initialize(){
 	stageGimmickManager_ = std::make_unique<StageGimmickManager>();
 	stageGimmickManager_->Initialize();
 
+	player_ = sceneContext_->FindFirst<DemoPlayer>();
+	playerUI_ = std::make_unique<PlayerUI>();
+	if (player_) {
+		playerUI_->Initialize(player_->GetMaxHP());
+	} else {
+		playerUI_->Initialize(4); // デフォルト
+	}
+
 	ShockwaveManager::GetInstance()->SetStage(stage_.get());
 
 	//=========================
@@ -121,6 +129,10 @@ void TestScene::Update([[maybe_unused]]float dt){
 	stageGimmickManager_->ShowGui();
 	stageGimmickManager_->Update(dt);
 
+	if (player_) {
+		playerUI_->Update(dt, player_->GetLife());
+	}
+
 	//衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }
@@ -131,6 +143,10 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	//	spriteの登録
 	//========================================================//
 	stage_->Draw(spriteRenderer_.get());
+
+	if (playerUI_) {
+		playerUI_->Draw(spriteRenderer_.get());
+	}
 
 	if(isPaused_) {
 		fanBg_->Draw(spriteRenderer_.get());

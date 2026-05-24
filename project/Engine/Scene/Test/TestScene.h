@@ -17,6 +17,7 @@
 #include <Game\DemoPlayer\DemoPlayer.h>
 #include <Game\StageGimmick\Manager\StageGimmickManager.h>
 #include <Game/3d/Camera/RailCamera.h>
+#include <Game\DemoPlayer\PlayerUI.h>
 #include <Game\Scene\Transition\TransitionPayload.h>
 #include <Game\Scene\Game\GameTransitionPayload.h>
 #include <Game/Scene/Transition/TransitionControl.h>
@@ -83,6 +84,7 @@ private:
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 
 	std::unique_ptr<TransitionControl> transitionControl_ = nullptr;
+	std::unique_ptr<PlayerUI>		   playerUI_		  = nullptr;
 
 	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
 

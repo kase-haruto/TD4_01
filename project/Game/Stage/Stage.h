@@ -19,6 +19,8 @@ public:
 	bool IsClear() const { return isClear_; }
 
 private:
+	std::unique_ptr<Sprite>		   baseUI_;
+	std::unique_ptr<Sprite>		   frameUI_;
 	std::unique_ptr<Sprite>		   hpUI_;
 	std::unique_ptr<NumbersSprite> numbersSprite_;
 	float						   stageHP_ = 0.0f;
@@ -28,6 +30,7 @@ private:
 	bool isGameOver_ = false;
 	bool isClear_	 = false;
 
-	CalyxEngine::Vector2 hpUISize_ = {500.0f, 20.0f};
+	CalyxEngine::Vector2 hpUISize_ = {700.0f, 80.0f};
+	CalyxEngine::Vector2 barSize_   = {500.0f, 20.0f};
 
 };
