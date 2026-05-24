@@ -62,7 +62,7 @@ void SelectScene::Initialize() {
 	}
 	// シーンタイプに基づいて自動で演出をセット
 	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::SELECT);
-	transitionControl_->StartOpening(0.75f, [this]() {
+	transitionControl_->StartOpening(1.25f, [this]() {
 		IsOpening_ = false;
 		transitionControl_->SetTexturePlate1("Textures/uvChecker.dds");
 		transitionControl_->SetTexturePlate2("Textures/uvChecker.dds");

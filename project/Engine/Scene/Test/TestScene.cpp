@@ -134,9 +134,10 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 
 	if(isPaused_) {
 		fanBg_->Draw(spriteRenderer_.get());
+		pauseUI_->Draw(spriteRenderer_.get());
 		resumeBtn_->Draw(spriteRenderer_.get());
+		toRetryBtn_->Draw(spriteRenderer_.get());
 		toSelectBtn_->Draw(spriteRenderer_.get());
-		toTitleBtn_->Draw(spriteRenderer_.get());
 	}
 	
 	transitionControl_->Draw(spriteRenderer_.get());
@@ -153,27 +154,33 @@ void TestScene::CleanUp(){
 }
 
 void TestScene::InitPauseResource() {
-	const std::string whiteTex = "Textures/white1x1.dds";
+	pauseUI_ = std::make_unique<CalyxEngine::SpriteObject2d>();
+	pauseUI_->Initialize("Textures/UI/Pose/pose_text.png");
+	pauseUI_->SetPosition({640.0f, 110.0f});
+	pauseUI_->SetScale({640.0f, 180.0f});
+	pauseUI_->SetAnchorPoint({0.5f, 0.5f});
+	pauseUI_->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+
 	resumeBtn_				   = std::make_unique<CalyxEngine::SpriteObject2d>();
-	resumeBtn_->Initialize(whiteTex);
-	resumeBtn_->SetPosition({640.0f, 125.0f});
-	resumeBtn_->SetScale({300.0f, 60.0f});
+	resumeBtn_->Initialize("Textures/UI/Pose/game.png");
+	resumeBtn_->SetPosition({640.0f, 210.0f});
+	resumeBtn_->SetScale({640.0f, 180.0f});
 	resumeBtn_->SetAnchorPoint({0.5f, 0.5f});
 	resumeBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
+	toRetryBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
+	toRetryBtn_->Initialize("Textures/UI/Pose/retry.png");
+	toRetryBtn_->SetPosition({640.0f, 310.0f});
+	toRetryBtn_->SetScale({640.0f, 180.0f});
+	toRetryBtn_->SetAnchorPoint({0.5f, 0.5f});
+	toRetryBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
+
 	toSelectBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
-	toSelectBtn_->Initialize(whiteTex);
-	toSelectBtn_->SetPosition({640.0f, 250.0f});
-	toSelectBtn_->SetScale({300.0f, 60.0f});
+	toSelectBtn_->Initialize("Textures/UI/Pose/select.png");
+	toSelectBtn_->SetPosition({640.0f, 410.0f});
+	toSelectBtn_->SetScale({640.0f, 180.0f});
 	toSelectBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
-
-	toTitleBtn_ = std::make_unique<CalyxEngine::SpriteObject2d>();
-	toTitleBtn_->Initialize(whiteTex);
-	toTitleBtn_->SetPosition({640.0f, 375.0f});
-	toTitleBtn_->SetScale({300.0f, 60.0f});
-	toTitleBtn_->SetAnchorPoint({0.5f, 0.5f});
-	toTitleBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
 
 	fanBg_	 = std::make_unique<CalyxEngine::SpriteObject2d>();
 	fanAnim_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
@@ -272,7 +279,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		PauseClose();
 	});
 
-	updateBtn(toSelectBtn_, 1, [&]() {
+	updateBtn(toRetryBtn_, 1, [&]() {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildGamePayload(stageNum_);
 		IsPhase_ = true;
@@ -282,13 +289,13 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		});
 	});
 
-	updateBtn(toTitleBtn_, 2, [&]() {
+	updateBtn(toSelectBtn_, 2, [&]() {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::TITLE);
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::SELECT);
 		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TITLE), std::move(payload_));
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
 		});
 	});
 }
@@ -386,12 +393,14 @@ void TestScene::ButtonFadeIn(float dt) {
 	currentFadeTime_ += dt;
 
 	float alpha = t;
+	pauseUI_->SetAlpha(alpha);
 	resumeBtn_->SetAlpha(alpha);
+	toRetryBtn_->SetAlpha(alpha);
 	toSelectBtn_->SetAlpha(alpha);
-	toTitleBtn_->SetAlpha(alpha);
+	pauseUI_->Update(dt);
 	resumeBtn_->Update(dt);
+	toRetryBtn_->Update(dt);
 	toSelectBtn_->Update(dt);
-	toTitleBtn_->Update(dt);
 
 	if(t >= 1.0f) {
 		isFadeFinish_ = true;
@@ -404,12 +413,14 @@ void TestScene::ButtonFadeOut(float dt) {
 	currentFadeTime_ += dt;
 
 	float alpha = 1.0f - t;
+	pauseUI_->SetAlpha(alpha);
 	resumeBtn_->SetAlpha(alpha);
+	toRetryBtn_->SetAlpha(alpha);
 	toSelectBtn_->SetAlpha(alpha);
-	toTitleBtn_->SetAlpha(alpha);
+	pauseUI_->Update(dt);
 	resumeBtn_->Update(dt);
+	toRetryBtn_->Update(dt);
 	toSelectBtn_->Update(dt);
-	toTitleBtn_->Update(dt);
 
 	if(t >= 1.0f) {
 		isFadeFinish_ = true;

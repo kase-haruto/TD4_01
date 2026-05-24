@@ -73,9 +73,10 @@ private:
 
 	std::unique_ptr<CalyxEngine::SpriteObject2d> fanBg_		  = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteAnimator2d> fanAnim_		  = nullptr;
-	std::unique_ptr<CalyxEngine::SpriteObject2d>   resumeBtn_	= nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d>   pauseUI_	  = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d>   resumeBtn_	  = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d>   toRetryBtn_	  = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteObject2d>   toSelectBtn_	  = nullptr;
-	std::unique_ptr<CalyxEngine::SpriteObject2d>   toTitleBtn_	  = nullptr;
 	
 	int									 stageNum_			  = 0;
 	std::unique_ptr<Stage>				 stage_				  = nullptr;

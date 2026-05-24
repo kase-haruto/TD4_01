@@ -332,14 +332,14 @@ void TransitionControl::InitAnim() {
 
 
 	auto asset		   = std::make_shared<CalyxEngine::SpriteAnimationAsset>();
-	asset->division	   = {5, 2}; // 例: 4x4分割
+	asset->division	   = {5, 4}; // 例: 4x4分割
 	asset->texturePath = "Textures/Transition/wave.png";
 
 	CalyxEngine::SpriteAnimationClip clip;
 	clip.name		   = "Wave";
 	clip.startFrame	   = 0;
-	clip.frameCount	   = 10;
-	clip.frameDuration = 0.1f;
+	clip.frameCount	   = 20;
+	clip.frameDuration = 0.075f;
 	clip.loop		   = true;
 	asset->clips.push_back(clip);
 
