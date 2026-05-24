@@ -434,6 +434,7 @@ SkinCluster CreateSkinCluster(const Microsoft::WRL::ComPtr<ID3D12Device>& device
 	skinCluster.mappedPalette = {mappedPalette, skeleton.joints.size()};
 
 	DescriptorHandle handle = DescriptorAllocator::Allocate(DescriptorUsage::CbvSrvUav);
+	skinCluster.paletteSrvDescriptor = handle;
 	skinCluster.paletteSrvHandle.first = handle.cpu;
 	skinCluster.paletteSrvHandle.second = handle.gpu;
 

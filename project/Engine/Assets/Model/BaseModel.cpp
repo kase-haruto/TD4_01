@@ -35,6 +35,13 @@ const std::string BaseModel::directoryPath_ = "Resource/models";
 
 namespace {
 	uint64_t gBaseModelUploadFrameGeneration = 1;
+	constexpr uint32_t kMaxGraphTextures = 8;
+}
+
+BaseModel::~BaseModel() {
+	for(const DescriptorHandle& textureTable : materialGraphTextureTables_) {
+		DescriptorAllocator::FreeRange(DescriptorUsage::CbvSrvUav, textureTable, kMaxGraphTextures);
+	}
 }
 
 void BaseModel::BeginUploadFrame() {
@@ -509,7 +516,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetTexSrv(size_t materialIndex) const {
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE BaseModel::GetMaterialGraphTextureSrvTable(size_t materialIndex) const {
-	constexpr uint32_t kMaxGraphTextures = 8;
 	auto* textureManager = CalyxEngine::AssetManager::GetInstance()->GetTextureManager();
 	ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
 	if(!textureManager || !device) return {};
