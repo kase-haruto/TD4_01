@@ -40,7 +40,7 @@ public:
 	//===================================================================*/
 	//			public methods
 	//===================================================================*/
-	virtual ~BaseModel() = default;
+	virtual ~BaseModel();
 
 	virtual void Initialize() = 0;
 	virtual void Update(float deltaTime);

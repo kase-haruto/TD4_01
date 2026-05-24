@@ -44,6 +44,12 @@ namespace CalyxEngine {
 		currentAnimation_ = &animationStates_.at(base);
 	}
 
+	AnimationModel::~AnimationModel() {
+		DescriptorAllocator::Free(DescriptorUsage::CbvSrvUav, sourceVertexSrv_);
+		DescriptorAllocator::Free(DescriptorUsage::CbvSrvUav, influenceSrv_);
+		DescriptorAllocator::Free(DescriptorUsage::CbvSrvUav, skinCluster_.paletteSrvDescriptor);
+	}
+
 	/* =====================================================================
 	   初期化 – マテリアルバッファなど
 	   ===================================================================*/
