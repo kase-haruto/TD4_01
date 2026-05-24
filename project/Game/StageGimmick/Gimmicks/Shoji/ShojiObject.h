@@ -5,6 +5,8 @@
 #include "Game\StageGimmick\Gimmicks\Shoji\ShojiPaperObject.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 /// <summary>
 /// 障子のオブジェクトクラス
 /// </summary>
@@ -30,6 +32,10 @@ public:
 	const std::array<std::shared_ptr<ShojiPaperObject>,12>& GetPaperObject() {
 		return paperObjs_;
 	}
+	void SetIsConfetti(uint32_t index) {
+		EffectAPI::Play(effectData_, paperObjs_[index]->GetWorldPosition());
+	}
+
 	void SetIsOpen(bool flag) { isOpen_ = flag; }
 	const bool GetIsOpen() const { return isOpen_; }
 
@@ -71,4 +77,6 @@ private:
 	float offsetX_ = 0.0f;
 	// 障子の速度
 	float velocityX_ = 0.0f;
+
+	CalyxEngine::EffectAsset effectData_;
 };

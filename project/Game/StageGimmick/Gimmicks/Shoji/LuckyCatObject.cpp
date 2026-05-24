@@ -46,6 +46,7 @@ void LuckyCatObject::OnCollisionEnter(Collider* other) {
 	// 収納箱の数をプラスする
 	worldTransform_.scale = param_.hitScale;
 	isParry_			  = true;
+	EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
 }
 
 void LuckyCatObject::ObjectInitialize() {
@@ -61,6 +62,8 @@ void LuckyCatObject::ObjectInitialize() {
 
 	worldTransform_.scale = CalyxEngine::Vector3::One() * param_.luckyCatScale;
 	worldTransform_.inheritScale = false;
+
+	effectData_.Load("StarEffect");
 }
 
 void LuckyCatObject::ObjectUpdate(float dt) {
@@ -127,6 +130,7 @@ void LuckyCatObject::ObjectUpdate(float dt) {
 			const auto& paperObj = shojiObjs_[shojiIndex_]->GetPaperObject()[randIndex_];
 			paperObj->SetModelFileNameForEditor("shojiTearPaper.obj");
 			shojiObjs_[shojiIndex_]->AddClearCount();
+			shojiObjs_[shojiIndex_]->SetIsConfetti(randIndex_);
 			worldTransform_.scale = param_.hitScale;
 			worldTransform_.translation = parryP2_ + CalyxEngine::Vector3{0.0f, 0.0f, -0.5f};
 			isShoji_			  = true;

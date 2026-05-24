@@ -10,14 +10,14 @@
         "cameraDitherNear": 0.0,
         "color": {
           "w": 1.0,
-          "x": 0.8967971801757813,
-          "y": 0.019148673862218857,
+          "x": 1.0,
+          "y": 0.021352291107177734,
           "z": 0.0
         },
         "emitCount": 10,
         "emitDelay": 0.0,
         "emitDuration": -1.0,
-        "emitRate": 0.0,
+        "emitRate": 0.029999999329447746,
         "emitterShape": 2,
         "followOneShot": false,
         "isComplement": true,
@@ -39,7 +39,7 @@
             "enabled": true,
             "end": [
               0.75,
-              1.0,
+              1.0499999523162842,
               1.0,
               1.0
             ],
@@ -57,7 +57,7 @@
           {
             "blend": 0,
             "clamp01": true,
-            "ease": 6,
+            "ease": 2,
             "enabled": true,
             "end": [
               0.0,
@@ -75,18 +75,40 @@
               1.0
             ],
             "target": 5
+          },
+          {
+            "blend": 1,
+            "clamp01": true,
+            "ease": 6,
+            "enabled": true,
+            "end": [
+              0.1814671754837036,
+              0.1814671754837036,
+              0.1814671754837036,
+              0.0
+            ],
+            "guid": "45cc27a6-aecf-4efc-acd6-ebac00b7e11e",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 4
           }
         ],
         "position": {
           "x": 0.0,
-          "y": 0.8299245834350586,
+          "y": 0.021831035614013672,
           "z": 0.0
         },
         "randomSpinEmit": false,
         "scale": {
           "constant": {
-            "x": 1.5299999713897705,
-            "y": 1.4900000095367432,
+            "x": 2.0,
+            "y": 2.0,
             "z": 1.0
           },
           "max": {
@@ -211,7 +233,7 @@
         ],
         "position": {
           "x": 0.0,
-          "y": 0.8299245834350586,
+          "y": 0.021831035614013672,
           "z": 0.0
         },
         "randomSpinEmit": false,
@@ -287,6 +309,6 @@
       }
     }
   ],
-  "name": "ParticlePreview",
+  "name": "FireLoadEffect",
   "type": "EffectAsset"
 }

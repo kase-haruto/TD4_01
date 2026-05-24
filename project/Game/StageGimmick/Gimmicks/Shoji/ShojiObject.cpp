@@ -53,6 +53,8 @@ void ShojiObject::ObjectInitialize() {
 
 	offsetX_   = worldTransform_.translation.x;
 	velocityX_ = param_.openVelocityX;
+
+	effectData_.Load("ConfettiEffect");
 }
 
 void ShojiObject::ObjectUpdate(float dt) {

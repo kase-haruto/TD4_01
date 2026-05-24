@@ -19,9 +19,7 @@ void FireLoadObject::BurnActive() {
 	if(collider_) {
 		collider_->SetCollisionEnabled(true);
 	}
-	if(model_) {
-		BaseGameObject::SetDrawEnable(true);
-	}
+	fxHandle_ = EffectAPI::Play(effectData_, worldTransform_.translation);
 }
 
 void FireLoadObject::OnCollisionEnter(Collider* other) {
@@ -38,6 +36,8 @@ void FireLoadObject::OnCollisionEnter(Collider* other) {
 	if(model_) {
 		BaseGameObject::SetDrawEnable(false);
 	}
+	EffectAPI::Stop(fxHandle_);
+	fxHandle_ = {};
 }
 
 void FireLoadObject::ObjectInitialize() {
@@ -50,6 +50,8 @@ void FireLoadObject::ObjectInitialize() {
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(false);
 	}
+
+	effectData_.Load("FireLoadEffect");
 
 	defaultScale_ = {1.0f, 1.0f, 1.0f};
 }
@@ -64,7 +66,6 @@ void FireLoadObject::ObjectUpdate(float dt) {
 		return;
 	};
 	IgnitionUpdate(dt);
-
 }
 
 void FireLoadObject::IgnitionUpdate(float dt) {

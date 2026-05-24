@@ -5,6 +5,8 @@
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 class ShojiObject;
 
 /// <summary>
@@ -83,5 +85,7 @@ private:
 	bool isFlying_ = false;
 	bool isParry_  = false;
 	bool isShoji_ = false;
+
+	CalyxEngine::EffectAsset  effectData_;
 
 };

@@ -1,0 +1,169 @@
+{
+  "emitters": [
+    {
+      "emitter": {
+        "autoDestroy": false,
+        "billboardMode": 1,
+        "blendMode": 2,
+        "cameraDitherEnabled": false,
+        "cameraDitherFar": 20.0,
+        "cameraDitherNear": 0.0,
+        "color": {
+          "w": 1.0,
+          "x": 1.0,
+          "y": 0.3416370153427124,
+          "z": 0.0
+        },
+        "emitCount": 8,
+        "emitDelay": 0.0,
+        "emitDuration": -1.0,
+        "emitRate": 0.20000000298023224,
+        "emitterShape": 1,
+        "followOneShot": false,
+        "isComplement": true,
+        "isDrawEnable": true,
+        "isOneShot": true,
+        "lifetime": {
+          "constant": 1.0,
+          "max": 0.800000011920929,
+          "min": 0.6000000238418579,
+          "mode": 1
+        },
+        "modelGuid": "00000000-0000-0000-0000-000000000000",
+        "modelPath": "plane.obj",
+        "modules": [
+          {
+            "blend": 2,
+            "clamp01": true,
+            "ease": 1,
+            "enabled": true,
+            "end": [
+              0.0,
+              0.0,
+              1.0,
+              1.0
+            ],
+            "guid": "5370662f-33cf-4f48-864c-f66dbed90303",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.0499999523162842,
+              1.0499999523162842,
+              1.0,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 1,
+            "enabled": true,
+            "end": [
+              7.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "6843faac-e887-4a0a-a426-65ad354a65c4",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 3
+          },
+          {
+            "enabled": true,
+            "gravity": {
+              "x": 0.0,
+              "y": -5.0,
+              "z": -15.0
+            },
+            "name": "GravityModule"
+          }
+        ],
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "randomSpinEmit": true,
+        "scale": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "mode": 0
+        },
+        "shapeAngle": 30.0,
+        "shapeRadius": 0.15000000596046448,
+        "shapeSize": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "textureGuid": "cce94e6f-a838-4c73-a8cb-330fd1745aa9",
+        "texturePath": "Textures/white1x1.dds",
+        "velocity": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 5.0,
+            "y": 10.0,
+            "z": 5.0
+          },
+          "min": {
+            "x": -5.0,
+            "y": 2.5,
+            "z": -5.0
+          },
+          "mode": 1
+        }
+      },
+      "isDrawEnable": true,
+      "isGpu": false,
+      "name": "Emitter",
+      "transform": {
+        "inheritRotate": true,
+        "inheritScale": true,
+        "inheritTranslate": true,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "translation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    }
+  ],
+  "name": "StarEffect",
+  "type": "EffectAsset"
+}

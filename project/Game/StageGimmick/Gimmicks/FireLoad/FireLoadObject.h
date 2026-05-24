@@ -3,6 +3,8 @@
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 /// <summary>
 /// 炎オブジェクト
 /// </summary>
@@ -54,4 +56,7 @@ private:
 
 	bool isBurn_ = false;
 	bool isIgnition_ = false;
+
+	CalyxEngine::EffectAsset effectData_;
+	CalyxEngine::EffectHandle fxHandle_{};
 };

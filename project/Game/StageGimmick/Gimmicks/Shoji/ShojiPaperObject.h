@@ -31,4 +31,5 @@ protected:
 private:
 
 	bool isGetPosition_ = false;
+
 };
