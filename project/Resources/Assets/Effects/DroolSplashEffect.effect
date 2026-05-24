@@ -10,55 +10,33 @@
         "cameraDitherNear": 0.0,
         "color": {
           "w": 1.0,
-          "x": 1.0,
-          "y": 1.0,
+          "x": 0.0,
+          "y": 0.5622775554656982,
           "z": 1.0
         },
-        "emitCount": 24,
+        "emitCount": 12,
         "emitDelay": 0.0,
         "emitDuration": -1.0,
-        "emitRate": 0.0,
-        "emitterShape": 4,
+        "emitRate": 0.009999999776482582,
+        "emitterShape": 3,
         "followOneShot": false,
-        "isComplement": false,
+        "isComplement": true,
         "isDrawEnable": true,
         "isOneShot": true,
         "lifetime": {
-          "constant": 0.6000000238418579,
-          "max": 3.0,
+          "constant": 0.6499999761581421,
+          "max": 1.5,
           "min": 1.0,
           "mode": 0
         },
-        "modelGuid": "db951345-144c-4ce3-a0bc-f94f7a303ca4",
+        "modelGuid": "00000000-0000-0000-0000-000000000000",
         "modelPath": "plane.obj",
         "modules": [
           {
-            "blend": 1,
-            "clamp01": true,
-            "ease": 1,
             "enabled": true,
-            "end": [
-              0.009999999776482582,
-              0.009999999776482582,
-              0.0,
-              1.0
-            ],
-            "guid": "d9f7f66a-eb9a-43c9-9bf1-05b5dee89113",
-            "invert": false,
-            "name": "OverLifetimeModule",
-            "start": [
-              0.019999999552965164,
-              0.019999999552965164,
-              0.0,
-              1.0
-            ],
-            "target": 0
-          },
-          {
-            "enabled": false,
             "gravity": {
               "x": 0.0,
-              "y": -3.0,
+              "y": -40.0,
               "z": 0.0
             },
             "name": "GravityModule"
@@ -66,7 +44,29 @@
           {
             "blend": 0,
             "clamp01": true,
-            "ease": 6,
+            "ease": 3,
+            "enabled": true,
+            "end": [
+              0.4000000059604645,
+              0.0,
+              1.0,
+              1.0
+            ],
+            "guid": "4e9d0be1-e628-4399-afa8-ac5751677816",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.03999999910593033,
+              0.800000011920929,
+              1.0,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 3,
             "enabled": true,
             "end": [
               0.0,
@@ -74,7 +74,7 @@
               1.0,
               1.0
             ],
-            "guid": "789d3370-8140-4e51-b9c1-d669237d73e2",
+            "guid": "9f6d206a-aa82-42f1-b8c9-86f174d75a98",
             "invert": false,
             "name": "OverLifetimeModule",
             "start": [
@@ -94,8 +94,8 @@
         "randomSpinEmit": false,
         "scale": {
           "constant": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": 0.0,
+            "y": 0.0,
             "z": 1.0
           },
           "max": {
@@ -104,20 +104,20 @@
             "z": 1.0
           },
           "min": {
-            "x": 0.10000000149011612,
-            "y": 0.10000000149011612,
-            "z": 1.0
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
           },
           "mode": 1
         },
-        "shapeAngle": 30.0,
+        "shapeAngle": 85.9000015258789,
         "shapeRadius": 1.0,
         "shapeSize": {
-          "x": 0.8999999761581421,
-          "y": 0.44999998807907104,
-          "z": 0.15000000596046448
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
         },
-        "textureGuid": "982cb98d-d454-4f9b-8c32-fc9bef08d459",
+        "textureGuid": "af72f7f7-e5c5-4621-b0eb-64d7c3d77c01",
         "texturePath": "Textures/white1x1.dds",
         "velocity": {
           "constant": {
@@ -126,14 +126,14 @@
             "z": 1.0
           },
           "max": {
-            "x": 5.0,
-            "y": 5.0,
-            "z": -0.5
+            "x": 4.5,
+            "y": 13.5,
+            "z": 4.5
           },
           "min": {
-            "x": -5.0,
-            "y": -5.0,
-            "z": -2.0
+            "x": -4.5,
+            "y": 12.5,
+            "z": -4.5
           },
           "mode": 1
         }
@@ -164,6 +164,6 @@
       }
     }
   ],
-  "name": "ConfettiEffect",
+  "name": "DroolSplashEffect",
   "type": "EffectAsset"
 }

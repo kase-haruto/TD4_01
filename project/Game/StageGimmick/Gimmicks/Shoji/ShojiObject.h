@@ -77,6 +77,8 @@ private:
 	float offsetX_ = 0.0f;
 	// 障子の速度
 	float velocityX_ = 0.0f;
+	// 開くための時間
+	float openTime_ = 0.0f;
 
 	CalyxEngine::EffectAsset effectData_;
 };

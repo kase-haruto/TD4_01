@@ -30,6 +30,7 @@ public:
 	void SetParam(const GroundSpikeParam& param) {
 		param_ = param;
 	}
+	const bool GetIsBuried() const { return isBuried_; }
 
 protected:
 

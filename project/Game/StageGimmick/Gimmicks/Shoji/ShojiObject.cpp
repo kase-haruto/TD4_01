@@ -59,6 +59,11 @@ void ShojiObject::ObjectInitialize() {
 
 void ShojiObject::ObjectUpdate(float dt) {
 
+	if(isOpen_ && openTime_ < param_.openTimer) {
+		openTime_ += dt;
+		return;
+	}
+
 	if(isOpen_ && !isStop_) {
 		float w = param_.wOpen;
 		if(worldTransform_.translation.x > 0.0f) {

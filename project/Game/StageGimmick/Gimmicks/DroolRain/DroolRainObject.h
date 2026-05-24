@@ -3,6 +3,8 @@
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 /// <summary>
 /// よだれ雨オブジェクト
 /// </summary>
@@ -49,4 +51,6 @@ private:
 	// 雨が降っているか
 	bool isRaining_ = false;
 	bool isOnceSet_ = true; // 初期Offset用
+
+	CalyxEngine::EffectAsset effectData_;
 };

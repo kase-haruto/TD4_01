@@ -24,6 +24,7 @@ public:
 	std::string_view GetObjectClassName() const override { return "PredictionCircle"; }
 
 	void SetObjectScale(float scale) { objectScale_ = scale; }
+	void SetIsRotation(bool flag) { isRotation_ = flag; }
 
 private:
 
@@ -33,5 +34,7 @@ private:
 	// 回転
 	float radian_ = 0.0f;
 	float objectScale_ = 1.0f;
+
+	bool isRotation_ = false;
 
 };

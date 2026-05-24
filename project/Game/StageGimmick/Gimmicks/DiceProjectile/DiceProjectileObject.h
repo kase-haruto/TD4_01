@@ -5,6 +5,8 @@
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 class DiceSocketObject;
 
 /// <summary>
@@ -79,5 +81,7 @@ private:
 	bool isSocket_ = false;
 	// 回転時間
 	float time_ = 0.0f;
+
+	CalyxEngine::EffectAsset effectData_;
 
 };

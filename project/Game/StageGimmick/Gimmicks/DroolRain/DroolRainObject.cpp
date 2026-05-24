@@ -30,6 +30,8 @@ void DroolRainObject::ObjectInitialize() {
 	dropTime_					 = Random::Generate<float>(0.0f, 1.0f);
 	isRaining_					 = false;
 	isOnceSet_					 = true;
+
+	effectData_.Load("DroolSplashEffect");
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {
@@ -62,6 +64,11 @@ void DroolRainObject::ObjectUpdate(float dt) {
 		float scaleY = worldTransform_.scale.y;
 		scaleY += runtimeParam_.airScaleSpeed_ * dt;
 		worldTransform_.scale.y = scaleY;
+		// よだれが落ちたら
+		if(worldTransform_.translation.y <= 0.0f) {
+			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() - CalyxEngine::Vector3{0.0f, 1.3f, 0.0f});
+		}
+
 
 	// 落下終了後の処理
 	} else {

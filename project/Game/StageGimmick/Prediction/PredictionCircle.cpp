@@ -35,10 +35,12 @@ void PredictionCircle::Update(float dt) {
 	// 高さによってスケールを変化させる
 	const auto& parent = worldTransform_.parent;
 	if(parent) {
-		float scale = parent->GetWorldPosition().y / targetObjectY_;
-		worldTransform_.scale = CalyxEngine::Vector3::One() * scale * objectScale_;
-
-		radian_ += dt;
-		worldTransform_.rotation = CalyxEngine::Quaternion::MakeRotateY(radian_);
+		if(isRotation_) {
+			radian_ += dt;
+			worldTransform_.rotation = CalyxEngine::Quaternion::MakeRotateY(radian_);
+		} else {
+			float scale = parent->GetWorldPosition().y / targetObjectY_;
+			worldTransform_.scale = CalyxEngine::Vector3::One() * scale * objectScale_;
+		}
 	}
 }

@@ -49,6 +49,8 @@ void DiceProjectileObject::ObjectInitialize() {
 	worldTransform_.scale = CalyxEngine::Vector3::One() * param_.scale;
 	worldTransform_.inheritScale = false;
 	isParry_ = false;
+
+	effectData_.Load("StarEffect");
 }
 
 void DiceProjectileObject::SameNumberRotation() {
@@ -122,6 +124,8 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 			worldTransform_.scale = param_.hitScale;
 			isSocket_			  = true;
 			parryCurveInit_		  = false;
+			auto offset			  = CalyxEngine::Vector3::Up() + CalyxEngine::Vector3::Forward();
+			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() - offset);
 			return;
 		}
 	}

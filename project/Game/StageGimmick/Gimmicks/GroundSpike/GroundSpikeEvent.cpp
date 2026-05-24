@@ -53,21 +53,22 @@ void GroundSpikeEvent::EventInitialize() {
 		targetObject_.lock()->Initialize();
 	}
 
-	auto prediction = ResolveLinkedObject<PredictionCircle>(targetObjectGuid_, predictionCirclePrefix);
+	auto prediction = ResolveLinkedObject<PredictionCircle>(predictionObjectGuid_, predictionCirclePrefix);
 	if(!prediction) prediction = FindOwnedObjectByClassName<PredictionCircle>(predictionCirclePrefix);
 	if(prediction) {
 		predictionObject_ = prediction;
 		prediction->SetName(predictionCirclePrefix);
-		prediction->SetObjectScale(1.2f);
-		prediction->SetParent(targetObject_.lock());
 	} else {
 		// シーンから対応するオブジェクトが無ければ生成する
 		predictionObject_ = SceneAPI::Instantiate<PredictionCircle>("PredictionCircle.obj", predictionCirclePrefix);
-		predictionObject_.lock()->SetParent(targetObject_.lock());
-		predictionObject_.lock()->SetObjectScale(1.2f);
-		targetObjectGuid_ = predictionObject_.lock()->GetGuid();
+		predictionObjectGuid_ = predictionObject_.lock()->GetGuid();
+	}
+	if(predictionObject_.lock()) {
 		predictionObject_.lock()->Initialize();
+		predictionObject_.lock()->SetScale(CalyxEngine::Vector3::One() * 1.2f);
+		predictionObject_.lock()->SetParent(targetObject_.lock());
 		predictionObject_.lock()->SetTexture("circle/groundPrediction.png");
+		predictionObject_.lock()->SetIsRotation(true);
 	}
 }
 
@@ -84,6 +85,9 @@ void GroundSpikeEvent::EventUpdate(float) {
 		CalyxEngine::Vector3 targetPos = targetObject_.lock()->GetWorldPosition();
 		targetPos.y = 0.1f;
 		predictionObject_.lock()->SetTranslate(targetPos);
+		if(targetObject_.lock()->GetIsBuried()) {
+			predictionObject_.lock()->SetDrawEnable(false);
+		}
 	}
 }
 

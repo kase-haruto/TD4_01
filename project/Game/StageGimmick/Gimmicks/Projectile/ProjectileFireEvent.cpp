@@ -43,6 +43,7 @@ void ProjectileFireEvent::EventInitialize() {
 	if(!object) object = FindOwnedObjectByClassName<ProjectileObject>(objectPrefix);
 	if(object) {
 		targetObject_ = object;
+		object->Initialize();
 		object->SetParam(param_.param);
 		object->SetParent(shared_from_this());
 		object->SetName(objectPrefix);
