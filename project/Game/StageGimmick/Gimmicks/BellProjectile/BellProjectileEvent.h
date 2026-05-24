@@ -1,5 +1,6 @@
 #pragma once
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Game\StageGimmick\Base\GeneralObject.h"
 #include "Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileObject.h"
 #include "Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileTarget.h"
 #include "Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.h"
@@ -82,6 +83,10 @@ private:
 	Guid							doorLGuid_;
 	std::weak_ptr<BellProjectileDoor> doorR_;
 	Guid							doorRGuid_;
+
+	// 建物
+	std::weak_ptr<GeneralObject> gate_;
+	Guid						 gateGuid_;
 
 	// パラメータ
 	BellProjectileEventParam   eventParam_;
