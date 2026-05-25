@@ -60,7 +60,7 @@ void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier)
 	isActive_					= true;
 	isTakeDamageForStage_		= false;
 	
-	SetDrawEnable(true);
+	//SetDrawEnable(true);
 	if (collider_) {
 		collider_->SetCollisionEnabled(true);
 	}
