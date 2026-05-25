@@ -21,18 +21,15 @@ public:
 		return "DiceSocketObject";
 	}
 
+	// クリア時のクラッカーまでの時間
+	void SetCrackerInterval(float time) { crackerInterval_ = time; }
+	void SetCrackerPos(const CalyxEngine::Vector3& pos) { crackerPos_ = pos; }
 	// クリアの数をセット
-	void SetClearCount(uint32_t count) {
-		clearCount_ = count;
-	}
+	void SetClearCount(uint32_t count) { clearCount_ = count; }
 	// 収納箱の数を加算する
-	void AddDiceSocketCount() {
-		diceSocketCount_++;
-	}
+	void AddDiceSocketCount() {	diceSocketCount_++; }
 	// 収納箱の数を取得
-	const uint32_t GetDiceSocketCount() {
-		return diceSocketCount_;
-	}
+	const uint32_t GetDiceSocketCount() { return diceSocketCount_; }
 	// 今収納可能な座標を取得
 	const CalyxEngine::Vector3 GetSocketPos();
 	// ゾロ目用の回転を取得する
@@ -60,6 +57,8 @@ private:
 
 	// クリア時の演出
 	bool isCracker_ = false;
+	float crackerInterval_ = 1.0f;
+	CalyxEngine::Vector3	 crackerPos_;
 	CalyxEngine::EffectAsset effectLeftData_;
 	CalyxEngine::EffectAsset effectRightData_;
 
