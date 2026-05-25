@@ -276,7 +276,6 @@ ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const st
 	// メッシュデータを格納
 	for(unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		const aiMesh* mesh = scene->mMeshes[meshIndex];
-		uint32_t	  baseVertex = static_cast<uint32_t>(modelData.meshResource.Vertices().size());
 		LoadMesh(mesh, modelData);
 
 		// ボーンごとの影響を集約
@@ -295,7 +294,7 @@ ModelData ModelManager::LoadModelFile(const std::string& directoryPath, const st
 			jointWeightData.inverseBindPoseMatrix = CalyxEngine::Matrix4x4::Inverse(bindPoseMatrix);
 
 			for(uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-				jointWeightData.vertexWeights.push_back({bone->mWeights[weightIndex].mWeight,baseVertex+ bone->mWeights[weightIndex].mVertexId});
+				jointWeightData.vertexWeights.push_back({bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId});
 			}
 		}
 	}
