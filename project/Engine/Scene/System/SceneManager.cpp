@@ -322,17 +322,33 @@ namespace CalyxEngine {
 
 		auto& slot = slots_[currentIdx_];
 		slot.scene->Draw(cmd, pso, rt);
-
-		// gameViewパネルにもスプライトを描画する
-		if(rt->GetRenderTargetType() != RenderTargetType::DebugView) {
-			slot.scene->DrawSpritesOnly(cmd, pso);
-		}
 	}
 
 	//------------------------------------------------------------
 	void SceneManager::DrawNotAffectedFromPE(ID3D12GraphicsCommandList* cmd, PipelineService* pso) {
 		if(slots_.empty()) return;
+
+		auto* postOutput = dx_->GetRenderTargetCollection().Get("PostEffectOutput");
+		DrawSpritesToRenderTarget(postOutput, cmd, pso, true);
+
+		auto* backBuffer = dx_->GetRenderTargetCollection().Get("BackBuffer");
+		DrawSpritesToRenderTarget(backBuffer, cmd, pso, false);
+	}
+
+	void SceneManager::DrawSpritesToRenderTarget(IRenderTarget* rt,
+												 ID3D12GraphicsCommandList* cmd,
+												 PipelineService* pso,
+												 bool transitionToShaderResource) {
+		if(!rt) return;
+
+		rt->TransitionTo(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		rt->SetRenderTarget(cmd);
+
 		slots_[currentIdx_].scene->DrawSpritesOnly(cmd, pso);
+
+		if(transitionToShaderResource) {
+			rt->TransitionTo(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		}
 	}
 
 	void SceneManager::RequestSceneChangeInternal(SceneId next) {
