@@ -46,6 +46,8 @@ void GroundSpikeObject::ObjectInitialize() {
 	isBuried_ = false;
 
 	worldTransform_.inheritScale = false;
+
+	effectData_.Load("GroundSpikeEffect");
 }
 
 void GroundSpikeObject::ObjectUpdate(float dt) {
@@ -55,6 +57,9 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 		float y = worldTransform_.translation.y;
 		y += param_.popUpSpeed * dt;
 		worldTransform_.translation.y = y;
+		if(param_.popUpHeight <= worldTransform_.translation.y) {
+			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
+		}
 	}
 
 	// 埋まる時の処理

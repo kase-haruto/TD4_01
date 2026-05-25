@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Game/StageGimmick/Base/StageGimmickObjectBase.h"
-
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
+
+#include "Engine\Scene\Utility\SceneUtility.h"
 
 /// <summary>
 /// 地面から生えてくる歯のオブジェクトクラス
@@ -54,5 +55,7 @@ private:
 	float spikeAimY_ = 0.5f;
 
 	GroundSpikeParam param_;
+
+	CalyxEngine::EffectAsset effectData_;
 
 };

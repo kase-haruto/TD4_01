@@ -1,0 +1,160 @@
+{
+  "emitters": [
+    {
+      "emitter": {
+        "autoDestroy": false,
+        "billboardMode": 1,
+        "blendMode": 2,
+        "cameraDitherEnabled": false,
+        "cameraDitherFar": 20.0,
+        "cameraDitherNear": 0.0,
+        "color": {
+          "w": 1.0,
+          "x": 1.0,
+          "y": 0.36298930644989014,
+          "z": 0.0
+        },
+        "emitCount": 6,
+        "emitDelay": 0.0,
+        "emitDuration": -1.0,
+        "emitRate": 0.10000000149011612,
+        "emitterShape": 1,
+        "followOneShot": false,
+        "isComplement": true,
+        "isDrawEnable": true,
+        "isOneShot": true,
+        "lifetime": {
+          "constant": 0.6800000071525574,
+          "max": 1.0,
+          "min": 0.0,
+          "mode": 0
+        },
+        "modelGuid": "00000000-0000-0000-0000-000000000000",
+        "modelPath": "plane.obj",
+        "modules": [
+          {
+            "blend": 1,
+            "clamp01": true,
+            "ease": 3,
+            "enabled": true,
+            "end": [
+              0.009999999776482582,
+              0.009999999776482582,
+              0.0,
+              1.0
+            ],
+            "guid": "0bb0e151-a70c-4444-9198-87b668e50de8",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.006000000052154064,
+              0.00800000037997961,
+              0.0,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": false,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "cba74665-5f5e-47a2-9b89-676bbf5948d1",
+            "invert": true,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 5
+          }
+        ],
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "randomSpinEmit": false,
+        "scale": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 0.10000000149011612,
+            "y": 0.20000000298023224,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.10000000149011612,
+            "z": 1.0
+          },
+          "mode": 1
+        },
+        "shapeAngle": 30.0,
+        "shapeRadius": 0.10000000149011612,
+        "shapeSize": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "textureGuid": "30d2c79a-c8ca-43e6-a7c5-e6a3b12b93d4",
+        "texturePath": "Textures/white1x1.dds",
+        "velocity": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 3.0,
+            "y": 3.0,
+            "z": -1.0
+          },
+          "min": {
+            "x": -3.0,
+            "y": -3.0,
+            "z": -1.5
+          },
+          "mode": 1
+        }
+      },
+      "isDrawEnable": true,
+      "isGpu": false,
+      "name": "Emitter",
+      "transform": {
+        "inheritRotate": true,
+        "inheritScale": true,
+        "inheritTranslate": true,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "translation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    }
+  ],
+  "name": "DiceStarEffect",
+  "type": "EffectAsset"
+}

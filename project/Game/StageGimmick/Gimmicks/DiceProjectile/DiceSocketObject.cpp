@@ -62,7 +62,18 @@ void DiceSocketObject::ObjectInitialize() {
 	worldTransform_.scale.x = static_cast<float>(clearCount_ + 1u);
 
 	sameNumbers_ = static_cast<uint32_t>(rand() % 6 + 1);
+
+	effectLeftData_.Load("CrackerLeftEffect");
+	effectRightData_.Load("CrackerRightEffect");
 }
 
 void DiceSocketObject::ObjectUpdate(float) {
+
+	if(!isCracker_ && clearCount_ <= diceSocketCount_){
+		isCracker_ = true;
+		CalyxEngine::Vector3 offset = CalyxEngine::Vector3{-5.0f, -2.0f, -1.0f} + worldTransform_.GetWorldPosition();
+		EffectAPI::Play(effectLeftData_, offset);
+		offset.x *= -1.0f;
+		EffectAPI::Play(effectRightData_, offset);
+	}
 }

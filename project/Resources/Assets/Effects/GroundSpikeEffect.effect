@@ -1,0 +1,191 @@
+{
+  "emitters": [
+    {
+      "emitter": {
+        "autoDestroy": false,
+        "billboardMode": 1,
+        "blendMode": 2,
+        "cameraDitherEnabled": false,
+        "cameraDitherFar": 20.0,
+        "cameraDitherNear": 0.0,
+        "color": {
+          "w": 1.0,
+          "x": 1.0,
+          "y": 0.4270462393760681,
+          "z": 0.0
+        },
+        "emitCount": 4,
+        "emitDelay": 0.0,
+        "emitDuration": -1.0,
+        "emitRate": 0.029999999329447746,
+        "emitterShape": 2,
+        "followOneShot": false,
+        "isComplement": true,
+        "isDrawEnable": true,
+        "isOneShot": true,
+        "lifetime": {
+          "constant": 0.75,
+          "max": 1.0,
+          "min": 0.0,
+          "mode": 0
+        },
+        "modelGuid": "00000000-0000-0000-0000-000000000000",
+        "modelPath": "plane.obj",
+        "modules": [
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 3,
+            "enabled": true,
+            "end": [
+              6.28000020980835,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "66f0bf63-e4a6-4c2e-b860-186181b52cba",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 3
+          },
+          {
+            "blend": 1,
+            "clamp01": true,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              -0.029999999329447746,
+              -0.029999999329447746,
+              1.0,
+              1.0
+            ],
+            "guid": "96afac6f-c03a-409a-a641-6460afeea0ac",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "enabled": true,
+            "gravity": {
+              "x": 0.0,
+              "y": -12.0,
+              "z": 0.0
+            },
+            "name": "GravityModule"
+          },
+          {
+            "blend": 2,
+            "clamp01": true,
+            "ease": 0,
+            "enabled": true,
+            "end": [
+              0.699999988079071,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "2f0b18cc-80a7-41cf-a89c-13e6cf2622ed",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.2000000476837158,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 5
+          }
+        ],
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "randomSpinEmit": true,
+        "scale": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "mode": 0
+        },
+        "shapeAngle": 75.0,
+        "shapeRadius": 0.5,
+        "shapeSize": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "textureGuid": "cce94e6f-a838-4c73-a8cb-330fd1745aa9",
+        "texturePath": "Textures/white1x1.dds",
+        "velocity": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 2.0,
+            "y": 8.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": -2.0,
+            "y": 8.0,
+            "z": -1.0
+          },
+          "mode": 1
+        }
+      },
+      "isDrawEnable": true,
+      "isGpu": false,
+      "name": "StarEmitter",
+      "transform": {
+        "inheritRotate": true,
+        "inheritScale": true,
+        "inheritTranslate": true,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "translation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    }
+  ],
+  "name": "GroundSpikeEffect",
+  "type": "EffectAsset"
+}

@@ -3,6 +3,8 @@
 #include "Game\StageGimmick\Base\StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 /// <summary>
 /// サイコロの収納箱オブジェクト
 /// </summary>
@@ -55,5 +57,10 @@ private:
 
 	// 今ハマっているサイコロの数
 	uint32_t diceSocketCount_ = 0;
+
+	// クリア時の演出
+	bool isCracker_ = false;
+	CalyxEngine::EffectAsset effectLeftData_;
+	CalyxEngine::EffectAsset effectRightData_;
 
 };
