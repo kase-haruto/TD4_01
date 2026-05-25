@@ -49,6 +49,42 @@ namespace CalyxEngine {
 		c.rotateToDirection = j.value("rotateToDirection",false);
 	}
 
+	inline Vector3ParamConfig ReadSpinConfig(const nlohmann::json& j,const Vector3ParamConfig& fallback) {
+		Vector3ParamConfig result = fallback;
+
+		auto readSpinValue = [](const nlohmann::json& value,CalyxEngine::Vector3& out) {
+			if(value.is_number()) {
+				out = CalyxEngine::Vector3(0.0f,0.0f,value.get<float>());
+			} else {
+				out = value.get<CalyxEngine::Vector3>();
+			}
+		};
+
+		if(j.is_null()) return result;
+		if(j.is_number()) {
+			result.mode = FxValueMode::Constant;
+			result.constant = CalyxEngine::Vector3(0.0f,0.0f,j.get<float>());
+			return result;
+		}
+
+		if(!j.is_object()) return j.get<Vector3ParamConfig>();
+
+		if(auto it = j.find("mode"); it != j.end() && !it->is_null()) {
+			result.mode = it->get<FxValueMode>();
+		}
+		if(auto it = j.find("constant"); it != j.end() && !it->is_null()) {
+			readSpinValue(*it,result.constant);
+		}
+		if(auto it = j.find("min"); it != j.end() && !it->is_null()) {
+			readSpinValue(*it,result.min);
+		}
+		if(auto it = j.find("max"); it != j.end() && !it->is_null()) {
+			readSpinValue(*it,result.max);
+		}
+
+		return result;
+	}
+
 	struct EmitterConfig {
 		CalyxEngine::Vector3 position{};
 		CalyxEngine::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
@@ -105,7 +141,9 @@ namespace CalyxEngine {
 		color		   = j.value("color", CalyxEngine::Vector4{1, 1, 1, 1});
 		velocity	   = j.value("velocity", Vector3ParamConfig{});
 		direction	   = j.value("direction", DirectionConfig{});
-		spin		   = j.value("spin", spin);
+		if(auto it = j.find("spin"); it != j.end() && !it->is_null()) {
+			spin = ReadSpinConfig(*it,spin);
+		}
 		lifetime	   = j.value("lifetime", FxFloatParamConfig{});
 		emitRate	   = j.value("emitRate", 1.0f);
 		modelPath	   = j.value("modelPath", "plane.obj");

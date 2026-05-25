@@ -20,6 +20,7 @@
 #include "Engine/Foundation/Math/MathUtil.h"
 #include "Engine/Foundation/Utility/Converter/EnumConverter.h"
 #include "Engine/Graphics/Camera/Manager/CameraManager.h"
+#include "../Detail/ParticleDetail.h"
 
 #include <externals/imgui/ImGuiFileDialog.h>
 #include <externals/imgui/imgui.h>
