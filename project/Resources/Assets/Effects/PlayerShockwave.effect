@@ -17,12 +17,12 @@
         "emitCount": 1,
         "emitDelay": 0.0,
         "emitDuration": -1.0,
-        "emitRate": 1.0,
+        "emitRate": 0.0,
         "emitterShape": 0,
         "followOneShot": false,
         "isComplement": false,
         "isDrawEnable": true,
-        "isOneShot": false,
+        "isOneShot": true,
         "lifetime": {
           "constant": 0.5,
           "max": 1.0,
@@ -31,7 +31,52 @@
         },
         "modelGuid": "d2f7e93c-5473-4749-a2bc-44956fb0a1a1",
         "modelPath": "shockwave.obj",
-        "modules": [],
+        "modules": [
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              2.0,
+              2.0,
+              2.0,
+              1.0
+            ],
+            "guid": "efcabdcf-8d7e-40d0-b3e0-38e0bb243731",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 6,
+            "enabled": true,
+            "end": [
+              0.7014962434768677,
+              0.8494208455085754,
+              0.20005667209625244,
+              1.0
+            ],
+            "guid": "11935370-e2f4-4474-af94-5cb06b8bfb30",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.8888955116271973,
+              1.0,
+              0.007722020149230957,
+              1.0
+            ],
+            "target": 4
+          }
+        ],
         "position": {
           "x": 0.0,
           "y": 0.0,
@@ -86,7 +131,7 @@
       },
       "isDrawEnable": true,
       "isGpu": false,
-      "name": "PlayerShockWave",
+      "name": "Emitter",
       "transform": {
         "inheritRotate": true,
         "inheritScale": true,
@@ -110,6 +155,6 @@
       }
     }
   ],
-  "name": "ParticlePreview",
+  "name": "PlayerShockwave",
   "type": "EffectAsset"
 }

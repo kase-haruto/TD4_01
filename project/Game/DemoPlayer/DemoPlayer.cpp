@@ -69,6 +69,7 @@ void DemoPlayer::Initialize() {
 	// 衝撃波マネージャーの初期化（プール作成）
 	ShockwaveManager::GetInstance()->Initialize(10);
 
+	effectData_.Load("PlayerShockwave");
 }
 
 void DemoPlayer::Update(float dt) {
@@ -95,6 +96,7 @@ void DemoPlayer::Update(float dt) {
 	LandingEvents landingEvents = ApplyGravity(dt);
 	if(landingEvents.hardLanded) {
 		//強い衝撃時の処理
+		EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
 		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale);
 		//カメラシェイク
 		CameraManager::GetMain3d()->StartShake(param_.shakeParm.duration, param_.shakeParm.intensity);
@@ -199,6 +201,7 @@ void DemoPlayer::Move(float dt) {
 	JumpEvents jumpEvents = HandleJump(dt);
 	if(jumpEvents.jumpStart) {
 		// ジャンプ時の処理
+		EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
 		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.defaultShockScale);
 	}
 

@@ -14,11 +14,48 @@
 #include <vector>
 
 namespace CalyxEngine {
+	struct DirectionConfig {
+		bool enabled = false;
+		Vector3ParamConfig vector;
+		FxFloatParamConfig speed;
+		bool rotateToDirection = false;
+
+		DirectionConfig() {
+			vector.constant = CalyxEngine::Vector3(0.0f,1.0f,0.0f);
+			vector.min = CalyxEngine::Vector3(-1.0f,0.0f,-1.0f);
+			vector.max = CalyxEngine::Vector3(1.0f,0.0f,1.0f);
+			speed.constant = 1.0f;
+			speed.min = 0.0f;
+			speed.max = 1.0f;
+		}
+	};
+
+	inline void to_json(nlohmann::json& j,const DirectionConfig& c) {
+		j = nlohmann::json{
+			{"enabled",c.enabled},
+			{"vector",c.vector},
+			{"speed",c.speed},
+			{"rotateToDirection",c.rotateToDirection}};
+	}
+
+	inline void from_json(const nlohmann::json& j,DirectionConfig& c) {
+		c.enabled = j.value("enabled",false);
+		if(auto it = j.find("vector"); it != j.end() && !it->is_null()) {
+			c.vector = it->get<Vector3ParamConfig>();
+		}
+		if(auto it = j.find("speed"); it != j.end() && !it->is_null()) {
+			c.speed = it->get<FxFloatParamConfig>();
+		}
+		c.rotateToDirection = j.value("rotateToDirection",false);
+	}
+
 	struct EmitterConfig {
 		CalyxEngine::Vector3 position{};
 		CalyxEngine::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
 		Vector3ParamConfig scale;
 		Vector3ParamConfig velocity;
+		DirectionConfig direction;
+		Vector3ParamConfig spin;
 		FxFloatParamConfig lifetime;
 
 		float		emitRate	= 0.1f;
@@ -52,6 +89,12 @@ namespace CalyxEngine {
 
 		std::vector<std::unique_ptr<BaseModuleConfig>> modules;
 
+		EmitterConfig() {
+			spin.constant = CalyxEngine::Vector3(0.0f,0.0f,0.0f);
+			spin.min = CalyxEngine::Vector3(0.0f,0.0f,0.0f);
+			spin.max = CalyxEngine::Vector3(0.0f,0.0f,0.0f);
+		}
+
 		void		   FromJson(const nlohmann::json& j);
 		nlohmann::json ToJson() const;
 	};
@@ -61,6 +104,8 @@ namespace CalyxEngine {
 		scale		   = j.value("scale", Vector3ParamConfig{});
 		color		   = j.value("color", CalyxEngine::Vector4{1, 1, 1, 1});
 		velocity	   = j.value("velocity", Vector3ParamConfig{});
+		direction	   = j.value("direction", DirectionConfig{});
+		spin		   = j.value("spin", spin);
 		lifetime	   = j.value("lifetime", FxFloatParamConfig{});
 		emitRate	   = j.value("emitRate", 1.0f);
 		modelPath	   = j.value("modelPath", "plane.obj");
@@ -120,6 +165,8 @@ namespace CalyxEngine {
 		j["position"]		= position;
 		j["color"]			= color;
 		j["velocity"]		= velocity;
+		j["direction"]		= direction;
+		j["spin"]			= spin;
 		j["scale"]			= scale;
 		j["lifetime"]		= lifetime;
 		j["emitRate"]		= emitRate;
