@@ -56,9 +56,9 @@ void TitleScene::Initialize() {
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	if(preType_ == SceneType::SELECT) {
-		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/Transition/wave.png", "Textures/uvChecker.dds");
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/Transition/wave.png");
 	} else {
-		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds", "Textures/uvChecker.dds");
+		transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
 	}
 	// シーンタイプに基づいて自動で演出をセット
 	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::TITLE);
@@ -66,7 +66,6 @@ void TitleScene::Initialize() {
 		IsOpening_ = false;
 		transitionControl_->SetTexturePlate1("Textures/Transition/wave.png");
 		transitionControl_->SetTexturePlate2("Textures/Transition/wave.png");
-		transitionControl_->SetTexturePlate3("Textures/Transition/wave.png");
 	});
 	IsOpening_ = true;
 	IsPhase_ = false;
@@ -87,7 +86,7 @@ void TitleScene::Update([[maybe_unused]] float dt) {
 		IsPhase_ = true;
 		payload_ = BuildNowTypePayload(SceneType::TITLE);
 		transitionControl_->SetAutoPreset(SceneType::TITLE, SceneType::SELECT);
-		transitionControl_->StartClosing(1.25f, [this]() {
+		transitionControl_->StartClosing(1.0f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
 		});
 	}
