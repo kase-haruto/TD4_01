@@ -154,6 +154,7 @@ namespace CalyxEngine {
 		mainViewport_	 = std::make_unique<Viewport>(ViewportType::VIEWPORT_MAIN, "Game Viewport");
 		debugViewport_	 = std::make_unique<Viewport>(ViewportType::VIEWPORT_DEBUG, "Debug Viewport");
 		pickingViewport_ = std::make_unique<Viewport>(ViewportType::VIEWPORT_PICKING, "Picking Viewport");
+		pickingViewport_->SetShow(false);
 		viewportSelection_->SetViewport(debugViewport_.get());
 		viewportSelection_->SetCallbacks(ViewportSelectionCallbacks{
 			[this]() { return GetSelectedObjects(); },
@@ -336,6 +337,16 @@ namespace CalyxEngine {
 					[this] {
 						if(debugViewport_) {
 							debugViewport_->SetShow(!debugViewport_->IsShow());
+						}
+					},
+					true});
+
+		menu_->Add(MenuCategory::View,
+				   {"Picking Viewport",
+					"",
+					[this] {
+						if(pickingViewport_) {
+							pickingViewport_->SetShow(!pickingViewport_->IsShow());
 						}
 					},
 					true});
@@ -1192,11 +1203,11 @@ namespace CalyxEngine {
 
 				if(viewportSelection_) viewportSelection_->DrawSelectionRect();
 			}
-		} //else if(type == ViewportType::VIEWPORT_PICKING) {
-		// 	if(pickingViewport_ && pickingViewport_->IsShow()) {
-		// 		pickingViewport_->Render(tex);
-		// 	}
-		// }
+		} else if(type == ViewportType::VIEWPORT_PICKING) {
+			if(pickingViewport_ && pickingViewport_->IsShow()) {
+				pickingViewport_->Render(tex);
+			}
+		}
 
 		restoreContext();
 	}
