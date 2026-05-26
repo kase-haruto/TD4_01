@@ -1,5 +1,6 @@
 #include "BellProjectileDoor.h"
 #include "BellProjectileTarget.h"
+#include "Engine/Objects/Collider/BoxCollider.h"
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Foundation/Math/MathUtil.h>
 
@@ -21,14 +22,23 @@ void BellProjectileDoor::ObjectInitialize() {
 		collider_->SetTargetType(ColliderType::Type_Player);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
+		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
+			radius->SetSize({12.0f, 14.0f, 1.0f});
+		}
 	}
 
 	worldTransform_.scale = param_.scale;
 	worldTransform_.rotationSource = RotationSource::Euler;
 	if (lr_ == 1) {
 		//worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f);
+		if(collider_) {
+			collider_->SetOffset({-6.2f, 7.0f, 0.0f});
+		}
 	} else {
 		worldTransform_.eulerRotation.y = 0.0f;
+		if(collider_) {
+			collider_->SetOffset({6.2f, 7.0f, 0.0f});
+		}
 	}
 
 	startPos_ = worldTransform_.translation;

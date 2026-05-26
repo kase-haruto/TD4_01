@@ -114,8 +114,9 @@ private:
 	};
 
 	PlayerParameter param_;
-	bool  isJumping_	 = false;
-	bool  isDiving_		 = false;
+	bool					isJumping_ = false;
+	bool					isDiving_  = false;
+	bool					isDivingInvincible_ = false;
 	CalyxEngine::Quaternion preRotate_;
 
 	// ダメージ点滅用

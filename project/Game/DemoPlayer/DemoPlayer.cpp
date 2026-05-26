@@ -35,6 +35,7 @@ void DemoPlayer::Initialize() {
 	velocity_					= {0.0f, 0.0f, 0.0f};
 	isJumping_					= false;
 	isDiving_					= false;
+	isDivingInvincible_			= false;
 	isRecovering_				= false;
 	recoveryTimer_				= 0.0f;
 
@@ -59,7 +60,8 @@ void DemoPlayer::Initialize() {
 		collider_->SetType(ColliderType::Type_Player);
 		collider_->SetOwner(this);
 		// 敵、イベントオブジェクト、ステージギミックを対象にする
-		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack | ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
+		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack |
+								 ColliderType::Type_EventObject | ColliderType::Type_StageGimmick | ColliderType::Type_Impediment);
 		collider_->SetOffset(param_.colliderOffset);
 		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
 			radius->SetSize(param_.colliderSize);
@@ -116,7 +118,7 @@ void DemoPlayer::TakeDamage(int32_t damage) {
 	if(isInvincible_) {
 		return;
 	}
-	if(isDiving_) {
+	if(isDivingInvincible_) {
 		return;
 	}
 
@@ -135,7 +137,7 @@ void DemoPlayer::DerivativeGui() {
 }
 
 void DemoPlayer::OnCollisionEnter(Collider* other) {
-	if(other->GetType() == ColliderType::Type_Enemy || other->GetType() == ColliderType::Type_EnemyAttack) {
+	if(other->GetType() == ColliderType::Type_Enemy || other->GetType() == ColliderType::Type_EnemyAttack || other->GetType() == ColliderType::Type_Impediment) {
 		TakeDamage(1);
 	}
 
@@ -229,6 +231,7 @@ DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
 			velocity_.y	  = param_.jumpForce;
 			isJumping_	  = true;
 			isDiving_	  = false;
+			isDivingInvincible_ = false;
 			jumpRotation_ = 0.0f;
 			// 接地状態からジャンプして着地するまでの時間を計算
 			float airTime		   = 2.0f * param_.jumpForce / param_.gravity;
@@ -249,8 +252,9 @@ DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
 				hammerScaleVelocity_				 = {0.0f, 0.0f, 0.0f};
 			}
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
-			velocity_.y = param_.jumpForce;
-			isDiving_	= true;
+			velocity_.y			= param_.jumpForce;
+			isDiving_			= true;
+			isDivingInvincible_ = true;
 			// 2回追加で回る
 			jumpRotationSpeed_	   = (4.0f * pi) / param_.diveRotationTime;
 			jumpRotationRemaining_ = 4.0f * pi;
@@ -377,6 +381,9 @@ void DemoPlayer::HammerControl(float dt) {
 			// 90度(pi/2)から0度へ
 			hammerAngle = std::lerp(pi * 0.5f, 0.0f, progress);
 
+			if(progress >= 0.5f && isDivingInvincible_) {
+				isDivingInvincible_ = false;
+			}
 			if(progress >= 1.0f) {
 				isRecovering_ = false;
 			}
