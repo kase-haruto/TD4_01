@@ -429,6 +429,9 @@ namespace CalyxEngine {
 
 		for(auto it = emitters_.begin(); it != emitters_.end();) {
 			if(auto sp = it->lock()) {
+				sp->GetWorldTransform().Update();
+				sp->SyncEmitterFromWorldTransform();
+
 				EffectEmitterNodeConfig n{};
 				n.name		 = sp->GetName();
 				n.guid		 = sp->GetGuid();
