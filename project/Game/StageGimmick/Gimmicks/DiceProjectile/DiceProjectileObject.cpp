@@ -28,7 +28,7 @@ void DiceProjectileObject::OnCollisionEnter(Collider* other) {
 	}
 	// 収納箱の座標を取得する
 	targetPos_ = socket_->GetSocketPos();
-	targetPos_.z -= socket_->GetWorldTransform().scale.z / 2.0f;  
+	targetPos_.y = 5.6f;
 	// 収納箱の数をプラスする
 	socket_->AddDiceSocketCount();
 	worldTransform_.scale = param_.hitScale;
