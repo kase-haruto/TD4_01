@@ -7,6 +7,8 @@
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Objects/3D/Actor/SplineDeformObject.h>
+#include <Engine/Objects/LightObject/DirectionalLight.h>
+#include <Engine/Objects/LightObject/PointLight.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/System/Command/EditorCommand/LevelEditorCommand/CreateObjectCommand/CreateObjectCommand.h>
@@ -128,6 +130,59 @@ namespace CalyxEngine {
 								  obj->SetTransient(true);
 								  return obj;
 							  }});
+
+		// ----------------------------- Light ------------------------------------
+		{
+			auto& lightItems = categoryItems_[PlaceItemCategory::Light];
+			const auto lightIcon = AssetManager::GetInstance()->GetTextureManager()->LoadTexture("UI/Tool/Hierarchy/lightIcon.dds");
+
+			lightItems.push_back({PlaceItemCategory::Light,
+								  "Directional Light",
+								  lightIcon,
+								  {64, 64},
+								  [](const CalyxEngine::Vector3& pos) {
+									  auto factory = [pos]() {
+										  auto obj = SceneAPI::Instantiate<DirectionalLight>("DirectionalLight");
+										  obj->Initialize();
+										  obj->GetWorldTransform().translation = pos;
+										  obj->GetWorldTransform().Update();
+										  return obj;
+									  };
+									  CommandManager::GetInstance()->Execute(
+										  std::make_unique<CreateObjectCommand<DirectionalLight>>(
+											  SceneContext::Current(), factory, "Create Directional Light"));
+								  },
+								  []() {
+									  auto obj = SceneAPI::Instantiate<DirectionalLight>("DirectionalLight");
+									  obj->Initialize();
+									  obj->SetTransient(true);
+									  return obj;
+								  }});
+
+			lightItems.push_back({PlaceItemCategory::Light,
+								  "Point Light",
+								  lightIcon,
+								  {64, 64},
+								  [](const CalyxEngine::Vector3& pos) {
+									  auto factory = [pos]() {
+										  auto obj = SceneAPI::Instantiate<PointLight>("PointLight");
+										  obj->Initialize();
+										  obj->GetWorldTransform().translation = pos;
+										  obj->GetWorldTransform().Update();
+										  obj->SyncPositionFromTransform();
+										  return obj;
+									  };
+									  CommandManager::GetInstance()->Execute(
+										  std::make_unique<CreateObjectCommand<PointLight>>(
+											  SceneContext::Current(), factory, "Create Point Light"));
+								  },
+								  []() {
+									  auto obj = SceneAPI::Instantiate<PointLight>("PointLight");
+									  obj->Initialize();
+									  obj->SetTransient(true);
+									  return obj;
+								  }});
+		}
 
 		// ---------------------------- Particle ----------------------------------
 		{
