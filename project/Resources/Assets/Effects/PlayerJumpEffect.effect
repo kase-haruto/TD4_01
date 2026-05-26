@@ -1,0 +1,215 @@
+{
+  "emitters": [
+    {
+      "emitter": {
+        "autoDestroy": false,
+        "billboardMode": 1,
+        "blendMode": 5,
+        "cameraDitherEnabled": false,
+        "cameraDitherFar": 20.0,
+        "cameraDitherNear": 0.0,
+        "color": {
+          "w": 1.0,
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "direction": {
+          "enabled": true,
+          "rotateToDirection": false,
+          "speed": {
+            "constant": 5.0,
+            "max": 5.0,
+            "min": 1.0,
+            "mode": 1
+          },
+          "vector": {
+            "constant": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "max": {
+              "x": 2.0,
+              "y": 1.0,
+              "z": -1.0
+            },
+            "min": {
+              "x": -2.0,
+              "y": 0.0,
+              "z": -5.0
+            },
+            "mode": 1
+          }
+        },
+        "emitCount": 32,
+        "emitDelay": 0.0,
+        "emitDuration": -1.0,
+        "emitRate": 0.10000000149011612,
+        "emitterShape": 0,
+        "followOneShot": false,
+        "isComplement": true,
+        "isDrawEnable": true,
+        "isOneShot": true,
+        "lifetime": {
+          "constant": 0.75,
+          "max": 1.0,
+          "min": 0.8999999761581421,
+          "mode": 0
+        },
+        "modelGuid": "00000000-0000-0000-0000-000000000000",
+        "modelPath": "plane.obj",
+        "modules": [
+          {
+            "enabled": true,
+            "gravity": {
+              "x": 0.0,
+              "y": 4.0,
+              "z": 0.0
+            },
+            "name": "GravityModule"
+          },
+          {
+            "blend": 1,
+            "clamp01": true,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              0.05000000074505806,
+              0.05000000074505806,
+              1.0,
+              1.0
+            ],
+            "guid": "452116f7-bc59-4975-8b20-928898c23fad",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              0.80694979429245,
+              0.80694979429245,
+              0.80694979429245,
+              0.0
+            ],
+            "guid": "3a1c0454-2ef9-4afa-9719-ba0fb9089d23",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.3281853199005127,
+              0.3281853199005127,
+              0.3281853199005127,
+              1.0
+            ],
+            "target": 4
+          }
+        ],
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "randomSpinEmit": true,
+        "scale": {
+          "constant": {
+            "x": 0.10000000149011612,
+            "y": 0.10000000149011612,
+            "z": 1.0
+          },
+          "max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "mode": 0
+        },
+        "shapeAngle": 30.0,
+        "shapeRadius": 1.0,
+        "shapeSize": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "spin": {
+          "constant": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "max": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 10.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -10.0
+          },
+          "mode": 1
+        },
+        "textureGuid": "652df591-3a05-4465-827e-bae6bfc7dbcb",
+        "texturePath": "Textures/white1x1.dds",
+        "velocity": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "mode": 0
+        }
+      },
+      "isDrawEnable": true,
+      "isGpu": false,
+      "name": "Emitter",
+      "transform": {
+        "inheritRotate": true,
+        "inheritScale": true,
+        "inheritTranslate": true,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "translation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    }
+  ],
+  "name": "PlayerJumpEffect",
+  "type": "EffectAsset"
+}
