@@ -73,6 +73,7 @@ void DemoPlayer::Initialize() {
 
 	effectData_.Load("PlayerShockwave");
 	effectStrongData_.Load("PlayerShockwaveStrong");
+	rollingEffect_.Load("PlayerRolling");
 	jumpEffect_.Load("PlayerJumpEffect");
 }
 
@@ -259,6 +260,8 @@ DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
 		} else if(!isDiving_ && velocity_.y >= -10.0f) {
 			velocity_.y			= param_.jumpForce;
 			isDiving_			= true;
+			auto offset			= CalyxEngine::Vector3{0.0f, 0.5f, 1.0f};
+			rollingFxHandle_	= EffectAPI::Play(rollingEffect_, worldTransform_.GetWorldPosition() + offset);
 			isDivingInvincible_ = true;
 			// 2回追加で回る
 			jumpRotationSpeed_	   = (4.0f * pi) / param_.diveRotationTime;
@@ -314,6 +317,9 @@ DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
 			if(isDiving_ && jumpRotationRemaining_ <= 0.0f) {
 				velocity_.y	  = param_.diveForce;
 				jumpRotation_ = 0.0f; // 回転をデフォルトに戻す
+				auto offset	  = CalyxEngine::Vector3{0.0f, 0.5f, 1.0f};
+				EffectAPI::Stop(rollingFxHandle_);
+				rollingFxHandle_ = {};
 
 				// 急降下開始時に少し縦に伸ばす
 				worldTransform_.scale = param_.diveScale;

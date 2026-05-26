@@ -151,5 +151,7 @@ private:
 
 	CalyxEngine::EffectAsset effectData_;
 	CalyxEngine::EffectAsset effectStrongData_;
-	CalyxEngine::EffectAsset jumpEffect_;
+	CalyxEngine::EffectAsset rollingEffect_;
+	CalyxEngine::EffectHandle rollingFxHandle_{};
+	CalyxEngine::EffectAsset  jumpEffect_;
 };
