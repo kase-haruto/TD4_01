@@ -9,6 +9,7 @@
 #include <Engine/Application/Settings/EngineSettings.h>
 #include <Engine/Application/System/Environment.h>
 #include <Engine/Application/UI/EngineUI/Manipulator.h>
+#include <Engine/Application/UI/Panels/SplineEditorPanel.h>
 #include <Engine/Assets/Database/AssetDatabase.h>
 #include <Engine/Assets/Manager/AssetManager.h>
 #include <Engine/Assets/Texture/TextureManager.h>
@@ -734,6 +735,9 @@ void Viewport::Render(const ImTextureID& tex) {
             if(auto* manipulator = dynamic_cast<Manipulator*>(tool)) {
                 manipulator->SetActiveViewportType(type_);
                 manipulator->SetViewRect(imagePos, imageSize);
+            }
+            if(auto* splineEditor = dynamic_cast<SplineEditorPanel*>(tool)) {
+                splineEditor->SyncViewportRect({imagePos.x, imagePos.y}, size_);
             }
 
             const ImVec2 viewSize(size_.x, size_.y);

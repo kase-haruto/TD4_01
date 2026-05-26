@@ -175,6 +175,9 @@ namespace CalyxEngine {
 			debugViewport_->AddTool(performanceOverlay_.get());
 			debugViewport_->AddTool(debugOverlay_.get());
 		}
+		if(splineEditor_) {
+			debugViewport_->AddTool(splineEditor_.get());
+		}
 
 		// エディターメニューの初期化 ------------------------------------------
 		menu_ = std::make_unique<EditorMenu>();
