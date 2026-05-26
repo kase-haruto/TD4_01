@@ -97,6 +97,9 @@ float3 ApplyToneMappingAndGamma(float3 color, float exposure) {
     return pow(toneMapped, 1.0 / 2.2);
 }
 
+bool CheckVisibility(float3 origin, float3 dir, float tMax);
+float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos, float lightDistance);
+
 #include "StandardLighting.hlsli"
 #include "ToonLighting.hlsli"
 
@@ -184,6 +187,19 @@ float ComputeDirectionalHardShadow_RT(float3 worldPos, float3 normal, float3 L) 
     float3 origin = worldPos + normal * gShadowRayEps;
     const float tMax = 1000.0f;
 
+    bool hit = CheckVisibility(origin, L, tMax);
+    return hit ? gMinShadow : 1.0f;
+}
+
+float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos, float lightDistance) {
+    float3 origin = worldPos + normal * gShadowRayEps;
+    float3 toLight = lightPos - origin;
+    float tMax = min(max(length(toLight) - gShadowRayEps, 0.0f), lightDistance);
+    if(tMax <= 0.0f) {
+        return 1.0f;
+    }
+
+    float3 L = normalize(toLight);
     bool hit = CheckVisibility(origin, L, tMax);
     return hit ? gMinShadow : 1.0f;
 }

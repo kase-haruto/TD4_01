@@ -53,10 +53,11 @@ void ComputeStandardPointLight(
         float  attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
 
         float NdotL = saturate(dot(normal, -lightDir));
-        diffuse += albedo * pointLight.color.rgb * NdotL * pointLight.intensity * attenuation;
+        float shadow = ComputePointHardShadow_RT(worldPos, normal, pointLight.position, distance);
+        diffuse += albedo * pointLight.color.rgb * NdotL * pointLight.intensity * attenuation * shadow;
 
         float3 halfVec = normalize(-lightDir + toEye);
         float  NdotH   = saturate(dot(normal, halfVec));
-        specular += pointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * pointLight.intensity * attenuation;
+        specular += pointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * pointLight.intensity * attenuation * shadow;
     }
 }

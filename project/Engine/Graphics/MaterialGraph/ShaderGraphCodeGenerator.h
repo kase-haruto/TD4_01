@@ -350,6 +350,9 @@ void ComputeGeneratedStandardDirectionalLight(float3 normal, float3 toEye, float
     }
 }
 
+bool CheckVisibility(float3 origin, float3 dir, float tMax);
+float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos, float lightDistance);
+
 void ComputeGeneratedStandardPointLight(float3 normal, float3 toEye, float3 worldPos, float3 albedo, GeneratedMaterialSurface surface, out float3 diffuse, out float3 specular) {
     diffuse = 0.0f;
     specular = 0.0f;
