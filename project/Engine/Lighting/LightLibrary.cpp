@@ -1,5 +1,6 @@
 #include "LightLibrary.h"
 
+#include <Engine/Application/Settings/EngineSettings.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include "Engine/Scene/Context/SceneContext.h"
 #include "Engine/Scene/Utility/SceneUtility.h"
@@ -18,6 +19,10 @@ void LightLibrary::CyncGpu() {
 	CleanupPointLights();
 
 	pointLightConstants_ = {};
+	const auto& graphicsSettings = CalyxEngine::EngineSettings::GetInstance()->GetData().graphics;
+	pointLightConstants_.pointLightShadowsEnabled = graphicsSettings.enablePointLightShadows ? 1u : 0u;
+	pointLightConstants_.maxPointShadowLights = 2u;
+	pointLightConstants_.pointShadowContributionThreshold = 0.01f;
 	uint32_t writeIndex = 0;
 	for(auto& weak : pointLights_) {
 		if(writeIndex >= kMaxPointLightCount) break;

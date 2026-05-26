@@ -56,7 +56,9 @@ cbuffer ShadowConstants : register(b3) {
 
 cbuffer PointLightConstants : register(b4) {
     uint gPointLightCount;
-    float3 gPointLightPad;
+    uint gPointLightShadowsEnabled;
+    uint gMaxPointShadowLights;
+    float gPointShadowContributionThreshold;
     PointLight gPointLights[16];
 }
 

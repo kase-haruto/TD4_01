@@ -296,7 +296,7 @@ namespace CalyxEngine {
 			out << "cbuffer MaterialConstants : register(b0) { Material gMaterial; }\n";
 			out << "cbuffer DirectionalLightConstants : register(b2) { DirectionalLight gDirectionalLight; }\n";
 			out << "cbuffer ShadowConstants : register(b3) { float4x4 gLightVP; float gShadowBias; float3 _shadowPad; };\n";
-			out << "cbuffer PointLightConstants : register(b4) { uint gPointLightCount; float3 gPointLightPad; PointLight gPointLights[16]; }\n";
+			out << "cbuffer PointLightConstants : register(b4) { uint gPointLightCount; uint gPointLightShadowsEnabled; uint gMaxPointShadowLights; float gPointShadowContributionThreshold; PointLight gPointLights[16]; }\n";
 			out << "cbuffer RaytracingShadowParamConstants : register(b5) { float gShadowRayEps; float gBaseAngularRadius; float gMinShadow; bool gIsSoft; };\n\n";
 			out << "Texture2D<float4> gTexture : register(t0);\n";
 			out << "TextureCube<float4> gEnvironmentMap : register(t1);\n";
@@ -356,6 +356,16 @@ float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos,
 void ComputeGeneratedStandardPointLight(float3 normal, float3 toEye, float3 worldPos, float3 albedo, GeneratedMaterialSurface surface, out float3 diffuse, out float3 specular) {
     diffuse = 0.0f;
     specular = 0.0f;
+    float topContribution0 = 0.0f;
+    float topContribution1 = 0.0f;
+    float3 topDiffuse0 = 0.0f;
+    float3 topDiffuse1 = 0.0f;
+    float3 topSpecular0 = 0.0f;
+    float3 topSpecular1 = 0.0f;
+    float3 topPosition0 = 0.0f;
+    float3 topPosition1 = 0.0f;
+    float topDistance0 = 0.0f;
+    float topDistance1 = 0.0f;
     [loop]
     for(uint i = 0; i < gPointLightCount; ++i) {
         PointLight pointLight = gPointLights[i];
@@ -366,11 +376,43 @@ void ComputeGeneratedStandardPointLight(float3 normal, float3 toEye, float3 worl
         float distance = length(pointLight.position - worldPos);
         float attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
         float NdotL = saturate(dot(normal, -lightDir));
-        float shadow = ComputePointHardShadow_RT(worldPos, normal, pointLight.position, distance);
-        diffuse += albedo * pointLight.color.rgb * NdotL * pointLight.intensity * attenuation * shadow;
+        float contribution = NdotL * pointLight.intensity * attenuation;
+        float3 lightDiffuse = albedo * pointLight.color.rgb * contribution;
+        diffuse += lightDiffuse;
         float3 halfVec = normalize(-lightDir + toEye);
         float NdotH = saturate(dot(normal, halfVec));
-        specular += pointLight.color.rgb * pow(NdotH, surface.shininess) * pointLight.intensity * attenuation * shadow;
+        float3 lightSpecular = pointLight.color.rgb * pow(NdotH, surface.shininess) * pointLight.intensity * attenuation;
+        specular += lightSpecular;
+        if(gPointLightShadowsEnabled != 0 && contribution > gPointShadowContributionThreshold) {
+            if(contribution > topContribution0) {
+                topContribution1 = topContribution0;
+                topDiffuse1 = topDiffuse0;
+                topSpecular1 = topSpecular0;
+                topPosition1 = topPosition0;
+                topDistance1 = topDistance0;
+                topContribution0 = contribution;
+                topDiffuse0 = lightDiffuse;
+                topSpecular0 = lightSpecular;
+                topPosition0 = pointLight.position;
+                topDistance0 = distance;
+            } else if(contribution > topContribution1) {
+                topContribution1 = contribution;
+                topDiffuse1 = lightDiffuse;
+                topSpecular1 = lightSpecular;
+                topPosition1 = pointLight.position;
+                topDistance1 = distance;
+            }
+        }
+    }
+    if(gPointLightShadowsEnabled != 0 && gMaxPointShadowLights > 0 && topContribution0 > 0.0f) {
+        float shadow0 = ComputePointHardShadow_RT(worldPos, normal, topPosition0, topDistance0);
+        diffuse += topDiffuse0 * (shadow0 - 1.0f);
+        specular += topSpecular0 * (shadow0 - 1.0f);
+    }
+    if(gPointLightShadowsEnabled != 0 && gMaxPointShadowLights > 1 && topContribution1 > 0.0f) {
+        float shadow1 = ComputePointHardShadow_RT(worldPos, normal, topPosition1, topDistance1);
+        diffuse += topDiffuse1 * (shadow1 - 1.0f);
+        specular += topSpecular1 * (shadow1 - 1.0f);
     }
 }
 
@@ -387,6 +429,16 @@ void ComputeGeneratedToonDirectionalLight(float3 normal, float3 toEye, float3 al
 void ComputeGeneratedToonPointLight(float3 normal, float3 toEye, float3 worldPos, float3 albedo, GeneratedMaterialSurface surface, out float3 diffuse, out float3 specular) {
     diffuse = 0.0f;
     specular = 0.0f;
+    float topContribution0 = 0.0f;
+    float topContribution1 = 0.0f;
+    float3 topDiffuse0 = 0.0f;
+    float3 topDiffuse1 = 0.0f;
+    float3 topSpecular0 = 0.0f;
+    float3 topSpecular1 = 0.0f;
+    float3 topPosition0 = 0.0f;
+    float3 topPosition1 = 0.0f;
+    float topDistance0 = 0.0f;
+    float topDistance1 = 0.0f;
     [loop]
     for(uint i = 0; i < gPointLightCount; ++i) {
         PointLight pointLight = gPointLights[i];
@@ -397,12 +449,44 @@ void ComputeGeneratedToonPointLight(float3 normal, float3 toEye, float3 worldPos
         float distance = length(pointLight.position - worldPos);
         float attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
         float rawNdotL = dot(normal, -lightDir);
-        float shadow = ComputePointHardShadow_RT(worldPos, normal, pointLight.position, distance);
-        diffuse += EvaluateGeneratedToonRamp(rawNdotL, albedo, surface) * pointLight.color.rgb * pointLight.intensity * attenuation * shadow;
+        float contribution = saturate(rawNdotL) * pointLight.intensity * attenuation;
+        float3 lightDiffuse = EvaluateGeneratedToonRamp(rawNdotL, albedo, surface) * pointLight.color.rgb * pointLight.intensity * attenuation;
+        diffuse += lightDiffuse;
         float3 halfVec = normalize(-lightDir + toEye);
         float NdotH = saturate(dot(normal, halfVec));
         float toonSpecular = EvaluateGeneratedToonSpecular(NdotH, surface);
-        specular += pointLight.color.rgb * surface.toonHighlightColor.rgb * toonSpecular * pointLight.intensity * attenuation * shadow;
+        float3 lightSpecular = pointLight.color.rgb * surface.toonHighlightColor.rgb * toonSpecular * pointLight.intensity * attenuation;
+        specular += lightSpecular;
+        if(gPointLightShadowsEnabled != 0 && contribution > gPointShadowContributionThreshold) {
+            if(contribution > topContribution0) {
+                topContribution1 = topContribution0;
+                topDiffuse1 = topDiffuse0;
+                topSpecular1 = topSpecular0;
+                topPosition1 = topPosition0;
+                topDistance1 = topDistance0;
+                topContribution0 = contribution;
+                topDiffuse0 = lightDiffuse;
+                topSpecular0 = lightSpecular;
+                topPosition0 = pointLight.position;
+                topDistance0 = distance;
+            } else if(contribution > topContribution1) {
+                topContribution1 = contribution;
+                topDiffuse1 = lightDiffuse;
+                topSpecular1 = lightSpecular;
+                topPosition1 = pointLight.position;
+                topDistance1 = distance;
+            }
+        }
+    }
+    if(gPointLightShadowsEnabled != 0 && gMaxPointShadowLights > 0 && topContribution0 > 0.0f) {
+        float shadow0 = ComputePointHardShadow_RT(worldPos, normal, topPosition0, topDistance0);
+        diffuse += topDiffuse0 * (shadow0 - 1.0f);
+        specular += topSpecular0 * (shadow0 - 1.0f);
+    }
+    if(gPointLightShadowsEnabled != 0 && gMaxPointShadowLights > 1 && topContribution1 > 0.0f) {
+        float shadow1 = ComputePointHardShadow_RT(worldPos, normal, topPosition1, topDistance1);
+        diffuse += topDiffuse1 * (shadow1 - 1.0f);
+        specular += topSpecular1 * (shadow1 - 1.0f);
     }
 }
 
