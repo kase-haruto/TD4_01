@@ -4,8 +4,18 @@
    ===================================================================== */
 #include <Engine/objects/LightObject/DirectionalLight.h>
 #include <Engine/objects/LightObject/PointLight.h>
+#include <Engine/Graphics/Buffer/DxConstantBuffer.h>
 
+#include <array>
+#include <cstdint>
 #include <memory>
+#include <vector>
+
+struct PointLightConstants {
+	uint32_t count = 0;
+	float pad[3] = {};
+	std::array<PointLightData, 16> lights = {};
+};
 
 /*-----------------------------------------------------------------------------------------
  * LightLibrary
@@ -24,9 +34,13 @@ public:
 	/* 登録／取得 --------------------------------------------------------*/
 	void SetDirectionalLight(const std::shared_ptr<DirectionalLight>& light);
 	void SetPointLight(const std::shared_ptr<PointLight>& light);
+	void AddPointLight(const std::shared_ptr<PointLight>& light);
+	void RemovePointLight(const std::shared_ptr<PointLight>& light);
 
 	DirectionalLight* GetDirectionalLight() const { return directionalLight_.get(); }
-	PointLight*       GetPointLight() const { return pointLight_.get(); }
+	PointLight*       GetPointLight() const;
+	const std::vector<std::weak_ptr<PointLight>>& GetPointLights() const { return pointLights_; }
+	static constexpr uint32_t GetMaxPointLightCount() { return kMaxPointLightCount; }
 
 	/* 描画コマンド ------------------------------------------------------*/
 	void SetCommand(ID3D12GraphicsCommandList* cmdList,PipelineType pipelineType);
@@ -35,6 +49,14 @@ public:
 	                LightType                  lightType);
 
 private:
+	void EnsurePointLightBuffer();
+	void CleanupPointLights();
+	bool ContainsPointLight(const PointLight* light) const;
+
+	static constexpr uint32_t kMaxPointLightCount = 16;
+
 	std::shared_ptr<DirectionalLight> directionalLight_;
-	std::shared_ptr<PointLight>       pointLight_;
+	std::vector<std::weak_ptr<PointLight>> pointLights_;
+	DxConstantBuffer<PointLightConstants> pointLightBuffer_;
+	PointLightConstants pointLightConstants_ = {};
 };

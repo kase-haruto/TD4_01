@@ -39,6 +39,7 @@ struct PointLight {
     float intensity;
     float radius;
     float decay;
+    float2 pad;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +54,11 @@ cbuffer ShadowConstants : register(b3) {
     float3 _shadowPad;
 };
 
-cbuffer PointLightConstants : register(b4) { PointLight gPointLight; }
+cbuffer PointLightConstants : register(b4) {
+    uint gPointLightCount;
+    float3 gPointLightPad;
+    PointLight gPointLights[16];
+}
 
 // NOTE:
 // gPenumbraStart / gPenumbraScale は「距離ベース」をやめるために未使用にします。

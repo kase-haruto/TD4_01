@@ -53,19 +53,26 @@ void ComputeToonPointLight(
     diffuse  = 0.0f;
     specular = 0.0f;
 
-    float3 lightDir    = normalize(worldPos - gPointLight.position);
-    float  distance    = length(gPointLight.position - worldPos);
-    float  attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
+    [loop]
+    for(uint i = 0; i < gPointLightCount; ++i) {
+        PointLight pointLight = gPointLights[i];
+        if(pointLight.intensity <= 0.0f || pointLight.radius <= 0.0f) {
+            continue;
+        }
 
-    float rawNdotL = dot(normal, -lightDir);
+        float3 lightDir    = normalize(worldPos - pointLight.position);
+        float  distance    = length(pointLight.position - worldPos);
+        float  attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
 
-    float3 baseDiffuse = EvaluateToonRamp(rawNdotL, albedo);
-    
-    diffuse = baseDiffuse * gPointLight.color.rgb * gPointLight.intensity * attenuation;
+        float rawNdotL = dot(normal, -lightDir);
 
-    float3 halfVec = normalize(-lightDir + toEye);
-    float  NdotH   = saturate(dot(normal, halfVec));
-    float toonSpecular = EvaluateToonSpecular(NdotH);
+        float3 baseDiffuse = EvaluateToonRamp(rawNdotL, albedo);
+        diffuse += baseDiffuse * pointLight.color.rgb * pointLight.intensity * attenuation;
 
-    specular = gPointLight.color.rgb * gMaterial.toonHighlightColor.rgb * toonSpecular * gPointLight.intensity * attenuation;
+        float3 halfVec = normalize(-lightDir + toEye);
+        float  NdotH   = saturate(dot(normal, halfVec));
+        float toonSpecular = EvaluateToonSpecular(NdotH);
+
+        specular += pointLight.color.rgb * gMaterial.toonHighlightColor.rgb * toonSpecular * pointLight.intensity * attenuation;
+    }
 }
