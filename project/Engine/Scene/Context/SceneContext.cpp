@@ -10,6 +10,12 @@
 
 SceneContext* SceneContext::current_ = nullptr;
 
+SceneContext::~SceneContext() {
+	if(current_ == this) {
+		current_ = nullptr;
+	}
+}
+
 void SceneContext::Initialize(bool createDefaultLights) {
 	MakeCurrent();
 

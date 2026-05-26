@@ -14,7 +14,7 @@
 struct PointLightConstants {
 	uint32_t count = 0;
 	float pad[3] = {};
-	std::array<PointLightData, 16> lights = {};
+	std::array<PointLightData, 128> lights = {};
 };
 
 /*-----------------------------------------------------------------------------------------
