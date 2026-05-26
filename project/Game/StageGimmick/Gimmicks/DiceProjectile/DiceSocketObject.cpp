@@ -67,13 +67,18 @@ void DiceSocketObject::ObjectInitialize() {
 	effectRightData_.Load("CrackerRightEffect");
 }
 
-void DiceSocketObject::ObjectUpdate(float) {
+void DiceSocketObject::ObjectUpdate(float dt) {
 
-	if(!isCracker_ && clearCount_ <= diceSocketCount_){
-		isCracker_ = true;
-		CalyxEngine::Vector3 offset = CalyxEngine::Vector3{-5.0f, -2.0f, -1.0f} + worldTransform_.GetWorldPosition();
-		EffectAPI::Play(effectLeftData_, offset);
-		offset.x *= -1.0f;
-		EffectAPI::Play(effectRightData_, offset);
+	if(!isCracker_ && clearCount_ <= diceSocketCount_) {
+		if(crackerInterval_ > 0.0f) {
+			crackerInterval_ -= dt;
+		} else {
+			isCracker_ = true;
+			CalyxEngine::Vector3 offset = crackerPos_ + worldTransform_.GetWorldPosition();
+			offset.x = worldTransform_.scale.x * 0.5f + crackerPos_.x;
+			EffectAPI::Play(effectRightData_, offset);
+			offset.x *= -1.0f;
+			EffectAPI::Play(effectLeftData_, offset);
+		}
 	}
 }

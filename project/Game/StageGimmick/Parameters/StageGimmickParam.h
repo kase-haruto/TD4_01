@@ -53,6 +53,10 @@ struct DiceProjectileParam {
 	float rotateSpeed;
 	// サイコロが収納箱に向かっていく時間
 	float parryDuration;
+	// クラッカーの座標
+	CalyxEngine::Vector3 crackerPos;
+	// クラッカーが出るまでの時間
+	float crackerInterval = 1.0f;
 
 };
 

@@ -19,7 +19,7 @@ void FireLoadObject::BurnActive() {
 	if(collider_) {
 		collider_->SetCollisionEnabled(true);
 	}
-	fxHandle_ = EffectAPI::Play(effectData_, worldTransform_.translation);
+	fxHandle_ = EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
 }
 
 void FireLoadObject::OnCollisionEnter(Collider* other) {
