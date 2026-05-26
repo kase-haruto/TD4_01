@@ -72,6 +72,7 @@ void DemoPlayer::Initialize() {
 	ShockwaveManager::GetInstance()->Initialize(10);
 
 	effectData_.Load("PlayerShockwave");
+	effectStrongData_.Load("PlayerShockwaveStrong");
 	jumpEffect_.Load("PlayerJumpEffect");
 }
 
@@ -99,12 +100,13 @@ void DemoPlayer::Update(float dt) {
 	LandingEvents landingEvents = ApplyGravity(dt);
 	if(landingEvents.hardLanded) {
 		//強い衝撃時の処理
+		EffectAPI::Play(effectStrongData_, worldTransform_.GetWorldPosition());
 		EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
 		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale);
 		//カメラシェイク
 		CameraManager::GetMain3d()->StartShake(param_.shakeParm.duration, param_.shakeParm.intensity);
 		PostEffectManager::Get()->PlayTriggeredEffect("PlayerShock");
-		EffectAPI::PlayFromName("shockwave", worldTransform_.GetWorldPosition());
+		//EffectAPI::PlayFromName("shockwave", worldTransform_.GetWorldPosition());
 	}
 	UpdatePopScale(dt);
 	HammerControl(dt);
