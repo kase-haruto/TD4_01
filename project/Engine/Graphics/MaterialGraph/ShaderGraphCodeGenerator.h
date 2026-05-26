@@ -292,11 +292,11 @@ namespace CalyxEngine {
 			out << "    float pad3;\n";
 			out << "};\n\n";
 			out << "struct DirectionalLight { float4 color; float3 direction; float intensity; };\n";
-			out << "struct PointLight { float4 color; float3 position; float intensity; float radius; float decay; };\n\n";
+			out << "struct PointLight { float4 color; float3 position; float intensity; float radius; float decay; float2 pad; };\n\n";
 			out << "cbuffer MaterialConstants : register(b0) { Material gMaterial; }\n";
 			out << "cbuffer DirectionalLightConstants : register(b2) { DirectionalLight gDirectionalLight; }\n";
 			out << "cbuffer ShadowConstants : register(b3) { float4x4 gLightVP; float gShadowBias; float3 _shadowPad; };\n";
-			out << "cbuffer PointLightConstants : register(b4) { PointLight gPointLight; }\n";
+			out << "cbuffer PointLightConstants : register(b4) { uint gPointLightCount; float3 gPointLightPad; PointLight gPointLights[16]; }\n";
 			out << "cbuffer RaytracingShadowParamConstants : register(b5) { float gShadowRayEps; float gBaseAngularRadius; float gMinShadow; bool gIsSoft; };\n\n";
 			out << "Texture2D<float4> gTexture : register(t0);\n";
 			out << "TextureCube<float4> gEnvironmentMap : register(t1);\n";
@@ -350,17 +350,28 @@ void ComputeGeneratedStandardDirectionalLight(float3 normal, float3 toEye, float
     }
 }
 
+bool CheckVisibility(float3 origin, float3 dir, float tMax);
+float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos, float lightDistance);
+
 void ComputeGeneratedStandardPointLight(float3 normal, float3 toEye, float3 worldPos, float3 albedo, GeneratedMaterialSurface surface, out float3 diffuse, out float3 specular) {
     diffuse = 0.0f;
     specular = 0.0f;
-    float3 lightDir = normalize(worldPos - gPointLight.position);
-    float distance = length(gPointLight.position - worldPos);
-    float attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
-    float NdotL = saturate(dot(normal, -lightDir));
-    diffuse = albedo * gPointLight.color.rgb * NdotL * gPointLight.intensity * attenuation;
-    float3 halfVec = normalize(-lightDir + toEye);
-    float NdotH = saturate(dot(normal, halfVec));
-    specular = gPointLight.color.rgb * pow(NdotH, surface.shininess) * gPointLight.intensity * attenuation;
+    [loop]
+    for(uint i = 0; i < gPointLightCount; ++i) {
+        PointLight pointLight = gPointLights[i];
+        if(pointLight.intensity <= 0.0f || pointLight.radius <= 0.0f) {
+            continue;
+        }
+        float3 lightDir = normalize(worldPos - pointLight.position);
+        float distance = length(pointLight.position - worldPos);
+        float attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
+        float NdotL = saturate(dot(normal, -lightDir));
+        float shadow = ComputePointHardShadow_RT(worldPos, normal, pointLight.position, distance);
+        diffuse += albedo * pointLight.color.rgb * NdotL * pointLight.intensity * attenuation * shadow;
+        float3 halfVec = normalize(-lightDir + toEye);
+        float NdotH = saturate(dot(normal, halfVec));
+        specular += pointLight.color.rgb * pow(NdotH, surface.shininess) * pointLight.intensity * attenuation * shadow;
+    }
 }
 
 void ComputeGeneratedToonDirectionalLight(float3 normal, float3 toEye, float3 albedo, GeneratedMaterialSurface surface, out float3 diffuse, out float3 specular) {
@@ -374,15 +385,25 @@ void ComputeGeneratedToonDirectionalLight(float3 normal, float3 toEye, float3 al
 }
 
 void ComputeGeneratedToonPointLight(float3 normal, float3 toEye, float3 worldPos, float3 albedo, GeneratedMaterialSurface surface, out float3 diffuse, out float3 specular) {
-    float3 lightDir = normalize(worldPos - gPointLight.position);
-    float distance = length(gPointLight.position - worldPos);
-    float attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
-    float rawNdotL = dot(normal, -lightDir);
-    diffuse = EvaluateGeneratedToonRamp(rawNdotL, albedo, surface) * gPointLight.color.rgb * gPointLight.intensity * attenuation;
-    float3 halfVec = normalize(-lightDir + toEye);
-    float NdotH = saturate(dot(normal, halfVec));
-    float toonSpecular = EvaluateGeneratedToonSpecular(NdotH, surface);
-    specular = gPointLight.color.rgb * surface.toonHighlightColor.rgb * toonSpecular * gPointLight.intensity * attenuation;
+    diffuse = 0.0f;
+    specular = 0.0f;
+    [loop]
+    for(uint i = 0; i < gPointLightCount; ++i) {
+        PointLight pointLight = gPointLights[i];
+        if(pointLight.intensity <= 0.0f || pointLight.radius <= 0.0f) {
+            continue;
+        }
+        float3 lightDir = normalize(worldPos - pointLight.position);
+        float distance = length(pointLight.position - worldPos);
+        float attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
+        float rawNdotL = dot(normal, -lightDir);
+        float shadow = ComputePointHardShadow_RT(worldPos, normal, pointLight.position, distance);
+        diffuse += EvaluateGeneratedToonRamp(rawNdotL, albedo, surface) * pointLight.color.rgb * pointLight.intensity * attenuation * shadow;
+        float3 halfVec = normalize(-lightDir + toEye);
+        float NdotH = saturate(dot(normal, halfVec));
+        float toonSpecular = EvaluateGeneratedToonSpecular(NdotH, surface);
+        specular += pointLight.color.rgb * surface.toonHighlightColor.rgb * toonSpecular * pointLight.intensity * attenuation * shadow;
+    }
 }
 
 float Hash21(float2 p) {
@@ -425,6 +446,17 @@ bool CheckVisibility(float3 origin, float3 dir, float tMax) {
 float ComputeDirectionalHardShadow_RT(float3 worldPos, float3 normal, float3 L) {
     float3 origin = worldPos + normal * gShadowRayEps;
     return CheckVisibility(origin, L, 1000.0f) ? gMinShadow : 1.0f;
+}
+
+float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos, float lightDistance) {
+    float3 origin = worldPos + normal * gShadowRayEps;
+    float3 toLight = lightPos - origin;
+    float tMax = min(max(length(toLight) - gShadowRayEps, 0.0f), lightDistance);
+    if(tMax <= 0.0f) {
+        return 1.0f;
+    }
+    float3 L = normalize(toLight);
+    return CheckVisibility(origin, L, tMax) ? gMinShadow : 1.0f;
 }
 
 float ComputeDirectionalSoftShadow_RT(float3 worldPos, float3 normal, float3 L) {

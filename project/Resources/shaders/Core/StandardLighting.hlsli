@@ -41,14 +41,23 @@ void ComputeStandardPointLight(
     diffuse  = 0.0f;
     specular = 0.0f;
 
-    float3 lightDir    = normalize(worldPos - gPointLight.position);
-    float  distance    = length(gPointLight.position - worldPos);
-    float  attenuation = pow(saturate(1.0f - distance / gPointLight.radius), gPointLight.decay);
+    [loop]
+    for(uint i = 0; i < gPointLightCount; ++i) {
+        PointLight pointLight = gPointLights[i];
+        if(pointLight.intensity <= 0.0f || pointLight.radius <= 0.0f) {
+            continue;
+        }
 
-    float NdotL = saturate(dot(normal, -lightDir));
-    diffuse     = albedo * gPointLight.color.rgb * NdotL * gPointLight.intensity * attenuation;
+        float3 lightDir    = normalize(worldPos - pointLight.position);
+        float  distance    = length(pointLight.position - worldPos);
+        float  attenuation = pow(saturate(1.0f - distance / pointLight.radius), pointLight.decay);
 
-    float3 halfVec = normalize(-lightDir + toEye);
-    float  NdotH   = saturate(dot(normal, halfVec));
-    specular       = gPointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gPointLight.intensity * attenuation;
+        float NdotL = saturate(dot(normal, -lightDir));
+        float shadow = ComputePointHardShadow_RT(worldPos, normal, pointLight.position, distance);
+        diffuse += albedo * pointLight.color.rgb * NdotL * pointLight.intensity * attenuation * shadow;
+
+        float3 halfVec = normalize(-lightDir + toEye);
+        float  NdotH   = saturate(dot(normal, halfVec));
+        specular += pointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * pointLight.intensity * attenuation * shadow;
+    }
 }

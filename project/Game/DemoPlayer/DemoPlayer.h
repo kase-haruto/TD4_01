@@ -2,6 +2,7 @@
 #include "Engine/Application/Effects/EffectAsset.h"
 #include "Engine\Objects\3D\Actor\Actor.h"
 #include "Engine\Foundation\Serialization\SerializableObject.h"
+#include "Engine\Scene\Utility\SceneUtility.h"
 
 #include <Game\DemoHammer\DemoHammer.h>
 
@@ -147,6 +148,5 @@ private:
 	std::shared_ptr<DemoHammer> hammer_;
 	bool						firstSetting_ = true;
 
-	CalyxEngine::EffectAsset effectData;
-
+	CalyxEngine::EffectAsset effectData_;
 };

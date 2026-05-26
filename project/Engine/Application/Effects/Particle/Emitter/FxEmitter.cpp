@@ -20,6 +20,7 @@
 #include "Engine/Foundation/Math/MathUtil.h"
 #include "Engine/Foundation/Utility/Converter/EnumConverter.h"
 #include "Engine/Graphics/Camera/Manager/CameraManager.h"
+#include "../Detail/ParticleDetail.h"
 
 #include <externals/imgui/ImGuiFileDialog.h>
 #include <externals/imgui/imgui.h>
@@ -67,8 +68,11 @@ namespace CalyxEngine {
 		// 各種パラメータ
 		velocity_ = FxParam<CalyxEngine::Vector3>::MakeRandom(CalyxEngine::Vector3(-1.0f,0.0f,-1.0f),
 															CalyxEngine::Vector3(1.0f,0.0f,1.0f));
+		direction_      = FxParam<CalyxEngine::Vector3>::MakeConstant(CalyxEngine::Vector3(0.0f,1.0f,0.0f));
+		directionSpeed_ = FxParam<float>::MakeConstant(1.0f);
 		lifetime_ = FxParam<float>::MakeRandom(1.0f,3.0f);
 		scale_    = FxParam<CalyxEngine::Vector3>::MakeConstant();
+		spin_     = FxParam<CalyxEngine::Vector3>::MakeConstant(CalyxEngine::Vector3(0.0f,0.0f,0.0f));
 
 		moduleContainer_ = std::make_unique<CalyxEngine::FxModuleContainer>();
 	}
@@ -149,7 +153,7 @@ namespace CalyxEngine {
 			if(fx.followEmitter) { fx.position = position_ + fx.followOffset; } else { fx.position += fx.velocity * deltaTime; }
 
 			// スピン
-			fx.rotationEuler.z += fx.spinSpeed * deltaTime;
+			fx.rotationEuler += fx.spinSpeed * deltaTime;
 
 			fx.age += deltaTime;
 			if(fx.age >= fx.lifetime) fx.alive = false;
@@ -201,7 +205,9 @@ namespace CalyxEngine {
 			data.position = fx.position;
 			data.scale    = fx.scale;
 			data.color    = fx.color;
-			data.rotation = fx.rotationEuler.z;
+			data.rotation = fx.rotationEuler;
+			data.alignDirection = fx.alignDirection;
+			data.alignToDirection = fx.alignToDirection ? 1u : 0u;
 
 			gpuUnits.push_back(data);
 		}
@@ -250,7 +256,24 @@ namespace CalyxEngine {
 		fx.alive        = true;
 		fx.uvTransform.Initialize();
 		fx.spinSpeed = spin_.Get();
-		if(HasFlag(RandomSpinEmit)) { fx.rotationEuler.z = Random::Generate<float>(-CalyxEngine::kPi,CalyxEngine::kPi); } else { fx.rotationEuler.z = 0.0f; }
+		fx.alignDirection = CalyxEngine::Vector3(0.0f,0.0f,0.0f);
+		fx.alignToDirection = false;
+		fx.rotationEuler = CalyxEngine::Vector3(0.0f,0.0f,0.0f);
+		if(HasFlag(RandomSpinEmit)) { fx.rotationEuler.z = Random::Generate<float>(-CalyxEngine::kPi,CalyxEngine::kPi); }
+		if(useDirection_) ApplyDirectionVelocity(fx);
+	}
+
+	void FxEmitter::ApplyDirectionVelocity(FxUnit& fx) {
+		CalyxEngine::Vector3 dir = direction_.Get();
+		if(dir.Length() <= 0.0001f) {
+			fx.velocity = CalyxEngine::Vector3(0.0f,0.0f,0.0f);
+			return;
+		}
+
+		dir = dir.Normalize();
+		fx.velocity = dir * directionSpeed_.Get();
+		fx.alignDirection = dir;
+		fx.alignToDirection = rotateToDirection_;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -463,9 +486,22 @@ namespace CalyxEngine {
 			// ================= Params =================
 			if(FxGui::GridScope sec{"Params"}; sec.open) {
 				FxGui::DrawParam("Scale",scale_);
+				ImGui::BeginDisabled(useDirection_);
 				FxGui::DrawParam("Velocity",velocity_);
+				ImGui::EndDisabled();
+				FxGui::RowLabel("Direction Enable");
+				GuiCmd::CheckBox("##directionEnable",useDirection_);
+
+				ImGui::BeginDisabled(!useDirection_);
+				FxGui::DrawParam("Direction",direction_);
+				FxGui::DrawParam("Direction Speed",directionSpeed_);
+
+				FxGui::RowLabel("Rotate To Direction");
+				GuiCmd::CheckBox("##rotateToDirection",rotateToDirection_);
+				ImGui::EndDisabled();
+
 				FxGui::DrawParam("Lifetime",lifetime_);
-				FxGui::DrawParam("spin",spin_);
+				FxGui::DrawParam("Spin",spin_);
 			}
 
 			// ================= Playback =================
@@ -602,6 +638,11 @@ namespace CalyxEngine {
 		position_       = config.position;
 		material_.color = config.color;
 		velocity_.FromConfig(config.velocity);
+		direction_.FromConfig(config.direction.vector);
+		directionSpeed_.FromConfig(config.direction.speed);
+		useDirection_       = config.direction.enabled;
+		rotateToDirection_  = config.direction.rotateToDirection;
+		spin_.FromConfig(config.spin);
 		lifetime_.FromConfig(config.lifetime);
 		scale_.FromConfig(config.scale);
 		emitRate_  = config.emitRate;
@@ -644,6 +685,11 @@ namespace CalyxEngine {
 		config.position       = position_;
 		config.color          = material_.color;
 		config.velocity       = Vector3ParamConfig{velocity_.ToConfig()};
+		config.direction.enabled = useDirection_;
+		config.direction.vector = Vector3ParamConfig{direction_.ToConfig()};
+		config.direction.speed = FxFloatParamConfig{directionSpeed_.ToConfig()};
+		config.direction.rotateToDirection = rotateToDirection_;
+		config.spin           = Vector3ParamConfig{spin_.ToConfig()};
 		config.lifetime       = FxFloatParamConfig{lifetime_.ToConfig()};
 		config.scale          = Vector3ParamConfig{scale_.ToConfig()};
 		config.emitRate       = emitRate_;

@@ -17,8 +17,10 @@ namespace CalyxEngine {
 	struct FxUnit {
 		CalyxEngine::Vector3 position;                        //< 座標
 		CalyxEngine::Vector3 rotationEuler;                   //< オイラー回転
-		float              spinSpeed;                       // < スピン速度
+		CalyxEngine::Vector3 spinSpeed;                       // < スピン速度
 		CalyxEngine::Vector3 velocity;                        //< 速度
+		CalyxEngine::Vector3 alignDirection{0.0f,0.0f,0.0f};   //< ビルボード板ポリの向き合わせ方向
+		bool               alignToDirection = false;          //< 移動方向へ板ポリを回転するか
 		CalyxEngine::Vector3 initialScale = {1.0f,1.0f,1.0f}; // 初期スケール
 		CalyxEngine::Vector3 scale;                           //< スケール
 		float              lifetime = 1.0f;                 //< 寿命
