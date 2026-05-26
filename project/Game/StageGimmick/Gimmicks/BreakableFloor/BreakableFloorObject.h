@@ -2,6 +2,8 @@
 
 #include "Game/StageGimmick/Base/StageGimmickObjectBase.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 /// <summary>
 /// 壊れる床オブジェクトのクラス
 /// </summary>
@@ -35,5 +37,7 @@ private:
 
 	// 壊れているか
 	bool isBroken_ = false;
+
+	CalyxEngine::EffectAsset effectData_;
 
 };

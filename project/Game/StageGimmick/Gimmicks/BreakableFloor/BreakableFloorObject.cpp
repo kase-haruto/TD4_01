@@ -27,7 +27,8 @@ void BreakableFloorObject::Break() {
 		BaseGameObject::SetDrawEnable(false);
 	}
 
-	// 破片パーティクル、SE、カメラ揺れを入れる
+	// 破片パーティクル
+	EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
 
 }
 
@@ -45,6 +46,8 @@ void BreakableFloorObject::ObjectInitialize() {
 		}
 	}
 	isBroken_ = false;
+
+	effectData_.Load("BreakableFloorEffect");
 }
 
 void BreakableFloorObject::ObjectUpdate(float) {

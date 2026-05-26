@@ -293,6 +293,8 @@ namespace CalyxEngine {
 	}
 	void GpuFxEmitter::ApplyConfigFrom(const EmitterConfig& config) {
 		position_ = config.position;
+		worldRotation_ = config.rotation;
+		worldScale_ = config.worldScale;
 		emitterData_.translate = config.position;
 		material_.color = config.color;
 		material_.texturePath = ResolveTexturePath(config.texturePath);
@@ -364,6 +366,8 @@ namespace CalyxEngine {
 	}
 	void GpuFxEmitter::ExtractConfigTo(EmitterConfig& config) const {
 		config.position = position_;
+		config.rotation = worldRotation_;
+		config.worldScale = worldScale_;
 		config.color = material_.color;
 		config.texturePath = material_.texturePath;
 		config.textureGuid = textureGuid_;
