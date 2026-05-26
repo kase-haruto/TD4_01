@@ -13,7 +13,9 @@
 
 struct PointLightConstants {
 	uint32_t count = 0;
-	float pad[3] = {};
+	uint32_t pointLightShadowsEnabled = 1;
+	uint32_t maxPointShadowLights = 2;
+	float pointShadowContributionThreshold = 0.01f;
 	std::array<PointLightData, 128> lights = {};
 };
 
