@@ -149,4 +149,5 @@ private:
 	bool						firstSetting_ = true;
 
 	CalyxEngine::EffectAsset effectData_;
+	CalyxEngine::EffectAsset jumpEffect_;
 };

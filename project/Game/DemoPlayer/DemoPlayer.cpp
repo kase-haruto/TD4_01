@@ -70,6 +70,7 @@ void DemoPlayer::Initialize() {
 	ShockwaveManager::GetInstance()->Initialize(10);
 
 	effectData_.Load("PlayerShockwave");
+	jumpEffect_.Load("PlayerJumpEffect");
 }
 
 void DemoPlayer::Update(float dt) {
@@ -202,6 +203,8 @@ void DemoPlayer::Move(float dt) {
 	if(jumpEvents.jumpStart) {
 		// ジャンプ時の処理
 		EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
+		auto offset = CalyxEngine::Vector3{0.0f, 0.5f, 1.0f};
+		EffectAPI::Play(jumpEffect_, worldTransform_.GetWorldPosition() + offset);
 		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.defaultShockScale);
 	}
 

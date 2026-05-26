@@ -52,7 +52,7 @@
         "isDrawEnable": true,
         "isOneShot": true,
         "lifetime": {
-          "constant": 0.47999998927116394,
+          "constant": 0.5,
           "max": 1.0,
           "min": 0.0,
           "mode": 0
@@ -88,21 +88,43 @@
             "ease": 6,
             "enabled": true,
             "end": [
-              0.7014962434768677,
-              0.8494208455085754,
-              0.20005667209625244,
-              1.0
+              1.0,
+              0.9961389899253845,
+              0.0,
+              0.10000000149011612
             ],
             "guid": "11935370-e2f4-4474-af94-5cb06b8bfb30",
             "invert": false,
             "name": "OverLifetimeModule",
             "start": [
-              0.8888955116271973,
               1.0,
-              0.007722020149230957,
+              0.6000000238418579,
+              0.0,
               1.0
             ],
             "target": 4
+          },
+          {
+            "blend": 1,
+            "clamp01": true,
+            "ease": 0,
+            "enabled": true,
+            "end": [
+              0.5649999976158142,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "9e863420-0b98-47a7-b4f3-32005b68bfbc",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.5649999976158142,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 2
           }
         ],
         "position": {
@@ -211,14 +233,14 @@
         "color": {
           "w": 1.0,
           "x": 1.0,
-          "y": 0.9608540534973145,
+          "y": 0.4274509847164154,
           "z": 0.0
         },
         "direction": {
-          "enabled": false,
+          "enabled": true,
           "rotateToDirection": false,
           "speed": {
-            "constant": 1.0,
+            "constant": 8.880000114440918,
             "max": 1.0,
             "min": 0.0,
             "mode": 0
@@ -231,12 +253,12 @@
             },
             "max": {
               "x": 1.0,
-              "y": 9.020000457763672,
+              "y": 1.0,
               "z": 1.0
             },
             "min": {
               "x": -1.0,
-              "y": 7.699999809265137,
+              "y": 1.0,
               "z": -1.0
             },
             "mode": 1
