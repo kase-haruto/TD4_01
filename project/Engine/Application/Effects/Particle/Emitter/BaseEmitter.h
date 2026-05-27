@@ -19,6 +19,7 @@ namespace CalyxEngine {
 		sphere,	   //< 球
 		cube,	   //< 立方体
 		cylinder,  //< 円柱
+		cone,      //< 円錐
 		torus,	   //< トーラス
 		triangle,  //< 三角形
 	};

@@ -609,6 +609,30 @@ namespace CalyxEngine {
 
 		CalyxEngine::Vector4 color = CalyxEngine::Vector4(1.0f,0.0f,0.0f,1.0f);
 		switch(shape_) {
+		case EmitterShape::Circle: {
+			const float radiusX = shapeRadius_ * absScale.x;
+			const float radiusZ = shapeRadius_ * absScale.z;
+			if(effectPreview) {
+				PrimitiveDrawer::GetInstance()->DrawEffectPreviewCircle(position_,worldRotation_,radiusX,radiusZ,color);
+			} else {
+				PrimitiveDrawer::GetInstance()->DrawCircle(position_,worldRotation_,radiusX,radiusZ,color);
+			}
+		}
+		break;
+
+		case EmitterShape::Cone: {
+			const float height = (std::max)(shapeRadius_,0.0f) * absScale.y;
+			const float angleRad = std::clamp(CalyxEngine::ToRadians(shapeAngle_),0.0f,CalyxEngine::kPi * 0.5f);
+			const float radiusX = height * std::tan(angleRad) * absScale.x;
+			const float radiusZ = height * std::tan(angleRad) * absScale.z;
+			if(effectPreview) {
+				PrimitiveDrawer::GetInstance()->DrawEffectPreviewCone(position_,worldRotation_,height,radiusX,radiusZ,color);
+			} else {
+				PrimitiveDrawer::GetInstance()->DrawCone(position_,worldRotation_,height,radiusX,radiusZ,color);
+			}
+		}
+		break;
+
 		case EmitterShape::Sphere: {
 			const float maxScale = (std::max)((std::max)(absScale.x,absScale.y),absScale.z);
 			if(effectPreview) {
