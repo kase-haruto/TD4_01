@@ -12,12 +12,12 @@ DiceSocketObject::DiceSocketObject(
 	std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
 
-	worldTransform_.scale *= 1.5f;
+	worldTransform_.scale *= 1.3f;
 }
 
 const CalyxEngine::Vector3 DiceSocketObject::GetSocketPos() {
 	CalyxEngine::Vector3 position = worldTransform_.translation;
-	float scale = 0.45f;
+	float scale = 0.47f;
 	int index = 1 - clearCount_ + (diceSocketCount_ * 2);
 	position.x += scale * static_cast<float>(index);
 	return position;
