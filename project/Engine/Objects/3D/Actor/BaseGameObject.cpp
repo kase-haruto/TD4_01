@@ -59,7 +59,13 @@ BaseGameObject::BaseGameObject() {
 	config_.SetOnApplied([this](const BaseGameObjectConfig&) { this->ApplyConfig(); });
 }
 
-BaseGameObject::~BaseGameObject() {}
+BaseGameObject::~BaseGameObject() {
+	for(auto& binding : boneParentBindings_) {
+		if(binding.target && binding.target->parent == binding.parentTransform.get()) {
+			binding.target->parent = nullptr;
+		}
+	}
+}
 
 void BaseGameObject::AlwaysUpdate(float dt) {
 	if(objectModelType_ != ObjectModelType::ModelType_Unknown && model_) {
@@ -67,6 +73,7 @@ void BaseGameObject::AlwaysUpdate(float dt) {
 	}
 
 	worldTransform_.Update();
+	UpdateBoneParents();
 
 	// collider の更新
 	if(collider_) {
@@ -411,6 +418,59 @@ AABB BaseGameObject::GetWorldAABB() const {
 	}
 
 	return SceneObject::FallbackAABBFromTransform();
+}
+
+void BaseGameObject::BoneParentTransform::SetWorldMatrix(const CalyxEngine::Matrix4x4& world) {
+	matrix.world				 = world;
+	matrix.WorldInverseTranspose = CalyxEngine::Matrix4x4::Transpose(CalyxEngine::Matrix4x4::Inverse(world));
+	++revision_;
+}
+
+void BaseGameObject::SetBoneParent(WorldTransform& target, const std::string& boneName, bool inheritScale) {
+	ClearBoneParent(target);
+
+	BoneParentBinding binding;
+	binding.target			= &target;
+	binding.boneName		= boneName;
+	binding.inheritScale	= inheritScale;
+	binding.parentTransform = std::make_unique<BoneParentTransform>();
+
+	target.parent		 = binding.parentTransform.get();
+	target.inheritScale = inheritScale;
+
+	boneParentBindings_.push_back(std::move(binding));
+	UpdateBoneParents();
+}
+
+void BaseGameObject::ClearBoneParent(WorldTransform& target) {
+	boneParentBindings_.erase(
+		std::remove_if(
+			boneParentBindings_.begin(),
+			boneParentBindings_.end(),
+			[&target](const BoneParentBinding& binding) {
+				if(binding.target == &target) {
+					target.parent = nullptr;
+					return true;
+				}
+				return false;
+			}),
+		boneParentBindings_.end());
+}
+
+void BaseGameObject::UpdateBoneParents() {
+	auto* animModel = AnimationModel();
+	if(!animModel) return;
+
+	for(auto& binding : boneParentBindings_) {
+		if(!binding.target || !binding.parentTransform) continue;
+
+		auto jointMatrix = animModel->GetJointMatrix(binding.boneName);
+		if(!jointMatrix.has_value()) continue;
+
+		binding.parentTransform->SetWorldMatrix(jointMatrix.value() * worldTransform_.matrix.world);
+		binding.target->parent		 = binding.parentTransform.get();
+		binding.target->inheritScale = binding.inheritScale;
+	}
 }
 
 bool BaseGameObject::Save() const {
