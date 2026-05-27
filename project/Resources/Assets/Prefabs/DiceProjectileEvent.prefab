@@ -9,11 +9,11 @@
             },
             "eventParam": {
                 "fields": {
-                    "crackerInterval": 0.75,
+                    "crackerInterval": 1.0,
                     "crackerPos": [
-                        1.5,
-                        -1.0,
-                        -1.0
+                        3.0,
+                        3.0,
+                        0.0
                     ],
                     "direction": [
                         -0.0,
@@ -27,14 +27,14 @@
                     "speed": 8.5
                 }
             },
-            "socketGuid": "687e3444-7fdc-4023-a098-93ee41acc34e",
+            "socketGuid": "83f05c27-48f2-4727-800e-14f29fa7586e",
             "targetObjectGuids": [
-                "03450a6c-ae03-4feb-965a-46c0b9d975aa",
-                "04e113c5-7e87-4933-8c17-91af008e47f3",
-                "29f49f52-9fdf-4d4b-9d8e-ce4f6b648a31",
-                "2abc48c2-e362-4394-a0a4-b38ab2f14842",
-                "6d8ade4d-e130-440a-be45-6a839b120f90",
-                "241c9570-6301-4f2f-b166-bf4d7519908a"
+                "60b2c548-3adb-46cc-b406-c422b4931cbe",
+                "dae5789e-788f-475b-a280-edcc2ac0d1dc",
+                "aa38612e-93d6-4960-a1d3-e95d698aa576",
+                "f4f13dea-180c-40bc-94a0-568402ca776c",
+                "d6763222-1a92-49c7-929e-c13be4af4eb5",
+                "3a0b5b68-a796-40dd-9faf-a4c3c83e81a3"
             ]
         },
         "castShadow": false,
@@ -61,7 +61,7 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "guid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
         "name": "DiceProjectileEvent",
         "objectType": 5,
         "outlineColor": {
@@ -89,9 +89,9 @@
                 "z": 1.0
             },
             "translation": {
-                "x": -0.0915459394454956,
-                "y": -0.0013507483527064323,
-                "z": 3.8653628826141357
+                "x": 0.12264817953109741,
+                "y": -0.012116724625229836,
+                "z": 5.120538711547852
             }
         },
         "type": "DiceProjectileEvent",
@@ -142,10 +142,10 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "04e113c5-7e87-4933-8c17-91af008e47f3",
+        "guid": "aa38612e-93d6-4960-a1d3-e95d698aa576",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
             "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
@@ -166,7 +166,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -183,9 +183,9 @@
                 "z": 0.4000000059604645
             },
             "translation": {
-                "x": 0.4566526412963867,
-                "y": 0.5675784349441528,
-                "z": 10.600345611572266
+                "x": 0.0,
+                "y": 0.5564357042312622,
+                "z": 8.879549026489258
             }
         },
         "type": "DiceProjectileObject",
@@ -205,9 +205,9 @@
                 "z": 0.4000000059604645
             },
             "translation": {
-                "x": 0.4566526412963867,
-                "y": 0.5675784349441528,
-                "z": 10.600345611572266
+                "x": 0.0,
+                "y": 0.5564357042312622,
+                "z": 8.879549026489258
             }
         }
     },
@@ -236,11 +236,293 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "687e3444-7fdc-4023-a098-93ee41acc34e",
+        "guid": "f4f13dea-180c-40bc-94a0-568402ca776c",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "debugCube.obj",
+            "modelName": "dice.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "DiceProjectileObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": -1.5,
+                "y": 0.5564357042312622,
+                "z": 7.5
+            }
+        },
+        "type": "DiceProjectileObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": -1.5,
+                "y": 0.5564357042312622,
+                "z": 7.5
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 16,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "60b2c548-3adb-46cc-b406-c422b4931cbe",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "dice.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "DiceProjectileObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": 1.5,
+                "y": 0.5564357042312622,
+                "z": 7.5
+            }
+        },
+        "type": "DiceProjectileObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": 1.5,
+                "y": 0.5564357042312622,
+                "z": 7.5
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 16,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 1
+        },
+        "drawEnable": true,
+        "guid": "d6763222-1a92-49c7-929e-c13be4af4eb5",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "dice.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "DiceProjectileObject",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": -1.5,
+                "y": 0.5564357042312622,
+                "z": 8.879549026489258
+            }
+        },
+        "type": "DiceProjectileObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": false,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 0.4000000059604645,
+                "y": 0.4000000059604645,
+                "z": 0.4000000059604645
+            },
+            "translation": {
+                "x": -1.5,
+                "y": 0.5564357042312622,
+                "z": 8.879549026489258
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 64,
+            "isCollisionEnabled": true,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "83f05c27-48f2-4727-800e-14f29fa7586e",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "diceStorage.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -260,7 +542,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -272,14 +554,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 5.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 1.2999999523162842,
+                "y": 1.2999999523162842,
+                "z": 1.2999999523162842
             },
             "translation": {
                 "x": 0.0,
-                "y": 4.379960536956787,
-                "z": 15.058597564697266
+                "y": 0.0,
+                "z": 13.79774284362793
             }
         },
         "type": "DiceSocketObject",
@@ -294,14 +576,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 5.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 1.2999999523162842,
+                "y": 1.2999999523162842,
+                "z": 1.2999999523162842
             },
             "translation": {
                 "x": 0.0,
-                "y": 4.379960536956787,
-                "z": 15.058597564697266
+                "y": 0.0,
+                "z": 13.79774284362793
             }
         }
     },
@@ -330,10 +612,10 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "03450a6c-ae03-4feb-965a-46c0b9d975aa",
+        "guid": "dae5789e-788f-475b-a280-edcc2ac0d1dc",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "0a40d1c6-6091-4ce9-a352-1a8f69b2fae3",
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
             "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
@@ -354,7 +636,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -371,9 +653,9 @@
                 "z": 0.4000000059604645
             },
             "translation": {
-                "x": -0.24264919757843018,
-                "y": 0.3716733455657959,
-                "z": 15.498249053955078
+                "x": 0.0,
+                "y": 0.5564357042312622,
+                "z": 7.5
             }
         },
         "type": "DiceProjectileObject",
@@ -393,9 +675,9 @@
                 "z": 0.4000000059604645
             },
             "translation": {
-                "x": -0.24264919757843018,
-                "y": 0.3716733455657959,
-                "z": 15.498249053955078
+                "x": 0.0,
+                "y": 0.5564357042312622,
+                "z": 7.5
             }
         }
     },
@@ -424,10 +706,10 @@
             "targetType": 1
         },
         "drawEnable": true,
-        "guid": "29f49f52-9fdf-4d4b-9d8e-ce4f6b648a31",
+        "guid": "3a0b5b68-a796-40dd-9faf-a4c3c83e81a3",
         "modelConfig": {
             "blendMode": 5,
-            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
             "modelName": "dice.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
@@ -448,7 +730,7 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
+        "parentGuid": "c565f7bc-7dd6-4fd7-af97-f9a11d90ece6",
         "transform": {
             "inheritRotate": true,
             "inheritScale": false,
@@ -465,9 +747,9 @@
                 "z": 0.4000000059604645
             },
             "translation": {
-                "x": -1.178688645362854,
-                "y": 0.3867371082305908,
-                "z": 12.139148712158203
+                "x": 1.5,
+                "y": 0.5564357042312622,
+                "z": 8.879549026489258
             }
         },
         "type": "DiceProjectileObject",
@@ -487,291 +769,9 @@
                 "z": 0.4000000059604645
             },
             "translation": {
-                "x": -1.178688645362854,
-                "y": 0.3867371082305908,
-                "z": 12.139148712158203
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 16,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "2abc48c2-e362-4394-a0a4-b38ab2f14842",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "dice.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "DiceProjectileObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.4000000059604645,
-                "y": 0.4000000059604645,
-                "z": 0.4000000059604645
-            },
-            "translation": {
-                "x": -1.1330496072769165,
-                "y": 0.5793263912200928,
-                "z": 10.600688934326172
-            }
-        },
-        "type": "DiceProjectileObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.4000000059604645,
-                "y": 0.4000000059604645,
-                "z": 0.4000000059604645
-            },
-            "translation": {
-                "x": -1.1330496072769165,
-                "y": 0.5793263912200928,
-                "z": 10.600688934326172
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 16,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "6d8ade4d-e130-440a-be45-6a839b120f90",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "dice.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "DiceProjectileObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.4000000059604645,
-                "y": 0.4000000059604645,
-                "z": 0.4000000059604645
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 0.6805965304374695,
-                "z": 13.92495059967041
-            }
-        },
-        "type": "DiceProjectileObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.4000000059604645,
-                "y": 0.4000000059604645,
-                "z": 0.4000000059604645
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 0.6805965304374695,
-                "z": 13.92495059967041
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 16,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "241c9570-6301-4f2f-b166-bf4d7519908a",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "19b6f71a-338d-4814-80bb-41e1a6f73022",
-            "modelName": "dice.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "DiceProjectileObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "77f299f5-80d4-43e1-80ba-c6587d85d786",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.4000000059604645,
-                "y": 0.4000000059604645,
-                "z": 0.4000000059604645
-            },
-            "translation": {
-                "x": 2.2899317741394043,
-                "y": 0.6555821895599365,
-                "z": 12.17703914642334
-            }
-        },
-        "type": "DiceProjectileObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 0.4000000059604645,
-                "y": 0.4000000059604645,
-                "z": 0.4000000059604645
-            },
-            "translation": {
-                "x": 2.2899317741394043,
-                "y": 0.6555821895599365,
-                "z": 12.17703914642334
+                "x": 1.5,
+                "y": 0.5564357042312622,
+                "z": 8.879549026489258
             }
         }
     }

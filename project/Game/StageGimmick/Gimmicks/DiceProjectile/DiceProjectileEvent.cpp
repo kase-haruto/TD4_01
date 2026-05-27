@@ -42,7 +42,7 @@ void DiceProjectileEvent::EventInitialize() {
 
 	// シーンから対応するオブジェクトが無ければ生成する
 	} else {
-		socket_ = SceneAPI::Instantiate<DiceSocketObject>("debugCube.obj", socketPrefix);
+		socket_ = SceneAPI::Instantiate<DiceSocketObject>("diceStorage.obj", socketPrefix);
 		socketGuid_ = socket_.lock()->GetGuid();
 	}
 	socket_.lock()->SetParent(shared_from_this());

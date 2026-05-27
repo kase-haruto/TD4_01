@@ -12,12 +12,12 @@ DiceSocketObject::DiceSocketObject(
 	std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
 
-	worldTransform_.translation.y += 2.5f;
+	worldTransform_.scale *= 1.3f;
 }
 
 const CalyxEngine::Vector3 DiceSocketObject::GetSocketPos() {
 	CalyxEngine::Vector3 position = worldTransform_.translation;
-	float scale = 0.5f;
+	float scale = 0.47f;
 	int index = 1 - clearCount_ + (diceSocketCount_ * 2);
 	position.x += scale * static_cast<float>(index);
 	return position;
@@ -59,7 +59,6 @@ void DiceSocketObject::ObjectInitialize() {
 	BaseGameObject::SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
 	worldTransform_.inheritScale = false;
-	worldTransform_.scale.x = static_cast<float>(clearCount_ + 1u);
 
 	sameNumbers_ = static_cast<uint32_t>(rand() % 6 + 1);
 
@@ -75,7 +74,7 @@ void DiceSocketObject::ObjectUpdate(float dt) {
 		} else {
 			isCracker_ = true;
 			CalyxEngine::Vector3 offset = crackerPos_ + worldTransform_.GetWorldPosition();
-			offset.x = worldTransform_.scale.x * 0.5f + crackerPos_.x;
+			offset.x = static_cast<float>(clearCount_ + 1u) * 0.5f + crackerPos_.x;
 			EffectAPI::Play(effectRightData_, offset);
 			offset.x *= -1.0f;
 			EffectAPI::Play(effectLeftData_, offset);
