@@ -41,7 +41,9 @@ void PreClearScene::Initialize() {
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/PreClearScene.scene");
+	std::string scenePath = "Resources/Assets/Scenes/PreClearScene.scene";
+	SceneSerializer::Load(*sceneContext_, scenePath);
+	sceneContext_->SetScenePath(scenePath);
 
 	LoadAssets();
 
@@ -52,6 +54,19 @@ void PreClearScene::Initialize() {
 	pauseBg_->Initialize({0.0f, 0.0f}, {320.0f, 180.0f});
 	pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
+
+	auto objectPlayer = sceneContext_->GetObjectLibrary()->FindByName("player");
+	player_			  = std::static_pointer_cast<GeneralObject>(objectPlayer);
+	auto objectOni	  = sceneContext_->GetObjectLibrary()->FindByName("oni");
+	oni_			  = std::static_pointer_cast<GeneralObject>(objectOni);
+	if(player_) {
+		player_->Initialize();
+	}
+	if(oni_) {
+		oni_->Initialize();
+	}
+
+	animTime_ = 2.0f;
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
@@ -116,6 +131,10 @@ std::unique_ptr<TransitionPayload> PreClearScene::BuildNowTypePayload(SceneType 
 
 void PreClearScene::AnimUpdate(float dt) {
 	animTime_ -= dt;
+
+	CalyxEngine::Vector3 pos = player_->GetWorldPosition();
+	pos += flyDir_ * dt;
+	player_->SetTranslate(pos);
 
 	if(animTime_ < 0.0f) {
 		IsPhase_ = true;

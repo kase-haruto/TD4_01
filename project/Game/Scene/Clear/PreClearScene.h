@@ -12,8 +12,9 @@
 #include <memory>
 #include <vector>
 
-#include <Game/Scene/Transition/TransitionControl.h>
 #include <Game\DemoPlayer\DemoPlayer.h>
+#include "Game\StageGimmick\Base\GeneralObject.h"
+#include <Game/Scene/Transition/TransitionControl.h>
 #include <Game\Scene\Transition\TransitionPayload.h>
 
 /// デバッグ関連///
@@ -54,9 +55,12 @@ private:
 	std::unique_ptr<Sprite>			testSprite_;
 	std::shared_ptr<CalyxHuman>		animationHuman_;
 
+	std::shared_ptr<GeneralObject> player_;
+	std::shared_ptr<GeneralObject> oni_;
+
 	std::unique_ptr<Sprite> pauseBg_ = nullptr;
 
-
+	CalyxEngine::Vector3 flyDir_   = {-1.0f, 0.1f, -0.1f};
 	float animTime_ = 2.0f;
 
 	std::unique_ptr<TransitionControl>			transitionControl_ = nullptr;
