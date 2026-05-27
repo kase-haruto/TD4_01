@@ -52,6 +52,16 @@ void GameoverScene::Initialize() {
 	pauseBg_->Initialize({0.0f, 0.0f}, {1280.0f, 720.0f});
 	pauseBg_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
+
+	transitionControl_ = std::make_unique<TransitionControl>();
+	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
+	// シーンタイプに基づいて自動で演出をセット
+	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::GAMEOVER);
+	transitionControl_->StartOpening(0.5f, [this]() {
+		IsOpening_ = false;
+	});
+	IsOpening_ = true;
+	IsPhase_   = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -59,8 +69,19 @@ void GameoverScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 void GameoverScene::Update([[maybe_unused]] float dt) {
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_LCONTROL) && CalyxFoundation::Input::TriggerKey(DIK_7)) {
-		transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
+	transitionControl_->Update(dt);
+
+	if(IsPhase_ || IsOpening_) {
+		return;
+	}
+
+	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE)) {
+		IsPhase_ = true;
+		payload_ = BuildNowTypePayload(SceneType::GAMEOVER);
+		transitionControl_->SetAutoPreset(SceneType::GAMEOVER, SceneType::SELECT);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
+		});
 	}
 
 	// 衝突判定
@@ -74,6 +95,8 @@ void GameoverScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* ps
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
 
+	transitionControl_->Draw(spriteRenderer_.get());
+
 	// シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
 }
@@ -82,4 +105,19 @@ void GameoverScene::CleanUp() {
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
+}
+
+void GameoverScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
+	if(!payload) return;
+
+	// 自分が知っている型にだけキャストする
+	if(auto* p = static_cast<TransitionPayload*>(payload.get())) {
+		preType_ = p->type;
+	}
+}
+
+std::unique_ptr<TransitionPayload> GameoverScene::BuildNowTypePayload(SceneType Type) {
+	auto payload  = std::make_unique<TransitionPayload>();
+	payload->type = Type;
+	return payload;
 }

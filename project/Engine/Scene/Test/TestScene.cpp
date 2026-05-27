@@ -256,7 +256,7 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::CLEAR);
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::GAMEOVER);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
 		});

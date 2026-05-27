@@ -114,16 +114,6 @@ void TitleScene::CleanUp() {
 	CollisionManager::GetInstance()->ClearColliders();
 }
 
-void TitleScene::PhaseUpdate(float) {
-
-}
-
-std::unique_ptr<TransitionPayload> TitleScene::BuildNowTypePayload(SceneType Type) {
-	auto payload	   = std::make_unique<TransitionPayload>();
-	payload->type = Type;
-	return payload;
-}
-
 void TitleScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
 	if(!payload) return;
 
@@ -131,4 +121,13 @@ void TitleScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) 
 	if(auto* p = static_cast<TransitionPayload*>(payload.get())) {
 		preType_ = p->type;
 	}
+}
+
+void TitleScene::PhaseUpdate(float) {
+}
+
+std::unique_ptr<TransitionPayload> TitleScene::BuildNowTypePayload(SceneType Type) {
+	auto payload  = std::make_unique<TransitionPayload>();
+	payload->type = Type;
+	return payload;
 }
