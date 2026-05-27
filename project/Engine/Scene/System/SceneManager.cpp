@@ -21,6 +21,7 @@
 #include "Engine/Scene/Test/TestScene.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
 #include "Game/Scene/Clear/ClearScene.h"
+#include "Game/Scene/Clear/PreClearScene.h"
 #include "Game/Scene/Gameover/GameoverScene.h"
 #include "Game/Scene/Select/SelectScene.h"
 #include "Game/Scene/Title/TitleScene.h"
@@ -48,6 +49,9 @@ namespace CalyxEngine {
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::CLEAR),
 				 std::make_unique<ClearScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::PRECLEAR),
+				 std::make_unique<PreClearScene>());
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::GAMEOVER),
 				 std::make_unique<GameoverScene>());

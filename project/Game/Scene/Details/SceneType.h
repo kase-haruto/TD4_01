@@ -9,6 +9,7 @@
 enum class SceneType : int8_t {
 	TEST,
 	CLEAR,
+	PRECLEAR,
 	GAMEOVER,
 	TITLE,
 	SELECT,
