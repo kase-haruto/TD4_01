@@ -246,6 +246,7 @@ namespace CalyxEngine {
 						}
 					}
 
+					sp->GetWorldTransform().ShowImGui("Emitter Transform");
 					sp->ShowGui();
 
 					ImGui::EndTabItem();

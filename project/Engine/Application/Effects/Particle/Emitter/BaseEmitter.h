@@ -78,6 +78,7 @@ namespace CalyxEngine {
 		virtual void SetDrawEnable(bool isEnable) { drawEnable_ = isEnable; }
 		virtual void SetPosition(const CalyxEngine::Vector3& pos) { position_ = pos; }
 		virtual void DrawEmitterShape(const WorldTransform&) {}
+		virtual void DrawEmitterShapePreview(const WorldTransform&) {}
 		virtual const Guid& GetTextureGuid() const { return emptyGuid_; }
 		virtual bool LoadTextureByGuid(const Guid&) { return false; }
 		virtual void SetTextureGuid(const Guid&) {}

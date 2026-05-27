@@ -593,7 +593,15 @@ namespace CalyxEngine {
 
 	void FxEmitter::DrawEmitterShape(const WorldTransform& tf) {
 		[[maybe_unused]] CalyxEngine::Vector3 pos = tf.GetWorldPosition();
+		DrawEmitterShapeInternal(false);
+	}
 
+	void FxEmitter::DrawEmitterShapePreview(const WorldTransform& tf) {
+		[[maybe_unused]] CalyxEngine::Vector3 pos = tf.GetWorldPosition();
+		DrawEmitterShapeInternal(true);
+	}
+
+	void FxEmitter::DrawEmitterShapeInternal(bool effectPreview) {
 		const CalyxEngine::Vector3 absScale{
 			(std::max)(std::abs(worldScale_.x), 0.0001f),
 			(std::max)(std::abs(worldScale_.y), 0.0001f),
@@ -603,7 +611,11 @@ namespace CalyxEngine {
 		switch(shape_) {
 		case EmitterShape::Sphere: {
 			const float maxScale = (std::max)((std::max)(absScale.x,absScale.y),absScale.z);
-			PrimitiveDrawer::GetInstance()->DrawSphere(position_,shapeRadius_ * maxScale,4,color);
+			if(effectPreview) {
+				PrimitiveDrawer::GetInstance()->DrawEffectPreviewSphere(position_,shapeRadius_ * maxScale,4,color);
+			} else {
+				PrimitiveDrawer::GetInstance()->DrawSphere(position_,shapeRadius_ * maxScale,4,color);
+			}
 		}
 		break;
 
@@ -612,7 +624,11 @@ namespace CalyxEngine {
 				shapeSize_.x * absScale.x,
 				shapeSize_.y * absScale.y,
 				shapeSize_.z * absScale.z};
-			PrimitiveDrawer::GetInstance()->DrawBox(position_,worldRotation_,scaledSize,color);
+			if(effectPreview) {
+				PrimitiveDrawer::GetInstance()->DrawEffectPreviewBox(position_,worldRotation_,scaledSize,color);
+			} else {
+				PrimitiveDrawer::GetInstance()->DrawBox(position_,worldRotation_,scaledSize,color);
+			}
 		}
 		break;
 		default:

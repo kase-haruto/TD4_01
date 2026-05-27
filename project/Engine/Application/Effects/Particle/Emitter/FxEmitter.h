@@ -36,6 +36,7 @@ namespace CalyxEngine {
 		void         TransferParticleDataToGPU() override; // BaseEmitterをoverride
 		void         ShowGui() override;
 		void         DrawEmitterShape(const WorldTransform& tf) override;
+		void         DrawEmitterShapePreview(const WorldTransform& tf) override;
 		// コマンドを積む
 		void SetCommand(ID3D12GraphicsCommandList* cmdList);
 
@@ -94,6 +95,7 @@ namespace CalyxEngine {
 		void Emit(const CalyxEngine::Vector3& pos);
 		void RestartOneShot();
 		void ApplyDirectionVelocity(FxUnit& fx);
+		void DrawEmitterShapeInternal(bool effectPreview);
 
 		// ---- flags helpers ----
 	private:
