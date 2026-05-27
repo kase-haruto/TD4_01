@@ -13,6 +13,7 @@
 #include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
 #include <Engine/Objects/Event/BaseEventObject.h>
+#include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
 #include <Engine/Renderer/Grid/GridRenderer.h>
 #include <Engine/Renderer/Model/ModelRenderer.h>
 
@@ -309,6 +310,22 @@ namespace CalyxEngine {
 		}
 
 		editorPreviewCtx_->GetFxSystem()->Render(pso, cmd);
+
+		PrimitiveDrawer::GetInstance()->ClearEffectPreview();
+		for(auto* object : editorPreviewCtx_->GetObjectLibrary()->GetAllObjectsRaw()) {
+			if(auto* particle = dynamic_cast<ParticleSystemObject*>(object)) {
+				particle->SyncEmitterFromWorldTransform();
+				if(auto emitter = particle->GetEmitter()) {
+					emitter->DrawEmitterShapePreview(particle->GetWorldTransform());
+				}
+			}
+		}
+		if(auto* cam = CameraManager::GetActive()) {
+			GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
+			cam->SetCommand(cmd, PipelineType::Line);
+			PrimitiveDrawer::GetInstance()->RenderEffectPreview();
+		}
+		PrimitiveDrawer::GetInstance()->ClearEffectPreview();
 	}
 
 	//------------------------------------------------------------
