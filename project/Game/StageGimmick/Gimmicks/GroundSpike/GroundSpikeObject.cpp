@@ -58,7 +58,8 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 		y += param_.popUpSpeed * dt;
 		worldTransform_.translation.y = y;
 		if(param_.popUpHeight <= worldTransform_.translation.y) {
-			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
+			auto offset = CalyxEngine::Vector3(0.0f, 1.0f, 0.0f);
+			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + offset);
 		}
 	}
 

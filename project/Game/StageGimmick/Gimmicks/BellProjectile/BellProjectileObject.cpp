@@ -2,6 +2,7 @@
 
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine\Foundation\Utility\Ease\CxEase.h>
+#include "Engine/Objects/Collider/BoxCollider.h"
 #include <Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileTarget.h>
 
 REGISTER_SCENE_OBJECT(BellProjectileObject)
@@ -41,6 +42,9 @@ void BellProjectileObject::ObjectInitialize() {
 		collider_->SetTargetType(ColliderType::Type_Player);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
+		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
+			radius->SetSize({1.0f, 1.0f, 5.5f});
+		}
 	}
 
 	worldTransform_.scale = param_.scale;

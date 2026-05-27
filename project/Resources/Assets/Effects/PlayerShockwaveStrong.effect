@@ -1,0 +1,437 @@
+{
+  "emitters": [
+    {
+      "emitter": {
+        "autoDestroy": false,
+        "billboardMode": 0,
+        "blendMode": 2,
+        "cameraDitherEnabled": false,
+        "cameraDitherFar": 20.0,
+        "cameraDitherNear": 0.0,
+        "color": {
+          "w": 1.0,
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "direction": {
+          "enabled": false,
+          "rotateToDirection": false,
+          "speed": {
+            "constant": 1.0,
+            "max": 1.0,
+            "min": 0.0,
+            "mode": 0
+          },
+          "vector": {
+            "constant": {
+              "x": 0.0,
+              "y": 1.8600000143051147,
+              "z": 1.0199999809265137
+            },
+            "max": {
+              "x": 1.0,
+              "y": 0.0,
+              "z": 1.0
+            },
+            "min": {
+              "x": -1.0,
+              "y": 0.0,
+              "z": -1.0
+            },
+            "mode": 0
+          }
+        },
+        "emitCount": 1,
+        "emitDelay": 0.0,
+        "emitDuration": -1.0,
+        "emitRate": 0.0,
+        "emitterShape": 0,
+        "followOneShot": false,
+        "isComplement": false,
+        "isDrawEnable": true,
+        "isOneShot": true,
+        "lifetime": {
+          "constant": 0.5,
+          "max": 1.0,
+          "min": 0.0,
+          "mode": 0
+        },
+        "modelGuid": "d2f7e93c-5473-4749-a2bc-44956fb0a1a1",
+        "modelPath": "shockwave.obj",
+        "modules": [
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              1.5,
+              1.5,
+              1.5,
+              1.0
+            ],
+            "guid": "efcabdcf-8d7e-40d0-b3e0-38e0bb243731",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 6,
+            "enabled": true,
+            "end": [
+              1.0,
+              0.9961389899253845,
+              0.0,
+              0.10000000149011612
+            ],
+            "guid": "11935370-e2f4-4474-af94-5cb06b8bfb30",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.0,
+              0.6000000238418579,
+              0.0,
+              1.0
+            ],
+            "target": 4
+          },
+          {
+            "blend": 1,
+            "clamp01": true,
+            "ease": 0,
+            "enabled": true,
+            "end": [
+              0.5649999976158142,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "9e863420-0b98-47a7-b4f3-32005b68bfbc",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              0.5649999976158142,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 2
+          }
+        ],
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "randomSpinEmit": false,
+        "scale": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "mode": 0
+        },
+        "shapeAngle": 30.0,
+        "shapeRadius": 0.009999999776482582,
+        "shapeSize": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "spin": {
+          "constant": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "max": {
+            "x": 0.0,
+            "y": 2.759999990463257,
+            "z": 0.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.029999999329447746,
+            "z": 0.0
+          },
+          "mode": 0
+        },
+        "textureGuid": "ec675a35-7435-45c0-b948-d23242ff7989",
+        "texturePath": "Textures/white1x1.dds",
+        "velocity": {
+          "constant": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "max": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "mode": 0
+        }
+      },
+      "isDrawEnable": true,
+      "isGpu": false,
+      "name": "Emitter",
+      "transform": {
+        "inheritRotate": true,
+        "inheritScale": true,
+        "inheritTranslate": true,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "translation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    },
+    {
+      "emitter": {
+        "autoDestroy": false,
+        "billboardMode": 1,
+        "blendMode": 2,
+        "cameraDitherEnabled": false,
+        "cameraDitherFar": 20.0,
+        "cameraDitherNear": 0.0,
+        "color": {
+          "w": 1.0,
+          "x": 1.0,
+          "y": 0.4274509847164154,
+          "z": 0.0
+        },
+        "direction": {
+          "enabled": true,
+          "rotateToDirection": false,
+          "speed": {
+            "constant": 8.880000114440918,
+            "max": 1.0,
+            "min": 0.0,
+            "mode": 0
+          },
+          "vector": {
+            "constant": {
+              "x": 0.0,
+              "y": 2.740000009536743,
+              "z": 0.0
+            },
+            "max": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0
+            },
+            "min": {
+              "x": -1.0,
+              "y": 1.0,
+              "z": -1.0
+            },
+            "mode": 1
+          }
+        },
+        "emitCount": 10,
+        "emitDelay": 0.0,
+        "emitDuration": -1.0,
+        "emitRate": 0.0,
+        "emitterShape": 2,
+        "followOneShot": false,
+        "isComplement": true,
+        "isDrawEnable": true,
+        "isOneShot": true,
+        "lifetime": {
+          "constant": 0.6000000238418579,
+          "max": 0.800000011920929,
+          "min": 0.44999998807907104,
+          "mode": 1
+        },
+        "modelGuid": "00000000-0000-0000-0000-000000000000",
+        "modelPath": "plane.obj",
+        "modules": [
+          {
+            "enabled": true,
+            "gravity": {
+              "x": 0.0,
+              "y": -15.0,
+              "z": 0.0
+            },
+            "name": "GravityModule"
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 2,
+            "enabled": true,
+            "end": [
+              0.30000001192092896,
+              0.30000001192092896,
+              0.30000001192092896,
+              1.0
+            ],
+            "guid": "0b498f07-585e-403d-a0fd-b73ae183cc13",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 1,
+            "enabled": true,
+            "end": [
+              0.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "1ef0ceba-fcaf-46af-9edd-161b88c6d509",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 5
+          }
+        ],
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "randomSpinEmit": false,
+        "scale": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 2.0,
+            "y": 2.0,
+            "z": 2.0
+          },
+          "min": {
+            "x": 0.8500000238418579,
+            "y": 0.8500000238418579,
+            "z": 0.12999999523162842
+          },
+          "mode": 1
+        },
+        "shapeAngle": 40.0,
+        "shapeRadius": 1.0,
+        "shapeSize": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "spin": {
+          "constant": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "max": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 5.0
+          },
+          "min": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -5.0
+          },
+          "mode": 1
+        },
+        "textureGuid": "7820d02f-1ce4-4df9-9ecf-2099cf40099a",
+        "texturePath": "Textures/white1x1.dds",
+        "velocity": {
+          "constant": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "max": {
+            "x": 5.0,
+            "y": 10.0,
+            "z": 5.0
+          },
+          "min": {
+            "x": -5.0,
+            "y": 6.5,
+            "z": -5.0
+          },
+          "mode": 1
+        }
+      },
+      "isDrawEnable": true,
+      "isGpu": false,
+      "name": "Emitter2",
+      "transform": {
+        "inheritRotate": true,
+        "inheritScale": true,
+        "inheritTranslate": true,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "translation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    }
+  ],
+  "name": "PlayerShockwave",
+  "type": "EffectAsset"
+}

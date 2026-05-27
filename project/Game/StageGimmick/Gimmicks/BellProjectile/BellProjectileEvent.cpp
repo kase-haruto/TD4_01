@@ -130,7 +130,7 @@ void BellProjectileEvent::EventInitialize() {
 	}
 
 	// 建物
-	const std::string gateName = "BellProjectileGate";
+	const std::string gateName = "GeneralObject";
 	auto			  gate	   = ResolveLinkedObject<GeneralObject>(gateGuid_, gateName);
 	if(!gate) gate = FindOwnedObjectByClassName<GeneralObject>(gateName);
 	if(gate) {

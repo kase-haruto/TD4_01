@@ -244,7 +244,7 @@ bool SceneSerializer::LoadJson(SceneContext&		 context,
 		if(auto dir = std::dynamic_pointer_cast<DirectionalLight>(sp)) {
 			context.GetLightLibrary()->SetDirectionalLight(dir);
 		} else if(auto pt = std::dynamic_pointer_cast<PointLight>(sp)) {
-			context.GetLightLibrary()->SetPointLight(pt);
+			context.GetLightLibrary()->AddPointLight(pt);
 		} else if(auto camDbg = std::dynamic_pointer_cast<DebugCamera>(sp)) {
 			context.GetCameraMgr()->SetDebugCamera(camDbg);
 		} else if(auto camMain = std::dynamic_pointer_cast<Camera3d>(sp)) {

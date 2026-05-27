@@ -37,19 +37,19 @@ void DiceProjectileEvent::EventInitialize() {
 	if(!object) object = FindOwnedObjectByClassName<DiceSocketObject>(socketPrefix);
 	if(object) {
 		object->SetName(socketPrefix);
-		object->SetClearCount(eventData_.clearCount);
-		object->Initialize();
 		socket_ = object;
 		socketGuid_ = object->GetGuid();
 
 	// シーンから対応するオブジェクトが無ければ生成する
 	} else {
-		socket_ = SceneAPI::Instantiate<DiceSocketObject>("debugCube.obj", socketPrefix);
-		socket_.lock()->SetParent(shared_from_this());
-		socket_.lock()->SetClearCount(eventData_.clearCount);
-		socket_.lock()->Initialize();
+		socket_ = SceneAPI::Instantiate<DiceSocketObject>("diceStorage.obj", socketPrefix);
 		socketGuid_ = socket_.lock()->GetGuid();
 	}
+	socket_.lock()->SetParent(shared_from_this());
+	socket_.lock()->SetClearCount(eventData_.clearCount);
+	socket_.lock()->SetCrackerPos(eventParam_.param_.crackerPos);
+	socket_.lock()->SetCrackerInterval(eventParam_.param_.crackerInterval);
+	socket_.lock()->Initialize();
 
 	auto childTargets = ResolveLinkedObjects<DiceProjectileObject>(targetObjectGuids_, objectName);
 	if(childTargets.empty()) childTargets = FindOwnedObjectsByClassName<DiceProjectileObject>(objectName);

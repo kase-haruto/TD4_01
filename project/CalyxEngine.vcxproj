@@ -227,6 +227,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Objects\LightObject\PointLightActor.cpp" />
+    <ClCompile Include="Game\3d\Actor\Lantern.cpp" />
     <ClCompile Include="Game\StageGimmick\Base\GeneralObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.cpp" />
@@ -541,6 +543,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Objects\LightObject\PointLightActor.h" />
+    <ClInclude Include="Game\3d\Actor\Lantern.h" />
     <ClInclude Include="Game\StageGimmick\Base\GeneralObject.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileEvent.h" />
@@ -945,6 +949,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Engine\Editor\Prefab\" />
+    <Folder Include="Engine\Objects\3D\Light\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

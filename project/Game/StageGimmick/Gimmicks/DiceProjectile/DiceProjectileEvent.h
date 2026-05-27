@@ -56,6 +56,9 @@ private:
 			AddField("speed", param_.speed).Category("DiceProjectileEvent");
 			AddField("parryDuration", param_.parryDuration).Category("DiceProjectileEvent");
 			AddField("direction", param_.direction).Category("DiceProjectileEvent");
+
+			AddField("crackerPos", param_.crackerPos).Category("DiceProjectileEvent");
+			AddField("crackerInterval", param_.crackerInterval).Category("DiceProjectileEvent");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

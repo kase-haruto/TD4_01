@@ -2,6 +2,7 @@
 
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
+#include "Engine/Objects/Collider/BoxCollider.h"
 
 REGISTER_SCENE_OBJECT(ShojiObject);
 
@@ -43,10 +44,13 @@ void ShojiObject::ObjectInitialize() {
 	// コライダーの初期化
 	BaseGameObject::InitializeCollider(ColliderKind::Box);
 	if(collider_) {
-		collider_->SetType(ColliderType::Type_EnemyAttack);
+		collider_->SetType(ColliderType::Type_Impediment);
 		collider_->SetTargetType(ColliderType::Type_Player);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
+		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
+			radius->SetSize({5.0f, 7.5f, 1.0f});
+		}
 	}
 	worldTransform_.scale = CalyxEngine::Vector3::One() * param_.shojiScale;
 	worldTransform_.inheritScale = false;

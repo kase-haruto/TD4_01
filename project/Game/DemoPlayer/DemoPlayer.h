@@ -114,8 +114,9 @@ private:
 	};
 
 	PlayerParameter param_;
-	bool  isJumping_	 = false;
-	bool  isDiving_		 = false;
+	bool					isJumping_ = false;
+	bool					isDiving_  = false;
+	bool					isDivingInvincible_ = false;
 	CalyxEngine::Quaternion preRotate_;
 
 	// ダメージ点滅用
@@ -149,4 +150,8 @@ private:
 	bool						firstSetting_ = true;
 
 	CalyxEngine::EffectAsset effectData_;
+	CalyxEngine::EffectAsset effectStrongData_;
+	CalyxEngine::EffectAsset rollingEffect_;
+	CalyxEngine::EffectHandle rollingFxHandle_{};
+	CalyxEngine::EffectAsset  jumpEffect_;
 };

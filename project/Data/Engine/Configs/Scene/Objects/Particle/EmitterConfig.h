@@ -7,6 +7,7 @@
 #include <Data/Engine/Configs/Scene/Objects/Particle/Module/ModuleConfigFactory.h>
 #include <Engine/Foundation/Math/Vector3.h>
 #include <Engine/Foundation/Math/Vector4.h>
+#include <Engine/Foundation/Math/Quaternion.h>
 #include <Engine/Objects/3D/Details/BillboardParams.h>
 #include <engine/Foundation/Utility/Guid/Guid.h>
 #include <externals/nlohmann/json.hpp>
@@ -87,6 +88,8 @@ namespace CalyxEngine {
 
 	struct EmitterConfig {
 		CalyxEngine::Vector3 position{};
+		CalyxEngine::Quaternion rotation = CalyxEngine::Quaternion::MakeIdentity();
+		CalyxEngine::Vector3 worldScale{1.0f, 1.0f, 1.0f};
 		CalyxEngine::Vector4 color{1.0f, 1.0f, 1.0f, 1.0f};
 		Vector3ParamConfig scale;
 		Vector3ParamConfig velocity;
@@ -137,6 +140,8 @@ namespace CalyxEngine {
 
 	inline void EmitterConfig::FromJson(const nlohmann::json& j) {
 		position	   = j.value("position", CalyxEngine::Vector3{0, 0, 0});
+		rotation	   = j.value("rotation", j.value("worldRotation", CalyxEngine::Quaternion::MakeIdentity()));
+		worldScale	   = j.value("worldScale", CalyxEngine::Vector3{1.0f, 1.0f, 1.0f});
 		scale		   = j.value("scale", Vector3ParamConfig{});
 		color		   = j.value("color", CalyxEngine::Vector4{1, 1, 1, 1});
 		velocity	   = j.value("velocity", Vector3ParamConfig{});
@@ -201,6 +206,8 @@ namespace CalyxEngine {
 	inline nlohmann::json EmitterConfig::ToJson() const {
 		nlohmann::json j;
 		j["position"]		= position;
+		j["rotation"]		= rotation;
+		j["worldScale"]		= worldScale;
 		j["color"]			= color;
 		j["velocity"]		= velocity;
 		j["direction"]		= direction;
