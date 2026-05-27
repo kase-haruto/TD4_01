@@ -160,7 +160,7 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 
 	//シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
-
+	//a
 }
 
 void TestScene::CleanUp(){
