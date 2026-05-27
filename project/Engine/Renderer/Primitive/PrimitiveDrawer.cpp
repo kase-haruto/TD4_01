@@ -3,10 +3,12 @@
 #include <Engine/Foundation/Math/Vector3.h>
 #include <Engine/Foundation/Math/Vector4.h>
 #include <Engine/Foundation/Math/Matrix4x4.h>
+#include <Engine/Foundation/Math/Quaternion.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 
@@ -58,7 +60,67 @@ void PrimitiveDrawer::DrawLine3d(const CalyxEngine::Vector3& start, const CalyxE
 	}
 }
 
-void PrimitiveDrawer::DrawBox(const CalyxEngine::Vector3& center, CalyxEngine::Quaternion& rotate, const CalyxEngine::Vector3& size, const CalyxEngine::Vector4& color) {
+namespace {
+	void DrawCircleLines(
+		LineDrawer* drawer,
+		const CalyxEngine::Vector3& center,
+		const CalyxEngine::Quaternion& rotate,
+		float radiusX,
+		float radiusZ,
+		const CalyxEngine::Vector4& color,
+		int subdivision) {
+		if(!drawer) return;
+
+		const int segments = (std::max)(subdivision, 3);
+		const float step = 2.0f * float(std::numbers::pi) / static_cast<float>(segments);
+
+		for(int i = 0; i < segments; ++i) {
+			const float t0 = step * static_cast<float>(i);
+			const float t1 = step * static_cast<float>(i + 1);
+			const CalyxEngine::Vector3 p0 = center + CalyxEngine::Quaternion::RotateVector(
+				{std::cos(t0) * radiusX, 0.0f, std::sin(t0) * radiusZ},
+				rotate);
+			const CalyxEngine::Vector3 p1 = center + CalyxEngine::Quaternion::RotateVector(
+				{std::cos(t1) * radiusX, 0.0f, std::sin(t1) * radiusZ},
+				rotate);
+			drawer->DrawLine(p0, p1, color);
+		}
+	}
+
+	void DrawConeLines(
+		LineDrawer* drawer,
+		const CalyxEngine::Vector3& apex,
+		const CalyxEngine::Quaternion& rotate,
+		float height,
+		float radiusX,
+		float radiusZ,
+		const CalyxEngine::Vector4& color,
+		int subdivision) {
+		if(!drawer) return;
+
+		const int segments = (std::max)(subdivision, 3);
+		const float step = 2.0f * float(std::numbers::pi) / static_cast<float>(segments);
+		const CalyxEngine::Vector3 baseCenter = apex + CalyxEngine::Quaternion::RotateVector({0.0f, height, 0.0f}, rotate);
+
+		for(int i = 0; i < segments; ++i) {
+			const float t0 = step * static_cast<float>(i);
+			const float t1 = step * static_cast<float>(i + 1);
+			const CalyxEngine::Vector3 p0 = baseCenter + CalyxEngine::Quaternion::RotateVector(
+				{std::cos(t0) * radiusX, 0.0f, std::sin(t0) * radiusZ},
+				rotate);
+			const CalyxEngine::Vector3 p1 = baseCenter + CalyxEngine::Quaternion::RotateVector(
+				{std::cos(t1) * radiusX, 0.0f, std::sin(t1) * radiusZ},
+				rotate);
+
+			drawer->DrawLine(p0, p1, color);
+			if(i % (std::max)(segments / 4, 1) == 0) {
+				drawer->DrawLine(apex, p0, color);
+			}
+		}
+	}
+}
+
+void PrimitiveDrawer::DrawBox(const CalyxEngine::Vector3& center, const CalyxEngine::Quaternion& rotate, const CalyxEngine::Vector3& size, const CalyxEngine::Vector4& color) {
 	if (boxDrawer_) {
 		boxDrawer_->DrawBox(center, rotate,size, color);
 	}
@@ -68,6 +130,22 @@ void PrimitiveDrawer::DrawEffectPreviewBox(const CalyxEngine::Vector3& center, c
 	if(effectPreviewBoxDrawer_) {
 		effectPreviewBoxDrawer_->DrawBox(center, rotate, size, color);
 	}
+}
+
+void PrimitiveDrawer::DrawCircle(const CalyxEngine::Vector3& center, const CalyxEngine::Quaternion& rotate, float radiusX, float radiusZ, const CalyxEngine::Vector4& color, int subdivision) {
+	DrawCircleLines(lineDrawer_.get(), center, rotate, radiusX, radiusZ, color, subdivision);
+}
+
+void PrimitiveDrawer::DrawCone(const CalyxEngine::Vector3& apex, const CalyxEngine::Quaternion& rotate, float height, float radiusX, float radiusZ, const CalyxEngine::Vector4& color, int subdivision) {
+	DrawConeLines(lineDrawer_.get(), apex, rotate, height, radiusX, radiusZ, color, subdivision);
+}
+
+void PrimitiveDrawer::DrawEffectPreviewCircle(const CalyxEngine::Vector3& center, const CalyxEngine::Quaternion& rotate, float radiusX, float radiusZ, const CalyxEngine::Vector4& color, int subdivision) {
+	DrawCircleLines(effectPreviewLineDrawer_.get(), center, rotate, radiusX, radiusZ, color, subdivision);
+}
+
+void PrimitiveDrawer::DrawEffectPreviewCone(const CalyxEngine::Vector3& apex, const CalyxEngine::Quaternion& rotate, float height, float radiusX, float radiusZ, const CalyxEngine::Vector4& color, int subdivision) {
+	DrawConeLines(effectPreviewLineDrawer_.get(), apex, rotate, height, radiusX, radiusZ, color, subdivision);
 }
 
 void PrimitiveDrawer::DrawGrid(){
