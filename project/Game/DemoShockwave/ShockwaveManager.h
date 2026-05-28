@@ -17,7 +17,7 @@ public:
 	/// <summary> 衝撃波を発生させる </summary>
 	/// <param name="pos"> 位置 </param>
 	/// <param name="scaleMultiplier"> 拡大の倍率 </param>
-	void Emit(const CalyxEngine::Vector3& pos, float scaleMultiplier = 1.0f);
+	void Emit(const CalyxEngine::Vector3& pos, float scaleMultiplier = 1.0f, bool strong = false);
 
 	/// <summary> 全てを非アクティブ </summary>
 	void Clear();

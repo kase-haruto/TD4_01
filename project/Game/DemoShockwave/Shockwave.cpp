@@ -20,10 +20,13 @@ void Shockwave::Initialize() {
 		collider_->SetType(ColliderType::Type_PlayerAttack);
 		// 敵、イベントオブジェクト、ステージギミックを対象にする
 		collider_->SetTargetType(ColliderType::Type_Enemy | ColliderType::Type_EnemyAttack | ColliderType::Type_EventObject | ColliderType::Type_StageGimmick);
+		collider_->SetOwner(this);
 	}
 
 	SetDrawEnable(false);
 	isActive_ = false;
+	isStrong_ = false;
+	isTakeDamageForStage_ = false;
 }
 
 void Shockwave::Update(float dt) {
@@ -51,13 +54,14 @@ void Shockwave::Update(float dt) {
 	
 }
 
-void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier) {
+void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier, bool strong) {
 	worldTransform_.translation = pos;
 	worldTransform_.scale		= {param_.startScale, param_.startScale, param_.startScale};
 	currentMaxScale_			= param_.endScale * scaleMultiplier;
 	scaleMultiplier_			= scaleMultiplier;
 	timer_						= 0.0f;
 	isActive_					= true;
+ 	isStrong_					= strong;
 	isTakeDamageForStage_		= false;
 	
 	//SetDrawEnable(true);
