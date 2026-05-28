@@ -8,7 +8,7 @@
 #include "Game/Scene/Details/SceneType.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
 #include <Game/DemoPlayer/DemoPlayer.h>
-#include <Game/Scene/Gameover/GameoverScene.h>
+#include <Game/Scene/Clear/PreClearScene.h>
 
 // engine
 #include <Engine/Collision/CollisionManager.h>
@@ -21,27 +21,29 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 //	コンストラクタ/デストラクタ
 /////////////////////////////////////////////////////////////////////////////////////////
-GameoverScene::GameoverScene() {
+PreClearScene::PreClearScene() {
 	// シーン名を設定
-	GameoverScene::SetSceneName("GameoverScene");
+	BaseScene::SetSceneName("PreClearScene");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //	アセットのロード
 /////////////////////////////////////////////////////////////////////////////////////////
-void GameoverScene::LoadAssets() {}
+void PreClearScene::LoadAssets() {}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //	初期化処理
 /////////////////////////////////////////////////////////////////////////////////////////
-void GameoverScene::Initialize() {
+void PreClearScene::Initialize() {
 	sceneContext_->Initialize();
 
-	sceneContext_->SetSceneName("GameoverScene");
+	sceneContext_->SetSceneName("PreClearScene");
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/Gameover.scene");
+	std::string scenePath = "Resources/Assets/Scenes/PreClearScene.scene";
+	SceneSerializer::Load(*sceneContext_, scenePath);
+	sceneContext_->SetScenePath(scenePath);
 
 	LoadAssets();
 
@@ -49,14 +51,27 @@ void GameoverScene::Initialize() {
 	// グラフィック関連
 	//=========================
 	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
-	pauseBg_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+	pauseBg_->Initialize({0.0f, 0.0f}, {320.0f, 180.0f});
+	pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
+
+	auto objectPlayer = sceneContext_->GetObjectLibrary()->FindByName("player");
+	player_			  = std::static_pointer_cast<GeneralObject>(objectPlayer);
+	auto objectOni	  = sceneContext_->GetObjectLibrary()->FindByName("oni");
+	oni_			  = std::static_pointer_cast<GeneralObject>(objectOni);
+	if(player_) {
+		player_->Initialize();
+	}
+	if(oni_) {
+		oni_->Initialize();
+	}
+
+	animTime_ = 2.0f;
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
 	// シーンタイプに基づいて自動で演出をセット
-	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::GAMEOVER);
+	transitionControl_->SetAutoPresetFromPrevious(preType_, SceneType::PRECLEAR);
 	transitionControl_->StartOpening(0.5f, [this]() {
 		IsOpening_ = false;
 	});
@@ -67,7 +82,7 @@ void GameoverScene::Initialize() {
 /////////////////////////////////////////////////////////////////////////////////////////
 //	更新処理
 /////////////////////////////////////////////////////////////////////////////////////////
-void GameoverScene::Update([[maybe_unused]] float dt) {
+void PreClearScene::Update([[maybe_unused]] float dt) {
 
 	transitionControl_->Update(dt);
 
@@ -75,20 +90,13 @@ void GameoverScene::Update([[maybe_unused]] float dt) {
 		return;
 	}
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE)) {
-		IsPhase_ = true;
-		payload_ = BuildNowTypePayload(SceneType::GAMEOVER);
-		transitionControl_->SetAutoPreset(SceneType::GAMEOVER, SceneType::SELECT);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
-		});
-	}
+	AnimUpdate(dt);
 
 	// 衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }
 
-void GameoverScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoService, IRenderTarget* rt) {
+void PreClearScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoService, IRenderTarget* rt) {
 
 	//========================================================//
 	//	spriteの登録
@@ -96,18 +104,17 @@ void GameoverScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* ps
 	spriteRenderer_->Register(pauseBg_.get());
 
 	transitionControl_->Draw(spriteRenderer_.get());
-
 	// シーン上のオブジェクトの描画
 	BaseScene::Draw(cmdList, psoService, rt);
 }
 
-void GameoverScene::CleanUp() {
+void PreClearScene::CleanUp() {
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
 }
 
-void GameoverScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
+void PreClearScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) {
 	if(!payload) return;
 
 	// 自分が知っている型にだけキャストする
@@ -116,8 +123,25 @@ void GameoverScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payloa
 	}
 }
 
-std::unique_ptr<TransitionPayload> GameoverScene::BuildNowTypePayload(SceneType Type) {
+std::unique_ptr<TransitionPayload> PreClearScene::BuildNowTypePayload(SceneType Type) {
 	auto payload  = std::make_unique<TransitionPayload>();
 	payload->type = Type;
 	return payload;
+}
+
+void PreClearScene::AnimUpdate(float dt) {
+	animTime_ -= dt;
+
+	CalyxEngine::Vector3 pos = player_->GetWorldPosition();
+	pos += flyDir_ * dt;
+	player_->SetTranslate(pos);
+
+	if(animTime_ < 0.0f) {
+		IsPhase_ = true;
+		payload_ = BuildNowTypePayload(SceneType::PRECLEAR);
+		transitionControl_->SetAutoPreset(SceneType::PRECLEAR, SceneType::CLEAR);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::CLEAR), std::move(payload_));
+		});
+	}
 }

@@ -20,6 +20,11 @@
 // scene
 #include "Engine/Scene/Test/TestScene.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
+#include "Game/Scene/Clear/ClearScene.h"
+#include "Game/Scene/Clear/PreClearScene.h"
+#include "Game/Scene/Gameover/GameoverScene.h"
+#include "Game/Scene/Select/SelectScene.h"
+#include "Game/Scene/Title/TitleScene.h"
 
 #include <Engine/Editor/PickingPass.h>
 
@@ -40,6 +45,21 @@ namespace CalyxEngine {
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::TEST),
 				 std::make_unique<TestScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::CLEAR),
+				 std::make_unique<ClearScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::PRECLEAR),
+				 std::make_unique<PreClearScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::GAMEOVER),
+				 std::make_unique<GameoverScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::SELECT),
+				 std::make_unique<SelectScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::TITLE),
+				 std::make_unique<TitleScene>());
 
 		SetCurrent(idToIndex_.at(
 			GameSceneUtil::ToSceneId(SceneType::TEST)));

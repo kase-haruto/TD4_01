@@ -49,7 +49,7 @@ void ClearScene::Initialize() {
 	// グラフィック関連
 	//=========================
 	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {1280.0f, 720.0f});
+	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
 	pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
 	pauseBg_->Update();
 
