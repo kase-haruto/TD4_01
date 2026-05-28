@@ -4,11 +4,12 @@
 
 #include <Engine/Assets/DataAsset/DataAssetManager.h>
 #include <Engine/Assets/Texture/TextureManager.h>
+#include <Engine/Editor/AssetPreviewManager.h>
 #include <externals/nlohmann/json.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <algorithm>
 
 using json = nlohmann::json;
 
@@ -141,7 +142,7 @@ void AssetDatabase::BuildPreview(AssetRecord& rec) {
 
 				if(ext == ".png" && std::filesystem::exists(previewPath)) {
 					auto previewRel = std::filesystem::relative(previewPath, assetsRoot_);
-					auto texHandle  = tm.LoadTexture(previewRel.generic_string());
+					auto texHandle	= tm.LoadTexture(previewRel.generic_string());
 					rec.previewTex	= (ImTextureID)texHandle.ptr;
 				} else {
 					auto icon	   = tm.LoadTexture("UI/Tool/AssetPanel/generic.dds");
@@ -233,7 +234,12 @@ AssetGUID AssetDatabase::RegisterOrUpdate(const std::filesystem::path& absOrRelP
 		r.sourcePath		  = abs;
 		r.lastWrite			  = ft;
 		normPathToGuid_[norm] = guid;
-		if(needPreview) BuildPreview(r);
+		if(needPreview) {
+			BuildPreview(r);
+			if(auto* previews = CalyxEngine::AssetPreviewManager::GetInstance()) {
+				previews->Invalidate(r.guid);
+			}
+		}
 	}
 
 	if(type == AssetType::Material) {
