@@ -2,29 +2,24 @@
 
 // engine
 #include <Engine/Application/System/PlaySession.h>
+#include <Engine/Editor/AssetPreviewManager.h>
 #include <Engine/Graphics/Camera/3d/Camera3d.h>
 #include <Engine/Graphics/Camera/Manager/CameraManager.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <Engine/Graphics/Device/DxCore.h>
+#include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
 #include <Engine/Graphics/RenderTarget/Collection/RenderTargetCollection.h>
+#include <Engine/Objects/3D/Actor/BaseGameObject.h>
+#include <Engine/Objects/Event/BaseEventObject.h>
+#include <Engine/Renderer/Grid/GridRenderer.h>
+#include <Engine/Renderer/Model/ModelRenderer.h>
 #include <Engine/Renderer/Primitive/PrimitiveDrawer.h>
 #include <Engine/Scene/Base/IScene.h>
 #include <Engine/Scene/Context/SceneContext.h>
-#include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
-#include <Engine/Objects/3D/Actor/BaseGameObject.h>
-#include <Engine/Objects/Event/BaseEventObject.h>
-#include <Engine/Application/Effects/Particle/Object/ParticleSystemObject.h>
-#include <Engine/Renderer/Grid/GridRenderer.h>
-#include <Engine/Renderer/Model/ModelRenderer.h>
 
 // scene
 #include "Engine/Scene/Test/TestScene.h"
 #include "Game/Scene/Utility/SceneTypeUtil.h"
-#include "Game/Scene/Clear/ClearScene.h"
-#include "Game/Scene/Gameover/GameoverScene.h"
-#include "Game/Scene/Select/SelectScene.h"
-#include "Game/Scene/Title/TitleScene.h"
-
 
 #include <Engine/Editor/PickingPass.h>
 
@@ -45,18 +40,6 @@ namespace CalyxEngine {
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::TEST),
 				 std::make_unique<TestScene>());
-
-		AddScene(GameSceneUtil::ToSceneId(SceneType::CLEAR),
-				 std::make_unique<ClearScene>());
-
-		AddScene(GameSceneUtil::ToSceneId(SceneType::GAMEOVER),
-				 std::make_unique<GameoverScene>());
-
-		AddScene(GameSceneUtil::ToSceneId(SceneType::SELECT),
-				 std::make_unique<SelectScene>());
-
-		AddScene(GameSceneUtil::ToSceneId(SceneType::TITLE),
-				 std::make_unique<TitleScene>());
 
 		SetCurrent(idToIndex_.at(
 			GameSceneUtil::ToSceneId(SceneType::TEST)));
@@ -252,12 +235,21 @@ namespace CalyxEngine {
 				PrimitiveDrawer::GetInstance()->Render();
 			}
 		}
+
+		if(auto* previewRT = dx_->GetRenderTargetCollection().Get("AssetPreview")) {
+			if(auto* previews = AssetPreviewManager::GetInstance()) {
+				SceneContext* previousContext = SceneContext::Current();
+				previews->ProcessRenderQueue(cmd, pso, previewRT, 1);
+				if(previousContext) previousContext->MakeCurrent();
+			}
+		}
+
 		PrimitiveDrawer::GetInstance()->ClearMesh();
 	}
 
-	void SceneManager::DrawEditorPreview(IRenderTarget* rt,
+	void SceneManager::DrawEditorPreview(IRenderTarget*				rt,
 										 ID3D12GraphicsCommandList* cmd,
-										 PipelineService* pso) {
+										 PipelineService*			pso) {
 		if(!rt || !editorPreviewCtx_) return;
 
 		editorPreviewCtx_->MakeCurrent();
@@ -310,22 +302,6 @@ namespace CalyxEngine {
 		}
 
 		editorPreviewCtx_->GetFxSystem()->Render(pso, cmd);
-
-		PrimitiveDrawer::GetInstance()->ClearEffectPreview();
-		for(auto* object : editorPreviewCtx_->GetObjectLibrary()->GetAllObjectsRaw()) {
-			if(auto* particle = dynamic_cast<ParticleSystemObject*>(object)) {
-				particle->SyncEmitterFromWorldTransform();
-				if(auto emitter = particle->GetEmitter()) {
-					emitter->DrawEmitterShapePreview(particle->GetWorldTransform());
-				}
-			}
-		}
-		if(auto* cam = CameraManager::GetActive()) {
-			GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
-			cam->SetCommand(cmd, PipelineType::Line);
-			PrimitiveDrawer::GetInstance()->RenderEffectPreview();
-		}
-		PrimitiveDrawer::GetInstance()->ClearEffectPreview();
 	}
 
 	//------------------------------------------------------------
@@ -339,33 +315,17 @@ namespace CalyxEngine {
 
 		auto& slot = slots_[currentIdx_];
 		slot.scene->Draw(cmd, pso, rt);
+
+		// gameViewパネルにもスプライトを描画する
+		if(rt->GetRenderTargetType() != RenderTargetType::DebugView) {
+			slot.scene->DrawSpritesOnly(cmd, pso);
+		}
 	}
 
 	//------------------------------------------------------------
 	void SceneManager::DrawNotAffectedFromPE(ID3D12GraphicsCommandList* cmd, PipelineService* pso) {
 		if(slots_.empty()) return;
-
-		auto* postOutput = dx_->GetRenderTargetCollection().Get("PostEffectOutput");
-		DrawSpritesToRenderTarget(postOutput, cmd, pso, true);
-
-		auto* backBuffer = dx_->GetRenderTargetCollection().Get("BackBuffer");
-		DrawSpritesToRenderTarget(backBuffer, cmd, pso, false);
-	}
-
-	void SceneManager::DrawSpritesToRenderTarget(IRenderTarget* rt,
-												 ID3D12GraphicsCommandList* cmd,
-												 PipelineService* pso,
-												 bool transitionToShaderResource) {
-		if(!rt) return;
-
-		rt->TransitionTo(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		rt->SetRenderTarget(cmd);
-
 		slots_[currentIdx_].scene->DrawSpritesOnly(cmd, pso);
-
-		if(transitionToShaderResource) {
-			rt->TransitionTo(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-		}
 	}
 
 	void SceneManager::RequestSceneChangeInternal(SceneId next) {

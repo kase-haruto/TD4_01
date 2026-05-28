@@ -227,6 +227,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Editor\AssetPreviewManager.cpp" />
     <ClCompile Include="Engine\Objects\LightObject\PointLightActor.cpp" />
     <ClCompile Include="Game\3d\Actor\Lantern.cpp" />
     <ClCompile Include="Game\StageGimmick\Base\GeneralObject.cpp" />
@@ -543,6 +544,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Editor\AssetPreviewManager.h" />
     <ClInclude Include="Engine\Objects\LightObject\PointLightActor.h" />
     <ClInclude Include="Game\3d\Actor\Lantern.h" />
     <ClInclude Include="Game\StageGimmick\Base\GeneralObject.h" />
