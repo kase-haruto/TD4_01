@@ -16,6 +16,7 @@ void FireLoadEvent::OnCollisionEnter(Collider* other) {
 	// プレイヤーがイベント内に入ったら燃える
 	for(auto& target : targetObjects_) {
 		if(auto lockedTarget = target.lock()) {
+			if(lockedTarget->IsActive()) return;
 			lockedTarget->BurnActive();
 		}
 	}

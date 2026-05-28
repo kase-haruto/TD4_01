@@ -36,6 +36,8 @@ public:
 
 	void OnCollisionEnter(Collider* other) override;
 
+	bool IsActive() const { return isBurn_; }
+
 protected:
 	// 初期化
 	void ObjectInitialize() override;
