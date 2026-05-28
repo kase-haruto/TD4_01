@@ -18,7 +18,7 @@
           "enabled": false,
           "rotateToDirection": false,
           "speed": {
-            "constant": 1.0,
+            "constant": 4.0,
             "max": 1.0,
             "min": 0.0,
             "mode": 0
@@ -31,15 +31,15 @@
             },
             "max": {
               "x": 1.0,
-              "y": 0.0,
-              "z": 1.0
+              "y": 1.0,
+              "z": -1.0
             },
             "min": {
               "x": -1.0,
-              "y": 0.0,
+              "y": -1.0,
               "z": -1.0
             },
-            "mode": 0
+            "mode": 1
           }
         },
         "emitCount": 6,
@@ -111,6 +111,12 @@
           "z": 0.0
         },
         "randomSpinEmit": false,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
         "scale": {
           "constant": {
             "x": 1.0,
@@ -154,7 +160,7 @@
           },
           "mode": 0
         },
-        "textureGuid": "7820d02f-1ce4-4df9-9ecf-2099cf40099a",
+        "textureGuid": "3ac2116b-ad97-45c1-bf5c-3d77f8fa6749",
         "texturePath": "Textures/white1x1.dds",
         "velocity": {
           "constant": {
@@ -173,6 +179,11 @@
             "z": -1.5
           },
           "mode": 1
+        },
+        "worldScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
         }
       },
       "isDrawEnable": true,
