@@ -16,7 +16,6 @@ void DiceProjectileEvent::OnCollisionEnter(Collider* other) {
 	for(auto& target : targetObjects_) {
 		if(target.lock()) {
 			target.lock()->SetIsFlying(true);
-			target.lock()->SetIsFlying(true);
 		}
 	}
 }
@@ -50,6 +49,9 @@ void DiceProjectileEvent::EventInitialize() {
 	socket_.lock()->SetCrackerPos(eventParam_.param_.crackerPos);
 	socket_.lock()->SetCrackerInterval(eventParam_.param_.crackerInterval);
 	socket_.lock()->Initialize();
+
+	CreateDoors();
+	UpdateDoorOpenRequest();
 
 	auto childTargets = ResolveLinkedObjects<DiceProjectileObject>(targetObjectGuids_, objectName);
 	if(childTargets.empty()) childTargets = FindOwnedObjectsByClassName<DiceProjectileObject>(objectName);
@@ -102,11 +104,12 @@ void DiceProjectileEvent::EventUpdate(float) {
 		EventInitialize();
 	}
 
+	UpdateDoorOpenRequest();
 }
 
 void DiceProjectileEvent::DerivativeGui() {
 
-	ImGui::Text("DroolRainObject");
+	ImGui::Text("DiceProjectileObject");
 	ImGui::SameLine();
 	if(ImGui::Button("+")) {
 		AddDiceProjectileObject();
@@ -151,6 +154,81 @@ void DiceProjectileEvent::DeleteDroolObject() {
 	eventData_.objectCount = objectCount_;
 }
 
+void DiceProjectileEvent::CreateDoors() {
+
+	// 扉(左)
+	const std::string doorLName = "DiceProjectileDoorL";
+	auto			  doorL		= ResolveLinkedObject<BellProjectileDoor>(doorLGuid_, doorLName);
+	if(!doorL) {
+		for(const auto& child : GetChildren()) {
+			if(child && child->GetName() == doorLName) {
+				doorL = std::dynamic_pointer_cast<BellProjectileDoor>(child);
+				break;
+			}
+		}
+	}
+	if(doorL) {
+		doorL->SetName(doorLName);
+		doorL->SetLR(0);
+		doorL->SetParam(eventParam_.doorParam_);
+		doorL->Initialize();
+		doorL_	   = doorL;
+		doorLGuid_ = doorL->GetGuid();
+	} else {
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorLName);
+		newDoor->SetParent(shared_from_this(), false);
+		newDoor->SetLR(0);
+		newDoor->SetParam(eventParam_.doorParam_);
+		newDoor->Initialize();
+		newDoor->SetTranslate({-12.0f, 0.0f, 40.0f});
+		doorL_	   = newDoor;
+		doorLGuid_ = newDoor->GetGuid();
+	}
+
+	// 扉(右)
+	const std::string doorRName = "DiceProjectileDoorR";
+	auto			  doorR		= ResolveLinkedObject<BellProjectileDoor>(doorRGuid_, doorRName);
+	if(!doorR) {
+		for(const auto& child : GetChildren()) {
+			if(child && child->GetName() == doorRName) {
+				doorR = std::dynamic_pointer_cast<BellProjectileDoor>(child);
+				break;
+			}
+		}
+	}
+	if(doorR) {
+		doorR->SetName(doorRName);
+		doorR->SetLR(1);
+		doorR->SetParam(eventParam_.doorParam_);
+		doorR->Initialize();
+		doorR_	   = doorR;
+		doorRGuid_ = doorR->GetGuid();
+	} else {
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoorR.obj", doorRName);
+		newDoor->SetParent(shared_from_this(), false);
+		newDoor->SetLR(1);
+		newDoor->SetParam(eventParam_.doorParam_);
+		newDoor->Initialize();
+		newDoor->SetTranslate({12.0f, 0.0f, 40.0f});
+		doorR_	   = newDoor;
+		doorRGuid_ = newDoor->GetGuid();
+	}
+}
+
+void DiceProjectileEvent::UpdateDoorOpenRequest() {
+	bool shouldOpen = false;
+	if(auto socket = socket_.lock()) {
+		shouldOpen = socket->GetDiceSocketCount() >= static_cast<uint32_t>(eventData_.clearCount);
+	}
+
+	if(auto doorL = doorL_.lock()) {
+		doorL->SetOpenRequested(shouldOpen);
+	}
+	if(auto doorR = doorR_.lock()) {
+		doorR->SetOpenRequested(shouldOpen);
+	}
+}
+
 void DiceProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
 	if(!derived) return;
 	if(derived->contains("eventParam")) {
@@ -164,10 +242,18 @@ void DiceProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, cons
 	}
 	socketGuid_ = derived->value("socketGuid", Guid{});
 	targetObjectGuids_ = derived->value("targetObjectGuids", std::vector<Guid>{});
+	doorLGuid_		   = derived->value("doorLGuid", Guid{});
+	doorRGuid_		   = derived->value("doorRGuid", Guid{});
 	for(auto& target : targetObjects_) {
 		if(auto object = target.lock()) {
 			object->SetParam(eventParam_.param_);
 		}
+	}
+	if(auto doorL = doorL_.lock()) {
+		doorL->SetParam(eventParam_.doorParam_);
+	}
+	if(auto doorR = doorR_.lock()) {
+		doorR->SetParam(eventParam_.doorParam_);
 	}
 }
 
@@ -187,9 +273,23 @@ void DiceProjectileEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::
 	}
 	if(guids.empty()) guids = targetObjectGuids_;
 	if(!guids.empty()) derived["targetObjectGuids"] = guids;
+
+	if(auto doorL = doorL_.lock()) {
+		derived["doorLGuid"] = doorL->GetGuid();
+	} else if(doorLGuid_.isValid()) {
+		derived["doorLGuid"] = doorLGuid_;
+	}
+
+	if(auto doorR = doorR_.lock()) {
+		derived["doorRGuid"] = doorR->GetGuid();
+	} else if(doorRGuid_.isValid()) {
+		derived["doorRGuid"] = doorRGuid_;
+	}
 }
 
 void DiceProjectileEvent::RemapSceneObjectReferences(const std::unordered_map<Guid, Guid>& guidMap) {
 	RemapGuid(socketGuid_, guidMap);
 	RemapGuids(targetObjectGuids_, guidMap);
+	RemapGuid(doorLGuid_, guidMap);
+	RemapGuid(doorRGuid_, guidMap);
 }

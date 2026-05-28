@@ -42,6 +42,7 @@ void BellProjectileDoor::ObjectInitialize() {
 	}
 
 	startPos_ = worldTransform_.translation;
+	isOpenRequested_ = false;
 	isOpened_ = false;
 	openRate_ = 0.0f;
 }
@@ -49,7 +50,7 @@ void BellProjectileDoor::ObjectInitialize() {
 void BellProjectileDoor::ObjectUpdate(float dt) {
 	if (isOpened_) return;
 
-	if (target_ && target_->GetIsRing()) {
+	if(isOpenRequested_ || (target_ && target_->GetIsRing())) {
 		openRate_ += param_.speed * dt;
 		if (openRate_ >= 1.0f) {
 			openRate_ = 1.0f;

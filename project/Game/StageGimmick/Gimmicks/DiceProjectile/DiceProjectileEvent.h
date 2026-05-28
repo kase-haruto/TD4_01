@@ -3,6 +3,7 @@
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
 #include "Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.h"
 #include "Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.h"
+#include "Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
@@ -48,6 +49,7 @@ private:
 	struct DiceProjectileEventParam : public CalyxEngine::SerializableObject {
 
 		DiceProjectileParam param_;
+		BellProjectileDoorParam doorParam_;
 
 		DiceProjectileEventParam() {
 			AddField("scale", param_.scale).Category("DiceProjectileEvent");
@@ -59,6 +61,9 @@ private:
 
 			AddField("crackerPos", param_.crackerPos).Category("DiceProjectileEvent");
 			AddField("crackerInterval", param_.crackerInterval).Category("DiceProjectileEvent");
+
+			AddField("doorScale", doorParam_.scale).Category("DiceProjectileDoor");
+			AddField("doorSpeed", doorParam_.speed).Category("DiceProjectileDoor");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {
@@ -93,6 +98,10 @@ private:
 	void AddDiceProjectileObject();
 	// 削除用関数
 	void DeleteDroolObject();
+	// 扉生成用関数
+	void CreateDoors();
+	// 扉開閉更新用関数
+	void UpdateDoorOpenRequest();
 
 private:
 	
@@ -103,6 +112,12 @@ private:
 	// ターゲットのサイコロオブジェクト
 	std::vector<std::weak_ptr<DiceProjectileObject>> targetObjects_;
 	std::vector<Guid> targetObjectGuids_;
+
+	// 扉
+	std::weak_ptr<BellProjectileDoor> doorL_;
+	Guid							  doorLGuid_;
+	std::weak_ptr<BellProjectileDoor> doorR_;
+	Guid							  doorRGuid_;
 
 	// パラメータ
 	DiceProjectileEventParam eventParam_;

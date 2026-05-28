@@ -24,6 +24,9 @@ public:
 	void SetTarget(BellProjectileTarget* target) {
 		target_ = target;
 	}
+	void SetOpenRequested(bool flag) {
+		isOpenRequested_ = flag;
+	}
 
 	// 0:左、1:右
 	void SetLR(int lr);
@@ -42,6 +45,8 @@ private:
 	BellProjectileDoorParam param_;
 
 	int lr_ = 0;
+	// 扉を開くリクエスト
+	bool isOpenRequested_ = false;
 	// 開ききったか
 	bool isOpened_ = false;
 	// 開くアニメーション用
