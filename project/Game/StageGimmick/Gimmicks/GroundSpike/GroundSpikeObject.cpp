@@ -1,5 +1,7 @@
 #include "GroundSpikeObject.h"
 
+#include "Game\DemoShockwave\Shockwave.h"
+
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine\Foundation\Utility\Ease\CxEase.h>
 
@@ -24,8 +26,12 @@ void GroundSpikeObject::OnCollisionEnter(Collider* other) {
 		return;
 	}
 
-	if(!isSpike_ || isBreak_) return;
-	isBreak_ = true;
+	if(!isSpike_ || isBreak_ || isBuried_) return;
+	if(auto* wave = dynamic_cast<Shockwave*>(otherObj)) {
+		if(wave->IsStrong()) {
+			isBreak_ = true;
+		}
+	}
 	isBuried_ = true;
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
@@ -65,9 +71,20 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 
 	// 埋まる時の処理
 	if (isBuried_) {
-		worldTransform_.translation.y -= (param_.popUpSpeed * 0.5f) * dt;
-		if (worldTransform_.translation.y < -5.0f) {
-			BaseGameObject::SetDrawEnable(false);
+		if(worldTransform_.GetWorldPosition().y <= -1.4f) {
+			//BaseGameObject::SetDrawEnable(false);
+			isSpike_ = false;
+			isBuried_ = false;
+			if(isBreak_) {
+				worldTransform_.scale.x = 1.2f;
+				worldTransform_.scale.y = 0.75f;
+				worldTransform_.scale.z = 1.2f;
+			} else {
+				worldTransform_.scale.x = 1.1f;
+				worldTransform_.scale.z = 1.1f;
+			}
+		} else {
+			worldTransform_.translation.y -= (param_.popUpSpeed * 0.5f) * dt;	
 		}
 	}
 

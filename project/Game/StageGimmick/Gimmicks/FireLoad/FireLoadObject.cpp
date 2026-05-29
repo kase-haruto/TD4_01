@@ -14,6 +14,7 @@ FireLoadObject::FireLoadObject(
 }
 
 void FireLoadObject::BurnActive() {
+	if(isBurn_) return;
 	SetIsBurn(true);
 	SetIsIgnition(true);
 	if(collider_) {

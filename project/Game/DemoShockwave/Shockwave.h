@@ -16,7 +16,7 @@ public:
 	/// <summary> 衝撃波を発生させる </summary>
 	/// <param name="pos"> 位置 </param>
 	/// <param name="scaleMultiplier"> 拡大の倍率 </param>
-	void Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier);
+	void Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier, bool strong);
 
 	/// <summary> 停止処理 </summary>
 	void Deactivate();
@@ -33,6 +33,7 @@ public:
 	std::string_view GetObjectClassName() const override { return "Shockwave"; }
 	float			 GetPushForce() const { return param_.pushForce * scaleMultiplier_; }
 	bool			 IsActive() const { return isActive_; }
+	bool			 IsStrong() const { return isStrong_; }
 	bool			 IsTakeDamageForStage();
 
 private:
@@ -59,5 +60,6 @@ private:
 	float			   timer_			= 0.0f;
 	float			   currentMaxScale_ = 5.0f;
 	bool			   isActive_			 = false;
+	bool			   isStrong_			 = false;
 	bool			   isTakeDamageForStage_ = false;
 };

@@ -103,7 +103,7 @@ void DemoPlayer::Update(float dt) {
 		//強い衝撃時の処理
 		EffectAPI::Play(effectStrongData_, worldTransform_.GetWorldPosition());
 		EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
-		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale);
+		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.strongShockScale, true);
 		//カメラシェイク
 		CameraManager::GetMain3d()->StartShake(param_.shakeParm.duration, param_.shakeParm.intensity);
 		PostEffectManager::Get()->PlayTriggeredEffect("PlayerShock");
