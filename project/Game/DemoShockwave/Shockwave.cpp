@@ -62,6 +62,7 @@ void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier,
 	timer_						= 0.0f;
 	isActive_					= true;
  	isStrong_					= strong;
+	isStrongDamage_				= false;
 	isTakeDamageForStage_		= false;
 	
 	//SetDrawEnable(true);
@@ -91,6 +92,9 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 
 	if(auto* spike = dynamic_cast<GroundSpikeObject*>(otherObj)) {
 		isTakeDamageForStage_ = true;
+		if(isStrong_) {
+			isStrongDamage_ = true;
+		}
 	}
 
 }

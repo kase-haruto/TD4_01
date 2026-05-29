@@ -34,6 +34,7 @@ public:
 	float			 GetPushForce() const { return param_.pushForce * scaleMultiplier_; }
 	bool			 IsActive() const { return isActive_; }
 	bool			 IsStrong() const { return isStrong_; }
+	bool			 IsStrongDamage() const { return isStrongDamage_; }
 	bool			 IsTakeDamageForStage();
 
 private:
@@ -61,5 +62,6 @@ private:
 	float			   currentMaxScale_ = 5.0f;
 	bool			   isActive_			 = false;
 	bool			   isStrong_			 = false;
+	bool			   isStrongDamage_		 = false;
 	bool			   isTakeDamageForStage_ = false;
 };
