@@ -41,8 +41,10 @@ void ClearScene::Initialize() {
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/Clear.scene");
+	std::string scenePath = "Resources/Assets/Scenes/Clear.scene";
 
+	SceneSerializer::Load(*sceneContext_, scenePath);
+	sceneContext_->SetScenePath(scenePath);
 	LoadAssets();
 
 	//=========================
