@@ -16,4 +16,5 @@ cbuffer CameraConstants : register(b1) {
 	float3 camForward;
 
 	float2 viewportSize;
+	uint cameraDitherEnabled;
 }

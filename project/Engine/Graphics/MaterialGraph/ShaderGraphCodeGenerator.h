@@ -268,6 +268,7 @@ namespace CalyxEngine {
 			out << "    float3 camUp;\n";
 			out << "    float3 camForward;\n";
 			out << "    float2 viewportSize;\n";
+			out << "    uint cameraDitherEnabled;\n";
 			out << "}\n\n";
 			out << "struct Material {\n";
 			out << "    float4 color;\n";
@@ -648,7 +649,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
 	// カメラ近傍フェード値(0.0〜1.0)に基づいてピクセルを破棄
 
-	if(fade <= ditherThreshold) {
+	if(cameraDitherEnabled != 0 && fade <= ditherThreshold) {
 		discard;
 	}
 
