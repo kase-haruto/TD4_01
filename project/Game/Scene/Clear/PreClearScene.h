@@ -60,7 +60,7 @@ private:
 
 	std::unique_ptr<Sprite> pauseBg_ = nullptr;
 
-	CalyxEngine::Vector3 flyDir_   = {-1.0f, 0.1f, -0.1f};
+	CalyxEngine::Vector3 flyDir_   = {-2.0f, 0.5f, -1.75f};
 	float animTime_ = 2.0f;
 
 	std::unique_ptr<TransitionControl>			transitionControl_ = nullptr;
