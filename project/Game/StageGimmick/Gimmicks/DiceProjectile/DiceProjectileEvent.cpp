@@ -88,6 +88,25 @@ void DiceProjectileEvent::EventInitialize() {
 			targetObjectGuids_[i] = targetObject->GetGuid();
 		}
 	}
+
+	// 建物
+	const std::string gateName = "GeneralObject";
+	auto			  gate	   = ResolveLinkedObject<GeneralObject>(gateGuid_, gateName);
+	if(!gate) gate = FindOwnedObjectByClassName<GeneralObject>(gateName);
+	if(gate) {
+		gate->SetName(gateName);
+		gate->Initialize();
+		gate_	  = gate;
+		gateGuid_ = gate->GetGuid();
+	} else {
+		auto newGate = SceneAPI::Instantiate<GeneralObject>("akamon.obj", gateName);
+		newGate->SetParent(shared_from_this(), false);
+		newGate->Initialize();
+		newGate->SetScale({1.95f, 2.0f, 2.25f});
+		newGate->SetTranslate({0.0f, 0.0f, 32.5f});
+		gate_	  = newGate;
+		gateGuid_ = newGate->GetGuid();
+	}
 }
 
 void DiceProjectileEvent::EventUpdate(float) {
@@ -175,7 +194,7 @@ void DiceProjectileEvent::CreateDoors() {
 		doorL_	   = doorL;
 		doorLGuid_ = doorL->GetGuid();
 	} else {
-		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoor.obj", doorLName);
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("akamonDoorL.obj", doorLName);
 		newDoor->SetParent(shared_from_this(), false);
 		newDoor->SetLR(0);
 		newDoor->SetParam(eventParam_.doorParam_);
@@ -204,7 +223,7 @@ void DiceProjectileEvent::CreateDoors() {
 		doorR_	   = doorR;
 		doorRGuid_ = doorR->GetGuid();
 	} else {
-		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("sanmonDoorR.obj", doorRName);
+		auto newDoor = SceneAPI::Instantiate<BellProjectileDoor>("akamonDoorR.obj", doorRName);
 		newDoor->SetParent(shared_from_this(), false);
 		newDoor->SetLR(1);
 		newDoor->SetParam(eventParam_.doorParam_);
