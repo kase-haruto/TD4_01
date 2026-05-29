@@ -133,8 +133,11 @@ void PreClearScene::AnimUpdate(float dt) {
 	animTime_ -= dt;
 
 	CalyxEngine::Vector3 pos = player_->GetWorldPosition();
+	CalyxEngine::Vector3 sca = player_->GetWorldTransform().scale;
 	pos += flyDir_ * dt;
+	sca += CalyxEngine::Vector3{0.65f, 0.65f, 0.65f} * dt;
 	player_->SetTranslate(pos);
+	player_->SetScale(sca);
 
 	if(animTime_ < 0.0f) {
 		IsPhase_ = true;
