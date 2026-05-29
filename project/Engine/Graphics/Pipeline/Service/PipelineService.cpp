@@ -88,6 +88,8 @@ void PipelineService::RegisterAllPipelines() {
 	regObjNoBlend(PipelineTag::Object::OutlineSkinnedObject3D, PipelinePresets::MakeOutlineSkinnedObject3D);
 	regObjNoBlend(PipelineTag::Object::OutlineNormalObject3D, PipelinePresets::MakeOutlineNormalObject3D);
 	regObjNoBlend(PipelineTag::Object::OutlineNormalSkinnedObject3D, PipelinePresets::MakeOutlineNormalSkinnedObject3D);
+	regObjNoBlend(PipelineTag::Object::OutlineDitherDepthObject3D, PipelinePresets::MakeOutlineDitherDepthObject3D);
+	regObjNoBlend(PipelineTag::Object::OutlineDitherDepthSkinnedObject3D, PipelinePresets::MakeOutlineDitherDepthSkinnedObject3D);
 
 	//========================= Shadow ===================================
 	regObjNoBlend(PipelineTag::Object::ShadowStatic, PipelinePresets::MakeShadowStatic);

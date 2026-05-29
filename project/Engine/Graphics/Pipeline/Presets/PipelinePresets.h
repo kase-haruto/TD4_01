@@ -18,6 +18,8 @@ namespace PipelinePresets {
 	GraphicsPipelineDesc MakeOutlineSkinnedObject3D();
 	GraphicsPipelineDesc MakeOutlineNormalObject3D();
 	GraphicsPipelineDesc MakeOutlineNormalSkinnedObject3D();
+	GraphicsPipelineDesc MakeOutlineDitherDepthObject3D();
+	GraphicsPipelineDesc MakeOutlineDitherDepthSkinnedObject3D();
 	// shadow
 	GraphicsPipelineDesc MakeShadowStatic();
 	GraphicsPipelineDesc MakeShadowSkinned();
