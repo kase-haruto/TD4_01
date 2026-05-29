@@ -21,6 +21,9 @@ void CalyxEngine::AssetManager::Initialize(ImGuiManager* imgui) {
 	textureManager_->StartUpLoad();
 
 	dataAssetManager_ = std::make_unique<DataAssetManager>();
+
+	audioManager_ = std::make_unique<Audio>();
+	audioManager_->Initialize();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -30,4 +33,5 @@ void CalyxEngine::AssetManager::Finalize() {
 	modelManager_.reset();
 	textureManager_.reset();
 	dataAssetManager_.reset();
+	audioManager_.reset();
 }

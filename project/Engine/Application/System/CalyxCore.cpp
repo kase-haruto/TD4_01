@@ -6,7 +6,7 @@
 // engine
 #include <Engine/Application/System/Environment.h>
 #include <Engine/Assets/Model/BaseModel.h>
-#include <Engine/Foundation/Audio/Audio.h>
+#include <Engine/Assets/Audio/Audio.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Foundation/Utility/Func/DxFunc.h>
 #include <Engine/Graphics/Context/GraphicsGroup.h>
@@ -61,8 +61,6 @@ namespace CalyxEngine {
 		// インプットの初期化
 		CalyxFoundation::Input::Initialize();
 
-		// audioの初期化
-		Audio::Initialize();
 
 		DescriptorAllocator::Initialize(dxCore_->GetDevice().Get());
 		DescriptorAllocator::CreateHeap(DescriptorUsage::CbvSrvUav, {});
@@ -220,7 +218,6 @@ namespace CalyxEngine {
 		pipelineStateManager_->Finalize();
 		DescriptorAllocator::Finalize();
 		CalyxFoundation::Input::Finalize();
-		Audio::Finalize();
 		// ウィンドウの破棄
 		winApp_->TerminateGameWindow();
 	}
