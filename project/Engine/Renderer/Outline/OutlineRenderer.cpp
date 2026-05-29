@@ -12,7 +12,7 @@
 
 namespace {
 	constexpr DXGI_FORMAT kNormalFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	constexpr float kDitherFadeFar = 10.0f;
+	constexpr float kDitherFadeFar = 8.0f;
 
 	D3D12_RECT MakeRect(uint32_t width, uint32_t height) {
 		return D3D12_RECT{0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
@@ -36,7 +36,15 @@ namespace {
 
 	bool IsDitherFadeActiveForOutline(const SceneObject& owner, const Camera3d& camera) {
 		const float fadeFarSq = kDitherFadeFar * kDitherFadeFar;
-		return DistanceSqPointAabb(camera.GetTranslate(), owner.GetWorldAABB()) < fadeFarSq;
+		return DistanceSqPointAabb(camera.GetWorldTransform().GetWorldPosition(), owner.GetWorldAABB()) < fadeFarSq;
+	}
+
+	bool IsOutlineEnabledForCameraDither(const SceneObject& owner, const Camera3d& camera) {
+		return owner.IsOutlineEnabled() && !IsDitherFadeActiveForOutline(owner, camera);
+	}
+
+	bool IsDitherEnabledForTarget(const IRenderTarget& rt) {
+		return rt.GetRenderTargetType() != RenderTargetType::DebugView;
 	}
 }
 
@@ -154,7 +162,7 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 	if(targetOwner) {
 		selectionDepthResource_.Transition(cmdList, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		cmdList->ClearDepthStencilView(selectionDepthDsv_.cpu, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	} else {
+	} else if(IsDitherEnabledForTarget(*rt)) {
 		RenderDitherDepthOccluders(cmdList, device, rt, psoService, camera, modelRenderer);
 	}
 	auto dsv = targetOwner ? selectionDepthDsv_.cpu : rt->GetDSV();
@@ -183,9 +191,7 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 		if(!inst.model || !inst.transform || !inst.owner) continue;
 		if(targetOwner) {
 			if(inst.owner != targetOwner) continue;
-		} else if(!inst.owner->IsOutlineEnabled()) {
-			continue;
-		} else if(IsDitherFadeActiveForOutline(*inst.owner, *camera)) {
+		} else if(IsDitherEnabledForTarget(*rt) ? !IsOutlineEnabledForCameraDither(*inst.owner, *camera) : !inst.owner->IsOutlineEnabled()) {
 			continue;
 		}
 		if(!inst.model->GetModelData() || !inst.model->GetIsDrawEnable()) continue;
@@ -246,9 +252,7 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 		if(!inst.model || !inst.transform || !inst.owner) continue;
 		if(targetOwner) {
 			if(inst.owner != targetOwner) continue;
-		} else if(!inst.owner->IsOutlineEnabled()) {
-			continue;
-		} else if(IsDitherFadeActiveForOutline(*inst.owner, *camera)) {
+		} else if(IsDitherEnabledForTarget(*rt) ? !IsOutlineEnabledForCameraDither(*inst.owner, *camera) : !inst.owner->IsOutlineEnabled()) {
 			continue;
 		}
 		if(!inst.model->GetModelData() || !inst.model->GetIsDrawEnable()) continue;
@@ -297,7 +301,7 @@ void OutlineRenderer::RenderDitherDepthOccluders(ID3D12GraphicsCommandList* cmdL
 	std::vector<StaticBatch> staticBatches;
 	for(const auto& inst : staticInstances) {
 		if(!inst.model || !inst.transform || !inst.owner) continue;
-		if(!inst.owner->IsOutlineEnabled()) continue;
+		if(!IsDitherFadeActiveForOutline(*inst.owner, *camera)) continue;
 		if(!inst.model->GetModelData() || !inst.model->GetIsDrawEnable()) continue;
 
 		auto it = std::find_if(staticBatches.begin(), staticBatches.end(),
@@ -350,7 +354,7 @@ void OutlineRenderer::RenderDitherDepthOccluders(ID3D12GraphicsCommandList* cmdL
 	bool skinnedPipelineSet = false;
 	for(const auto& inst : skinnedInstances) {
 		if(!inst.model || !inst.transform || !inst.owner) continue;
-		if(!inst.owner->IsOutlineEnabled()) continue;
+		if(!IsDitherFadeActiveForOutline(*inst.owner, *camera)) continue;
 		if(!inst.model->GetModelData() || !inst.model->GetIsDrawEnable()) continue;
 
 		if(!skinnedPipelineSet) {
