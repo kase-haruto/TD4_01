@@ -45,7 +45,7 @@ void ShockwaveManager::CheckTakeDamageForStage() {
 	if(!stage_) return;
 	for(auto& sw : pool_) {
 		if(!sw->IsTakeDamageForStage()) continue;
-		if(sw->IsStrong()) {
+		if(sw->IsStrongDamage()) {
 			stage_->TakeDamage(2);
 		} else {
 			stage_->TakeDamage(1);
