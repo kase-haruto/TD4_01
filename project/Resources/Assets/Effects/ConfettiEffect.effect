@@ -272,7 +272,7 @@
         "isDrawEnable": true,
         "isOneShot": true,
         "lifetime": {
-          "constant": 0.699999988079071,
+          "constant": 1.0,
           "max": 1.0,
           "min": 0.0,
           "mode": 0
@@ -281,13 +281,13 @@
         "modelPath": "plane.obj",
         "modules": [
           {
-            "blend": 0,
+            "blend": 2,
             "clamp01": true,
-            "ease": 6,
+            "ease": 0,
             "enabled": true,
             "end": [
-              3.0,
-              3.0,
+              0.75,
+              0.75,
               1.0,
               1.0
             ],
@@ -295,12 +295,34 @@
             "invert": false,
             "name": "OverLifetimeModule",
             "start": [
-              2.0,
-              2.0,
+              1.100000023841858,
+              1.100000023841858,
               1.0,
               1.0
             ],
             "target": 0
+          },
+          {
+            "blend": 0,
+            "clamp01": true,
+            "ease": 3,
+            "enabled": true,
+            "end": [
+              -3.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "guid": "b39beec3-acd0-4a68-aea7-3b4aa5adbaca",
+            "invert": false,
+            "name": "OverLifetimeModule",
+            "start": [
+              1.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "target": 5
           }
         ],
         "position": {
@@ -317,8 +339,8 @@
         },
         "scale": {
           "constant": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": 1.5,
+            "y": 1.5,
             "z": 1.0
           },
           "max": {
@@ -336,8 +358,8 @@
         "shapeAngle": 30.0,
         "shapeRadius": 1.0,
         "shapeSize": {
-          "x": 4.0,
-          "y": 4.0,
+          "x": 2.0,
+          "y": 2.0,
           "z": 0.10000000149011612
         },
         "spin": {
@@ -364,7 +386,7 @@
           "constant": {
             "x": 0.0,
             "y": 0.0,
-            "z": -3.0
+            "z": 0.0
           },
           "max": {
             "x": 0.0,
