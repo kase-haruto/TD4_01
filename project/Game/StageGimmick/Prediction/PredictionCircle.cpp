@@ -24,6 +24,7 @@ void PredictionCircle::Initialize() {
 	}
 
 	SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+	SetOutlineEnabled(false);
 }
 
 void PredictionCircle::Update(float dt) {

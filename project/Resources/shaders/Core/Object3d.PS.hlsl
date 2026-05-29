@@ -381,7 +381,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	float fade = saturate((dist - fadeNear) / (fadeFar - fadeNear));
 
 	// カメラ近傍フェード値(0.0〜1.0)に基づいてピクセルを破棄
-	if(fade <= ditherThreshold) {
+	if(cameraDitherEnabled != 0 && fade <= ditherThreshold) {
 		discard;
 	}
 

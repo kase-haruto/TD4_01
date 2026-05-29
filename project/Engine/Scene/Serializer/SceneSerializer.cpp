@@ -211,12 +211,19 @@ bool SceneSerializer::LoadJson(SceneContext&		 context,
 			}
 		}
 
+		Guid guid = j.value("guid", Guid{});
+		if(!guid.isValid()) {
+			guid = sp->GetGuid();
+		}
+		sp->SetGuid(guid);
+
 		// ライブラリへ登録
 		context.GetObjectLibrary()->AddObject(sp);
 		sp->BeginSerializableParamCapture(paramOverrides);
 		sp->Initialize();
 		sp->EndSerializableParamCapture();
 		ApplySceneConfig(*sp, j);
+		sp->SetGuid(guid);
 		if(false) {
 			auto* cfg = dynamic_cast<IConfigurable*>(sp.get());
 			if(j.contains("configPath")) {
@@ -252,7 +259,6 @@ bool SceneSerializer::LoadJson(SceneContext&		 context,
 		}
 
 		// GUID
-		Guid guid	  = j.value("guid", Guid{});
 		guidMap[guid] = sp;
 	}
 
