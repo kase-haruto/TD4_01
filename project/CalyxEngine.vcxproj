@@ -227,6 +227,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Assets\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Editor\AssetPreviewManager.cpp" />
     <ClCompile Include="Engine\Objects\LightObject\PointLightActor.cpp" />
     <ClCompile Include="Game\3d\Actor\Lantern.cpp" />
@@ -371,7 +372,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Editor\BaseEditor.cpp" />
     <ClCompile Include="Engine\Graphics\Material.cpp" />
     <ClCompile Include="Engine\Foundation\Clock\ClockManager.cpp" />
-    <ClCompile Include="Engine\Foundation\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Foundation\Utility\Ease\Ease.cpp" />
     <ClCompile Include="Engine\Graphics\Camera\3d\DebugCamera.cpp" />
     <ClCompile Include="Engine\Graphics\Camera\Base\BaseCamera.cpp" />
@@ -545,6 +545,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Assets\Audio\Audio.h" />
     <ClInclude Include="Engine\Editor\AssetPreviewManager.h" />
     <ClInclude Include="Engine\Objects\LightObject\PointLightActor.h" />
     <ClInclude Include="Game\3d\Actor\Lantern.h" />
@@ -736,7 +737,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineKey.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineType.h" />
     <ClInclude Include="Engine\Lighting\LightData.h" />
-    <ClInclude Include="Engine\Foundation\Audio\Audio.h" />
     <ClInclude Include="Engine\Foundation\Utility\Ease\Ease.h" />
     <ClInclude Include="Engine\Graphics\Camera\3d\DebugCamera.h" />
     <ClInclude Include="Engine\Graphics\Camera\Base\BaseCamera.h" />
