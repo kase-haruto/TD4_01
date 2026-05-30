@@ -23,7 +23,7 @@ void BellProjectileDoor::ObjectInitialize() {
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
 		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
-			radius->SetSize({9.0f, 11.5f, 1.0f});
+			radius->SetSize({6.5f, 8.0f, 1.0f});
 		}
 	}
 
@@ -32,12 +32,12 @@ void BellProjectileDoor::ObjectInitialize() {
 	if (lr_ == 1) {
 		//worldTransform_.eulerRotation.y = CalyxEngine::ToRadians(180.0f);
 		if(collider_) {
-			collider_->SetOffset({-4.5f, 5.75f, 0.0f});
+			collider_->SetOffset({-3.0f, 4.0f, 0.0f});
 		}
 	} else {
 		worldTransform_.eulerRotation.y = 0.0f;
 		if(collider_) {
-			collider_->SetOffset({4.5f, 5.75f, 0.0f});
+			collider_->SetOffset({3.0f, 4.0f, 0.0f});
 		}
 	}
 
