@@ -42,7 +42,7 @@ void SelectScene::Initialize() {
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/Select.scene");
+	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/SelectScene.scene");
 
 	LoadAssets();
 
