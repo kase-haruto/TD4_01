@@ -58,6 +58,7 @@ private:
 	void PauseClose();
 	void ButtonFadeIn(float dt);
 	void ButtonFadeOut(float dt);
+	void CloudFade(float dt);
 	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
 	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
 
@@ -78,7 +79,8 @@ private:
 	std::unique_ptr<CalyxEngine::SpriteObject2d>   resumeBtn_	  = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteObject2d>   toRetryBtn_	  = nullptr;
 	std::unique_ptr<CalyxEngine::SpriteObject2d>   toSelectBtn_	  = nullptr;
-	
+	std::vector<std::unique_ptr<CalyxEngine::SpriteObject2d>> cloud_;
+
 	int									 stageNum_			  = 0;
 	std::unique_ptr<Stage>				 stage_				  = nullptr;
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
@@ -104,6 +106,13 @@ private:
 	bool  isFanOpen_		  = false;
 	bool  isOncePlay_		  = false;
 	bool  isPaused_			  = false;
+
+	// ポーズ用（雲）ボタンとはタイミングをずらす
+	float cloudFadeInTime_		= 0.6f;	// フェードインはボタンより時間をかける
+	float cloudFadeInDelay_		= 0.1f;	// ボタンがある程度現れてから開始
+	float cloudFadeOutTime_		= 0.3f;	// フェードアウトもボタンと時間をずらす
+	float cloudFadeOutDelay_	= 0.05f;
+	float currentCloudFadeTime_ = 0.0f;
 	// 遷移用
 	bool IsPhase_	= false;
 	bool IsOpening_ = false;

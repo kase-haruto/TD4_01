@@ -311,7 +311,6 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 	plate1_->SetRotation(0.0f);
 	plate2_->SetRotation(0.0f);
 	float w		= static_cast<float>(kWindowWidth);
-	float halfW = w * 0.5f;
 	float h		= static_cast<float>(kWindowHeight);
 	//float halfH = h * 0.5f;
 	// タイトルからセレクトに来た時はスライドで開ける
