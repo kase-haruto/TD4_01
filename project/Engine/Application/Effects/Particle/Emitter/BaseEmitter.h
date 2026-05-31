@@ -52,6 +52,7 @@ namespace CalyxEngine {
 		 * \return 発生座標
 		 */
 		CalyxEngine::Vector3 GenerateSpawnPosition();
+		CalyxEngine::Vector3 GenerateSpawnPosition(const CalyxEngine::Vector3& basePos);
 
 		/**
 		 * \brief 再生
@@ -90,6 +91,8 @@ namespace CalyxEngine {
 		 * \return
 		 */
 		virtual bool LoadModelByGuid(const Guid& g);
+
+		void         SetAutoDestroy(bool autoDestroy) { autoDestroy_ = autoDestroy; }
 
 	public:
 		// accessor -------------------------------------------------
@@ -139,6 +142,7 @@ namespace CalyxEngine {
 
 		float alphaMultiplier_ = 1.0f;
 		bool  drawEnable_ = true;
+		bool autoDestroy_ = false;
 
 	private:
 		inline static const Guid emptyGuid_{Guid::Empty()};
