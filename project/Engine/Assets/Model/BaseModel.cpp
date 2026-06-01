@@ -294,7 +294,6 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 			}
 		}
 
-		ImGui::TextDisabled("Current: %s", labelFromGuid(materialGuid_).c_str());
 		ImGui::SameLine();
 		if(materialGuid_.isValid() && ImGui::SmallButton("Copy GUID##material")) {
 			ImGui::SetClipboardText(materialGuid_.ToString().c_str());
@@ -380,7 +379,6 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 			}
 			return "(missing)";
 		};
-		ImGui::TextDisabled("Current: %s", labelFromGuid(textureGuid_).c_str());
 		ImGui::SameLine();
 		if(textureGuid_.isValid() && ImGui::SmallButton("Copy GUID")) {
 			ImGui::SetClipboardText(textureGuid_.ToString().c_str());
@@ -392,7 +390,7 @@ void BaseModel::ShowImGui(BaseModelConfig& config) {
 	// materialData_.ShowImGui(config.materialConfig); // TODO: マテリアルアセットの切り替えUIをここに実装
 
 	// ブレンドモード
-	if(ImGui::TreeNodeEx("BlendMode", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+	if(ImGui::TreeNodeEx("BlendMode", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 		static const char* blendModeNames[] = {
 			"NONE", "ALPHA", "ADD", "SUB", "MUL", "NORMAL", "SCREEN"};
 		int currentBlendMode = static_cast<int>(blendMode_);
