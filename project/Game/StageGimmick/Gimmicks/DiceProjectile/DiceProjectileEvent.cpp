@@ -237,7 +237,7 @@ void DiceProjectileEvent::CreateDoors() {
 void DiceProjectileEvent::UpdateDoorOpenRequest() {
 	bool shouldOpen = false;
 	if(auto socket = socket_.lock()) {
-		shouldOpen = socket->GetDiceSocketCount() >= static_cast<uint32_t>(eventData_.clearCount);
+		shouldOpen = socket->GetIsCracker();
 	}
 
 	if(auto doorL = doorL_.lock()) {

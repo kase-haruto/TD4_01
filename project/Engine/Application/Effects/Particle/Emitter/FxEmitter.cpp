@@ -125,7 +125,7 @@ namespace CalyxEngine {
 					float              dist     = static_cast<float>(i) * spawnInterval;
 					float              t        = dist / distance;
 					CalyxEngine::Vector3 spawnPos = CalyxEngine::Vector3::Lerp(prevPostion_,position_,t);
-					Emit(spawnPos);
+					Emit(GenerateSpawnPosition(spawnPos) + offset_);
 				}
 			} else {
 				emitTimer_ += deltaTime;
@@ -220,7 +220,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxEmitter::Emit() {
 		// 形状が点の時はエミッタの位置、そうでない時は形状に応じた位置を生成して発生させる
-		Emit(GenerateSpawnPosition());
+		Emit(GenerateSpawnPosition() + offset_);
 	}
 
 	void FxEmitter::Emit(const CalyxEngine::Vector3& pos) {
@@ -417,6 +417,10 @@ namespace CalyxEngine {
 		if(GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::ParameterData)) {
 			// ================= Emission =================
 			if(FxGui::GridScope sec{"Emission"}; sec.open) {
+
+				FxGui::RowLabel("offset");
+				GuiCmd::DragFloat3("##offset",offset_,0.01f,-100.0f,100.0f);
+				
 				// エミッタ形状を選べるようにする
 				FxGui::RowLabel("emitter shape");
 				CalyxEngine::EnumConverter<EmitterShape>::Combo("Emitter Shape",shape_);
@@ -676,6 +680,7 @@ namespace CalyxEngine {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxEmitter::ApplyConfigFrom(const EmitterConfig& config) {
 		position_       = config.position;
+		offset_         = config.offset;
 		worldRotation_  = config.rotation;
 		worldScale_     = config.worldScale;
 		material_.color = config.color;
@@ -725,6 +730,7 @@ namespace CalyxEngine {
 
 	void FxEmitter::ExtractConfigTo(EmitterConfig& config) const {
 		config.position       = position_;
+		config.offset         = offset_;
 		config.rotation       = worldRotation_;
 		config.worldScale     = worldScale_;
 		config.color          = material_.color;

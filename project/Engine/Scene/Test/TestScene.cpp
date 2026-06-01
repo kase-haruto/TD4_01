@@ -103,7 +103,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 
 	// ポーズの切り替え
 	if(CalyxFoundation::Input::TriggerKey(DIK_ESCAPE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::START)) {
-		if(!isPaused_) {
+		if(!isPaused_ && dt >= 0.0f) {
 			lastDt_	  = dt;
 			isPaused_ = true;
 			ClockManager::GetInstance()->SetTimeScale(0.0f);
@@ -151,6 +151,9 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	if(isPaused_) {
 		fanBg_->Draw(spriteRenderer_.get());
 		pauseUI_->Draw(spriteRenderer_.get());
+		for(auto& cloud : cloud_) {
+			cloud->Draw(spriteRenderer_.get());
+		}
 		resumeBtn_->Draw(spriteRenderer_.get());
 		toRetryBtn_->Draw(spriteRenderer_.get());
 		toSelectBtn_->Draw(spriteRenderer_.get());
@@ -197,6 +200,30 @@ void TestScene::InitPauseResource() {
 	toSelectBtn_->SetScale({640.0f, 180.0f});
 	toSelectBtn_->SetAnchorPoint({0.5f, 0.5f});
 	toSelectBtn_->SetColor({0.3f, 0.3f, 0.3f, 0.0f});
+
+	for(int i = 0; i < 4; i++) {
+		auto cloud = std::make_unique<CalyxEngine::SpriteObject2d>();
+		if(i == 0) {
+			cloud->Initialize("Textures/Pause/cloud01.png");
+			cloud->SetPosition({170.0f, 300.0f});
+		}
+		if(i == 1) {
+			cloud->Initialize("Textures/Pause/cloud02.png");
+			cloud->SetPosition({1080.0f, 140.0f});
+		}
+		if(i == 2) {
+			cloud->Initialize("Textures/Pause/cloud03.png");
+			cloud->SetPosition({300.0f, 500.0f});
+		}
+		if(i == 3) {
+			cloud->Initialize("Textures/Pause/cloud04.png");
+			cloud->SetPosition({1100.0f, 530.0f});
+		}
+		cloud->SetScale({320.0f, 180.0f});
+		cloud->SetAnchorPoint({0.5f, 0.5f});
+		cloud->SetColor({1.0f, 1.0f, 1.0f, 0.0f});
+		cloud_.push_back(std::move(cloud));
+	}
 
 	fanBg_	 = std::make_unique<CalyxEngine::SpriteObject2d>();
 	fanAnim_ = std::make_unique<CalyxEngine::SpriteAnimator2d>();
@@ -320,8 +347,11 @@ void TestScene::PauseUIUpdate(float dt) {
 	if(isFanOpen_) {
 		if(currentOpeningTime_ >= openingTime_ && fanAnim_->IsFinished()) {
 			ButtonFadeIn(dt);
+			CloudFade(dt);
 		}
 	} else {
+		// 雲はボタンとは別タイマーで動かすため、フェード完了前でも毎フレーム進める
+		CloudFade(dt);
 		if(!isFadeFinish_) {
 			ButtonFadeOut(dt);
 			return;
@@ -388,19 +418,21 @@ void TestScene::PauseUIUpdate(float dt) {
 }
 
 void TestScene::PauseOpen() {
-	isFanOpen_			= true;
-	isFadeFinish_		= false;
-	currentOpeningTime_ = 0.0f;
-	currentFadeTime_	= 0.0f;
+	isFanOpen_			   = true;
+	isFadeFinish_		   = false;
+	currentOpeningTime_	   = 0.0f;
+	currentFadeTime_	   = 0.0f;
+	currentCloudFadeTime_  = 0.0f;
 }
 
 void TestScene::PauseClose() {
 	if(!isFanOpen_) return;
-	isOncePlay_			= false;
-	isFanOpen_			= false;
-	isFadeFinish_		= false;
-	currentOpeningTime_ = 0.0f;
-	currentFadeTime_	= 0.0f;
+	isOncePlay_			   = false;
+	isFanOpen_			   = false;
+	isFadeFinish_		   = false;
+	currentOpeningTime_	   = 0.0f;
+	currentFadeTime_	   = 0.0f;
+	currentCloudFadeTime_  = 0.0f;
 }
 
 void TestScene::ButtonFadeIn(float dt) {
@@ -440,6 +472,28 @@ void TestScene::ButtonFadeOut(float dt) {
 
 	if(t >= 1.0f) {
 		isFadeFinish_ = true;
+	}
+}
+
+void TestScene::CloudFade(float dt) {
+	currentCloudFadeTime_ += dt;
+
+	float alpha = 0.0f;
+	if(isFanOpen_) {
+		// 開く：ボタンがある程度現れてから、ボタンより時間をかけてゆっくりα→1
+		float t = (currentCloudFadeTime_ - cloudFadeInDelay_) / cloudFadeInTime_;
+		t	  = (std::max)(0.0f, (std::min)(t, 1.0f));
+		alpha = t;
+	} else {
+		// 閉じる：ボタンとタイミングをずらしてα→0（閉じきる前に0になってもよい）
+		float t = (currentCloudFadeTime_ - cloudFadeOutDelay_) / cloudFadeOutTime_;
+		t	  = (std::max)(0.0f, (std::min)(t, 1.0f));
+		alpha = 1.0f - t;
+	}
+
+	for(auto& cloud : cloud_) {
+		cloud->SetAlpha(alpha);
+		cloud->Update(dt);
 	}
 }
 

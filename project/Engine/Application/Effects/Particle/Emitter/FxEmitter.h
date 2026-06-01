@@ -60,7 +60,7 @@ namespace CalyxEngine {
 
 		//--------- accessor -----------------------------------------------//
 		const std::vector<FxUnit>& GetUnits() const { return units_; }
-
+		const Vector3& GetOffset() const { return offset_; }
 		bool                               IsDrawEnable() const override { return HasFlag(DrawEnable); }
 		void                               SetDrawEnable(bool isEnable) override { SetFlag(DrawEnable,isEnable); }
 		bool                               IsPlaying() const override { return HasFlag(Playing); }
@@ -68,6 +68,7 @@ namespace CalyxEngine {
 		const Guid&                        GetTextureGuid() const override { return textureGuid_; }
 
 		//--------- Timed Preview（一定間隔での自動再生） ---------------//
+		void SetOffset(const CalyxEngine::Vector3& offset) { offset_ = offset; }
 		void      SetTimedPreview(bool v) { timedPreview_ = v; }
 		void      SetPosition(const CalyxEngine::Vector3& pos) override { position_ = pos; }
 		bool      GetTimedPreview() const { return timedPreview_; }
@@ -148,6 +149,7 @@ namespace CalyxEngine {
 		uint32_t flags_ = FollowOneShot | FirstFrame | Complement | DrawEnable;
 
 	protected:
+		Vector3 offset_;
 		bool isOneShot_   = false; //<
 		bool hasEmitted_  = false; //< 発生したか
 		bool autoDestroy_ = false; //< 自動削除するか

@@ -1,6 +1,7 @@
 #include "Shockwave.h"
 #include "Engine/Objects/Collider/SphereCollider.h"
 #include "Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h"
+#include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
 #include <algorithm>
 
 Shockwave::Shockwave() : Actor() {
@@ -91,6 +92,13 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 	if(!otherObj) return;
 
 	if(auto* spike = dynamic_cast<GroundSpikeObject*>(otherObj)) {
+		isTakeDamageForStage_ = true;
+		if(isStrong_) {
+			isStrongDamage_ = true;
+		}
+	}
+
+	if(auto* projectile = dynamic_cast<ProjectileObject*>(otherObj)) {
 		isTakeDamageForStage_ = true;
 		if(isStrong_) {
 			isStrongDamage_ = true;

@@ -3,6 +3,7 @@
 #include <Engine/Assets/Model/ModelManager.h>
 #include <Engine/Assets/Texture/TextureManager.h>
 #include <Engine/Assets/DataAsset/DataAssetManager.h>
+#include <Engine/Assets/Audio/Audio.h>
 
 namespace CalyxEngine {
 
@@ -28,8 +29,8 @@ namespace CalyxEngine {
 		void Finalize();
 
 		// accessor ==========================//
-		ModelManager*   GetModelManager() const { return modelManager_.get(); }
-		TextureManager* GetTextureManager() const { return textureManager_.get(); }
+		ModelManager*     GetModelManager() const { return modelManager_.get(); }
+		TextureManager*   GetTextureManager() const { return textureManager_.get(); }
 		DataAssetManager* GetDataAssetManager() const { return dataAssetManager_.get(); }
 
 	private:
@@ -38,14 +39,14 @@ namespace CalyxEngine {
 		//===================================================================*/
 		AssetManager() = default;
 
-
 	private:
 		//===================================================================*/
 		//                    private members
 		//===================================================================*/
-		std::unique_ptr<ModelManager>   modelManager_;
-		std::unique_ptr<TextureManager> textureManager_;
+		std::unique_ptr<ModelManager>     modelManager_;
+		std::unique_ptr<TextureManager>   textureManager_;
 		std::unique_ptr<DataAssetManager> dataAssetManager_;
+		std::unique_ptr<Audio>            audioManager_;
 
 	};
 

@@ -1,53 +1,9 @@
 [
     {
-        "BellProjectileEvent": {
-            "bellGuid": "3b0a8416-59b5-4291-8e08-8a6f76e43d4d",
-            "doorLGuid": "02ec037e-07a7-412b-8cc2-49d11c5bca57",
-            "doorRGuid": "e72f5cbb-f3a9-45da-90da-2d8ce21d795a",
-            "eventParam": {
-                "fields": {
-                    "direction": [
-                        -0.0,
-                        -0.0,
-                        -1.0
-                    ],
-                    "doorScale": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "doorSpeed": 2.0,
-                    "hitScale": [
-                        1.25,
-                        1.25,
-                        1.25
-                    ],
-                    "parryDuration": 0.5,
-                    "scale": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "speed": 6.599999904632568,
-                    "targetHitScale": [
-                        1.25,
-                        1.25,
-                        1.25
-                    ],
-                    "targetMoveSpeed": 5.0,
-                    "targetScale": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "targetObjectGuid": "0807e56c-27ea-476f-93bb-4b9c036dd149"
-        },
-        "castShadow": false,
+        "castShadow": true,
         "colliderConfig": {
-            "colliderType": 32,
-            "isCollisionEnabled": true,
+            "colliderType": 0,
+            "isCollisionEnabled": false,
             "isDraw": true,
             "offset": {
                 "x": 0.0,
@@ -61,23 +17,36 @@
                 "z": 0.0
             },
             "size": {
-                "x": 10.0,
-                "y": 5.0,
+                "x": 1.0,
+                "y": 1.0,
                 "z": 1.0
             },
-            "targetType": 1
+            "targetType": 0
         },
         "drawEnable": true,
-        "guid": "8128d08d-3d79-4f16-a74d-a7a647e7878e",
-        "name": "BellProjectileEvent",
-        "objectType": 5,
+        "guid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiFull.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "shojiFull",
+        "objectType": 2,
         "outlineColor": {
             "w": 1.0,
             "x": 0.019999999552965164,
             "y": 0.019999999552965164,
             "z": 0.02500000037252903
         },
-        "outlineEnabled": false,
+        "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
         "parentGuid": "00000000-0000-0000-0000-000000000000",
         "transform": {
@@ -91,17 +60,17 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 10.0,
-                "y": 5.0,
-                "z": 1.0
+                "x": 2.0,
+                "y": 2.0,
+                "z": 2.0
             },
             "translation": {
-                "x": -1.002962350845337,
-                "y": -0.3431042432785034,
-                "z": 119.19329071044922
+                "x": -16.850000381469727,
+                "y": -2.4093034267425537,
+                "z": 34.47945785522461
             }
         },
-        "type": "BellProjectileEvent",
+        "type": "BaseGameObject",
         "worldTransform": {
             "inheritRotate": true,
             "inheritScale": true,
@@ -113,390 +82,14 @@
                 "z": 0.0
             },
             "scale": {
-                "x": 10.0,
-                "y": 5.0,
-                "z": 1.0
+                "x": 2.0,
+                "y": 2.0,
+                "z": 2.0
             },
             "translation": {
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 64,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "targetType": 0
-        },
-        "drawEnable": true,
-        "guid": "3b0a8416-59b5-4291-8e08-8a6f76e43d4d",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "bell.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "BellProjectileTarget",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "8128d08d-3d79-4f16-a74d-a7a647e7878e",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 5.0,
-                "z": 30.0
-            }
-        },
-        "type": "BellProjectileTarget",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 5.0,
-                "z": 30.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 16,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 4.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "0807e56c-27ea-476f-93bb-4b9c036dd149",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "woodenBellHammer.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "BellProjectileObject",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "8128d08d-3d79-4f16-a74d-a7a647e7878e",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 1.0,
-                "z": 20.0
-            }
-        },
-        "type": "BellProjectileObject",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 0.0,
-                "y": 1.0,
-                "z": 20.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 128,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": 3.0,
-                "y": 4.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 6.5,
-                "y": 8.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "02ec037e-07a7-412b-8cc2-49d11c5bca57",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "sanmonDoor.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "BellProjectileDoorR",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "8128d08d-3d79-4f16-a74d-a7a647e7878e",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -6.199999809265137,
-                "y": 0.0,
-                "z": 36.0
-            }
-        },
-        "type": "BellProjectileDoor",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": -6.199999809265137,
-                "y": 0.0,
-                "z": 36.0
-            }
-        }
-    },
-    {
-        "castShadow": true,
-        "colliderConfig": {
-            "colliderType": 128,
-            "isCollisionEnabled": true,
-            "isDraw": true,
-            "offset": {
-                "x": -3.0,
-                "y": 4.0,
-                "z": 0.0
-            },
-            "radius": 1.0,
-            "rotate": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "size": {
-                "x": 6.5,
-                "y": 8.0,
-                "z": 1.0
-            },
-            "targetType": 1
-        },
-        "drawEnable": true,
-        "guid": "e72f5cbb-f3a9-45da-90da-2d8ce21d795a",
-        "modelConfig": {
-            "blendMode": 5,
-            "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "sanmonDoorR.obj",
-            "textureGuid": "00000000-0000-0000-0000-000000000000",
-            "uvTransConfig": {
-                "rotation": 0.0,
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0
-                }
-            }
-        },
-        "name": "BellProjectileDoorR",
-        "objectType": 2,
-        "outlineColor": {
-            "w": 1.0,
-            "x": 0.019999999552965164,
-            "y": 0.019999999552965164,
-            "z": 0.02500000037252903
-        },
-        "outlineEnabled": true,
-        "outlineThickness": 0.03500000014901161,
-        "parentGuid": "8128d08d-3d79-4f16-a74d-a7a647e7878e",
-        "transform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 6.199999809265137,
-                "y": 0.0,
-                "z": 36.0
-            }
-        },
-        "type": "BellProjectileDoor",
-        "worldTransform": {
-            "inheritRotate": true,
-            "inheritScale": false,
-            "inheritTranslate": true,
-            "rotation": {
-                "w": 1.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "translation": {
-                "x": 6.199999809265137,
-                "y": 0.0,
-                "z": 36.0
             }
         }
     },
@@ -504,7 +97,7 @@
         "castShadow": true,
         "colliderConfig": {
             "colliderType": 0,
-            "isCollisionEnabled": true,
+            "isCollisionEnabled": false,
             "isDraw": true,
             "offset": {
                 "x": 0.0,
@@ -525,11 +118,11 @@
             "targetType": 0
         },
         "drawEnable": true,
-        "guid": "eaa0cae5-f291-4e0b-aeaf-9df2682566b5",
+        "guid": "a44aa254-8831-4c63-8172-e2caee7cbe49",
         "modelConfig": {
             "blendMode": 5,
             "materialGuid": "00000000-0000-0000-0000-000000000000",
-            "modelName": "sanmon.obj",
+            "modelName": "shojiFull.obj",
             "textureGuid": "00000000-0000-0000-0000-000000000000",
             "uvTransConfig": {
                 "rotation": 0.0,
@@ -539,7 +132,7 @@
                 }
             }
         },
-        "name": "GeneralGateObject",
+        "name": "shojiFull",
         "objectType": 2,
         "outlineColor": {
             "w": 1.0,
@@ -549,10 +142,10 @@
         },
         "outlineEnabled": true,
         "outlineThickness": 0.03500000014901161,
-        "parentGuid": "8128d08d-3d79-4f16-a74d-a7a647e7878e",
+        "parentGuid": "9053b94f-b1ca-43f0-b134-18ace7359185",
         "transform": {
             "inheritRotate": true,
-            "inheritScale": false,
+            "inheritScale": true,
             "inheritTranslate": true,
             "rotation": {
                 "w": 1.0,
@@ -566,15 +159,15 @@
                 "z": 1.0
             },
             "translation": {
-                "x": 0.0,
+                "x": 5.64762544631958,
                 "y": 0.0,
-                "z": 32.5
+                "z": 0.0
             }
         },
-        "type": "GeneralObject",
+        "type": "BaseGameObject",
         "worldTransform": {
             "inheritRotate": true,
-            "inheritScale": false,
+            "inheritScale": true,
             "inheritTranslate": true,
             "rotation": {
                 "w": 1.0,
@@ -588,9 +181,385 @@
                 "z": 1.0
             },
             "translation": {
+                "x": 5.64762544631958,
+                "y": 0.0,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 32.5
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "d9f4a15a-b147-4f3f-9795-110abd0ab5f6",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiFull.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "shojiFull",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 11.29727840423584,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        "type": "BaseGameObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 11.29727840423584,
+                "y": 0.0,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "d4168e6a-1178-4b6c-bb5e-8ac5a6334e51",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "shojiFull.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "shojiFull",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 16.934206008911133,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        "type": "BaseGameObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 16.934206008911133,
+                "y": 0.0,
+                "z": 0.0
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "d746d0b0-c362-4964-bf90-849afe2f59ae",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "selectWall.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "selectWall",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.399999976158142,
+                "y": 1.399999976158142,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 8.443246841430664,
+                "y": 10.234044075012207,
+                "z": 0.21356201171875
+            }
+        },
+        "type": "BaseGameObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.399999976158142,
+                "y": 1.399999976158142,
+                "z": 1.0
+            },
+            "translation": {
+                "x": 8.443246841430664,
+                "y": 10.234044075012207,
+                "z": 0.21356201171875
+            }
+        }
+    },
+    {
+        "castShadow": true,
+        "colliderConfig": {
+            "colliderType": 0,
+            "isCollisionEnabled": false,
+            "isDraw": true,
+            "offset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "radius": 1.0,
+            "rotate": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "targetType": 0
+        },
+        "drawEnable": true,
+        "guid": "09d94435-bc6d-425b-af55-f73b8eb65bd9",
+        "modelConfig": {
+            "blendMode": 5,
+            "materialGuid": "00000000-0000-0000-0000-000000000000",
+            "modelName": "frame.obj",
+            "textureGuid": "00000000-0000-0000-0000-000000000000",
+            "uvTransConfig": {
+                "rotation": 0.0,
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "name": "frame",
+        "objectType": 2,
+        "outlineColor": {
+            "w": 1.0,
+            "x": 0.019999999552965164,
+            "y": 0.019999999552965164,
+            "z": 0.02500000037252903
+        },
+        "outlineEnabled": true,
+        "outlineThickness": 0.03500000014901161,
+        "parentGuid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+        "transform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.5,
+                "y": 1.5,
+                "z": 1.5
+            },
+            "translation": {
+                "x": 8.428478240966797,
+                "y": 10.450196266174316,
+                "z": -0.2517509460449219
+            }
+        },
+        "type": "BaseGameObject",
+        "worldTransform": {
+            "inheritRotate": true,
+            "inheritScale": true,
+            "inheritTranslate": true,
+            "rotation": {
+                "w": 1.0,
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.5,
+                "y": 1.5,
+                "z": 1.5
+            },
+            "translation": {
+                "x": 8.428478240966797,
+                "y": 10.450196266174316,
+                "z": -0.2517509460449219
             }
         }
     }
