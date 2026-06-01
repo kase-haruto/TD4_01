@@ -59,6 +59,7 @@ void TutorialEvent::EventUpdate(float dt) {
 		eventData_.LoadParams();
 		EventInitialize();
 	}
+	if(state_ == TutorialState::Idle) lastDt_ = dt;
 
 	// スプライトの更新（生成済みのときのみ）
 	// dt は時間停止（TimeScale=0）の影響を受けないグローバルdtなので、

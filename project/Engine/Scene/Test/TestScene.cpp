@@ -10,6 +10,7 @@
 #include "Game/Scene/Utility/SceneTypeUtil.h"
 #include <Game/DemoPlayer/DemoPlayer.h>
 #include <Game/DemoShockwave/ShockwaveManager.h>
+#include <Game/StageGimmick/Tutorial/TutorialEvent.h>
 #include <Game\Scene\Game\GameTransitionPayload.h>
 
 // engine
@@ -143,6 +144,14 @@ void TestScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSer
 	//	spriteの登録
 	//========================================================//
 	stage_->Draw(spriteRenderer_.get());
+
+	if(sceneContext_) {
+		for(auto& obj : sceneContext_->GetObjectLibrary()->FindByClassName("TutorialEvent")) {
+			if(auto* tutorial = dynamic_cast<TutorialEvent*>(obj.get())) {
+				tutorial->DrawSprite(spriteRenderer_.get());
+			}
+		}
+	}
 
 	if (playerUI_) {
 		playerUI_->Draw(spriteRenderer_.get());

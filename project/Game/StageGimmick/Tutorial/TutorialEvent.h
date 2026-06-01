@@ -115,14 +115,15 @@ private:
 	std::unique_ptr<CalyxEngine::SpriteObject2d> sprite_ = nullptr;
 
 	// typeごとのテクスチャパス（仮、GUIで変更可）
-	std::string jumpTexturePath_	= "Textures/UI/Tutorial/tutorial_jump.png";
-	std::string diveTexturePath_	= "Textures/UI/Tutorial/tutorial_dive.png";
-	std::string purposeTexturePath_ = "Textures/UI/Tutorial/tutorial_purpose.png";
+	std::string jumpTexturePath_	= "Textures/uvChecker.dds";
+	std::string diveTexturePath_	= "Textures/uvChecker.dds";
+	std::string purposeTexturePath_ = "Textures/uvChecker.dds";
 
 	// 進行状態
 	TutorialState state_	 = TutorialState::Idle;
 	DivePhase	  divePhase_ = DivePhase::WaitFirstInput;
 
+	float lastDt_ = 0.0f;
 	// 入力ブロックタイマー（連打対策）
 	float inputBlockTimer_ = 0.0f;
 	// Diveの時間再開タイマー
