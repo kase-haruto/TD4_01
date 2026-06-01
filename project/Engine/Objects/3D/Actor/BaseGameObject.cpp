@@ -85,7 +85,7 @@ void BaseGameObject::AlwaysUpdate(float dt) {
 		}
 	}
 	if(model_) {
-		model_->SetIsDrawEnable(isDrawEnable_);
+		model_->SetIsDrawEnable(IsDrawEnable());
 	}
 }
 
@@ -175,18 +175,20 @@ void BaseGameObject::ShowGui() {
 
 	// --- 描画設定 ---
 	if(GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::Object)) {
+		if(ImGui::TreeNodeEx("Draw Config", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+			GuiCmd::CheckBox("Camera Dither", drawConfig_.cameraDitherEnabled);
+			GuiCmd::CheckBox("Cast Shadow", drawConfig_.castShadow);
+			GuiCmd::CheckBox("Enable Outline", drawConfig_.outline.enabled);
+			GuiCmd::DragFloat("Outline Thickness", drawConfig_.outline.thickness, 0.001f, 0.0f, 1.0f);
+			ImGui::ColorEdit4("Outline Color", &drawConfig_.outline.color.x);
+			ImGui::TreePop();
+		}
 		if(ImGui::TreeNodeEx("Billboard Mode", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
 			int			mode	= static_cast<int>(billboardMode_);
 			const char* items[] = {"None", "Full", "AxisY"};
 			if(GuiCmd::Combo("Billboard Mode", mode, items, 3)) {
 				billboardMode_ = static_cast<BillboardMode>(mode);
 			}
-			ImGui::TreePop();
-		}
-		if(ImGui::TreeNodeEx("Outline", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
-			GuiCmd::CheckBox("Enable Outline", outlineSettings_.enabled);
-			GuiCmd::DragFloat("Outline Thickness", outlineSettings_.thickness, 0.001f, 0.0f, 1.0f);
-			ImGui::ColorEdit4("Outline Color", &outlineSettings_.color.x);
 			ImGui::TreePop();
 		}
 		GuiCmd::EndSection();
@@ -219,9 +221,10 @@ void BaseGameObject::ApplyConfig() {
 	if(collider_)
 		collider_->ApplyConfig(cfg.colliderConfig);
 	worldTransform_.ApplyConfig(cfg.transform);
-	outlineSettings_.enabled	 = cfg.outlineEnabled;
-	outlineSettings_.thickness = cfg.outlineThickness;
-	outlineSettings_.color	 = cfg.outlineColor;
+	drawConfig_.cameraDitherEnabled = cfg.cameraDitherEnabled;
+	drawConfig_.outline.enabled	 = cfg.outlineEnabled;
+	drawConfig_.outline.thickness = cfg.outlineThickness;
+	drawConfig_.outline.color	 = cfg.outlineColor;
 	id_		  = cfg.guid;
 	parentId_ = cfg.parentGuid;
 	name_	  = cfg.name;
@@ -239,9 +242,10 @@ void BaseGameObject::ExtractConfig() {
 	cfg.name	   = name_;
 	cfg.guid	   = id_;
 	cfg.parentGuid = parentId_;
-	cfg.outlineEnabled	 = outlineSettings_.enabled;
-	cfg.outlineThickness = outlineSettings_.thickness;
-	cfg.outlineColor	 = outlineSettings_.color;
+	cfg.cameraDitherEnabled = drawConfig_.cameraDitherEnabled;
+	cfg.outlineEnabled	 = drawConfig_.outline.enabled;
+	cfg.outlineThickness = drawConfig_.outline.thickness;
+	cfg.outlineColor	 = drawConfig_.outline.color;
 }
 
 void BaseGameObject::ApplyConfigFromJson(const nlohmann::json& j) {
@@ -302,7 +306,9 @@ void BaseGameObject::SetScale(const CalyxEngine::Vector3& scale) {
 
 void BaseGameObject::SetDrawEnable(bool isDrawEnable) {
 	SceneObject::SetDrawEnable(isDrawEnable);
-	model_->SetIsDrawEnable(isDrawEnable);
+	if(model_) {
+		model_->SetIsDrawEnable(isDrawEnable);
+	}
 }
 
 const CalyxEngine::Vector3 BaseGameObject::GetCenterPos() const {

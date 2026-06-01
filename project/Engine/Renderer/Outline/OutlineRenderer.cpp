@@ -35,6 +35,7 @@ namespace {
 	}
 
 	bool IsDitherFadeActiveForOutline(const SceneObject& owner, const Camera3d& camera) {
+		if(!owner.IsCameraDitherEnabled()) return false;
 		const float fadeFarSq = kDitherFadeFar * kDitherFadeFar;
 		return DistanceSqPointAabb(camera.GetWorldTransform().GetWorldPosition(), owner.GetWorldAABB()) < fadeFarSq;
 	}

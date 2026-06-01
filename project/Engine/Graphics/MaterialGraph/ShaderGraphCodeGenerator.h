@@ -270,6 +270,7 @@ namespace CalyxEngine {
 			out << "    float2 viewportSize;\n";
 			out << "    uint cameraDitherEnabled;\n";
 			out << "}\n\n";
+			out << "cbuffer ObjectDrawConstants : register(b6) { uint objectDitherEnabled; }\n\n";
 			out << "struct Material {\n";
 			out << "    float4 color;\n";
 			out << "    int enableLighting;\n";
@@ -637,19 +638,18 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     float3 finalColor = ApplyToneMappingAndGamma(litColor, 1.0f);
 
-	// ---- ディザ抜き (Dithered Clipping) ----
+	// Dithered clipping
 	uint2 pixelPos = uint2(input.position.xy) % 4;
 	float ditherThreshold = kBayerMatrix[pixelPos.y][pixelPos.x];
 
-	// カメラからの距離を計算（Object3d は input.fade がないためここで計算）
 	float dist = length(input.worldPosition - cameraPosition);
-	float fadeNear = 2.5f; // 透け始めの距離（必要に応じて調整）
-	float fadeFar = 10.0f;  // 完全に不透明になる距離（必要に応じて調整）
+	float fadeNear = 2.5f;
+	float fadeFar = 10.0f;
 	float fade = saturate((dist - fadeNear) / (fadeFar - fadeNear));
 
 	// カメラ近傍フェード値(0.0〜1.0)に基づいてピクセルを破棄
 
-	if(cameraDitherEnabled != 0 && fade <= ditherThreshold) {
+	if(cameraDitherEnabled != 0 && objectDitherEnabled != 0 && fade <= ditherThreshold) {
 		discard;
 	}
 

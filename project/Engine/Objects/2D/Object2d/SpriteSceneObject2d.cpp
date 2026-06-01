@@ -41,7 +41,7 @@ namespace CalyxEngine {
 
 	SpriteSceneObject2d::SpriteSceneObject2d() {
 		SetName("Sprite2D", ObjectType::Object2D);
-		isCastShadow_ = false;
+		SetCastShadow(false);
 		worldTransform_.translation = {640.0f, 360.0f, 0.0f};
 		worldTransform_.scale = {128.0f, 128.0f, 1.0f};
 	}
@@ -64,7 +64,7 @@ namespace CalyxEngine {
 	}
 
 	void SpriteSceneObject2d::DrawSprite(SpriteRenderer* renderer) const {
-		if(sprite_ && renderer && isDrawEnable_) {
+		if(sprite_ && renderer && IsDrawEnable()) {
 			sprite_->Draw(renderer);
 		}
 	}
@@ -126,7 +126,7 @@ namespace CalyxEngine {
 		sprite_->SetScale({worldTransform_.scale.x, worldTransform_.scale.y});
 		sprite_->SetRotation(worldTransform_.eulerRotation.z);
 		sprite_->SetAnchorPoint(anchor_);
-		sprite_->SetVisibility(isDrawEnable_);
+		sprite_->SetVisibility(IsDrawEnable());
 	}
 
 	void SpriteSceneObject2d::DrawBaseGui() {

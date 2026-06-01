@@ -16,6 +16,7 @@ struct BaseGameObjectConfig
 	: public SceneObjectConfig {
 	ColliderConfig	colliderConfig;
 	BaseModelConfig modelConfig;
+	bool cameraDitherEnabled = true;
 	bool outlineEnabled = true;
 	float outlineThickness = 0.035f;
 	CalyxEngine::Vector4 outlineColor = {0.02f, 0.02f, 0.025f, 1.0f};
@@ -30,6 +31,7 @@ inline void to_json(nlohmann::json& j, const BaseGameObjectConfig& c) {
 		{"transform", c.transform},
 		{"colliderConfig", c.colliderConfig},
 		{"modelConfig", c.modelConfig},
+		{"cameraDitherEnabled", c.cameraDitherEnabled},
 		{"outlineEnabled", c.outlineEnabled},
 		{"outlineThickness", c.outlineThickness},
 		{"outlineColor", c.outlineColor}};
@@ -43,6 +45,7 @@ inline void from_json(const nlohmann::json& j, BaseGameObjectConfig& c) {
 	if(j.contains("transform")) j.at("transform").get_to(c.transform);
 	if(j.contains("colliderConfig")) j.at("colliderConfig").get_to(c.colliderConfig);
 	if(j.contains("modelConfig")) j.at("modelConfig").get_to(c.modelConfig);
+	if(j.contains("cameraDitherEnabled")) j.at("cameraDitherEnabled").get_to(c.cameraDitherEnabled);
 	if(j.contains("outlineEnabled")) j.at("outlineEnabled").get_to(c.outlineEnabled);
 	if(j.contains("outlineThickness")) j.at("outlineThickness").get_to(c.outlineThickness);
 	if(j.contains("outlineColor")) j.at("outlineColor").get_to(c.outlineColor);
