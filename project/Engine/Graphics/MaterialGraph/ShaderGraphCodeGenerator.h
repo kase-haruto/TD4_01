@@ -326,7 +326,10 @@ namespace CalyxEngine {
 			out << "RaytracingAccelerationStructure gRtScene : register(t3);\n";
 			out << "Texture2D<float4> gGraphTextures[8] : register(t9);\n";
 			out << "SamplerState gSampler : register(s0);\n\n";
-			out << "struct PixelShaderOutput { float4 color : SV_TARGET0; };\n\n";
+			out << "struct PixelShaderOutput {\n";
+			out << "    float4 color : SV_TARGET0;\n";
+			out << "    float4 bloomMask : SV_TARGET1;\n";
+			out << "};\n\n";
 			out << materialFunction.hlsl << "\n";
 			out << R"(
 
@@ -618,10 +621,10 @@ PixelShaderOutput main(VertexShaderOutput input) {
     float alpha = surface.baseColor.a;
     float3 emissive = surface.emissiveColor.rgb * max(surface.emissiveIntensity, 0.0f);
 
-    if(gMaterial.enableLighting == 4) {
+    if(surface.lightingMode == 4) {
         if(alpha <= 0.01f) discard;
-        float3 emissive = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
         output.color = float4(ApplyToneMappingAndGamma(albedo, 1.0f) + emissive, alpha);
+        output.bloomMask = float4(emissive, 1.0f);
         return output;
     }
 
@@ -676,6 +679,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
 if(alpha <= 0.01f) discard;
     output.color = float4(finalColor, alpha);
+    output.bloomMask = float4(emissive, 1.0f);
     return output;
 }
 )";

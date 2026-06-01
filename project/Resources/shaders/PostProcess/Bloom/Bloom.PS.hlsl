@@ -27,20 +27,17 @@ float3 ExtractBloom(float3 color) {
 	return color;
 }
 
-float3 SampleBloom(float2 uv, float2 texelSize) {
-	// Increased spread for more blur
-	float spread = max(radius, 0.0f) * 4.0f;
+float3 SampleGaussianGrid(float2 uv, float2 texelSize, float spread, float sigma) {
 	float3 bloom = float3(0,0,0);
 	float totalWeight = 0.0f;
 
-	// Use a standard Gaussian-like distribution
 	const int samples = 5;
 	for (int x = -samples; x <= samples; ++x) {
 		for (int y = -samples; y <= samples; ++y) {
 			float2 offset = float2(float(x), float(y));
 			float2 sampleUV = uv + offset * texelSize * spread;
 			
-			float weight = exp(-(dot(offset, offset) / (2.0f * 2.0f)));
+			float weight = exp(-(dot(offset, offset) / (2.0f * sigma * sigma)));
 			
 			bloom += ExtractBloom(gBloomMask.Sample(gSampler, sampleUV).rgb) * weight;
 			totalWeight += weight;
@@ -48,6 +45,19 @@ float3 SampleBloom(float2 uv, float2 texelSize) {
 	}
 
 	return bloom / max(totalWeight, 0.0001f);
+}
+
+float3 SampleBloom(float2 uv, float2 texelSize) {
+	float bloomRadius = max(radius, 0.0f);
+	if(bloomRadius <= 0.001f) {
+		return ExtractBloom(gBloomMask.Sample(gSampler, uv).rgb);
+	}
+
+	float3 nearBloom = SampleGaussianGrid(uv, texelSize, bloomRadius * 2.0f, 2.0f);
+	float3 midBloom = SampleGaussianGrid(uv, texelSize, bloomRadius * 5.0f, 2.6f);
+	float3 farBloom = SampleGaussianGrid(uv, texelSize, bloomRadius * 11.0f, 3.2f);
+
+	return nearBloom * 0.45f + midBloom * 0.35f + farBloom * 0.20f;
 }
 
 PixelShaderOutput main(VertexShaderOutput input) {
