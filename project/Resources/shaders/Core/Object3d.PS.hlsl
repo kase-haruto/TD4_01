@@ -320,7 +320,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
     if(gMaterial.enableLighting == 4) {
         if(alpha <= 0.01f) discard;
         float3 emissive = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
-        output.color = float4(saturate(albedo + emissive), alpha);
+        output.color = float4(ApplyToneMappingAndGamma(albedo, 1.0f) + emissive, alpha);
         return output;
     }
 
@@ -356,7 +356,6 @@ PixelShaderOutput main(VertexShaderOutput input) {
     directionalSpecular *= shadow;
 
     float3 litColor = directionalDiffuse + directionalSpecular + pointDiffuse + pointSpecular;
-    litColor += gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
 
     // AOではない（定数アンビエント）
     float3 ambient = albedo * 0.07f;
@@ -374,6 +373,9 @@ PixelShaderOutput main(VertexShaderOutput input) {
     }
 
     float3 finalColor = ApplyToneMappingAndGamma(litColor, 1.0f);
+
+    // トーンマッピング後にEmissiveを加算し、閾値越えのHDR値として出力させる
+    finalColor += gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
 
 	// ---- ディザ抜き (Dithered Clipping) ----
 	uint2 pixelPos = uint2(input.position.xy) % 4;

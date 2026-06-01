@@ -62,9 +62,14 @@ namespace CalyxEngine {
 		swapchainRT->SetRenderTargetType(RenderTargetType::BackBuffer);
 		renderTargetCollection_->Add("BackBuffer", std::move(swapchainRT));
 
-		// Offscreen
+		// Offscreen (MRT: SceneColor + EmissiveBloomMask)
 		auto offscreenRT = std::make_unique<OffscreenRenderTarget>();
-		offscreenRT->Initialize(device.Get(), width, height, format_, DescriptorAllocator::Allocate(DescriptorUsage::Rtv), DescriptorAllocator::Allocate(DescriptorUsage::Dsv));
+		std::vector<DXGI_FORMAT> offscreenFormats = {DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT};
+		std::vector<DescriptorHandle> offscreenRtvHandles = {
+			DescriptorAllocator::Allocate(DescriptorUsage::Rtv),
+			DescriptorAllocator::Allocate(DescriptorUsage::Rtv)
+		};
+		offscreenRT->InitializeMRT(device.Get(), width, height, offscreenFormats, offscreenRtvHandles, DescriptorAllocator::Allocate(DescriptorUsage::Dsv));
 		offscreenRT->SetRenderTargetType(RenderTargetType::Offscreen);
 		renderTargetCollection_->Add("Offscreen", std::move(offscreenRT));
 

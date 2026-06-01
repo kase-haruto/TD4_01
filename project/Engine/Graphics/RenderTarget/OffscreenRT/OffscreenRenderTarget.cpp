@@ -109,3 +109,52 @@ void OffscreenRenderTarget::Resize(uint32_t width, uint32_t height) {
 	// リソースを再生成 (Initializeを再利用)
 	Initialize(device.Get(), width, height, format, rtvHandle_, dsvHandle_);
 }
+
+void OffscreenRenderTarget::InitializeMRT(ID3D12Device* device, uint32_t width, uint32_t height,
+										   const std::vector<DXGI_FORMAT>& formats,
+										   const std::vector<DescriptorHandle>& rtvHandles,
+										   DescriptorHandle dsvHandle) {
+	if(formats.empty() || rtvHandles.empty() || formats.size() != rtvHandles.size()) {
+		throw std::invalid_argument("MRT formats and rtvHandles must have same non-zero size");
+	}
+
+	mrtRtvHandles_ = rtvHandles;
+	dsvHandle_     = dsvHandle;
+
+	// ビューポート・シザー設定
+	viewport_	 = {0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 1.0f};
+	scissorRect_ = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
+
+	// 最初のRTVハンドル（GetRTV/GetSRV互換性用）
+	rtvHandle_ = rtvHandles[0];
+
+	// mrtResources_をクリア
+	mrtResources_.clear();
+
+	// 各RTVフォーマットに対応するリソースを作成
+	for(size_t i = 0; i < formats.size(); ++i) {
+		auto resource = std::make_unique<DxGpuResource>();
+		resource->InitializeAsRenderTarget(device, width, height, formats[i]);
+		resource->CreateRTV(device, rtvHandles[i].cpu);
+		resource->CreateSRV(device);
+		resource->SetCurrentState(D3D12_RESOURCE_STATE_RENDER_TARGET);
+		mrtResources_.push_back(std::move(resource));
+	}
+
+	// 互換性維持のため resource_ も設定（最初のリソースをコピー）
+	if(mrtResources_.size() > 0) {
+		resource_ = std::make_unique<DxGpuResource>(*mrtResources_[0]);
+	}
+
+	// Depthバッファ作成
+	if(!depthResource_) {
+		depthResource_ = std::make_unique<DxGpuResource>();
+		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R32_TYPELESS);
+		depthResource_->CreateDSV(device, dsvHandle_.cpu);
+		depthResource_->CreateSRV(device);
+	} else {
+		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R32_TYPELESS);
+		depthResource_->CreateDSV(device, dsvHandle_.cpu);
+		depthResource_->UpdateSRV(device);
+	}
+}

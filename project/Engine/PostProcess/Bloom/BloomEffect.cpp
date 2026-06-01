@@ -41,7 +41,7 @@ void BloomEffect::ShowImGui() {
 
 void BloomEffect::ResetParameters() {
 	param_.intensity = 0.7f;
-	param_.threshold = 0.8f;
+	param_.threshold = 1.0f;
 	param_.softKnee = 0.5f;
 	param_.radius = 1.0f;
 	param_.tint = {1.0f, 1.0f, 1.0f};

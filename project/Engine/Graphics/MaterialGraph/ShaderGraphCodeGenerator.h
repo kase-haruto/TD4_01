@@ -618,9 +618,10 @@ PixelShaderOutput main(VertexShaderOutput input) {
     float alpha = surface.baseColor.a;
     float3 emissive = surface.emissiveColor.rgb * max(surface.emissiveIntensity, 0.0f);
 
-    if(surface.lightingMode == 4) {
+    if(gMaterial.enableLighting == 4) {
         if(alpha <= 0.01f) discard;
-        output.color = float4(saturate(albedo + emissive), alpha);
+        float3 emissive = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
+        output.color = float4(ApplyToneMappingAndGamma(albedo, 1.0f) + emissive, alpha);
         return output;
     }
 
@@ -668,8 +669,6 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	float fadeNear = 2.5f;
 	float fadeFar = 10.0f;
 	float fade = saturate((dist - fadeNear) / (fadeFar - fadeNear));
-
-	// カメラ近傍フェード値(0.0〜1.0)に基づいてピクセルを破棄
 
 	if(cameraDitherEnabled != 0 && objectDitherEnabled != 0 && fade <= ditherThreshold) {
 		discard;
