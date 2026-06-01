@@ -38,6 +38,7 @@ namespace CalyxEngine {
 			GeneratedShaderGraphCode code;
 			code.usesObjectTexture =
 				graph.baseColor.usesObjectTexture ||
+				graph.emissiveColor.usesObjectTexture ||
 				graph.toonHighlightColor.usesObjectTexture ||
 				graph.toonBaseColor.usesObjectTexture ||
 				graph.toonFirstShadeColor.usesObjectTexture ||
@@ -47,6 +48,8 @@ namespace CalyxEngine {
 			out << "struct GeneratedMaterialSurface {\n";
 			out << "    int lightingMode;\n";
 			out << "    float4 baseColor;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
 			out << "    float shininess;\n";
 			out << "    float roughness;\n";
 			out << "    int isReflect;\n";
@@ -70,6 +73,8 @@ namespace CalyxEngine {
 			}
 			out << "    surface.lightingMode = " << graph.lightingMode << ";\n";
 			out << "    surface.baseColor = " << ColorExpr(graph.baseColor) << ";\n";
+			out << "    surface.emissiveColor = " << ColorExpr(graph.emissiveColor) << ";\n";
+			out << "    surface.emissiveIntensity = " << FloatExpr(graph.emissiveIntensity) << ";\n";
 			out << "    surface.shininess = " << FloatExpr(graph.shininess) << ";\n";
 			out << "    surface.roughness = " << FloatExpr(graph.roughness) << ";\n";
 			out << "    surface.isReflect = " << (graph.isReflect ? 1 : 0) << ";\n";
@@ -107,6 +112,8 @@ namespace CalyxEngine {
 			int32_t lightingMode = 0;
 			int32_t textureSlotCount = 0;
 			MaterialExpression baseColor;
+			MaterialExpression emissiveColor;
+			MaterialExpression emissiveIntensity;
 			MaterialExpression shininess;
 			MaterialExpression roughness;
 			bool isReflect = false;
@@ -127,6 +134,7 @@ namespace CalyxEngine {
 			GeneratedShaderGraphCode code;
 			code.usesObjectTexture =
 				surface.baseColor.usesObjectTexture ||
+				surface.emissiveColor.usesObjectTexture ||
 				surface.toonHighlightColor.usesObjectTexture ||
 				surface.toonBaseColor.usesObjectTexture ||
 				surface.toonFirstShadeColor.usesObjectTexture ||
@@ -134,6 +142,8 @@ namespace CalyxEngine {
 			code.textureSlotCount = surface.textureSlotCount;
 			const bool usesNoiseTexture =
 				surface.baseColor.usesNoiseTexture ||
+				surface.emissiveColor.usesNoiseTexture ||
+				surface.emissiveIntensity.usesNoiseTexture ||
 				surface.shininess.usesNoiseTexture ||
 				surface.roughness.usesNoiseTexture ||
 				surface.toonHighlightColor.usesNoiseTexture ||
@@ -152,6 +162,8 @@ namespace CalyxEngine {
 			out << "struct GeneratedMaterialSurface {\n";
 			out << "    int lightingMode;\n";
 			out << "    float4 baseColor;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
 			out << "    float shininess;\n";
 			out << "    float roughness;\n";
 			out << "    int isReflect;\n";
@@ -175,6 +187,8 @@ namespace CalyxEngine {
 			out << "    GeneratedMaterialSurface surface;\n";
 			out << "    surface.lightingMode = " << surface.lightingMode << ";\n";
 			out << "    surface.baseColor = " << surface.baseColor.hlsl << ";\n";
+			out << "    surface.emissiveColor = " << surface.emissiveColor.hlsl << ";\n";
+			out << "    surface.emissiveIntensity = " << surface.emissiveIntensity.hlsl << ";\n";
 			out << "    surface.shininess = " << surface.shininess.hlsl << ";\n";
 			out << "    surface.roughness = " << surface.roughness.hlsl << ";\n";
 			out << "    surface.isReflect = " << (surface.isReflect ? 1 : 0) << ";\n";
@@ -226,6 +240,9 @@ namespace CalyxEngine {
 			out << "    float toonSpecularSoftness;\n";
 			out << "    float toonSpecularIntensity;\n";
 			out << "    float pad3;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
+			out << "    float3 emissivePadding;\n";
 			out << "};\n";
 			out << "cbuffer MaterialConstants : register(b0) { Material gMaterial; }\n\n";
 			out << "struct VertexShaderOutput {\n";
@@ -239,7 +256,7 @@ namespace CalyxEngine {
 			out << "PixelShaderOutput main(VertexShaderOutput input) {\n";
 			out << "    PixelShaderOutput output;\n";
 			out << "    GeneratedMaterialSurface surface = EvaluateGeneratedMaterial(input.texcoord, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), float3(0.0f, 0.0f, 1.0f));\n";
-			out << "    output.color = surface.baseColor;\n";
+			out << "    output.color = float4(saturate(surface.baseColor.rgb + surface.emissiveColor.rgb * max(surface.emissiveIntensity, 0.0f)), surface.baseColor.a);\n";
 			out << "    return output;\n";
 			out << "}\n";
 
@@ -292,6 +309,9 @@ namespace CalyxEngine {
 			out << "    float toonSpecularSoftness;\n";
 			out << "    float toonSpecularIntensity;\n";
 			out << "    float pad3;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
+			out << "    float3 emissivePadding;\n";
 			out << "};\n\n";
 			out << "struct DirectionalLight { float4 color; float3 direction; float intensity; };\n";
 			out << "struct PointLight { float4 color; float3 position; float intensity; float radius; float decay; float2 pad; };\n\n";
@@ -596,10 +616,11 @@ PixelShaderOutput main(VertexShaderOutput input) {
     GeneratedMaterialSurface surface = EvaluateGeneratedMaterial(transformedUV.xy, input.worldPosition, normal, toEye);
     float3 albedo = surface.baseColor.rgb;
     float alpha = surface.baseColor.a;
+    float3 emissive = surface.emissiveColor.rgb * max(surface.emissiveIntensity, 0.0f);
 
     if(surface.lightingMode == 4) {
         if(alpha <= 0.01f) discard;
-        output.color = float4(albedo, alpha);
+        output.color = float4(saturate(albedo + emissive), alpha);
         return output;
     }
 
@@ -625,6 +646,7 @@ PixelShaderOutput main(VertexShaderOutput input) {
     directionalSpecular *= shadow;
 
     float3 litColor = directionalDiffuse + directionalSpecular + pointDiffuse + pointSpecular;
+    litColor += emissive;
     litColor += albedo * 0.07f;
 
     if(surface.isReflect != 0) {
@@ -1059,6 +1081,8 @@ float GeneratedValueNoise(float2 p) {
 			surface.textureSlotCount = (std::min)(TextureSlotCount(material.graph), kMaxGraphTextures);
 			surface.lightingMode = material.lightingMode;
 			surface.baseColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.color", false} : ColorExpression(material.color);
+			surface.emissiveColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.emissiveColor", false} : ColorExpression(material.emissiveColor);
+			surface.emissiveIntensity = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.emissiveIntensity", false} : FloatExpression(material.emissiveIntensity);
 			surface.shininess = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.shiniess", false} : FloatExpression(material.shininess);
 			surface.roughness = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.roughness", false} : FloatExpression(material.roughness);
 			surface.isReflect = material.isReflect;
@@ -1079,6 +1103,8 @@ float GeneratedValueNoise(float2 p) {
 		static void ApplyLegacyOutputExpressions(const MaterialAsset& material, const Node& output, MaterialExpressionSurface& surface) {
 			for(const NodePin& pin : output.inputs) {
 				if(pin.name == "BaseColor") surface.baseColor = ColorExpressionFromInput(material.graph, pin.id, surface.baseColor, 0);
+				if(pin.name == "Emissive") surface.emissiveColor = ColorExpressionFromInput(material.graph, pin.id, surface.emissiveColor, 0);
+				if(pin.name == "Emissive Intensity") surface.emissiveIntensity = FloatExpressionFromInput(material.graph, pin.id, surface.emissiveIntensity, 0);
 				if(pin.name == "Shininess") surface.shininess = FloatExpressionFromInput(material.graph, pin.id, surface.shininess, 0);
 				if(pin.name == "Roughness") surface.roughness = FloatExpressionFromInput(material.graph, pin.id, surface.roughness, 0);
 				if(pin.name == "Lighting Mode") {
@@ -1108,10 +1134,13 @@ float GeneratedValueNoise(float2 p) {
 			if(master->type == "ToonMaster") {
 				surface.lightingMode = 2;
 				const Vector4 baseColor = GetColorProperty(*master, "baseColor", {1, 1, 1, 1});
+				const Vector4 emissiveColor = GetColorProperty(*master, "emissiveColor", material.emissiveColor);
 				const Vector4 highlightColor = GetColorProperty(*master, "highlightColor", {1.08f, 1.06f, 1.02f, 1.0f});
 				const Vector4 firstShade = GetColorProperty(*master, "firstShadeColor", {0.72f, 0.76f, 0.86f, 1.0f});
 				const Vector4 secondShade = GetColorProperty(*master, "secondShadeColor", {0.42f, 0.46f, 0.58f, 1.0f});
 				surface.baseColor = ColorInputExpression(material, *master, "Base Color", useMaterialCBufferDefaults ? surface.baseColor : ColorExpression(baseColor));
+				surface.emissiveColor = ColorInputExpression(material, *master, "Emissive", useMaterialCBufferDefaults ? surface.emissiveColor : ColorExpression(emissiveColor));
+				surface.emissiveIntensity = FloatInputExpression(material, *master, "Emissive Intensity", useMaterialCBufferDefaults ? surface.emissiveIntensity : FloatExpression(GetFloatProperty(*master, "emissiveIntensity", material.emissiveIntensity)));
 				surface.toonBaseColor = useMaterialCBufferDefaults ? surface.toonBaseColor : ColorExpression({1, 1, 1, 1});
 				surface.toonHighlightColor = ColorInputExpression(material, *master, "Highlight", useMaterialCBufferDefaults ? surface.toonHighlightColor : ColorExpression(highlightColor));
 				surface.toonFirstShadeColor = ColorInputExpression(material, *master, "1st Shade", useMaterialCBufferDefaults ? surface.toonFirstShadeColor : ColorExpression(firstShade));
@@ -1129,6 +1158,8 @@ float GeneratedValueNoise(float2 p) {
 			if(master->type == "LitMaster") {
 				surface.lightingMode = static_cast<int32_t>(GetFloatProperty(*master, "lightingMode", 0.0f));
 				surface.baseColor = ColorInputExpression(material, *master, "Base Color", useMaterialCBufferDefaults ? surface.baseColor : ColorExpression(material.color));
+				surface.emissiveColor = ColorInputExpression(material, *master, "Emissive", useMaterialCBufferDefaults ? surface.emissiveColor : ColorExpression(GetColorProperty(*master, "emissiveColor", material.emissiveColor)));
+				surface.emissiveIntensity = FloatInputExpression(material, *master, "Emissive Intensity", useMaterialCBufferDefaults ? surface.emissiveIntensity : FloatExpression(GetFloatProperty(*master, "emissiveIntensity", material.emissiveIntensity)));
 				surface.shininess = FloatInputExpression(material, *master, "Shininess", useMaterialCBufferDefaults ? surface.shininess : FloatExpression(GetFloatProperty(*master, "shininess", material.shininess)));
 				surface.roughness = FloatInputExpression(material, *master, "Roughness", useMaterialCBufferDefaults ? surface.roughness : FloatExpression(GetFloatProperty(*master, "roughness", material.roughness)));
 				return surface;
@@ -1137,6 +1168,8 @@ float GeneratedValueNoise(float2 p) {
 			if(master->type == "UnlitMaster") {
 				surface.lightingMode = 4;
 				surface.baseColor = ColorInputExpression(material, *master, "Base Color", useMaterialCBufferDefaults ? surface.baseColor : ColorExpression(material.color));
+				surface.emissiveColor = ColorInputExpression(material, *master, "Emissive", useMaterialCBufferDefaults ? surface.emissiveColor : ColorExpression(GetColorProperty(*master, "emissiveColor", material.emissiveColor)));
+				surface.emissiveIntensity = FloatInputExpression(material, *master, "Emissive Intensity", useMaterialCBufferDefaults ? surface.emissiveIntensity : FloatExpression(GetFloatProperty(*master, "emissiveIntensity", material.emissiveIntensity)));
 				return surface;
 			}
 

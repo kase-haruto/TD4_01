@@ -30,6 +30,8 @@ struct MaterialConfig final{
 	float toonSpecularThreshold = 0.96f;
 	float toonSpecularSoftness = 0.02f;
 	float toonSpecularIntensity = 0.35f;
+	CalyxEngine::Vector4 emissiveColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float emissiveIntensity = 0.0f;
 };
 
 inline void to_json(nlohmann::json& j, const MaterialConfig& c) {
@@ -55,7 +57,9 @@ inline void to_json(nlohmann::json& j, const MaterialConfig& c) {
 		{"toonEdgeSoftness", c.toonEdgeSoftness},
 		{"toonSpecularThreshold", c.toonSpecularThreshold},
 		{"toonSpecularSoftness", c.toonSpecularSoftness},
-		{"toonSpecularIntensity", c.toonSpecularIntensity}
+		{"toonSpecularIntensity", c.toonSpecularIntensity},
+		{"emissiveColor", c.emissiveColor},
+		{"emissiveIntensity", c.emissiveIntensity}
 	};
 }
 
@@ -86,4 +90,6 @@ inline void from_json(const nlohmann::json& j, MaterialConfig& c) {
 	if(j.contains("toonSpecularThreshold")) j.at("toonSpecularThreshold").get_to(c.toonSpecularThreshold);
 	if(j.contains("toonSpecularSoftness")) j.at("toonSpecularSoftness").get_to(c.toonSpecularSoftness);
 	if(j.contains("toonSpecularIntensity")) j.at("toonSpecularIntensity").get_to(c.toonSpecularIntensity);
+	if(j.contains("emissiveColor")) j.at("emissiveColor").get_to(c.emissiveColor);
+	if(j.contains("emissiveIntensity")) j.at("emissiveIntensity").get_to(c.emissiveIntensity);
 }

@@ -22,6 +22,8 @@ namespace CalyxEngine {
 		int32_t lightingMode = 0;
 
 		CompiledColorInput baseColor;
+		CompiledColorInput emissiveColor{{0, 0, 0, 1}, false};
+		float emissiveIntensity = 0.0f;
 		float shininess = 20.0f;
 		float roughness = 0.5f;
 		bool isReflect = false;

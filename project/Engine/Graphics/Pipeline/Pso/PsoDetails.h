@@ -54,6 +54,7 @@ namespace PipelineTag {
 		CRT,
 		OutlineComposite,
 		Blend,
+		Bloom,
 
 		Count
 	};
