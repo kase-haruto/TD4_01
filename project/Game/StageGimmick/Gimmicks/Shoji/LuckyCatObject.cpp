@@ -10,7 +10,7 @@ LuckyCatObject::LuckyCatObject(
 	std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
 
-	worldTransform_.translation.y += 1.5f;
+	worldTransform_.translation.z += 3.0f;
 }
 
 void LuckyCatObject::OnCollisionEnter(Collider* other) {
