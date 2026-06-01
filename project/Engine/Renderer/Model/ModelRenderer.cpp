@@ -260,44 +260,38 @@ void ModelRenderer::BuildStaticBatches() {
 	for(auto& [model, insts] : staticModels_) {
 		if(!model->GetModelData() || !model->GetIsDrawEnable()) continue;
 
-		std::vector<WorldTransform>		visTf;
-		std::vector<GpuBillboardParams> visBb;
-		visTf.reserve(insts.size());
-		visBb.reserve(insts.size());
-
-		for(auto& inst : insts) {
-			if(!inst.visible) continue;
-			visTf.push_back(inst.tf);
-
-			GpuBillboardParams p{};
-			p.mode = static_cast<uint32_t>(inst.mode);
-			visBb.push_back(p);
-		}
-		if(visTf.empty()) continue;
-
 		PipelineKey key{PipelineTag::Object::Object3d, model->GetBlendMode()};
 		auto&		batch = staticBatches_[key];
 
-		if(auto* item = FindCompatibleStaticBatch(batch, model)) {
-			item->transforms.insert(item->transforms.end(), visTf.begin(), visTf.end());
-			item->billboards.insert(item->billboards.end(), visBb.begin(), visBb.end());
-			continue;
-		}
+		for(auto& inst : insts) {
+			if(!inst.visible) continue;
 
-		StaticBatchItem item;
-		item.model = model;
-		item.transforms.swap(visTf);
-		item.billboards.swap(visBb);
-		batch.emplace_back(std::move(item));
+			const bool cameraDitherEnabled = !inst.owner || inst.owner->IsCameraDitherEnabled();
+			auto* item = FindCompatibleStaticBatch(batch, model, cameraDitherEnabled);
+			if(!item) {
+				StaticBatchItem newItem;
+				newItem.model = model;
+				newItem.cameraDitherEnabled = cameraDitherEnabled;
+				batch.emplace_back(std::move(newItem));
+				item = &batch.back();
+			}
+
+			item->transforms.push_back(inst.tf);
+
+			GpuBillboardParams p{};
+			p.mode = static_cast<uint32_t>(inst.mode);
+			item->billboards.push_back(p);
+		}
 	}
 }
 
-ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model) {
+ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticBatch& batch, BaseModel* model, bool cameraDitherEnabled) {
 	if(!model || !model->GetModelData()) return nullptr;
 
 	for(auto& item : batch) {
 		BaseModel* base = item.model;
 		if(!base || !base->GetModelData()) continue;
+		if(item.cameraDitherEnabled != cameraDitherEnabled) continue;
 		if(base->GetModelData() != model->GetModelData()) continue;
 		if(base->GetTexSrv().ptr != model->GetTexSrv().ptr) continue;
 		if(base->GetEnvMapSrv().ptr != model->GetEnvMapSrv().ptr) continue;
@@ -318,20 +312,27 @@ void ModelRenderer::BuildSkinnedBatches() {
 	for(auto& [model, insts] : skinnedModels_) {
 		if(!model->GetModelData()) continue;
 
-		tempVisibleSkinned_.clear();
-		tempVisibleSkinned_.reserve(insts.size());
-
+		SkinnedBatchItem ditherOn;
+		ditherOn.model = model;
+		ditherOn.cameraDitherEnabled = true;
+		SkinnedBatchItem ditherOff;
+		ditherOff.model = model;
+		ditherOff.cameraDitherEnabled = false;
 		for(auto& inst : insts) {
 			if(inst.visible) {
-				tempVisibleSkinned_.push_back(inst.tf);
+				const bool cameraDitherEnabled = !inst.owner || inst.owner->IsCameraDitherEnabled();
+				(cameraDitherEnabled ? ditherOn.transforms : ditherOff.transforms).push_back(inst.tf);
 			}
 		}
-		if(tempVisibleSkinned_.empty()) continue;
 
 		PipelineKey key{PipelineTag::Object::SkinningObject3D, model->GetBlendMode()};
 		auto&		batch = skinnedBatches_[key];
-		batch.emplace_back(model, std::vector<WorldTransform>());
-		batch.back().second.swap(tempVisibleSkinned_);
+		if(!ditherOn.transforms.empty()) {
+			batch.emplace_back(std::move(ditherOn));
+		}
+		if(!ditherOff.transforms.empty()) {
+			batch.emplace_back(std::move(ditherOff));
+		}
 	}
 }
 
@@ -484,6 +485,8 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				const UINT need = static_cast<UINT>(item.billboards.size());
 				if(need == 0) continue;
 				CX_CHECK(item.transforms.size() == item.billboards.size(), "Assertion failed");
+				const uint32_t objectDitherEnabled = item.cameraDitherEnabled ? 1u : 0u;
+				cmdList->SetGraphicsRoot32BitConstants(13, 1, &objectDitherEnabled, 0);
 
 				model->EnsureBillboardCapacity(device, need);
 				model->UploadBillboardParams(item.billboards);
@@ -555,7 +558,9 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				usingGeneratedPipeline = false;
 			}
 
-			for(auto& [model, visible] : batch) {
+			for(auto& item : batch) {
+				auto* model = item.model;
+				auto& visible = item.transforms;
 				if(!model || visible.empty()) continue;
 
 				if(model->UsesRuntimeMaterialGraph()) {
@@ -608,6 +613,8 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				}
 
 				const UINT need = static_cast<UINT>(visible.size());
+				const uint32_t objectDitherEnabled = item.cameraDitherEnabled ? 1u : 0u;
+				cmdList->SetGraphicsRoot32BitConstants(13, 1, &objectDitherEnabled, 0);
 				model->EnsureInstanceCapacity(device, need);
 				model->UploadInstanceMatrices(visible);
 				cmdList->SetGraphicsRootDescriptorTable(1, model->GetInstanceSrv());
