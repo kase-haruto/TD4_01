@@ -3,6 +3,7 @@
 /*  include space
 /* ===================================================================== */
 #include <Engine/Foundation/Math/Vector4.h>
+#include <Engine/Foundation/Utility/Guid/Guid.h>
 #include <externals/nlohmann/json.hpp>
 #include <cstdint>
 #include <string>
@@ -32,6 +33,10 @@ struct MaterialConfig final{
 	float toonSpecularIntensity = 0.35f;
 	CalyxEngine::Vector4 emissiveColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	float emissiveIntensity = 0.0f;
+	bool useNormalMap = false;
+	float normalMapStrength = 1.0f;
+	bool normalMapFlipY = false;
+	Guid normalMapGuid;
 };
 
 inline void to_json(nlohmann::json& j, const MaterialConfig& c) {
@@ -59,7 +64,11 @@ inline void to_json(nlohmann::json& j, const MaterialConfig& c) {
 		{"toonSpecularSoftness", c.toonSpecularSoftness},
 		{"toonSpecularIntensity", c.toonSpecularIntensity},
 		{"emissiveColor", c.emissiveColor},
-		{"emissiveIntensity", c.emissiveIntensity}
+		{"emissiveIntensity", c.emissiveIntensity},
+		{"useNormalMap", c.useNormalMap},
+		{"normalMapStrength", c.normalMapStrength},
+		{"normalMapFlipY", c.normalMapFlipY},
+		{"normalMapGuid", c.normalMapGuid}
 	};
 }
 
@@ -92,4 +101,8 @@ inline void from_json(const nlohmann::json& j, MaterialConfig& c) {
 	if(j.contains("toonSpecularIntensity")) j.at("toonSpecularIntensity").get_to(c.toonSpecularIntensity);
 	if(j.contains("emissiveColor")) j.at("emissiveColor").get_to(c.emissiveColor);
 	if(j.contains("emissiveIntensity")) j.at("emissiveIntensity").get_to(c.emissiveIntensity);
+	if(j.contains("useNormalMap")) j.at("useNormalMap").get_to(c.useNormalMap);
+	if(j.contains("normalMapStrength")) j.at("normalMapStrength").get_to(c.normalMapStrength);
+	if(j.contains("normalMapFlipY")) j.at("normalMapFlipY").get_to(c.normalMapFlipY);
+	if(j.contains("normalMapGuid")) j.at("normalMapGuid").get_to(c.normalMapGuid);
 }

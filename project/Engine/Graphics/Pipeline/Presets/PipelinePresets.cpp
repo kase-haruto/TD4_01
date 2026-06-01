@@ -56,6 +56,7 @@ GraphicsPipelineDesc PipelinePresets::MakeObject3D(BlendMode mode) {
 		.CBV(5, D3D12_SHADER_VISIBILITY_PIXEL)											 // shadow 11
 		.SRVTable(9, 8, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [12] Material graph textures t9-t16
 		.Constants(6, 1, D3D12_SHADER_VISIBILITY_PIXEL)									 // [13] ObjectDrawConstants b6
+		.SRVTable(4, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [14] NormalMap t4
 
 		.SamplerWrapLinear(0);
 
@@ -166,6 +167,7 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 		.CBV(5, D3D12_SHADER_VISIBILITY_PIXEL)											 // shadow 11
 		.SRVTable(9, 8, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [12] Material graph textures t9-t16
 		.Constants(6, 1, D3D12_SHADER_VISIBILITY_PIXEL)									 // [13] ObjectDrawConstants b6
+		.SRVTable(4, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)	 // [14] NormalMap t4
 
 		.SamplerWrapLinear(0);
 

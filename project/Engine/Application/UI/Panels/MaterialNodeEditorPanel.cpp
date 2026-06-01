@@ -1486,6 +1486,8 @@ namespace CalyxEngine {
 		node.inputs.push_back({material.graph.AllocateId(), "Spec Threshold", NodePinKind::Input, NodeValueType::Float});
 		node.inputs.push_back({material.graph.AllocateId(), "Spec Softness", NodePinKind::Input, NodeValueType::Float});
 		node.inputs.push_back({material.graph.AllocateId(), "Spec Intensity", NodePinKind::Input, NodeValueType::Float});
+		node.inputs.push_back({material.graph.AllocateId(), "Normal Map", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Normal Strength", NodePinKind::Input, NodeValueType::Float});
 		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
 		material.graph.nodes.push_back(std::move(node));
 	}
@@ -1507,6 +1509,8 @@ namespace CalyxEngine {
 		node.inputs.push_back({material.graph.AllocateId(), "Shininess", NodePinKind::Input, NodeValueType::Float});
 		node.inputs.push_back({material.graph.AllocateId(), "Roughness", NodePinKind::Input, NodeValueType::Float});
 		node.inputs.push_back({material.graph.AllocateId(), "Reflect", NodePinKind::Input, NodeValueType::Bool});
+		node.inputs.push_back({material.graph.AllocateId(), "Normal Map", NodePinKind::Input, NodeValueType::Color});
+		node.inputs.push_back({material.graph.AllocateId(), "Normal Strength", NodePinKind::Input, NodeValueType::Float});
 		node.outputs.push_back({material.graph.AllocateId(), "Surface", NodePinKind::Output, NodeValueType::Material});
 		material.graph.nodes.push_back(std::move(node));
 	}
@@ -2071,6 +2075,9 @@ namespace CalyxEngine {
 		data.toonSpecularIntensity = material.toonSpecularIntensity;
 		data.emissiveColor = material.emissiveColor;
 		data.emissiveIntensity = material.emissiveIntensity;
+		data.useNormalMap = material.useNormalMap ? 1 : 0;
+		data.normalMapStrength = material.normalMapStrength;
+		data.normalMapFlipY = material.normalMapFlipY ? 1 : 0;
 		data.uvTransform = material.uvTransform;
 		data.pad3 = ClockManager::GetInstance()->GetTotalTime();
 		return data;

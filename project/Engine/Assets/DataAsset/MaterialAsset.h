@@ -43,6 +43,10 @@ namespace CalyxEngine {
 		Vector4 emissiveColor = {0.0f, 0.0f, 0.0f, 1.0f};
 		float   emissiveIntensity = 0.0f;
 		Guid    objectTextureGuid;
+		Guid    normalMapGuid;
+		bool    useNormalMap = false;
+		float   normalMapStrength = 1.0f;
+		bool    normalMapFlipY = false;
 		Matrix4x4 uvTransform = Matrix4x4::MakeIdentity();
 		NodeGraph graph;
 

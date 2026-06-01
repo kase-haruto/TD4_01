@@ -7,15 +7,18 @@
       1.0
     ],
     "emissiveColor": [
-      1.0,
-      0.4941176474094391,
-      0.01568627543747425,
+      0.0,
+      0.0,
+      0.0,
       1.0
     ],
-    "emissiveIntensity": 1.2400000095367432,
+    "emissiveIntensity": 0.0,
     "envirometCoefficient": 0.5,
     "isReflect": false,
     "lightingMode": 0,
+    "normalMapFlipY": false,
+    "normalMapGuid": "00000000-0000-0000-0000-000000000000",
+    "normalMapStrength": 1.6799999475479126,
     "objectTextureGuid": "00000000-0000-0000-0000-000000000000",
     "roughness": 0.5,
     "shininess": 20.0,
@@ -53,37 +56,43 @@
     "toonSpecularThreshold": 0.9599999785423279,
     "toonThreshold1": -0.15000000596046448,
     "toonThreshold2": 0.25,
-    "toonThreshold3": 0.8199999928474426
+    "toonThreshold3": 0.8199999928474426,
+    "useNormalMap": false
   },
   "graph": {
     "links": [
       {
-        "fromPinId": 37,
+        "fromPinId": 26,
+        "id": 32,
+        "toPinId": 28
+      },
+      {
+        "fromPinId": 35,
         "id": 43,
         "toPinId": 39
       },
       {
         "fromPinId": 41,
-        "id": 63,
-        "toPinId": 56
+        "id": 62,
+        "toPinId": 59
       },
       {
         "fromPinId": 46,
-        "id": 69,
-        "toPinId": 57
+        "id": 63,
+        "toPinId": 60
       },
       {
-        "fromPinId": 49,
-        "id": 70,
-        "toPinId": 58
+        "fromPinId": 30,
+        "id": 64,
+        "toPinId": 53
       },
       {
-        "fromPinId": 62,
-        "id": 71,
+        "fromPinId": 61,
+        "id": 68,
         "toPinId": 2
       }
     ],
-    "nextId": 75,
+    "nextId": 69,
     "nodes": [
       {
         "boolValue": false,
@@ -106,8 +115,8 @@
         "intValue": 0,
         "outputs": [],
         "position": [
-          1183.0,
-          -100.0
+          1298.0,
+          128.0
         ],
         "properties": {},
         "title": "Output",
@@ -122,24 +131,103 @@
           1.0
         ],
         "floatValue": 0.0,
-        "id": 36,
+        "id": 25,
         "inputs": [],
         "intValue": 0,
         "outputs": [
           {
-            "id": 37,
+            "id": 26,
             "kind": 1,
             "name": "Texture",
             "valueType": 6
           }
         ],
         "position": [
-          138.0,
-          -243.0
+          282.0,
+          143.0
+        ],
+        "properties": {
+          "textureGuid": "bfdc462d-81f1-4c5f-95ee-bb3ee3fc53e1"
+        },
+        "title": "Texture2D",
+        "type": "Texture2D"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 27,
+        "inputs": [
+          {
+            "id": 28,
+            "kind": 0,
+            "name": "Texture",
+            "valueType": 6
+          },
+          {
+            "id": 29,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 30,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          },
+          {
+            "id": 31,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          584.0,
+          145.0
         ],
         "properties": {},
-        "title": "Object Texture",
-        "type": "ObjectTexture"
+        "title": "Texture Sample",
+        "type": "TextureSample"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 34,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 35,
+            "kind": 1,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "position": [
+          189.0,
+          650.0
+        ],
+        "properties": {
+          "textureGuid": "633fbfad-7c49-4822-ac05-9fb50a055c9c"
+        },
+        "title": "Texture2D",
+        "type": "Texture2D"
       },
       {
         "boolValue": false,
@@ -181,8 +269,8 @@
           }
         ],
         "position": [
-          370.0,
-          -233.0
+          520.0,
+          636.0
         ],
         "properties": {},
         "title": "Texture Sample",
@@ -192,11 +280,11 @@
         "boolValue": false,
         "colorValue": [
           1.0,
-          0.4941176474094391,
-          0.01568627543747425,
+          1.0,
+          1.0,
           1.0
         ],
-        "floatValue": 0.0,
+        "floatValue": 1.6799999475479126,
         "id": 45,
         "inputs": [],
         "intValue": 0,
@@ -204,44 +292,16 @@
           {
             "id": 46,
             "kind": 1,
-            "name": "Color",
-            "valueType": 2
-          }
-        ],
-        "position": [
-          385.0,
-          39.0
-        ],
-        "properties": {},
-        "title": "Emissive Color",
-        "type": "Color"
-      },
-      {
-        "boolValue": false,
-        "colorValue": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "floatValue": 1.2400000095367432,
-        "id": 48,
-        "inputs": [],
-        "intValue": 0,
-        "outputs": [
-          {
-            "id": 49,
-            "kind": 1,
             "name": "Value",
             "valueType": 1
           }
         ],
         "position": [
-          384.0,
-          167.0
+          432.0,
+          903.0
         ],
         "properties": {},
-        "title": "Emissive Intensity",
+        "title": "Float",
         "type": "Float"
       },
       {
@@ -253,66 +313,78 @@
           1.0
         ],
         "floatValue": 0.0,
-        "id": 55,
+        "id": 52,
         "inputs": [
           {
-            "id": 56,
+            "id": 53,
             "kind": 0,
             "name": "Base Color",
             "valueType": 2
           },
           {
-            "id": 57,
+            "id": 54,
             "kind": 0,
             "name": "Emissive",
             "valueType": 2
           },
           {
-            "id": 58,
+            "id": 55,
             "kind": 0,
             "name": "Emissive Intensity",
             "valueType": 1
           },
           {
-            "id": 59,
+            "id": 56,
             "kind": 0,
             "name": "Shininess",
             "valueType": 1
           },
           {
-            "id": 60,
+            "id": 57,
             "kind": 0,
             "name": "Roughness",
             "valueType": 1
           },
           {
-            "id": 61,
+            "id": 58,
             "kind": 0,
             "name": "Reflect",
             "valueType": 3
+          },
+          {
+            "id": 59,
+            "kind": 0,
+            "name": "Normal Map",
+            "valueType": 2
+          },
+          {
+            "id": 60,
+            "kind": 0,
+            "name": "Normal Strength",
+            "valueType": 1
           }
         ],
         "intValue": 0,
         "outputs": [
           {
-            "id": 62,
+            "id": 61,
             "kind": 1,
             "name": "Surface",
             "valueType": 5
           }
         ],
         "position": [
-          759.0,
-          -139.0
+          857.0,
+          380.0
         ],
         "properties": {
           "emissiveColor": [
-            1.0,
-            1.0,
-            1.0,
+            0.0,
+            0.0,
+            0.0,
             1.0
           ],
-          "emissiveIntensity": 2.5299999713897705,
+          "emissiveIntensity": 0.0,
           "lightingMode": 0.0,
           "roughness": 0.5,
           "shininess": 20.0
@@ -322,7 +394,7 @@
       }
     ]
   },
-  "guid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
-  "name": "EmissivMaterial",
+  "guid": "e8c0b3fe-57e0-46ac-a19e-f076814ef683",
+  "name": "groundMaterial",
   "type": "MaterialAsset"
 }
