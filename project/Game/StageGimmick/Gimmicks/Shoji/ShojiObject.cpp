@@ -11,7 +11,6 @@ ShojiObject::ShojiObject(
 	std::optional<std::string> objectName)
 	: StageGimmickObjectBase(modelName, objectName) {
 
-	worldTransform_.translation.y += 1.5f;
 	worldTransform_.translation.z += 5.0f;
 }
 

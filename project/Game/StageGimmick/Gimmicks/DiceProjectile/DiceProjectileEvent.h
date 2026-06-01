@@ -4,6 +4,7 @@
 #include "Game\StageGimmick\Gimmicks\DiceProjectile\DiceSocketObject.h"
 #include "Game\StageGimmick\Gimmicks\DiceProjectile\DiceProjectileObject.h"
 #include "Game\StageGimmick\Gimmicks\BellProjectile\BellProjectileDoor.h"
+#include "Game\StageGimmick\Base\GeneralObject.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
@@ -118,6 +119,10 @@ private:
 	Guid							  doorLGuid_;
 	std::weak_ptr<BellProjectileDoor> doorR_;
 	Guid							  doorRGuid_;
+
+	// 建物
+	std::weak_ptr<GeneralObject> gate_;
+	Guid						 gateGuid_;
 
 	// パラメータ
 	DiceProjectileEventParam eventParam_;

@@ -87,6 +87,7 @@ namespace CalyxEngine {
 	}
 
 	struct EmitterConfig {
+		Vector3 offset;
 		CalyxEngine::Vector3 position{};
 		CalyxEngine::Quaternion rotation = CalyxEngine::Quaternion::MakeIdentity();
 		CalyxEngine::Vector3 worldScale{1.0f, 1.0f, 1.0f};
@@ -139,6 +140,7 @@ namespace CalyxEngine {
 	};
 
 	inline void EmitterConfig::FromJson(const nlohmann::json& j) {
+		offset = j.value("offset", Vector3(0.0f,0.0f,0.0f));
 		position	   = j.value("position", CalyxEngine::Vector3{0, 0, 0});
 		rotation	   = j.value("rotation", j.value("worldRotation", CalyxEngine::Quaternion::MakeIdentity()));
 		worldScale	   = j.value("worldScale", CalyxEngine::Vector3{1.0f, 1.0f, 1.0f});
@@ -205,6 +207,7 @@ namespace CalyxEngine {
 
 	inline nlohmann::json EmitterConfig::ToJson() const {
 		nlohmann::json j;
+		j["offset"]			= offset;
 		j["position"]		= position;
 		j["rotation"]		= rotation;
 		j["worldScale"]		= worldScale;

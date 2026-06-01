@@ -24,6 +24,7 @@ public:
 	// クリア時のクラッカーまでの時間
 	void SetCrackerInterval(float time) { crackerInterval_ = time; }
 	void SetCrackerPos(const CalyxEngine::Vector3& pos) { crackerPos_ = pos; }
+	const bool GetIsCracker() const { return isCracker_; }
 	// クリアの数をセット
 	void SetClearCount(uint32_t count) { clearCount_ = count; }
 	// 収納箱の数を加算する

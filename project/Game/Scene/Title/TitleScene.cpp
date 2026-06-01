@@ -41,7 +41,7 @@ void TitleScene::Initialize() {
 
 	BaseScene::Initialize();
 
-	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/Title.scene");
+	SceneSerializer::Load(*sceneContext_, "Resources/Assets/Scenes/TitleScene.scene");
 
 	LoadAssets();
 

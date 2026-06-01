@@ -286,16 +286,6 @@ void TransitionControl::SetAutoPreset(SceneType now, SceneType next) {
 		InitAnim();
 		SetPresetUpDownSlide();
 	}
-	// テスト（ゲーム)からセレクトへは観音開き
-	else if(now == SceneType::TEST && next == SceneType::SELECT) {
-		isDrawPlate2_ = true;
-		SetPresetSplit();
-	}
-	// テスト（ゲーム)からタイトルへは観音開き
-	else if(now == SceneType::TEST && next == SceneType::TITLE) {
-		isDrawPlate2_ = true;
-		SetPresetSplit();
-	}
 	// ゲームオーバーやクリアへの遷移はフェード
 	else if(next == SceneType::GAMEOVER || next == SceneType::CLEAR) {
 		SetPresetFade();
@@ -321,7 +311,6 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 	plate1_->SetRotation(0.0f);
 	plate2_->SetRotation(0.0f);
 	float w		= static_cast<float>(kWindowWidth);
-	float halfW = w * 0.5f;
 	float h		= static_cast<float>(kWindowHeight);
 	//float halfH = h * 0.5f;
 	// タイトルからセレクトに来た時はスライドで開ける
@@ -344,30 +333,6 @@ void TransitionControl::SetAutoPresetFromPrevious(SceneType prev, SceneType now)
 		plate3_->SetPosition({kPosXEven, yD - disY * 2});
 		plate4_->SetPosition({kPosXOdd, yD - disY * 3});
 		SetPresetUpDownSlide();
-	}
-	// ゲームからセレクトに来た時は観音開きで開ける
-	else if(prev == SceneType::TEST && now == SceneType::SELECT) {
-		isDrawPlate2_ = true;
-		plate1_->SetScale({halfW, h});
-		plate2_->SetScale({halfW, h});
-
-		float offset = 0.0f;
-		offset = halfW;
-		plate1_->SetPosition({0.0f, 0});
-		plate2_->SetPosition({halfW, 0});
-		SetPresetSplit();
-	}
-	// ゲームからタイトルに来た時は観音開きで開ける
-	else if(prev == SceneType::TEST && now == SceneType::TITLE) {
-		isDrawPlate2_ = true;
-		plate1_->SetScale({halfW, h});
-		plate2_->SetScale({halfW, h});
-
-		float offset = 0.0f;
-		offset		 = halfW;
-		plate1_->SetPosition({0.0f, 0});
-		plate2_->SetPosition({halfW, 0});
-		SetPresetSplit();
 	}
 	// その他、フェードで開ける
 	else {

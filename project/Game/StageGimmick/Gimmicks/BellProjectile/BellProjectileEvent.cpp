@@ -41,7 +41,7 @@ void BellProjectileEvent::EventInitialize() {
 		newTarget->SetParent(shared_from_this(), false);
 		newTarget->SetParam(eventParam_.targetParam_);
 		newTarget->Initialize();
-		newTarget->SetTranslate({0.0f, 8.5f, 30.0f});
+		newTarget->SetTranslate({0.0f, 4.5f, 30.0f});
 		bell_ = newTarget;
 		bellGuid_ = newTarget->GetGuid();
 	}
@@ -93,7 +93,7 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({-12.0f, 0.0f, 40.0f});
+		newDoor->SetTranslate({-6.2f, 0.0f, 36.0f});
 		doorL_	  = newDoor;
 		doorLGuid_ = newDoor->GetGuid();
 	}
@@ -124,7 +124,7 @@ void BellProjectileEvent::EventInitialize() {
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->SetTarget(bell_.lock().get());
 		newDoor->Initialize();
-		newDoor->SetTranslate({12.0f, 0.0f, 40.0f});
+		newDoor->SetTranslate({6.2f, 0.0f, 36.0f});
 		doorR_	  = newDoor;
 		doorRGuid_ = newDoor->GetGuid();
 	}
@@ -142,7 +142,7 @@ void BellProjectileEvent::EventInitialize() {
 		auto newGate = SceneAPI::Instantiate<GeneralObject>("sanmon.obj", gateName);
 		newGate->SetParent(shared_from_this(), false);
 		newGate->Initialize();
-		newGate->SetScale({1.95f, 2.0f, 2.25f});
+		newGate->SetScale({1.0f, 1.0f, 1.0f});
 		newGate->SetTranslate({0.0f, 0.0f, 32.5f});
 		gate_	  = newGate;
 		gateGuid_	  = newGate->GetGuid();
