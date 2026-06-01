@@ -175,7 +175,7 @@ void BaseGameObject::ShowGui() {
 
 	// --- 描画設定 ---
 	if(GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::Object)) {
-		if(ImGui::TreeNodeEx("Draw Config", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+		if(ImGui::TreeNodeEx("Draw Config", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 			GuiCmd::CheckBox("Camera Dither", drawConfig_.cameraDitherEnabled);
 			GuiCmd::CheckBox("Cast Shadow", drawConfig_.castShadow);
 			GuiCmd::CheckBox("Enable Outline", drawConfig_.outline.enabled);
@@ -183,7 +183,7 @@ void BaseGameObject::ShowGui() {
 			ImGui::ColorEdit4("Outline Color", &drawConfig_.outline.color.x);
 			ImGui::TreePop();
 		}
-		if(ImGui::TreeNodeEx("Billboard Mode", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+		if(ImGui::TreeNodeEx("Billboard Mode", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 			int			mode	= static_cast<int>(billboardMode_);
 			const char* items[] = {"None", "Full", "AxisY"};
 			if(GuiCmd::Combo("Billboard Mode", mode, items, 3)) {

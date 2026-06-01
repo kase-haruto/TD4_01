@@ -120,12 +120,12 @@ void Material::ShowImGui(MaterialConfig& config) {
     static int currentLightingMode_ = 0;
 
     // color
-    if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_SpanAvailWidth)) {
         GuiCmd::ColorEdit4("color", config.color);
         ImGui::TreePop();
     }
 
-    if (config.enableLighting == 2 && ImGui::TreeNodeEx("Toon", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (config.enableLighting == 2 && ImGui::TreeNodeEx("Toon", ImGuiTreeNodeFlags_SpanAvailWidth)) {
         GuiCmd::ColorEdit4("highlight", config.toonHighlightColor);
         GuiCmd::ColorEdit4("base ramp", config.toonBaseColor);
         GuiCmd::ColorEdit4("mid shadow", config.toonMidShadowColor);
@@ -141,7 +141,7 @@ void Material::ShowImGui(MaterialConfig& config) {
     }
 
     // lighting
-    if (ImGui::TreeNodeEx("Lighting", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::TreeNodeEx("Lighting", ImGuiTreeNodeFlags_SpanAvailWidth)) {
         GuiCmd::DragFloat("shininess", config.shininess, 0.01f);
 
         static constexpr const char* lightingModes[] = {
@@ -172,7 +172,7 @@ void Material::ShowImGui(MaterialConfig& config) {
     }
 
     // 環境マップ
-    if (ImGui::TreeNodeEx("EnviromentCoefficient", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen)) {
+    if (ImGui::TreeNodeEx("EnviromentCoefficient", ImGuiTreeNodeFlags_SpanAvailWidth)) {
         GuiCmd::CheckBox("isReflect", config.isReflect);
         if (config.isReflect) {
             GuiCmd::SliderFloat("enviromentCoefficient", config.enviromentCoefficient, 0.0f, 1.0f);
