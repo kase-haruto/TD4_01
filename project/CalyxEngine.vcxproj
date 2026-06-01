@@ -479,6 +479,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\ShojiEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\ShojiObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\Shoji\ShojiPaperObject.cpp" />
+    <ClCompile Include="Game\StageGimmick\Tutorial\TutorialEvent.cpp" />
     <ClCompile Include="Game\Stage\Stage.cpp" />
     <ClCompile Include="main.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</MultiProcessorCompilation>
@@ -920,6 +921,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\StageGimmick\Parameters\StageGimmickParam.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.h" />
     <ClInclude Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h" />
+    <ClInclude Include="Game\StageGimmick\Tutorial\TutorialEvent.h" />
     <ClInclude Include="Game\Stage\Stage.h" />
     <ClInclude Include="Game\StageGimmick\Prediction\PredictionCircle.h" />
     <ClInclude Include="Resources\shaders\CRT.PS.hlsl">
