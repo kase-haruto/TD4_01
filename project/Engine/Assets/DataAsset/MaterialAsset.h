@@ -40,6 +40,8 @@ namespace CalyxEngine {
 		float   toonSpecularThreshold = 0.96f;
 		float   toonSpecularSoftness = 0.02f;
 		float   toonSpecularIntensity = 0.35f;
+		Vector4 emissiveColor = {0.0f, 0.0f, 0.0f, 1.0f};
+		float   emissiveIntensity = 0.0f;
 		Guid    objectTextureGuid;
 		Matrix4x4 uvTransform = Matrix4x4::MakeIdentity();
 		NodeGraph graph;

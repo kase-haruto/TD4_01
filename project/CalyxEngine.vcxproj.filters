@@ -253,6 +253,9 @@
     <Filter Include="Engine\PostProcess\Blur">
       <UniqueIdentifier>{450B20C8-3928-43C3-9D16-CAFDDE88BE86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\PostProcess\Bloom">
+      <UniqueIdentifier>{30CC4247-BBA8-4F04-A883-D5F239E6D6E4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\PostProcess\CRT">
       <UniqueIdentifier>{9A8B1330-0F12-4D93-B6C1-6C489A2F5D44}</UniqueIdentifier>
     </Filter>
@@ -996,6 +999,9 @@
     <ClCompile Include="Engine\PostProcess\Blend\BlendEffect.cpp">
       <Filter>Engine\PostProcess</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\PostProcess\Bloom\BloomEffect.cpp">
+      <Filter>Engine\PostProcess\Bloom</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\PostProcess\Manager\PostEffectManager.cpp">
       <Filter>Engine\PostProcess\Manager</Filter>
     </ClCompile>
@@ -1722,6 +1728,9 @@
     </ClInclude>
     <ClInclude Include="Engine\PostProcess\Blend\BlendEffect.h">
       <Filter>Engine\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\PostProcess\Bloom\BloomEffect.h">
+      <Filter>Engine\PostProcess\Bloom</Filter>
     </ClInclude>
     <ClInclude Include="Engine\PostProcess\Manager\PostEffectManager.h">
       <Filter>Engine\PostProcess\Manager</Filter>

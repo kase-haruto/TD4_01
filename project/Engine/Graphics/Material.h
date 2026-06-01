@@ -39,6 +39,9 @@ struct Material {
 	float     toonSpecularSoftness = 0.02f;
 	float     toonSpecularIntensity = 0.35f;
 	float     pad3 = 0.0f;
+	CalyxEngine::Vector4 emissiveColor = {0.0f, 0.0f, 0.0f, 1.0f};
+	float     emissiveIntensity = 0.0f;
+	float     emissivePadding[3] = {};
 
 	//config
 	void           ApplyConfig(const MaterialConfig& config);

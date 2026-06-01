@@ -9,6 +9,7 @@
 #include <Engine/Graphics/Device/DxCore.h>
 #include <Engine/Graphics/Pipeline/BlendMode/BlendMode.h>
 #include <Engine/Graphics/RenderTarget/Collection/RenderTargetCollection.h>
+#include <Engine/Graphics/RenderTarget/OffscreenRT/OffscreenRenderTarget.h>
 #include <Engine/Objects/3D/Actor/BaseGameObject.h>
 #include <Engine/Objects/Event/BaseEventObject.h>
 #include <Engine/Renderer/Grid/GridRenderer.h>

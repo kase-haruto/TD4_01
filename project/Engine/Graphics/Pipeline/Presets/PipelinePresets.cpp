@@ -19,8 +19,9 @@ GraphicsPipelineDesc PipelinePresets::MakeObject3D(BlendMode mode) {
 			.CullBack()
 			.DepthEnable(true)
 			.DepthFunc(D3D12_COMPARISON_FUNC_LESS_EQUAL)
-			.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
 			.Samples(1);
+		// MRT: RT0 = SceneColor, RT1 = EmissiveBloomMask
+		desc.rtvFormats_ = {DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT};
 	} else {
 		D3D12_DEPTH_STENCIL_DESC depthDesc = {};
 		depthDesc.DepthEnable = TRUE;
@@ -34,8 +35,9 @@ GraphicsPipelineDesc PipelinePresets::MakeObject3D(BlendMode mode) {
 			.Blend(mode)
 			.CullBack()
 			.DepthState(depthDesc)
-			.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
 			.Samples(1);
+		// MRT: RT0 = SceneColor, RT1 = EmissiveBloomMask
+		desc.rtvFormats_ = {DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT};
 	}
 
 	desc.root_
@@ -127,8 +129,9 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 			.CullBack()
 			.DepthEnable(true)
 			.DepthFunc(D3D12_COMPARISON_FUNC_LESS_EQUAL)
-			.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
 			.Samples(1);
+		// MRT: RT0 = SceneColor, RT1 = EmissiveBloomMask
+		desc.rtvFormats_ = {DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT};
 	} else {
 		D3D12_DEPTH_STENCIL_DESC depthDesc = {};
 		depthDesc.DepthEnable = TRUE;
@@ -142,8 +145,9 @@ GraphicsPipelineDesc PipelinePresets::MakeSkinningObject3D(BlendMode mode) {
 			.Blend(mode)
 			.CullBack()
 			.DepthState(depthDesc)
-			.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
 			.Samples(1);
+		// MRT: RT0 = SceneColor, RT1 = EmissiveBloomMask
+		desc.rtvFormats_ = {DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT};
 	}
 
 	desc.root_
@@ -857,6 +861,30 @@ GraphicsPipelineDesc PipelinePresets::MakeBlend() {
 		.AllowIA()
 		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
 		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
+		.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL)
+		.SampleClampLinear(0);
+	return desc;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//		Bloom
+/////////////////////////////////////////////////////////////////////////////////////////
+GraphicsPipelineDesc PipelinePresets::MakeBloom() {
+	GraphicsPipelineDesc desc;
+	desc.VS(L"CopyImage.VS.hlsl")
+		.PS(L"Bloom.PS.hlsl")
+		.BlendNone()
+		.CullNone()
+		.DepthEnable(false)
+		.RTV(DXGI_FORMAT_R8G8B8A8_UNORM)
+		.Samples(1);
+
+	desc.inputElems_.clear();
+
+	desc.root_
+		.AllowIA()
+		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL) // t0
+		.SRVTable(1, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL) // t1
 		.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL)
 		.SampleClampLinear(0);
 	return desc;

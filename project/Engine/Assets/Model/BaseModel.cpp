@@ -662,6 +662,8 @@ void BaseModel::TransferMaterial() {
 		data.toonSpecularThreshold = ma->toonSpecularThreshold;
 		data.toonSpecularSoftness = ma->toonSpecularSoftness;
 		data.toonSpecularIntensity = ma->toonSpecularIntensity;
+		data.emissiveColor = ma->emissiveColor;
+		data.emissiveIntensity = ma->emissiveIntensity;
 	} else {
 		// Default fallback
 		data.color = {1, 1, 1, 1};

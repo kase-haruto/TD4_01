@@ -25,6 +25,8 @@ void Material::ApplyConfig(const MaterialConfig& config) {
     toonSpecularThreshold = config.toonSpecularThreshold;
     toonSpecularSoftness  = config.toonSpecularSoftness;
     toonSpecularIntensity = config.toonSpecularIntensity;
+    emissiveColor         = config.emissiveColor;
+    emissiveIntensity     = config.emissiveIntensity;
 
 }
 
@@ -51,6 +53,8 @@ MaterialConfig Material::ExtractConfig() const {
     config.toonSpecularThreshold = toonSpecularThreshold;
     config.toonSpecularSoftness  = toonSpecularSoftness;
     config.toonSpecularIntensity = toonSpecularIntensity;
+    config.emissiveColor         = emissiveColor;
+    config.emissiveIntensity     = emissiveIntensity;
 	return config;
 }
 
@@ -89,6 +93,10 @@ void Material::ShowImGui() {
     ImGui::SeparatorText("Color");
     GuiCmd::ColorEdit4("color", color);
 
+    ImGui::SeparatorText("Emissive");
+    GuiCmd::ColorEdit4("emissive color", emissiveColor);
+    GuiCmd::SliderFloat("emissive intensity", emissiveIntensity, 0.0f, 20.0f);
+
     if (lightingMode == 2) {
         ImGui::SeparatorText("Toon");
         GuiCmd::ColorEdit4("highlight", toonHighlightColor);
@@ -122,6 +130,12 @@ void Material::ShowImGui(MaterialConfig& config) {
     // color
     if (ImGui::TreeNodeEx("Color", ImGuiTreeNodeFlags_SpanAvailWidth)) {
         GuiCmd::ColorEdit4("color", config.color);
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNodeEx("Emissive", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+        GuiCmd::ColorEdit4("emissive color", config.emissiveColor);
+        GuiCmd::SliderFloat("emissive intensity", config.emissiveIntensity, 0.0f, 20.0f);
         ImGui::TreePop();
     }
 

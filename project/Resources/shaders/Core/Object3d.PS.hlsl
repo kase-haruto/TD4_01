@@ -25,6 +25,9 @@ struct Material {
     float toonSpecularSoftness;
     float toonSpecularIntensity;
     float pad3;
+    float4 emissiveColor;
+    float emissiveIntensity;
+    float3 emissivePadding;
 };
 
 struct DirectionalLight {
@@ -79,7 +82,7 @@ Texture2D<float>    gShadowMap      : register(t2); // unused
 RaytracingAccelerationStructure gRtScene : register(t3);
 Texture2D<float4>   gTexture        : register(t0);
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////j/////
 //                            samplers
 ///////////////////////////////////////////////////////////////////////////////
 SamplerState gSampler : register(s0);
@@ -88,7 +91,8 @@ SamplerState gSampler : register(s0);
 //                            出力
 ///////////////////////////////////////////////////////////////////////////////
 struct PixelShaderOutput {
-    float4 color : SV_TARGET0;
+    float4 color     : SV_TARGET0;
+    float4 bloomMask : SV_TARGET1; // Emissive bloom mask (MRT RT1)
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -316,7 +320,9 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     if(gMaterial.enableLighting == 4) {
         if(alpha <= 0.01f) discard;
-        output.color = float4(albedo, alpha);
+        float3 emissive = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
+        output.color     = float4(ApplyToneMappingAndGamma(albedo, 1.0f) + emissive, alpha);
+        output.bloomMask = float4(emissive, 1.0f);
         return output;
     }
 
@@ -370,6 +376,9 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     float3 finalColor = ApplyToneMappingAndGamma(litColor, 1.0f);
 
+    // トーンマッピング後にEmissiveを加算し、閾値越えのHDR値として出力させる
+    finalColor += gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
+
 	// ---- ディザ抜き (Dithered Clipping) ----
 	uint2 pixelPos = uint2(input.position.xy) % 4;
 	float ditherThreshold = kBayerMatrix[pixelPos.y][pixelPos.x];
@@ -387,6 +396,8 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     if(alpha <= 0.01f) discard;
 
-    output.color = float4(finalColor, alpha);
+    float3 emissiveOut = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
+    output.color     = float4(finalColor, alpha);
+    output.bloomMask = float4(emissiveOut, 1.0f);
     return output;
 }
