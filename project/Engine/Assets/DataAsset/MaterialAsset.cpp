@@ -33,6 +33,10 @@ namespace CalyxEngine {
 		AddField("emissiveColor", emissiveColor);
 		AddField("emissiveIntensity", emissiveIntensity);
 		AddField("objectTextureGuid", objectTextureGuid);
+		AddField("normalMapGuid", normalMapGuid);
+		AddField("useNormalMap", useNormalMap);
+		AddField("normalMapStrength", normalMapStrength);
+		AddField("normalMapFlipY", normalMapFlipY);
 		// uvTransform のシリアライズは必要に応じて追加
 	}
 

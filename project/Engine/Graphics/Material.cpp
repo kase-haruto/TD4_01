@@ -27,6 +27,9 @@ void Material::ApplyConfig(const MaterialConfig& config) {
     toonSpecularIntensity = config.toonSpecularIntensity;
     emissiveColor         = config.emissiveColor;
     emissiveIntensity     = config.emissiveIntensity;
+	useNormalMap          = config.useNormalMap ? 1 : 0;
+	normalMapStrength     = config.normalMapStrength;
+	normalMapFlipY        = config.normalMapFlipY ? 1 : 0;
 
 }
 
@@ -55,6 +58,9 @@ MaterialConfig Material::ExtractConfig() const {
     config.toonSpecularIntensity = toonSpecularIntensity;
     config.emissiveColor         = emissiveColor;
     config.emissiveIntensity     = emissiveIntensity;
+	config.useNormalMap          = useNormalMap != 0;
+	config.normalMapStrength     = normalMapStrength;
+	config.normalMapFlipY        = normalMapFlipY != 0;
 	return config;
 }
 
@@ -97,6 +103,17 @@ void Material::ShowImGui() {
     GuiCmd::ColorEdit4("emissive color", emissiveColor);
     GuiCmd::SliderFloat("emissive intensity", emissiveIntensity, 0.0f, 20.0f);
 
+	ImGui::SeparatorText("Normal Map");
+	bool normalMapEnabled = useNormalMap != 0;
+	if(GuiCmd::CheckBox("use normal map", normalMapEnabled)) {
+		useNormalMap = normalMapEnabled ? 1 : 0;
+	}
+	GuiCmd::SliderFloat("normal map strength", normalMapStrength, 0.0f, 2.0f);
+	bool flipY = normalMapFlipY != 0;
+	if(GuiCmd::CheckBox("flip normal map Y", flipY)) {
+		normalMapFlipY = flipY ? 1 : 0;
+	}
+
     if (lightingMode == 2) {
         ImGui::SeparatorText("Toon");
         GuiCmd::ColorEdit4("highlight", toonHighlightColor);
@@ -138,6 +155,13 @@ void Material::ShowImGui(MaterialConfig& config) {
         GuiCmd::SliderFloat("emissive intensity", config.emissiveIntensity, 0.0f, 20.0f);
         ImGui::TreePop();
     }
+
+	if(ImGui::TreeNodeEx("Normal Map", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+		GuiCmd::CheckBox("use normal map", config.useNormalMap);
+		GuiCmd::SliderFloat("normal map strength", config.normalMapStrength, 0.0f, 2.0f);
+		GuiCmd::CheckBox("flip normal map Y", config.normalMapFlipY);
+		ImGui::TreePop();
+	}
 
     if (config.enableLighting == 2 && ImGui::TreeNodeEx("Toon", ImGuiTreeNodeFlags_SpanAvailWidth)) {
         GuiCmd::ColorEdit4("highlight", config.toonHighlightColor);

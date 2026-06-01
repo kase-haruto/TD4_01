@@ -54,6 +54,8 @@ namespace CalyxEngine {
 			compiled.shininess = material.shininess;
 			compiled.roughness = material.roughness;
 			compiled.isReflect = material.isReflect;
+			compiled.normalMap = {{0.5f, 0.5f, 1.0f, 1.0f}, false};
+			compiled.normalMapStrength = material.normalMapStrength;
 			compiled.toonHighlightColor = {material.toonHighlightColor, false};
 			compiled.toonBaseColor = {material.toonBaseColor, false};
 			compiled.toonFirstShadeColor = {material.toonMidShadowColor, false};
@@ -76,6 +78,7 @@ namespace CalyxEngine {
 			material.shininess = compiled.shininess;
 			material.roughness = compiled.roughness;
 			material.isReflect = compiled.isReflect;
+			material.normalMapStrength = compiled.normalMapStrength;
 			material.toonHighlightColor = compiled.toonHighlightColor.factor;
 			material.toonBaseColor = compiled.toonBaseColor.factor;
 			material.toonMidShadowColor = compiled.toonFirstShadeColor.factor;
@@ -329,6 +332,8 @@ namespace CalyxEngine {
 			if(const NodePin* pin = FindInput(node, "Shininess")) compiled.shininess = EvaluateFloat(material, pin->id, GetFloatProperty(node, "shininess", compiled.shininess));
 			if(const NodePin* pin = FindInput(node, "Roughness")) compiled.roughness = EvaluateFloat(material, pin->id, GetFloatProperty(node, "roughness", compiled.roughness));
 			if(const NodePin* pin = FindInput(node, "Reflect")) compiled.isReflect = EvaluateBool(material, pin->id, compiled.isReflect);
+			if(const NodePin* pin = FindInput(node, "Normal Map")) compiled.normalMap = EvaluateColorInput(material, pin->id, compiled.normalMap.factor);
+			if(const NodePin* pin = FindInput(node, "Normal Strength")) compiled.normalMapStrength = EvaluateFloat(material, pin->id, compiled.normalMapStrength);
 		}
 
 		static void CompileUnlitMasterIR(const MaterialAsset& material, const Node& node, CompiledMaterialGraph& compiled) {
@@ -376,6 +381,8 @@ namespace CalyxEngine {
 			if(const NodePin* pin = FindInput(node, "Spec Threshold")) specularThreshold = EvaluateFloat(material, pin->id, specularThreshold);
 			if(const NodePin* pin = FindInput(node, "Spec Softness")) specularSoftness = EvaluateFloat(material, pin->id, specularSoftness);
 			if(const NodePin* pin = FindInput(node, "Spec Intensity")) specularIntensity = EvaluateFloat(material, pin->id, specularIntensity);
+			if(const NodePin* pin = FindInput(node, "Normal Map")) compiled.normalMap = EvaluateColorInput(material, pin->id, compiled.normalMap.factor);
+			if(const NodePin* pin = FindInput(node, "Normal Strength")) compiled.normalMapStrength = EvaluateFloat(material, pin->id, compiled.normalMapStrength);
 
 			compiled.toonShadeStep = shadeStep;
 			compiled.toonShadeFeather = shadeFeather;
