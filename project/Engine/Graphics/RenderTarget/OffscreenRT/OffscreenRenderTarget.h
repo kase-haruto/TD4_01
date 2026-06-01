@@ -30,8 +30,9 @@ public:
 	D3D12_VIEWPORT				GetViewport() const override;
 	void						SetDepthDSV(DescriptorHandle dsv) override;
 	D3D12_RECT					GetScissorRect() const override;
-	void						Clear(ID3D12GraphicsCommandList* cmdList) override;
-	void						SetRenderTarget(ID3D12GraphicsCommandList* commandList) override;
+	void Clear(ID3D12GraphicsCommandList* cmdList) override;
+	void SetRenderTarget(ID3D12GraphicsCommandList* commandList) override;
+	void SetRenderTargetMRT(ID3D12GraphicsCommandList* commandList);
 
 	void			 SetRenderTargetType(RenderTargetType type) override { rtType_ = type; }
 	RenderTargetType GetRenderTargetType() const { return rtType_; }

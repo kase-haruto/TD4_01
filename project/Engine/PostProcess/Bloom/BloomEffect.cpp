@@ -1,5 +1,7 @@
 #include "BloomEffect.h"
 
+#include "Engine/Graphics/RenderTarget/OffscreenRT/OffscreenRenderTarget.h"
+
 #include <Engine/Graphics/Context/GraphicsGroup.h>
 #include <externals/imgui/imgui.h>
 
@@ -19,8 +21,17 @@ void BloomEffect::Apply(ID3D12GraphicsCommandList* cmd,
 
 	buffer_.TransferData(param_);
 	psoSet_.SetCommand(cmd);
+
+	auto* dxCore = GraphicsGroup::GetInstance()->GetDxCore();
+	auto* offscreen = dxCore->GetRenderTargetCollection().Get("Offscreen");
+	auto* offscreenRT = dynamic_cast<OffscreenRenderTarget*>(offscreen);
+	
+	D3D12_GPU_DESCRIPTOR_HANDLE maskSRV = offscreenRT->GetMRTResource(1)->GetSRVGpuHandle();
+
+	// Bind t0: SceneColor, t1: BloomMask
 	cmd->SetGraphicsRootDescriptorTable(0, inputSRV);
-	buffer_.SetCommand(cmd, 1);
+	cmd->SetGraphicsRootDescriptorTable(1, maskSRV);
+	buffer_.SetCommand(cmd, 2);
 
 	cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	cmd->DrawInstanced(3, 1, 0, 0);

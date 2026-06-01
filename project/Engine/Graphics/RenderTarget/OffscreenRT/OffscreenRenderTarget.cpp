@@ -90,6 +90,17 @@ void OffscreenRenderTarget::SetRenderTarget(ID3D12GraphicsCommandList* commandLi
 	commandList->OMSetRenderTargets(1, &rtvHandle_.cpu, FALSE, &dsvHandle_.cpu);
 }
 
+void OffscreenRenderTarget::SetRenderTargetMRT(ID3D12GraphicsCommandList* commandList) {
+	commandList->RSSetViewports(1, &viewport_);
+	commandList->RSSetScissorRects(1, &scissorRect_);
+
+	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+	for(const auto& handle : mrtRtvHandles_) {
+		rtvHandles.push_back(handle.cpu);
+	}
+	commandList->OMSetRenderTargets((UINT)rtvHandles.size(), rtvHandles.data(), FALSE, &dsvHandle_.cpu);
+}
+
 void OffscreenRenderTarget::TransitionTo(ID3D12GraphicsCommandList* cmdList, D3D12_RESOURCE_STATES newState) {
 	resource_->Transition(cmdList, newState);
 }

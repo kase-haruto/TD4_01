@@ -7,15 +7,15 @@
       1.0
     ],
     "emissiveColor": [
-      1.0,
-      0.07058823853731155,
       0.0,
+      0.4941176474094391,
+      0.01568627543747425,
       1.0
     ],
-    "emissiveIntensity": 1.0499999523162842,
+    "emissiveIntensity": 5.599999904632568,
     "envirometCoefficient": 0.5,
     "isReflect": false,
-    "lightingMode": 2,
+    "lightingMode": 0,
     "objectTextureGuid": "00000000-0000-0000-0000-000000000000",
     "roughness": 0.5,
     "shininess": 20.0,
@@ -58,32 +58,32 @@
   "graph": {
     "links": [
       {
-        "fromPinId": 34,
-        "id": 35,
-        "toPinId": 2
-      },
-      {
         "fromPinId": 37,
         "id": 43,
         "toPinId": 39
       },
       {
         "fromPinId": 41,
-        "id": 44,
-        "toPinId": 21
+        "id": 63,
+        "toPinId": 56
       },
       {
         "fromPinId": 46,
-        "id": 47,
-        "toPinId": 22
+        "id": 69,
+        "toPinId": 57
       },
       {
         "fromPinId": 49,
-        "id": 50,
-        "toPinId": 23
+        "id": 70,
+        "toPinId": 58
+      },
+      {
+        "fromPinId": 62,
+        "id": 71,
+        "toPinId": 2
       }
     ],
-    "nextId": 51,
+    "nextId": 75,
     "nodes": [
       {
         "boolValue": false,
@@ -112,152 +112,6 @@
         "properties": {},
         "title": "Output",
         "type": "Output"
-      },
-      {
-        "boolValue": false,
-        "colorValue": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "floatValue": 0.0,
-        "id": 20,
-        "inputs": [
-          {
-            "id": 21,
-            "kind": 0,
-            "name": "Base Color",
-            "valueType": 2
-          },
-          {
-            "id": 22,
-            "kind": 0,
-            "name": "Emissive",
-            "valueType": 2
-          },
-          {
-            "id": 23,
-            "kind": 0,
-            "name": "Emissive Intensity",
-            "valueType": 1
-          },
-          {
-            "id": 24,
-            "kind": 0,
-            "name": "Highlight",
-            "valueType": 2
-          },
-          {
-            "id": 25,
-            "kind": 0,
-            "name": "1st Shade",
-            "valueType": 2
-          },
-          {
-            "id": 26,
-            "kind": 0,
-            "name": "2nd Shade",
-            "valueType": 2
-          },
-          {
-            "id": 27,
-            "kind": 0,
-            "name": "Base Step",
-            "valueType": 1
-          },
-          {
-            "id": 28,
-            "kind": 0,
-            "name": "Base Feather",
-            "valueType": 1
-          },
-          {
-            "id": 29,
-            "kind": 0,
-            "name": "Shade Step",
-            "valueType": 1
-          },
-          {
-            "id": 30,
-            "kind": 0,
-            "name": "Shade Feather",
-            "valueType": 1
-          },
-          {
-            "id": 31,
-            "kind": 0,
-            "name": "Spec Threshold",
-            "valueType": 1
-          },
-          {
-            "id": 32,
-            "kind": 0,
-            "name": "Spec Softness",
-            "valueType": 1
-          },
-          {
-            "id": 33,
-            "kind": 0,
-            "name": "Spec Intensity",
-            "valueType": 1
-          }
-        ],
-        "intValue": 0,
-        "outputs": [
-          {
-            "id": 34,
-            "kind": 1,
-            "name": "Surface",
-            "valueType": 5
-          }
-        ],
-        "position": [
-          769.0,
-          -440.0
-        ],
-        "properties": {
-          "baseColor": [
-            1.0,
-            1.0,
-            1.0,
-            1.0
-          ],
-          "baseFeather": 0.029999999329447746,
-          "baseStep": 0.25,
-          "emissiveColor": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "emissiveIntensity": 0.0,
-          "firstShadeColor": [
-            0.7200000286102295,
-            0.7599999904632568,
-            0.8600000143051147,
-            1.0
-          ],
-          "highlightColor": [
-            1.0800000429153442,
-            1.059999942779541,
-            1.0199999809265137,
-            1.0
-          ],
-          "secondShadeColor": [
-            0.41999998688697815,
-            0.46000000834465027,
-            0.5799999833106995,
-            1.0
-          ],
-          "shadeFeather": 0.029999999329447746,
-          "shadeStep": -0.15000000596046448,
-          "specularIntensity": 0.3499999940395355,
-          "specularSoftness": 0.019999999552965164,
-          "specularThreshold": 0.9599999785423279
-        },
-        "title": "Toon Master",
-        "type": "ToonMaster"
       },
       {
         "boolValue": false,
@@ -337,9 +191,9 @@
       {
         "boolValue": false,
         "colorValue": [
-          1.0,
-          0.07058823853731155,
           0.0,
+          0.4941176474094391,
+          0.01568627543747425,
           1.0
         ],
         "floatValue": 0.0,
@@ -355,7 +209,7 @@
           }
         ],
         "position": [
-          289.0,
+          385.0,
           39.0
         ],
         "properties": {},
@@ -370,7 +224,7 @@
           1.0,
           1.0
         ],
-        "floatValue": 1.0499999523162842,
+        "floatValue": 5.599999904632568,
         "id": 48,
         "inputs": [],
         "intValue": 0,
@@ -383,12 +237,88 @@
           }
         ],
         "position": [
-          288.0,
-          215.0
+          384.0,
+          167.0
         ],
         "properties": {},
         "title": "Emissive Intensity",
         "type": "Float"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 55,
+        "inputs": [
+          {
+            "id": 56,
+            "kind": 0,
+            "name": "Base Color",
+            "valueType": 2
+          },
+          {
+            "id": 57,
+            "kind": 0,
+            "name": "Emissive",
+            "valueType": 2
+          },
+          {
+            "id": 58,
+            "kind": 0,
+            "name": "Emissive Intensity",
+            "valueType": 1
+          },
+          {
+            "id": 59,
+            "kind": 0,
+            "name": "Shininess",
+            "valueType": 1
+          },
+          {
+            "id": 60,
+            "kind": 0,
+            "name": "Roughness",
+            "valueType": 1
+          },
+          {
+            "id": 61,
+            "kind": 0,
+            "name": "Reflect",
+            "valueType": 3
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 62,
+            "kind": 1,
+            "name": "Surface",
+            "valueType": 5
+          }
+        ],
+        "position": [
+          759.0,
+          -139.0
+        ],
+        "properties": {
+          "emissiveColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissiveIntensity": 2.5299999713897705,
+          "lightingMode": 0.0,
+          "roughness": 0.5,
+          "shininess": 20.0
+        },
+        "title": "Lit Master",
+        "type": "LitMaster"
       }
     ]
   },
