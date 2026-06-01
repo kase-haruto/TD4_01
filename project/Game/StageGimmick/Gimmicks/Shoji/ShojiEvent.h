@@ -8,6 +8,7 @@
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
 #include "Game\StageGimmick\Gimmicks\Shoji\ShojiObject.h"
 #include "Game\StageGimmick\Gimmicks\Shoji\LuckyCatObject.h"
+#include "Game\StageGimmick\Base\GeneralObject.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
 /// <summary>
@@ -116,10 +117,15 @@ private:
 	std::vector<std::weak_ptr<LuckyCatObject>> luckyCatObjs_;
 	std::vector<Guid> luckyCatGuids_;
 
+	// はめる数を表示するUI
+	std::weak_ptr<GeneralObject> numbersUi_;
+	Guid						 numbersUiGuid_;
+
 	ShojiEventParam eventParam_;
 	AllShojiEventData eventData_;
 	bool hasSerializedEventParam_ = false;
 	bool hasSerializedEventData_  = false;
 
+	int	 openCount_ = 0;
 	bool isOpen_ = false;
 };

@@ -344,7 +344,10 @@ DemoPlayer::LandingEvents DemoPlayer::ApplyGravity(float dt) {
 	velocity_.y -= gravity * dt;
 
 	// 接地判定（Y=0を床とする）
-	if(worldTransform_.translation.y <= 0.0f) {
+	// 上昇中（velocity_.y > 0）は着地扱いしない。
+	// TimeStep=0（dt=0）でジャンプした瞬間は位置が動かず y=0 のままになるため、
+	// この条件が無いとジャンプ開始と同フレームで着地判定が成立し、ジャンプ速度が消えてしまう。
+	if(worldTransform_.translation.y <= 0.0f && velocity_.y <= 0.0f) {
 		// 着地した瞬間
 		if(isJumping_) {
 			events.landed = true;

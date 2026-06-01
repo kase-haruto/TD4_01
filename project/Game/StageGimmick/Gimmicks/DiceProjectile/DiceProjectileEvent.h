@@ -109,6 +109,7 @@ private:
 	// サイコロの収納箱
 	std::weak_ptr<DiceSocketObject> socket_;
 	Guid socketGuid_;
+	int								openCount_ = 0;
 
 	// ターゲットのサイコロオブジェクト
 	std::vector<std::weak_ptr<DiceProjectileObject>> targetObjects_;
@@ -123,6 +124,8 @@ private:
 	// 建物
 	std::weak_ptr<GeneralObject> gate_;
 	Guid						 gateGuid_;
+	std::weak_ptr<GeneralObject> numbersUi_;
+	Guid						 numbersUiGuid_;
 
 	// パラメータ
 	DiceProjectileEventParam eventParam_;

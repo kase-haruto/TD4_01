@@ -69,30 +69,29 @@ void DiceProjectileEvent::EventInitialize() {
 			childTargets[i]->SetSocket(socket_.lock().get());
 			childTargets[i]->Initialize();
 		}
-		return;
-	}
+	} else {
+		targetObjects_.resize(objectCount_);
+		targetObjectGuids_.resize(objectCount_);
+		eventData_.objectCount = objectCount_;
 
-	targetObjects_.resize(objectCount_);
-	targetObjectGuids_.resize(objectCount_);
-	eventData_.objectCount = objectCount_;
-
-	// シーンから対応するオブジェクトを生成する
-	for(uint32_t i = 0; i < objectCount_; ++i) {
-		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
-		if(targetObject) {
-			targetObject->SetParent(shared_from_this());
-			targetObject->SetParam(eventParam_.param_);
-			targetObject->SetSocket(socket_.lock().get());
-			targetObject->Initialize();
-			targetObjects_[i] = (targetObject);
-			targetObjectGuids_[i] = targetObject->GetGuid();
+		// シーンから対応するオブジェクトを生成する
+		for(uint32_t i = 0; i < objectCount_; ++i) {
+			auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
+			if(targetObject) {
+				targetObject->SetParent(shared_from_this());
+				targetObject->SetParam(eventParam_.param_);
+				targetObject->SetSocket(socket_.lock().get());
+				targetObject->Initialize();
+				targetObjects_[i]	  = (targetObject);
+				targetObjectGuids_[i] = targetObject->GetGuid();
+			}
 		}
 	}
 
 	// 建物
-	const std::string gateName = "GeneralObject";
-	auto			  gate	   = ResolveLinkedObject<GeneralObject>(gateGuid_, gateName);
-	if(!gate) gate = FindOwnedObjectByClassName<GeneralObject>(gateName);
+	const std::string gateName = "akamon";
+	auto			  gate	   = ResolveLinkedObjectByName<GeneralObject>(gateGuid_, gateName);
+	if(!gate) gate = FindOwnedObjectByName<GeneralObject>(gateName);
 	if(gate) {
 		gate->SetName(gateName);
 		gate->Initialize();
@@ -102,11 +101,30 @@ void DiceProjectileEvent::EventInitialize() {
 		auto newGate = SceneAPI::Instantiate<GeneralObject>("akamon.obj", gateName);
 		newGate->SetParent(shared_from_this(), false);
 		newGate->Initialize();
-		newGate->SetScale({1.95f, 2.0f, 2.25f});
+		newGate->SetScale({1.0f, 1.0f, 1.0f});
 		newGate->SetTranslate({0.0f, 0.0f, 32.5f});
 		gate_	  = newGate;
 		gateGuid_ = newGate->GetGuid();
 	}
+	const std::string numbersUiName = "diceNumbersUI";
+	auto			  numbersUi		= ResolveLinkedObjectByName<GeneralObject>(numbersUiGuid_, numbersUiName);
+	if(!numbersUi) numbersUi = FindOwnedObjectByName<GeneralObject>(numbersUiName);
+	if(numbersUi) {
+		numbersUi->SetName(numbersUiName);
+		numbersUi->Initialize();
+		numbersUi_	   = numbersUi;
+		numbersUiGuid_ = numbersUi->GetGuid();
+	} else {
+		auto newNumbersUi = SceneAPI::Instantiate<GeneralObject>("plane.obj", numbersUiName);
+		newNumbersUi->SetParent(shared_from_this(), false);
+		newNumbersUi->Initialize();
+		numbersUi_	   = newNumbersUi;
+		numbersUiGuid_ = newNumbersUi->GetGuid();
+	}
+	if(auto ui = numbersUi_.lock()) {
+		ui->SetTexture("Numbers/" + std::to_string(eventData_.clearCount) + ".png");
+	}
+
 }
 
 void DiceProjectileEvent::EventUpdate(float) {
@@ -199,7 +217,7 @@ void DiceProjectileEvent::CreateDoors() {
 		newDoor->SetLR(0);
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->Initialize();
-		newDoor->SetTranslate({-12.0f, 0.0f, 40.0f});
+		newDoor->SetTranslate({-5.0f, 0.0f, 40.0f});
 		doorL_	   = newDoor;
 		doorLGuid_ = newDoor->GetGuid();
 	}
@@ -228,7 +246,7 @@ void DiceProjectileEvent::CreateDoors() {
 		newDoor->SetLR(1);
 		newDoor->SetParam(eventParam_.doorParam_);
 		newDoor->Initialize();
-		newDoor->SetTranslate({12.0f, 0.0f, 40.0f});
+		newDoor->SetTranslate({5.0f, 0.0f, 40.0f});
 		doorR_	   = newDoor;
 		doorRGuid_ = newDoor->GetGuid();
 	}
@@ -246,6 +264,19 @@ void DiceProjectileEvent::UpdateDoorOpenRequest() {
 	if(auto doorR = doorR_.lock()) {
 		doorR->SetOpenRequested(shouldOpen);
 	}
+
+	int count = socket_.lock()->GetDiceSocketCount();
+	if(openCount_ != count) {
+		if(auto ui = numbersUi_.lock()) {
+			int	 number		 = eventData_.clearCount - count;
+			std::string textureName = "Numbers/0.png";
+			if(number >= 0) {
+				textureName = "Numbers/" + std::to_string(number) + ".png";
+			}
+			ui->SetTexture(textureName);
+		}
+	}
+	openCount_ = count;
 }
 
 void DiceProjectileEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
