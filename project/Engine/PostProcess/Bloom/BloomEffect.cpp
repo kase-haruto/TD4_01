@@ -25,8 +25,16 @@ void BloomEffect::Apply(ID3D12GraphicsCommandList* cmd,
 	auto* dxCore = GraphicsGroup::GetInstance()->GetDxCore();
 	auto* offscreen = dxCore->GetRenderTargetCollection().Get("Offscreen");
 	auto* offscreenRT = dynamic_cast<OffscreenRenderTarget*>(offscreen);
-	
-	D3D12_GPU_DESCRIPTOR_HANDLE maskSRV = offscreenRT->GetMRTResource(1)->GetSRVGpuHandle();
+
+	if(offscreenRT) {
+		offscreenRT->TransitionMRTTo(cmd, 1, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	}
+
+	auto* maskResource = offscreenRT ? offscreenRT->GetMRTResource(1) : nullptr;
+	if(!maskResource) {
+		return;
+	}
+	D3D12_GPU_DESCRIPTOR_HANDLE maskSRV = maskResource->GetSRVGpuHandle();
 
 	// Bind t0: SceneColor, t1: BloomMask
 	cmd->SetGraphicsRootDescriptorTable(0, inputSRV);

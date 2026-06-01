@@ -308,6 +308,7 @@ namespace CalyxEngine {
 		const std::string modelName = record.sourcePath.filename().string();
 		auto			  model		= std::make_shared<Model>(modelName);
 		model->Update(0.0f);
+
 		if(!model->GetModelData()) return false;
 
 		const AABB&	  bounds  = model->GetModelData()->localAABB;
@@ -340,6 +341,8 @@ namespace CalyxEngine {
 		modelRenderer_->RegisterStatic(model.get(), transform, BillboardMode::None, nullptr);
 
 		if(auto* camera = dynamic_cast<Camera3d*>(CameraManager::GetActive())) {
+			// previewはディザ抜きを行わない
+			camera->SetCameraDitherEnabled(false);
 			modelRenderer_->PreCullAndBatch(camera, false);
 		} else {
 			modelRenderer_->BuildAllVisibleBatches();

@@ -218,7 +218,7 @@ protected:
 	bool	 isEnableRaycast_ = false; // レイキャスト有効/無効
 	bool	 isTransient_	  = false; // 一時的（保存・階層除外）
 	DrawConfig drawConfig_{};
-	uint32_t pickingID_		  = 0;;
+	uint32_t pickingID_		  = 0;
 	uint32_t duplicateNameIndex_ = 0; //< 表示用の同名識別番号。保存名には含めない
 	CalyxEngine::TransformKeyframeAnimation2d transformAnimation2d_;
 	std::vector<CalyxEngine::SerializableObject*> serializableParamObjects_;

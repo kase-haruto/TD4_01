@@ -33,6 +33,7 @@ public:
 	void Clear(ID3D12GraphicsCommandList* cmdList) override;
 	void SetRenderTarget(ID3D12GraphicsCommandList* commandList) override;
 	void SetRenderTargetMRT(ID3D12GraphicsCommandList* commandList);
+	void TransitionMRTTo(ID3D12GraphicsCommandList* cmdList, size_t index, D3D12_RESOURCE_STATES newState);
 
 	void			 SetRenderTargetType(RenderTargetType type) override { rtType_ = type; }
 	RenderTargetType GetRenderTargetType() const { return rtType_; }

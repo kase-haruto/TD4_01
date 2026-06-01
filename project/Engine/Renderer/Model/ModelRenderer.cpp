@@ -347,7 +347,6 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							CalyxEngine::ShadowMapSystem* shadowMapSystem) {
 	(void)rt;
 
-	// Skinned meshes are converted to skinned vertex buffers once per frame.
 	{
 		bool computeSet = false;
 		for(auto& [model, insts] : skinnedModels_) {
@@ -390,7 +389,6 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 			// Skinned Models
 			for(auto& [model, transforms] : skinnedVisibleForShadow_) {
 				if(!model->GetModelData()) continue;
-				// TODO: Skinning update for BLAS if needed (Refitting/Rebuild)
 				model->EnsureRaytracingBLAS(device5.Get(), cmd4.Get());
 
 				if(model->HasBLAS()) {
