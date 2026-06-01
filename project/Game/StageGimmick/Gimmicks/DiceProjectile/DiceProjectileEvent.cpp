@@ -69,30 +69,29 @@ void DiceProjectileEvent::EventInitialize() {
 			childTargets[i]->SetSocket(socket_.lock().get());
 			childTargets[i]->Initialize();
 		}
-		return;
-	}
+	} else {
+		targetObjects_.resize(objectCount_);
+		targetObjectGuids_.resize(objectCount_);
+		eventData_.objectCount = objectCount_;
 
-	targetObjects_.resize(objectCount_);
-	targetObjectGuids_.resize(objectCount_);
-	eventData_.objectCount = objectCount_;
-
-	// シーンから対応するオブジェクトを生成する
-	for(uint32_t i = 0; i < objectCount_; ++i) {
-		auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
-		if(targetObject) {
-			targetObject->SetParent(shared_from_this());
-			targetObject->SetParam(eventParam_.param_);
-			targetObject->SetSocket(socket_.lock().get());
-			targetObject->Initialize();
-			targetObjects_[i] = (targetObject);
-			targetObjectGuids_[i] = targetObject->GetGuid();
+		// シーンから対応するオブジェクトを生成する
+		for(uint32_t i = 0; i < objectCount_; ++i) {
+			auto targetObject = SceneAPI::Instantiate<DiceProjectileObject>("dice.obj", objectName);
+			if(targetObject) {
+				targetObject->SetParent(shared_from_this());
+				targetObject->SetParam(eventParam_.param_);
+				targetObject->SetSocket(socket_.lock().get());
+				targetObject->Initialize();
+				targetObjects_[i]	  = (targetObject);
+				targetObjectGuids_[i] = targetObject->GetGuid();
+			}
 		}
 	}
 
 	// 建物
-	const std::string gateName = "GeneralObject";
-	auto			  gate	   = ResolveLinkedObject<GeneralObject>(gateGuid_, gateName);
-	if(!gate) gate = FindOwnedObjectByClassName<GeneralObject>(gateName);
+	const std::string gateName = "akamon";
+	auto			  gate	   = ResolveLinkedObjectByName<GeneralObject>(gateGuid_, gateName);
+	if(!gate) gate = FindOwnedObjectByName<GeneralObject>(gateName);
 	if(gate) {
 		gate->SetName(gateName);
 		gate->Initialize();
@@ -108,8 +107,8 @@ void DiceProjectileEvent::EventInitialize() {
 		gateGuid_ = newGate->GetGuid();
 	}
 	const std::string numbersUiName = "diceNumbersUI";
-	auto			  numbersUi		= ResolveLinkedObject<GeneralObject>(numbersUiGuid_, numbersUiName);
-	if(!numbersUi) numbersUi = FindOwnedObjectByClassName<GeneralObject>(numbersUiName);
+	auto			  numbersUi		= ResolveLinkedObjectByName<GeneralObject>(numbersUiGuid_, numbersUiName);
+	if(!numbersUi) numbersUi = FindOwnedObjectByName<GeneralObject>(numbersUiName);
 	if(numbersUi) {
 		numbersUi->SetName(numbersUiName);
 		numbersUi->Initialize();

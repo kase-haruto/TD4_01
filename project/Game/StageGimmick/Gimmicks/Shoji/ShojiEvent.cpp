@@ -109,8 +109,8 @@ void ShojiEvent::EventInitialize() {
 	}
 
 	const std::string numbersUiName = "shojiNumberUI";
-	auto			  numbersUi		= ResolveLinkedObject<GeneralObject>(numbersUiGuid_, numbersUiName);
-	if(!numbersUi) numbersUi = FindOwnedObjectByClassName<GeneralObject>(numbersUiName);
+	auto			  numbersUi		= ResolveLinkedObjectByName<GeneralObject>(numbersUiGuid_, numbersUiName);
+	if(!numbersUi) numbersUi = FindOwnedObjectByName<GeneralObject>(numbersUiName);
 	if(numbersUi) {
 		numbersUi->SetName(numbersUiName);
 		numbersUi->Initialize();
