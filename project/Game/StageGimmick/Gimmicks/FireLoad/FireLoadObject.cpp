@@ -61,7 +61,7 @@ void FireLoadObject::ObjectUpdate(float dt) {
 
 	if(!isBurn_) {
 		worldTransform_.scale = {0.0f, 0.0f, 0.0f};
-		if(model_ && isDrawEnable_) {
+		if(model_ && IsDrawEnable()) {
 			BaseGameObject::SetDrawEnable(false);
 		}
 		return;

@@ -89,24 +89,42 @@ void ShojiEvent::EventInitialize() {
 			luckyCatObjs_[i]  = childTargets[i];
 			luckyCatGuids_[i] = childTargets[i]->GetGuid();
 		}
-		return;
+	} else {
+		luckyCatObjs_.resize(objectCount_);
+		luckyCatGuids_.resize(objectCount_);
+		eventData_.objectCount = objectCount_;
+
+		for(uint32_t i = 0; i < objectCount_; ++i) {
+			auto luckyCat = SceneAPI::Instantiate<LuckyCatObject>("manekineko.obj", catName);
+			if(!luckyCat) continue;
+
+			luckyCat->SetParent(shared_from_this());
+			luckyCat->SetParam(eventParam_.param_);
+			luckyCat->SetShoji(shojiObjs_);
+			luckyCat->Initialize();
+
+			luckyCatObjs_[i]  = luckyCat;
+			luckyCatGuids_[i] = luckyCat->GetGuid();
+		}
 	}
 
-	luckyCatObjs_.resize(objectCount_);
-	luckyCatGuids_.resize(objectCount_);
-	eventData_.objectCount = objectCount_;
-
-	for(uint32_t i = 0; i < objectCount_; ++i) {
-		auto luckyCat = SceneAPI::Instantiate<LuckyCatObject>("manekineko.obj", catName);
-		if(!luckyCat) continue;
-
-		luckyCat->SetParent(shared_from_this());
-		luckyCat->SetParam(eventParam_.param_);
-		luckyCat->SetShoji(shojiObjs_);
-		luckyCat->Initialize();
-
-		luckyCatObjs_[i]  = luckyCat;
-		luckyCatGuids_[i] = luckyCat->GetGuid();
+	const std::string numbersUiName = "shojiNumberUI";
+	auto			  numbersUi		= ResolveLinkedObjectByName<GeneralObject>(numbersUiGuid_, numbersUiName);
+	if(!numbersUi) numbersUi = FindOwnedObjectByName<GeneralObject>(numbersUiName);
+	if(numbersUi) {
+		numbersUi->SetName(numbersUiName);
+		numbersUi->Initialize();
+		numbersUi_	   = numbersUi;
+		numbersUiGuid_ = numbersUi->GetGuid();
+	} else {
+		auto newNumbersUi = SceneAPI::Instantiate<GeneralObject>("plane.obj", numbersUiName);
+		newNumbersUi->SetParent(shared_from_this(), false);
+		newNumbersUi->Initialize();
+		numbersUi_	   = newNumbersUi;
+		numbersUiGuid_ = newNumbersUi->GetGuid();
+	}
+	if(auto ui = numbersUi_.lock()) {
+		ui->SetTexture("Numbers/" + std::to_string(eventData_.clearCount) + ".png");
 	}
 }
 
@@ -135,6 +153,13 @@ void ShojiEvent::EventUpdate(float) {
 			}
 			isOpen_ = true;
 		}
+		if(openCount_ != count) {
+			if(auto ui = numbersUi_.lock()) {
+				auto textureName = "Numbers/" + std::to_string(eventData_.clearCount - count) + ".png";
+				ui->SetTexture(textureName);	
+			}
+		}
+		openCount_ = count; 
 	}
 }
 

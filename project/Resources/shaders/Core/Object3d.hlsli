@@ -18,3 +18,7 @@ cbuffer CameraConstants : register(b1) {
 	float2 viewportSize;
 	uint cameraDitherEnabled;
 }
+
+cbuffer ObjectDrawConstants : register(b6) {
+	uint objectDitherEnabled;
+}

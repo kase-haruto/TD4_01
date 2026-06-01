@@ -50,6 +50,13 @@ protected:
 		const SceneObject& parent,
 		std::string_view expectedClassName) const;
 
+	template <class TObject>
+	std::shared_ptr<TObject> ResolveLinkedObjectByName(const Guid&		guid,
+													   std::string_view expectedName) const;
+
+	template <class TObject>
+	std::shared_ptr<TObject> FindOwnedObjectByName(std::string_view expectedName) const;
+
 	static void RemapGuid(Guid& guid, const std::unordered_map<Guid, Guid>& guidMap);
 	static void RemapGuids(std::vector<Guid>& guids, const std::unordered_map<Guid, Guid>& guidMap);
 	
@@ -129,4 +136,29 @@ std::vector<std::shared_ptr<TObject>> StageGimmickEventBase::FindChildrenByClass
 				  return lhs->GetGuid().ToString() < rhs->GetGuid().ToString();
 			  });
 	return result;
+}
+
+template <class TObject>
+std::shared_ptr<TObject> StageGimmickEventBase::ResolveLinkedObjectByName(
+	const Guid&		 guid,
+	std::string_view expectedName) const {
+	if(!guid.isValid()) return nullptr;
+
+	auto* ctx = SceneContext::Current();
+	if(!ctx || !ctx->GetObjectLibrary()) return nullptr;
+
+	auto object = ctx->GetObjectLibrary()->Find(guid);
+	if(!object || object->GetName() != expectedName) return nullptr;
+	return std::dynamic_pointer_cast<TObject>(object);
+}
+
+template <class TObject>
+std::shared_ptr<TObject> StageGimmickEventBase::FindOwnedObjectByName(
+	std::string_view expectedName) const {
+	for(const auto& child : GetChildren()) {
+		if(child && child->GetName() == expectedName) {
+			return std::dynamic_pointer_cast<TObject>(child);
+		}
+	}
+	return nullptr;
 }
