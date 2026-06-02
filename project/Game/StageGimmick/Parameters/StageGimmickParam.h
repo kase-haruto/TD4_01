@@ -117,8 +117,11 @@ struct CraneProjectileParam {
 	float speed = 1.0f;
 	// プレイヤーをターゲットしている時間
 	float targetTime = 0.0f;
-	// 
+	// 鶴が刺さる位置のY座標
 	float parryPositionY = 0.0f;
+	// 鶴が刺さるまでの時間
+	float parryTime = 0.0f;
+
 };
 
 struct BellProjectileParam {

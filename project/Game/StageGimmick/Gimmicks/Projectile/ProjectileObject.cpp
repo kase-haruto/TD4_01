@@ -62,6 +62,13 @@ void ProjectileObject::ObjectUpdate(float dt) {
 				velocity_ = CalyxEngine::Vector3::Zero();
 			}
 		}
+		// パリーされた時に飛んでいく座標と回転を設定する
+		targetPosition_	  = worldTransform_.GetWorldPosition();
+		targetPosition_.y = param_.parryPositionY;
+		targetRotation_	  = CalyxEngine::Quaternion::LookAt(
+			targetPosition_,
+			worldTransform_.translation,
+			CalyxEngine::Vector3::Up());
 	} else {
 		if(param_.targetTime > targetTime_ && !isParry_) {
 			targetTime_ += dt;
@@ -69,7 +76,25 @@ void ProjectileObject::ObjectUpdate(float dt) {
 			velocity_	= player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
 		}
 		if(isParry_) {
-			velocity_ = CalyxEngine::Vector3::Forward() + CalyxEngine::Vector3::Up();
+			// パリーされたらターゲット方向に時間で飛んでいく
+			if(targetTime_ < param_.parryTime) {
+				velocity_ = CalyxEngine::Vector3::Zero();
+				targetTime_ += dt;
+				targetTime_ = std::clamp(targetTime_, 0.0f, param_.parryTime);
+				float t = targetTime_ / param_.parryTime;
+
+				//移動処理
+				worldTransform_.translation = CalyxEngine::Vector3::Lerp(
+					worldTransform_.translation,
+					targetPosition_,
+					t);
+				// 回転処理
+				worldTransform_.rotation = CalyxEngine::Quaternion::Slerp(
+					worldTransform_.rotation, targetRotation_, 0.2f);
+
+			} else {
+				velocity_ = CalyxEngine::Vector3::Zero();
+			}
 		}
 	}
 

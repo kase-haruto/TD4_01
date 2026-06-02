@@ -23,6 +23,7 @@ public:
 	void SetParam(const CraneProjectileParam& param) {
 		param_ = param;
 	}
+	const float DamageTime() const { return param_.parryTime; }
 
 	void OnCollisionEnter(Collider* other) override;
 
@@ -46,6 +47,8 @@ private:
 
 	// 調整するパラメーター
 	CalyxEngine::Vector3 velocity_;
+	CalyxEngine::Vector3 targetPosition_;
+	CalyxEngine::Quaternion targetRotation_;
 	float targetTime_ = 0.0f;
 
 
