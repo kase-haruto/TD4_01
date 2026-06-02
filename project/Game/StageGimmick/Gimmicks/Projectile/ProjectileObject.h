@@ -23,7 +23,7 @@ public:
 	void SetParam(const CraneProjectileParam& param) {
 		param_ = param;
 	}
-	const float DamageTime() const { return param_.parryTime; }
+	const float GetDamageTime() const { return param_.parryTime; }
 
 	void OnCollisionEnter(Collider* other) override;
 
