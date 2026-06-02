@@ -12,6 +12,8 @@ void ComputeStandardDirectionalLight(
 
     float rawNdotL = dot(normal, L);
     float NdotL    = saturate(rawNdotL);
+    float roughness = saturate(gMaterial.roughness);
+    float specularWeight = pow(1.0f - roughness, 2.0f);
 
     if(gMaterial.enableLighting == 0) {
         float halfLambert = pow(rawNdotL * 0.5f + 0.5f, 2.0f);
@@ -19,14 +21,14 @@ void ComputeStandardDirectionalLight(
 
         float3 H    = normalize(L + toEye);
         float NdotH = saturate(dot(normal, H));
-        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity;
+        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity * specularWeight;
     }
     else if(gMaterial.enableLighting == 1) {
         diffuse = albedo * gDirectionalLight.color.rgb * NdotL * gDirectionalLight.intensity;
 
         float3 H    = normalize(L + toEye);
         float NdotH = saturate(dot(normal, H));
-        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity;
+        specular    = gDirectionalLight.color.rgb * pow(NdotH, gMaterial.shiniess) * gDirectionalLight.intensity * specularWeight;
     }
 }
 
@@ -50,6 +52,8 @@ void ComputeStandardPointLight(
     float3 topPosition1 = 0.0f;
     float topDistance0 = 0.0f;
     float topDistance1 = 0.0f;
+    float roughness = saturate(gMaterial.roughness);
+    float specularWeight = pow(1.0f - roughness, 2.0f);
 
     [loop]
     for(uint i = 0; i < gPointLightCount; ++i) {
@@ -69,7 +73,7 @@ void ComputeStandardPointLight(
 
         float3 halfVec = normalize(-lightDir + toEye);
         float  NdotH   = saturate(dot(normal, halfVec));
-        float3 lightSpecular = pointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * pointLight.intensity * attenuation;
+        float3 lightSpecular = pointLight.color.rgb * pow(NdotH, gMaterial.shiniess) * pointLight.intensity * attenuation * specularWeight;
         specular += lightSpecular;
 
         if(gPointLightShadowsEnabled != 0 && contribution > gPointShadowContributionThreshold) {

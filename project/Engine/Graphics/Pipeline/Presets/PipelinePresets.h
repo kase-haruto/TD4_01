@@ -50,4 +50,5 @@ namespace PipelinePresets {
 	GraphicsPipelineDesc MakeCRT();
 	GraphicsPipelineDesc MakeOutlineComposite();
 	GraphicsPipelineDesc MakeBlend();
+	GraphicsPipelineDesc MakeBloom();
 }

@@ -25,6 +25,11 @@ struct Material {
     float toonSpecularSoftness;
     float toonSpecularIntensity;
     float pad3;
+    float4 emissiveColor;
+    float emissiveIntensity;
+    int useNormalMap;
+    float normalMapStrength;
+    int normalMapFlipY;
 };
 
 struct DirectionalLight {
@@ -40,6 +45,14 @@ struct PointLight {
     float radius;
     float decay;
     float2 pad;
+};
+
+struct Object3dVertexOutput {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 worldPosition : POSITION0;
+    float4 tangent : TANGENT0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,8 +91,9 @@ TextureCube<float4> gEnvironmentMap : register(t1);
 Texture2D<float>    gShadowMap      : register(t2); // unused
 RaytracingAccelerationStructure gRtScene : register(t3);
 Texture2D<float4>   gTexture        : register(t0);
+Texture2D<float4>   gNormalMap      : register(t4);
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////j/////
 //                            samplers
 ///////////////////////////////////////////////////////////////////////////////
 SamplerState gSampler : register(s0);
@@ -88,7 +102,8 @@ SamplerState gSampler : register(s0);
 //                            出力
 ///////////////////////////////////////////////////////////////////////////////
 struct PixelShaderOutput {
-    float4 color : SV_TARGET0;
+    float4 color     : SV_TARGET0;
+    float4 bloomMask : SV_TARGET1; // Emissive bloom mask (MRT RT1)
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,6 +116,47 @@ float3 ApplyToneMappingAndGamma(float3 color, float exposure) {
 
 bool CheckVisibility(float3 origin, float3 dir, float tMax);
 float ComputePointHardShadow_RT(float3 worldPos, float3 normal, float3 lightPos, float lightDistance);
+
+float3 ApplyNormalMap(Object3dVertexOutput input, float2 uv, float3 vertexNormal) {
+    if(gMaterial.useNormalMap == 0 || gMaterial.normalMapStrength <= 0.0f) {
+        return vertexNormal;
+    }
+
+    float3 tangent = normalize(input.tangent.xyz);
+    tangent = normalize(tangent - vertexNormal * dot(tangent, vertexNormal));
+    float3 bitangent = normalize(cross(vertexNormal, tangent) * input.tangent.w);
+
+    float3 normalTexel = gNormalMap.Sample(gSampler, uv).xyz;
+    if(all(normalTexel > 0.99f)) {
+        return vertexNormal;
+    }
+
+    float grayscaleDelta = max(abs(normalTexel.r - normalTexel.g), abs(normalTexel.g - normalTexel.b));
+    if(grayscaleDelta < 0.03f) {
+        float height = normalTexel.r;
+        float heightDx = ddx(height);
+        float heightDy = ddy(height);
+        float2 uvDx = ddx(uv);
+        float2 uvDy = ddy(uv);
+        float texelScale = max(max(length(uvDx), length(uvDy)), 0.0001f);
+        float2 heightSlope = float2(heightDx, heightDy) / texelScale;
+        float3 bumpNormal = normalize(float3(-heightSlope.x, -heightSlope.y, 1.0f));
+        bumpNormal.xy *= max(gMaterial.normalMapStrength, 0.0f);
+        bumpNormal = normalize(bumpNormal);
+        float3x3 bumpTbn = float3x3(tangent, bitangent, vertexNormal);
+        return normalize(mul(bumpNormal, bumpTbn));
+    }
+
+    float3 sampledNormal = normalTexel * 2.0f - 1.0f;
+    if(gMaterial.normalMapFlipY != 0) {
+        sampledNormal.y *= -1.0f;
+    }
+    sampledNormal.xy *= max(gMaterial.normalMapStrength, 0.0f);
+    sampledNormal = normalize(sampledNormal);
+
+    float3x3 tbn = float3x3(tangent, bitangent, vertexNormal);
+    return normalize(mul(sampledNormal, tbn));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                    ディザマップ
@@ -305,7 +361,7 @@ float ComputeDirectionalSoftShadow_RT(float3 worldPos, float3 normal, float3 L) 
 ///////////////////////////////////////////////////////////////////////////////
 //                              main
 ///////////////////////////////////////////////////////////////////////////////
-PixelShaderOutput main(VertexShaderOutput input) {
+PixelShaderOutput main(Object3dVertexOutput input) {
     PixelShaderOutput output;
 
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
@@ -316,11 +372,13 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     if(gMaterial.enableLighting == 4) {
         if(alpha <= 0.01f) discard;
-        output.color = float4(albedo, alpha);
+        float3 emissive = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
+        output.color     = float4(ApplyToneMappingAndGamma(albedo, 1.0f) + emissive, alpha);
+        output.bloomMask = float4(emissive, 1.0f);
         return output;
     }
 
-    float3 normal = normalize(input.normal);
+    float3 normal = ApplyNormalMap(input, transformedUV.xy, normalize(input.normal));
     float3 toEye  = normalize(cameraPosition - input.worldPosition);
 
     float3 directionalDiffuse = 0.0f;
@@ -362,13 +420,18 @@ PixelShaderOutput main(VertexShaderOutput input) {
         float3 reflectDir = reflect(viewDir, normal);
 
         const float maxMipLevel = 7.0f;
-        float mipLevel = saturate(gMaterial.roughness) * maxMipLevel;
+        float roughness = saturate(gMaterial.roughness);
+        float mipLevel = roughness * maxMipLevel;
+        float reflectionWeight = gMaterial.environmentCoefficient * pow(1.0f - roughness, 2.0f);
 
         float3 envColor = gEnvironmentMap.SampleLevel(gSampler, reflectDir, mipLevel).rgb;
-        litColor += envColor * gMaterial.environmentCoefficient;
+        litColor += envColor * reflectionWeight;
     }
 
     float3 finalColor = ApplyToneMappingAndGamma(litColor, 1.0f);
+
+    // トーンマッピング後にEmissiveを加算し、閾値越えのHDR値として出力させる
+    finalColor += gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
 
 	// ---- ディザ抜き (Dithered Clipping) ----
 	uint2 pixelPos = uint2(input.position.xy) % 4;
@@ -387,6 +450,8 @@ PixelShaderOutput main(VertexShaderOutput input) {
 
     if(alpha <= 0.01f) discard;
 
-    output.color = float4(finalColor, alpha);
+    float3 emissiveOut = gMaterial.emissiveColor.rgb * max(gMaterial.emissiveIntensity, 0.0f);
+    output.color     = float4(finalColor, alpha);
+    output.bloomMask = float4(emissiveOut, 1.0f);
     return output;
 }

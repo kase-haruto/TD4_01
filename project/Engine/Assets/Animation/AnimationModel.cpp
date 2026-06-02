@@ -577,6 +577,7 @@ namespace CalyxEngine {
 		cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv());
 		cmdList->SetGraphicsRootDescriptorTable(6, GetEnvMapSrv());
 		SetCommandPalletSrv(7, cmdList);
+		cmdList->SetGraphicsRootDescriptorTable(14, GetNormalMapSrv());
 
 		// 頂点バッファ/インデックスバッファをセット
 		BindVertexIndexBuffers(cmdList);
@@ -588,6 +589,7 @@ namespace CalyxEngine {
 		} else {
 			for(const auto& subMesh : subMeshes) {
 				cmdList->SetGraphicsRootDescriptorTable(2, GetTexSrv(subMesh.materialIndex));
+				cmdList->SetGraphicsRootDescriptorTable(14, GetNormalMapSrv(subMesh.materialIndex));
 				cmdList->DrawIndexedInstanced(subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
 			}
 		}

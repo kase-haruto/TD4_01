@@ -38,6 +38,8 @@ namespace CalyxEngine {
 			GeneratedShaderGraphCode code;
 			code.usesObjectTexture =
 				graph.baseColor.usesObjectTexture ||
+				graph.emissiveColor.usesObjectTexture ||
+				graph.normalMap.usesObjectTexture ||
 				graph.toonHighlightColor.usesObjectTexture ||
 				graph.toonBaseColor.usesObjectTexture ||
 				graph.toonFirstShadeColor.usesObjectTexture ||
@@ -47,9 +49,13 @@ namespace CalyxEngine {
 			out << "struct GeneratedMaterialSurface {\n";
 			out << "    int lightingMode;\n";
 			out << "    float4 baseColor;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
 			out << "    float shininess;\n";
 			out << "    float roughness;\n";
 			out << "    int isReflect;\n";
+			out << "    float4 normalMap;\n";
+			out << "    float normalMapStrength;\n";
 			out << "    float4 toonHighlightColor;\n";
 			out << "    float4 toonBaseColor;\n";
 			out << "    float4 toonFirstShadeColor;\n";
@@ -70,9 +76,13 @@ namespace CalyxEngine {
 			}
 			out << "    surface.lightingMode = " << graph.lightingMode << ";\n";
 			out << "    surface.baseColor = " << ColorExpr(graph.baseColor) << ";\n";
+			out << "    surface.emissiveColor = " << ColorExpr(graph.emissiveColor) << ";\n";
+			out << "    surface.emissiveIntensity = " << FloatExpr(graph.emissiveIntensity) << ";\n";
 			out << "    surface.shininess = " << FloatExpr(graph.shininess) << ";\n";
 			out << "    surface.roughness = " << FloatExpr(graph.roughness) << ";\n";
 			out << "    surface.isReflect = " << (graph.isReflect ? 1 : 0) << ";\n";
+			out << "    surface.normalMap = " << ColorExpr(graph.normalMap) << ";\n";
+			out << "    surface.normalMapStrength = " << FloatExpr(graph.normalMapStrength) << ";\n";
 			out << "    surface.toonHighlightColor = " << ColorExpr(graph.toonHighlightColor) << ";\n";
 			out << "    surface.toonBaseColor = " << ColorExpr(graph.toonBaseColor) << ";\n";
 			out << "    surface.toonFirstShadeColor = " << ColorExpr(graph.toonFirstShadeColor) << ";\n";
@@ -107,9 +117,13 @@ namespace CalyxEngine {
 			int32_t lightingMode = 0;
 			int32_t textureSlotCount = 0;
 			MaterialExpression baseColor;
+			MaterialExpression emissiveColor;
+			MaterialExpression emissiveIntensity;
 			MaterialExpression shininess;
 			MaterialExpression roughness;
 			bool isReflect = false;
+			MaterialExpression normalMap;
+			MaterialExpression normalMapStrength;
 			MaterialExpression toonHighlightColor;
 			MaterialExpression toonBaseColor;
 			MaterialExpression toonFirstShadeColor;
@@ -127,6 +141,8 @@ namespace CalyxEngine {
 			GeneratedShaderGraphCode code;
 			code.usesObjectTexture =
 				surface.baseColor.usesObjectTexture ||
+				surface.emissiveColor.usesObjectTexture ||
+				surface.normalMap.usesObjectTexture ||
 				surface.toonHighlightColor.usesObjectTexture ||
 				surface.toonBaseColor.usesObjectTexture ||
 				surface.toonFirstShadeColor.usesObjectTexture ||
@@ -134,8 +150,12 @@ namespace CalyxEngine {
 			code.textureSlotCount = surface.textureSlotCount;
 			const bool usesNoiseTexture =
 				surface.baseColor.usesNoiseTexture ||
+				surface.emissiveColor.usesNoiseTexture ||
+				surface.emissiveIntensity.usesNoiseTexture ||
 				surface.shininess.usesNoiseTexture ||
 				surface.roughness.usesNoiseTexture ||
+				surface.normalMap.usesNoiseTexture ||
+				surface.normalMapStrength.usesNoiseTexture ||
 				surface.toonHighlightColor.usesNoiseTexture ||
 				surface.toonBaseColor.usesNoiseTexture ||
 				surface.toonFirstShadeColor.usesNoiseTexture ||
@@ -152,9 +172,13 @@ namespace CalyxEngine {
 			out << "struct GeneratedMaterialSurface {\n";
 			out << "    int lightingMode;\n";
 			out << "    float4 baseColor;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
 			out << "    float shininess;\n";
 			out << "    float roughness;\n";
 			out << "    int isReflect;\n";
+			out << "    float4 normalMap;\n";
+			out << "    float normalMapStrength;\n";
 			out << "    float4 toonHighlightColor;\n";
 			out << "    float4 toonBaseColor;\n";
 			out << "    float4 toonFirstShadeColor;\n";
@@ -175,9 +199,13 @@ namespace CalyxEngine {
 			out << "    GeneratedMaterialSurface surface;\n";
 			out << "    surface.lightingMode = " << surface.lightingMode << ";\n";
 			out << "    surface.baseColor = " << surface.baseColor.hlsl << ";\n";
+			out << "    surface.emissiveColor = " << surface.emissiveColor.hlsl << ";\n";
+			out << "    surface.emissiveIntensity = " << surface.emissiveIntensity.hlsl << ";\n";
 			out << "    surface.shininess = " << surface.shininess.hlsl << ";\n";
 			out << "    surface.roughness = " << surface.roughness.hlsl << ";\n";
 			out << "    surface.isReflect = " << (surface.isReflect ? 1 : 0) << ";\n";
+			out << "    surface.normalMap = " << surface.normalMap.hlsl << ";\n";
+			out << "    surface.normalMapStrength = " << surface.normalMapStrength.hlsl << ";\n";
 			out << "    surface.toonHighlightColor = " << surface.toonHighlightColor.hlsl << ";\n";
 			out << "    surface.toonBaseColor = " << surface.toonBaseColor.hlsl << ";\n";
 			out << "    surface.toonFirstShadeColor = " << surface.toonFirstShadeColor.hlsl << ";\n";
@@ -226,6 +254,11 @@ namespace CalyxEngine {
 			out << "    float toonSpecularSoftness;\n";
 			out << "    float toonSpecularIntensity;\n";
 			out << "    float pad3;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
+			out << "    int useNormalMap;\n";
+			out << "    float normalMapStrength;\n";
+			out << "    int normalMapFlipY;\n";
 			out << "};\n";
 			out << "cbuffer MaterialConstants : register(b0) { Material gMaterial; }\n\n";
 			out << "struct VertexShaderOutput {\n";
@@ -239,7 +272,7 @@ namespace CalyxEngine {
 			out << "PixelShaderOutput main(VertexShaderOutput input) {\n";
 			out << "    PixelShaderOutput output;\n";
 			out << "    GeneratedMaterialSurface surface = EvaluateGeneratedMaterial(input.texcoord, float3(0.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 1.0f), float3(0.0f, 0.0f, 1.0f));\n";
-			out << "    output.color = surface.baseColor;\n";
+			out << "    output.color = float4(saturate(surface.baseColor.rgb + surface.emissiveColor.rgb * max(surface.emissiveIntensity, 0.0f)), surface.baseColor.a);\n";
 			out << "    return output;\n";
 			out << "}\n";
 
@@ -258,6 +291,7 @@ namespace CalyxEngine {
 			out << "    float2 texcoord : TEXCOORD0;\n";
 			out << "    float3 normal : NORMAL0;\n";
 			out << "    float3 worldPosition : POSITION0;\n";
+			out << "    float4 tangent : TANGENT0;\n";
 			out << "};\n\n";
 			out << "cbuffer CameraConstants : register(b1) {\n";
 			out << "    float4x4 View;\n";
@@ -292,6 +326,11 @@ namespace CalyxEngine {
 			out << "    float toonSpecularSoftness;\n";
 			out << "    float toonSpecularIntensity;\n";
 			out << "    float pad3;\n";
+			out << "    float4 emissiveColor;\n";
+			out << "    float emissiveIntensity;\n";
+			out << "    int useNormalMap;\n";
+			out << "    float normalMapStrength;\n";
+			out << "    int normalMapFlipY;\n";
 			out << "};\n\n";
 			out << "struct DirectionalLight { float4 color; float3 direction; float intensity; };\n";
 			out << "struct PointLight { float4 color; float3 position; float intensity; float radius; float decay; float2 pad; };\n\n";
@@ -304,9 +343,13 @@ namespace CalyxEngine {
 			out << "TextureCube<float4> gEnvironmentMap : register(t1);\n";
 			out << "Texture2D<float> gShadowMap : register(t2);\n";
 			out << "RaytracingAccelerationStructure gRtScene : register(t3);\n";
+			out << "Texture2D<float4> gNormalMap : register(t4);\n";
 			out << "Texture2D<float4> gGraphTextures[8] : register(t9);\n";
 			out << "SamplerState gSampler : register(s0);\n\n";
-			out << "struct PixelShaderOutput { float4 color : SV_TARGET0; };\n\n";
+			out << "struct PixelShaderOutput {\n";
+			out << "    float4 color : SV_TARGET0;\n";
+			out << "    float4 bloomMask : SV_TARGET1;\n";
+			out << "};\n\n";
 			out << materialFunction.hlsl << "\n";
 			out << R"(
 
@@ -353,13 +396,15 @@ void ComputeGeneratedStandardDirectionalLight(float3 normal, float3 toEye, float
     float NdotL = saturate(rawNdotL);
     float3 H = normalize(L + toEye);
     float NdotH = saturate(dot(normal, H));
+    float roughness = saturate(surface.roughness);
+    float specularWeight = pow(1.0f - roughness, 2.0f);
     if(surface.lightingMode == 0) {
         float halfLambert = pow(rawNdotL * 0.5f + 0.5f, 2.0f);
         diffuse = albedo * gDirectionalLight.color.rgb * halfLambert * gDirectionalLight.intensity;
-        specular = gDirectionalLight.color.rgb * pow(NdotH, surface.shininess) * gDirectionalLight.intensity;
+        specular = gDirectionalLight.color.rgb * pow(NdotH, surface.shininess) * gDirectionalLight.intensity * specularWeight;
     } else if(surface.lightingMode == 1) {
         diffuse = albedo * gDirectionalLight.color.rgb * NdotL * gDirectionalLight.intensity;
-        specular = gDirectionalLight.color.rgb * pow(NdotH, surface.shininess) * gDirectionalLight.intensity;
+        specular = gDirectionalLight.color.rgb * pow(NdotH, surface.shininess) * gDirectionalLight.intensity * specularWeight;
     }
 }
 
@@ -379,6 +424,8 @@ void ComputeGeneratedStandardPointLight(float3 normal, float3 toEye, float3 worl
     float3 topPosition1 = 0.0f;
     float topDistance0 = 0.0f;
     float topDistance1 = 0.0f;
+    float roughness = saturate(surface.roughness);
+    float specularWeight = pow(1.0f - roughness, 2.0f);
     [loop]
     for(uint i = 0; i < gPointLightCount; ++i) {
         PointLight pointLight = gPointLights[i];
@@ -394,7 +441,7 @@ void ComputeGeneratedStandardPointLight(float3 normal, float3 toEye, float3 worl
         diffuse += lightDiffuse;
         float3 halfVec = normalize(-lightDir + toEye);
         float NdotH = saturate(dot(normal, halfVec));
-        float3 lightSpecular = pointLight.color.rgb * pow(NdotH, surface.shininess) * pointLight.intensity * attenuation;
+        float3 lightSpecular = pointLight.color.rgb * pow(NdotH, surface.shininess) * pointLight.intensity * attenuation * specularWeight;
         specular += lightSpecular;
         if(gPointLightShadowsEnabled != 0 && contribution > gPointShadowContributionThreshold) {
             if(contribution > topContribution0) {
@@ -587,19 +634,65 @@ float ComputeDirectionalSoftShadow_RT(float3 worldPos, float3 normal, float3 L) 
     float shadow = 1.0f - (occluded / (float)sampleCount);
     return lerp(gMinShadow, 1.0f, shadow);
 }
+)";
+			out << R"(
+
+float3 ApplyGeneratedNormalMap(VertexShaderOutput input, float3 vertexNormal, GeneratedMaterialSurface surface) {
+    if(surface.normalMapStrength <= 0.0f) {
+        return vertexNormal;
+    }
+
+    float3 tangent = normalize(input.tangent.xyz);
+    tangent = normalize(tangent - vertexNormal * dot(tangent, vertexNormal));
+    float3 bitangent = normalize(cross(vertexNormal, tangent) * input.tangent.w);
+
+    float3 normalTexel = surface.normalMap.rgb;
+    if(all(normalTexel > 0.99f)) {
+        return vertexNormal;
+    }
+
+    float grayscaleDelta = max(abs(normalTexel.r - normalTexel.g), abs(normalTexel.g - normalTexel.b));
+    if(grayscaleDelta < 0.03f) {
+        float height = normalTexel.r;
+        float heightDx = ddx(height);
+        float heightDy = ddy(height);
+        float2 uvDx = ddx(input.texcoord);
+        float2 uvDy = ddy(input.texcoord);
+        float texelScale = max(max(length(uvDx), length(uvDy)), 0.0001f);
+        float2 heightSlope = float2(heightDx, heightDy) / texelScale;
+        float3 bumpNormal = normalize(float3(-heightSlope.x, -heightSlope.y, 1.0f));
+        bumpNormal.xy *= max(surface.normalMapStrength, 0.0f);
+        bumpNormal = normalize(bumpNormal);
+        float3x3 bumpTbn = float3x3(tangent, bitangent, vertexNormal);
+        return normalize(mul(bumpNormal, bumpTbn));
+    }
+
+    float3 sampledNormal = normalTexel * 2.0f - 1.0f;
+    if(gMaterial.normalMapFlipY != 0) {
+        sampledNormal.y *= -1.0f;
+    }
+    sampledNormal.xy *= max(surface.normalMapStrength, 0.0f);
+    sampledNormal = normalize(sampledNormal);
+
+    float3x3 tbn = float3x3(tangent, bitangent, vertexNormal);
+    return normalize(mul(sampledNormal, tbn));
+}
 
 PixelShaderOutput main(VertexShaderOutput input) {
     PixelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float3 normal = normalize(input.normal);
     float3 toEye = normalize(cameraPosition - input.worldPosition);
+    float3 normal = normalize(input.normal);
     GeneratedMaterialSurface surface = EvaluateGeneratedMaterial(transformedUV.xy, input.worldPosition, normal, toEye);
+    normal = ApplyGeneratedNormalMap(input, normal, surface);
     float3 albedo = surface.baseColor.rgb;
     float alpha = surface.baseColor.a;
+    float3 emissive = surface.emissiveColor.rgb * max(surface.emissiveIntensity, 0.0f);
 
     if(surface.lightingMode == 4) {
         if(alpha <= 0.01f) discard;
-        output.color = float4(albedo, alpha);
+        output.color = float4(ApplyToneMappingAndGamma(albedo, 1.0f) + emissive, alpha);
+        output.bloomMask = float4(emissive, 1.0f);
         return output;
     }
 
@@ -625,15 +718,18 @@ PixelShaderOutput main(VertexShaderOutput input) {
     directionalSpecular *= shadow;
 
     float3 litColor = directionalDiffuse + directionalSpecular + pointDiffuse + pointSpecular;
+    litColor += emissive;
     litColor += albedo * 0.07f;
 
     if(surface.isReflect != 0) {
         float3 viewDir = normalize(input.worldPosition - cameraPosition);
         float3 reflectDir = reflect(viewDir, normal);
         const float maxMipLevel = 7.0f;
-        float mipLevel = saturate(surface.roughness) * maxMipLevel;
+        float roughness = saturate(surface.roughness);
+        float mipLevel = roughness * maxMipLevel;
+        float reflectionWeight = gMaterial.environmentCoefficient * pow(1.0f - roughness, 2.0f);
         float3 envColor = gEnvironmentMap.SampleLevel(gSampler, reflectDir, mipLevel).rgb;
-        litColor += envColor * gMaterial.environmentCoefficient;
+        litColor += envColor * reflectionWeight;
     }
 
     float3 finalColor = ApplyToneMappingAndGamma(litColor, 1.0f);
@@ -647,14 +743,13 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	float fadeFar = 10.0f;
 	float fade = saturate((dist - fadeNear) / (fadeFar - fadeNear));
 
-	// カメラ近傍フェード値(0.0〜1.0)に基づいてピクセルを破棄
-
 	if(cameraDitherEnabled != 0 && objectDitherEnabled != 0 && fade <= ditherThreshold) {
 		discard;
 	}
 
 if(alpha <= 0.01f) discard;
     output.color = float4(finalColor, alpha);
+    output.bloomMask = float4(emissive, 1.0f);
     return output;
 }
 )";
@@ -1059,9 +1154,15 @@ float GeneratedValueNoise(float2 p) {
 			surface.textureSlotCount = (std::min)(TextureSlotCount(material.graph), kMaxGraphTextures);
 			surface.lightingMode = material.lightingMode;
 			surface.baseColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.color", false} : ColorExpression(material.color);
+			surface.emissiveColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.emissiveColor", false} : ColorExpression(material.emissiveColor);
+			surface.emissiveIntensity = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.emissiveIntensity", false} : FloatExpression(material.emissiveIntensity);
 			surface.shininess = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.shiniess", false} : FloatExpression(material.shininess);
 			surface.roughness = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.roughness", false} : FloatExpression(material.roughness);
 			surface.isReflect = material.isReflect;
+			surface.normalMap = useMaterialCBufferDefaults
+				? MaterialExpression{"(gMaterial.useNormalMap != 0 ? gNormalMap.Sample(gSampler, uv) : float4(0.5f, 0.5f, 1.0f, 1.0f))", false}
+				: ColorExpression({0.5f, 0.5f, 1.0f, 1.0f});
+			surface.normalMapStrength = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.normalMapStrength", false} : FloatExpression(material.normalMapStrength);
 			surface.toonHighlightColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.toonHighlightColor", false} : ColorExpression(material.toonHighlightColor);
 			surface.toonBaseColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.toonBaseColor", false} : ColorExpression(material.toonBaseColor);
 			surface.toonFirstShadeColor = useMaterialCBufferDefaults ? MaterialExpression{"gMaterial.toonMidShadowColor", false} : ColorExpression(material.toonMidShadowColor);
@@ -1079,6 +1180,8 @@ float GeneratedValueNoise(float2 p) {
 		static void ApplyLegacyOutputExpressions(const MaterialAsset& material, const Node& output, MaterialExpressionSurface& surface) {
 			for(const NodePin& pin : output.inputs) {
 				if(pin.name == "BaseColor") surface.baseColor = ColorExpressionFromInput(material.graph, pin.id, surface.baseColor, 0);
+				if(pin.name == "Emissive") surface.emissiveColor = ColorExpressionFromInput(material.graph, pin.id, surface.emissiveColor, 0);
+				if(pin.name == "Emissive Intensity") surface.emissiveIntensity = FloatExpressionFromInput(material.graph, pin.id, surface.emissiveIntensity, 0);
 				if(pin.name == "Shininess") surface.shininess = FloatExpressionFromInput(material.graph, pin.id, surface.shininess, 0);
 				if(pin.name == "Roughness") surface.roughness = FloatExpressionFromInput(material.graph, pin.id, surface.roughness, 0);
 				if(pin.name == "Lighting Mode") {
@@ -1108,10 +1211,13 @@ float GeneratedValueNoise(float2 p) {
 			if(master->type == "ToonMaster") {
 				surface.lightingMode = 2;
 				const Vector4 baseColor = GetColorProperty(*master, "baseColor", {1, 1, 1, 1});
+				const Vector4 emissiveColor = GetColorProperty(*master, "emissiveColor", material.emissiveColor);
 				const Vector4 highlightColor = GetColorProperty(*master, "highlightColor", {1.08f, 1.06f, 1.02f, 1.0f});
 				const Vector4 firstShade = GetColorProperty(*master, "firstShadeColor", {0.72f, 0.76f, 0.86f, 1.0f});
 				const Vector4 secondShade = GetColorProperty(*master, "secondShadeColor", {0.42f, 0.46f, 0.58f, 1.0f});
 				surface.baseColor = ColorInputExpression(material, *master, "Base Color", useMaterialCBufferDefaults ? surface.baseColor : ColorExpression(baseColor));
+				surface.emissiveColor = ColorInputExpression(material, *master, "Emissive", useMaterialCBufferDefaults ? surface.emissiveColor : ColorExpression(emissiveColor));
+				surface.emissiveIntensity = FloatInputExpression(material, *master, "Emissive Intensity", useMaterialCBufferDefaults ? surface.emissiveIntensity : FloatExpression(GetFloatProperty(*master, "emissiveIntensity", material.emissiveIntensity)));
 				surface.toonBaseColor = useMaterialCBufferDefaults ? surface.toonBaseColor : ColorExpression({1, 1, 1, 1});
 				surface.toonHighlightColor = ColorInputExpression(material, *master, "Highlight", useMaterialCBufferDefaults ? surface.toonHighlightColor : ColorExpression(highlightColor));
 				surface.toonFirstShadeColor = ColorInputExpression(material, *master, "1st Shade", useMaterialCBufferDefaults ? surface.toonFirstShadeColor : ColorExpression(firstShade));
@@ -1123,20 +1229,28 @@ float GeneratedValueNoise(float2 p) {
 				surface.toonSpecularThreshold = FloatInputExpression(material, *master, "Spec Threshold", useMaterialCBufferDefaults ? surface.toonSpecularThreshold : FloatExpression(GetFloatProperty(*master, "specularThreshold", 0.96f)));
 				surface.toonSpecularSoftness = FloatInputExpression(material, *master, "Spec Softness", useMaterialCBufferDefaults ? surface.toonSpecularSoftness : FloatExpression(GetFloatProperty(*master, "specularSoftness", 0.02f)));
 				surface.toonSpecularIntensity = FloatInputExpression(material, *master, "Spec Intensity", useMaterialCBufferDefaults ? surface.toonSpecularIntensity : FloatExpression(GetFloatProperty(*master, "specularIntensity", 0.35f)));
+				surface.normalMap = ColorInputExpression(material, *master, "Normal Map", surface.normalMap);
+				surface.normalMapStrength = FloatInputExpression(material, *master, "Normal Strength", surface.normalMapStrength);
 				return surface;
 			}
 
 			if(master->type == "LitMaster") {
 				surface.lightingMode = static_cast<int32_t>(GetFloatProperty(*master, "lightingMode", 0.0f));
 				surface.baseColor = ColorInputExpression(material, *master, "Base Color", useMaterialCBufferDefaults ? surface.baseColor : ColorExpression(material.color));
+				surface.emissiveColor = ColorInputExpression(material, *master, "Emissive", useMaterialCBufferDefaults ? surface.emissiveColor : ColorExpression(GetColorProperty(*master, "emissiveColor", material.emissiveColor)));
+				surface.emissiveIntensity = FloatInputExpression(material, *master, "Emissive Intensity", useMaterialCBufferDefaults ? surface.emissiveIntensity : FloatExpression(GetFloatProperty(*master, "emissiveIntensity", material.emissiveIntensity)));
 				surface.shininess = FloatInputExpression(material, *master, "Shininess", useMaterialCBufferDefaults ? surface.shininess : FloatExpression(GetFloatProperty(*master, "shininess", material.shininess)));
 				surface.roughness = FloatInputExpression(material, *master, "Roughness", useMaterialCBufferDefaults ? surface.roughness : FloatExpression(GetFloatProperty(*master, "roughness", material.roughness)));
+				surface.normalMap = ColorInputExpression(material, *master, "Normal Map", surface.normalMap);
+				surface.normalMapStrength = FloatInputExpression(material, *master, "Normal Strength", surface.normalMapStrength);
 				return surface;
 			}
 
 			if(master->type == "UnlitMaster") {
 				surface.lightingMode = 4;
 				surface.baseColor = ColorInputExpression(material, *master, "Base Color", useMaterialCBufferDefaults ? surface.baseColor : ColorExpression(material.color));
+				surface.emissiveColor = ColorInputExpression(material, *master, "Emissive", useMaterialCBufferDefaults ? surface.emissiveColor : ColorExpression(GetColorProperty(*master, "emissiveColor", material.emissiveColor)));
+				surface.emissiveIntensity = FloatInputExpression(material, *master, "Emissive Intensity", useMaterialCBufferDefaults ? surface.emissiveIntensity : FloatExpression(GetFloatProperty(*master, "emissiveIntensity", material.emissiveIntensity)));
 				return surface;
 			}
 

@@ -231,6 +231,80 @@
         {
             "cameraDitherEnabled": true,
             "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 1
+            },
+            "guid": "8d9fec09-ae24-48e2-8ff6-91b2c9af80ec",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "waterDrop.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "DroolRainObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "e84943cd-e4dc-419c-b140-a465b01c690a",
+            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
+            "prefabSourceGuid": "2cca6676-9cfc-4730-8fa3-2540cdb13efc",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -5.447416305541992,
+                    "y": 12.142928123474121,
+                    "z": 6.645076751708984
+                }
+            },
+            "type": "DroolRainObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
                 "isDraw": true,
@@ -311,7 +385,7 @@
                     "z": 0.1709197610616684
                 },
                 "decay": 1.0,
-                "intensity": 3.019657611846924,
+                "intensity": 2.700605869293213,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 0.0,
@@ -345,7 +419,7 @@
             "guid": "bacf9cc1-3915-4484-b4cf-19beac069257",
             "modelConfig": {
                 "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
                 "modelName": "lantern.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
@@ -441,12 +515,12 @@
         {
             "cameraDitherEnabled": true,
             "colliderConfig": {
-                "colliderType": 16,
+                "colliderType": 128,
                 "isCollisionEnabled": true,
                 "isDraw": true,
                 "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
+                    "x": -3.0,
+                    "y": 4.0,
                     "z": 0.0
                 },
                 "radius": 1.0,
@@ -456,17 +530,17 @@
                     "z": 0.0
                 },
                 "size": {
-                    "x": 1.0,
-                    "y": 1.0,
+                    "x": 6.5,
+                    "y": 8.0,
                     "z": 1.0
                 },
                 "targetType": 1
             },
-            "guid": "8d9fec09-ae24-48e2-8ff6-91b2c9af80ec",
+            "guid": "1a5b899a-00b8-4010-ae9a-1e395a89dac2",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "waterDrop.obj",
+                "modelName": "sanmonDoorR.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -476,7 +550,7 @@
                     }
                 }
             },
-            "name": "DroolRainObject",
+            "name": "BellProjectileDoorR",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -486,9 +560,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "e84943cd-e4dc-419c-b140-a465b01c690a",
-            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
-            "prefabSourceGuid": "2cca6676-9cfc-4730-8fa3-2540cdb13efc",
+            "parentGuid": "827343fd-8634-48ea-8d53-cb67c48fec4c",
+            "prefabAssetGuid": "8c06b3e9-7210-42e8-93e4-d57ed3e67f4e",
+            "prefabSourceGuid": "2298bf98-eab4-4088-9f5a-46a6e74d1d72",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": false,
@@ -500,17 +574,17 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
+                    "x": 2.0,
+                    "y": 2.0,
                     "z": 1.0
                 },
                 "translation": {
-                    "x": -5.447416305541992,
-                    "y": 12.142928123474121,
-                    "z": 6.645076751708984
+                    "x": 12.0,
+                    "y": 0.0,
+                    "z": 40.0
                 }
             },
-            "type": "DroolRainObject"
+            "type": "BellProjectileDoor"
         },
         {
             "BellProjectileEvent": {
@@ -836,80 +910,6 @@
             "type": "BellProjectileDoor"
         },
         {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 128,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": -3.0,
-                    "y": 4.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 6.5,
-                    "y": 8.0,
-                    "z": 1.0
-                },
-                "targetType": 1
-            },
-            "guid": "1a5b899a-00b8-4010-ae9a-1e395a89dac2",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "sanmonDoorR.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "BellProjectileDoorR",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "827343fd-8634-48ea-8d53-cb67c48fec4c",
-            "prefabAssetGuid": "8c06b3e9-7210-42e8-93e4-d57ed3e67f4e",
-            "prefabSourceGuid": "2298bf98-eab4-4088-9f5a-46a6e74d1d72",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 2.0,
-                    "y": 2.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 12.0,
-                    "y": 0.0,
-                    "z": 40.0
-                }
-            },
-            "type": "BellProjectileDoor"
-        },
-        {
             "guid": "752b6d6f-8df6-448c-a75f-0c2ec1a86b5b",
             "name": "DebugCamera",
             "objectType": 0,
@@ -919,10 +919,10 @@
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 0.9250451922416687,
-                    "x": 0.3753621578216553,
-                    "y": 0.05399008467793465,
-                    "z": -0.02190793864428997
+                    "w": 0.9758052825927734,
+                    "x": 0.1856199949979782,
+                    "y": 0.11350458860397339,
+                    "z": -0.02159111201763153
                 },
                 "scale": {
                     "x": 1.0,
@@ -930,9 +930,9 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": -5.262576580047607,
-                    "y": 25.239992141723633,
-                    "z": -1.3184032440185547
+                    "x": -10.891727447509766,
+                    "y": 6.103793144226074,
+                    "z": 15.736137390136719
                 }
             },
             "type": "DebugCamera"
@@ -1302,6 +1302,1002 @@
         {
             "cameraDitherEnabled": true,
             "colliderConfig": {
+                "colliderType": 128,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": -3.0,
+                    "y": 4.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 6.5,
+                    "y": 8.0,
+                    "z": 1.0
+                },
+                "targetType": 1
+            },
+            "guid": "7d40025c-5bc5-4cab-8988-5c7d2c5787cb",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "akamonDoorR.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "DiceProjectileDoorR",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "a6c5a894-55c1-4cea-b2b2-6721cedeb124",
+            "prefabAssetGuid": "bc3889ff-8f96-492f-a27d-19e227432e8d",
+            "prefabSourceGuid": "f2065554-06e1-41f2-947e-17ab0f6a56b3",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 5.0,
+                    "y": 0.0,
+                    "z": 25.5423641204834
+                }
+            },
+            "type": "BellProjectileDoor"
+        },
+        {
+            "guid": "5cea663f-3afb-4b5b-aca3-5b57fef30653",
+            "name": "RailCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "RailCamera"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 3
+            },
+            "guid": "b9d7ad41-f297-420c-9dda-b2b4f75f1e7f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "cone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "FireLoadObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
+            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
+            "prefabSourceGuid": "b9d7ad41-f297-420c-9dda-b2b4f75f1e7f",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -6.008864879608154,
+                    "y": 0.3964109420776367,
+                    "z": 17.178476333618164
+                }
+            },
+            "type": "FireLoadObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "310595e4-6d47-45f1-825a-5d97cf6d179e",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "shojiPaper.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShojiPaperObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5ddebe44-cfe2-4ef8-a63c-e666a1ea2817",
+            "prefabAssetGuid": "df8dd86a-38df-445b-8e80-25d721411876",
+            "prefabSourceGuid": "812ee0f0-0b52-424b-8e71-3fdf1bc58078",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -1.75,
+                    "y": 4.300000190734863,
+                    "z": 0.0
+                }
+            },
+            "type": "ShojiPaperObject"
+        },
+        {
+            "SplineDeformObject": {
+                "autoRebuild": true,
+                "deformAxis": 2,
+                "distanceOffset": -0.25,
+                "radiusScale": 30.3700008392334,
+                "sourceModelFile": "wall.obj",
+                "splinePath": "Resources/Assets/Spline/Rail.json"
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "91b3d307-48b3-4d0b-acda-493492630634",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "wall.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Spline Wall Deform",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.673860490322113,
+                    "y": 0.5099999904632568,
+                    "z": 0.5099999904632568
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.19230127334594727,
+                    "z": -0.6501591205596924
+                }
+            },
+            "type": "SplineDeformObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "3cbd057f-5375-454c-bb04-d6ef8a7dcbfb",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "PredictionCircle.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "PredictionCircle",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": false,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "076cdef1-f1b7-4974-b71e-c4a8b8c9c8c7",
+            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
+            "prefabSourceGuid": "2a14258a-4734-485e-8d55-9c6d1846a1a2",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": false,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -2.9313859939575195,
+                    "y": 0.009999999776482582,
+                    "z": 103.29794311523438
+                }
+            },
+            "type": "PredictionCircle"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "f244f328-d5dc-4cb4-80cc-df194c8cbce7",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "PredictionCircle.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "PredictionCircle",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": false,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "437c840e-0a42-4537-bf57-d3426baed0c7",
+            "prefabAssetGuid": "bbe603a2-75aa-415b-849b-d20612eda5f1",
+            "prefabSourceGuid": "3baa4a1f-13d2-4283-af92-762e7091987b",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": false,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.2000000476837158,
+                    "y": 1.2000000476837158,
+                    "z": 1.2000000476837158
+                },
+                "translation": {
+                    "x": -0.8374866247177124,
+                    "y": 0.10000000149011612,
+                    "z": 21.338321685791016
+                }
+            },
+            "type": "PredictionCircle"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "3e681c2e-a615-4a23-9684-0a92ffaff10e",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "shojiPaper.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShojiPaperObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5ddebe44-cfe2-4ef8-a63c-e666a1ea2817",
+            "prefabAssetGuid": "df8dd86a-38df-445b-8e80-25d721411876",
+            "prefabSourceGuid": "f45e0851-b96b-44b5-82b8-39cde0a3357c",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 1.75,
+                    "y": 7.099999904632568,
+                    "z": 0.0
+                }
+            },
+            "type": "ShojiPaperObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 3
+            },
+            "guid": "cf0399e4-fd18-488d-8673-a38f16cc1d13",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "cone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "FireLoadObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
+            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
+            "prefabSourceGuid": "cf0399e4-fd18-488d-8673-a38f16cc1d13",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 1.024703860282898,
+                    "y": 0.3964109420776367,
+                    "z": 17.198095321655273
+                }
+            },
+            "type": "FireLoadObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "004cc0cd-28e6-4bd5-9074-7d7108c1ce3f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "PredictionCircle.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "PredictionCircle",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": false,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "d21332a2-b2ef-418a-bdf6-fccdb88153f9",
+            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
+            "prefabSourceGuid": "18dbdce0-72cb-479c-8311-0095895c0a28",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": false,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 2.9231534004211426,
+                    "y": 0.009999999776482582,
+                    "z": 90.93029022216797
+                }
+            },
+            "type": "PredictionCircle"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 1
+            },
+            "guid": "ddd84393-e112-45fd-a39f-5dad931f0542",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "waterDrop.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "DroolRainObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "e84943cd-e4dc-419c-b140-a465b01c690a",
+            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
+            "prefabSourceGuid": "92fa09ab-8919-4198-b762-11eeabb35447",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -4.677040100097656,
+                    "y": 12.142928123474121,
+                    "z": 14.695747375488281
+                }
+            },
+            "type": "DroolRainObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 1
+            },
+            "guid": "90449554-8d52-42d4-841b-99d6c6b788b6",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "manekineko.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "LuckyCatObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "a66071e0-9669-4279-9197-1144d08b1cab",
+            "prefabAssetGuid": "df8dd86a-38df-445b-8e80-25d721411876",
+            "prefabSourceGuid": "6ac576ed-ea77-4ed4-b77f-536eb2a50ee3",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.5,
+                    "y": 0.5,
+                    "z": 0.5
+                },
+                "translation": {
+                    "x": -1.7310328483581543,
+                    "y": 0.0,
+                    "z": 10.185135841369629
+                }
+            },
+            "type": "LuckyCatObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 3
+            },
+            "guid": "702a3508-27ee-45d7-83ae-d82c11556929",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "cone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "FireLoadObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
+            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
+            "prefabSourceGuid": "702a3508-27ee-45d7-83ae-d82c11556929",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 4.031400203704834,
+                    "y": 0.3964109420776367,
+                    "z": 15.10399055480957
+                }
+            },
+            "type": "FireLoadObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 16,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 3
+            },
+            "guid": "cdfe5c63-ea24-4de3-8ce2-10d26ee0ed44",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "cone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "FireLoadObject",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
+            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
+            "prefabSourceGuid": "cdfe5c63-ea24-4de3-8ce2-10d26ee0ed44",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": false,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -1.4635355472564697,
+                    "y": 0.3964109420776367,
+                    "z": 16.78927993774414
+                }
+            },
+            "type": "FireLoadObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
                 "colliderType": 16,
                 "isCollisionEnabled": false,
                 "isDraw": true,
@@ -1624,318 +2620,6 @@
             "type": "DroolRainObject"
         },
         {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 16,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 1
-            },
-            "guid": "ddd84393-e112-45fd-a39f-5dad931f0542",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "waterDrop.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "DroolRainObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "e84943cd-e4dc-419c-b140-a465b01c690a",
-            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
-            "prefabSourceGuid": "92fa09ab-8919-4198-b762-11eeabb35447",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -4.677040100097656,
-                    "y": 12.142928123474121,
-                    "z": 14.695747375488281
-                }
-            },
-            "type": "DroolRainObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 16,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 1
-            },
-            "guid": "90449554-8d52-42d4-841b-99d6c6b788b6",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "manekineko.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "LuckyCatObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "a66071e0-9669-4279-9197-1144d08b1cab",
-            "prefabAssetGuid": "df8dd86a-38df-445b-8e80-25d721411876",
-            "prefabSourceGuid": "6ac576ed-ea77-4ed4-b77f-536eb2a50ee3",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 0.5,
-                    "y": 0.5,
-                    "z": 0.5
-                },
-                "translation": {
-                    "x": -1.7310328483581543,
-                    "y": 0.0,
-                    "z": 10.185135841369629
-                }
-            },
-            "type": "LuckyCatObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 16,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 3
-            },
-            "guid": "702a3508-27ee-45d7-83ae-d82c11556929",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "cone.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "FireLoadObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
-            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
-            "prefabSourceGuid": "702a3508-27ee-45d7-83ae-d82c11556929",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 4.031400203704834,
-                    "y": 0.3964109420776367,
-                    "z": 15.10399055480957
-                }
-            },
-            "type": "FireLoadObject"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "ef87e29e-e8a0-4714-b91d-f7d9ba15afc3",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 11.175504684448242,
-                    "y": 8.482498168945313,
-                    "z": 106.01519775390625
-                }
-            },
-            "type": "Lantern"
-        },
-        {
             "GroundSpikeEvent": {
                 "eventParam": {
                     "fields": {
@@ -2227,80 +2911,6 @@
             "type": "FireLoadEvent"
         },
         {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "f244f328-d5dc-4cb4-80cc-df194c8cbce7",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "PredictionCircle.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "PredictionCircle",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": false,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "437c840e-0a42-4537-bf57-d3426baed0c7",
-            "prefabAssetGuid": "bbe603a2-75aa-415b-849b-d20612eda5f1",
-            "prefabSourceGuid": "3baa4a1f-13d2-4283-af92-762e7091987b",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": false,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.2000000476837158,
-                    "y": 1.2000000476837158,
-                    "z": 1.2000000476837158
-                },
-                "translation": {
-                    "x": -0.8374866247177124,
-                    "y": 0.10000000149011612,
-                    "z": 21.338321685791016
-                }
-            },
-            "type": "PredictionCircle"
-        },
-        {
             "cameraDitherEnabled": false,
             "colliderConfig": {
                 "colliderType": 0,
@@ -2327,7 +2937,7 @@
             "guid": "6fa81461-886a-4dd1-b7c9-42be5bbe2226",
             "modelConfig": {
                 "blendMode": 5,
-                "materialGuid": "4367fd92-8f1f-4b12-b601-94e996adf837",
+                "materialGuid": "e8c0b3fe-57e0-46ac-a19e-f076814ef683",
                 "modelName": "plane.obj",
                 "textureGuid": "bfdc462d-81f1-4c5f-95ee-bb3ee3fc53e1",
                 "uvTransConfig": {
@@ -2523,80 +3133,6 @@
         {
             "cameraDitherEnabled": true,
             "colliderConfig": {
-                "colliderType": 16,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 3
-            },
-            "guid": "cf0399e4-fd18-488d-8673-a38f16cc1d13",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "cone.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "FireLoadObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
-            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
-            "prefabSourceGuid": "cf0399e4-fd18-488d-8673-a38f16cc1d13",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 1.024703860282898,
-                    "y": 0.3964109420776367,
-                    "z": 17.198095321655273
-                }
-            },
-            "type": "FireLoadObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
                 "isDraw": true,
@@ -2741,262 +3277,6 @@
                 }
             },
             "type": "FireLoadObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 16,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 3
-            },
-            "guid": "cdfe5c63-ea24-4de3-8ce2-10d26ee0ed44",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "cone.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "FireLoadObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
-            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
-            "prefabSourceGuid": "cdfe5c63-ea24-4de3-8ce2-10d26ee0ed44",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -1.4635355472564697,
-                    "y": 0.3964109420776367,
-                    "z": 16.78927993774414
-                }
-            },
-            "type": "FireLoadObject"
-        },
-        {
-            "guid": "5cea663f-3afb-4b5b-aca3-5b57fef30653",
-            "name": "RailCamera",
-            "objectType": 0,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "RailCamera"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 16,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 3
-            },
-            "guid": "b9d7ad41-f297-420c-9dda-b2b4f75f1e7f",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "cone.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "FireLoadObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "4352b987-91f3-4336-95ee-4f4aee1a7fad",
-            "prefabAssetGuid": "d4dee4d4-ccac-4c73-a3f2-12349d950fc0",
-            "prefabSourceGuid": "b9d7ad41-f297-420c-9dda-b2b4f75f1e7f",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -6.008864879608154,
-                    "y": 0.3964109420776367,
-                    "z": 17.178476333618164
-                }
-            },
-            "type": "FireLoadObject"
-        },
-        {
-            "SplineDeformObject": {
-                "autoRebuild": true,
-                "deformAxis": 2,
-                "distanceOffset": -0.25,
-                "radiusScale": 30.3700008392334,
-                "sourceModelFile": "wall.obj",
-                "splinePath": "Resources/Assets/Spline/Rail.json"
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "91b3d307-48b3-4d0b-acda-493492630634",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "wall.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Spline Wall Deform",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 0.673860490322113,
-                    "y": 0.5099999904632568,
-                    "z": 0.5099999904632568
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.19230127334594727,
-                    "z": -0.6501591205596924
-                }
-            },
-            "type": "SplineDeformObject"
         },
         {
             "cameraDitherEnabled": true,
@@ -3803,154 +4083,6 @@
         {
             "cameraDitherEnabled": true,
             "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "004cc0cd-28e6-4bd5-9074-7d7108c1ce3f",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "PredictionCircle.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "PredictionCircle",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": false,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "d21332a2-b2ef-418a-bdf6-fccdb88153f9",
-            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
-            "prefabSourceGuid": "18dbdce0-72cb-479c-8311-0095895c0a28",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": false,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 2.9231534004211426,
-                    "y": 0.009999999776482582,
-                    "z": 90.93029022216797
-                }
-            },
-            "type": "PredictionCircle"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "3cbd057f-5375-454c-bb04-d6ef8a7dcbfb",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "PredictionCircle.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "PredictionCircle",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": false,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "076cdef1-f1b7-4974-b71e-c4a8b8c9c8c7",
-            "prefabAssetGuid": "9ef7879e-fbec-41fb-bbf2-836f5435f7c5",
-            "prefabSourceGuid": "2a14258a-4734-485e-8d55-9c6d1846a1a2",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": false,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -2.9313859939575195,
-                    "y": 0.009999999776482582,
-                    "z": 103.29794311523438
-                }
-            },
-            "type": "PredictionCircle"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
                 "colliderType": 16,
                 "isCollisionEnabled": true,
                 "isDraw": true,
@@ -4529,816 +4661,6 @@
             "type": "GroundSpikeObject"
         },
         {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "8177d489-9a65-473b-8dd9-5dba5a412a8a",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -10.132442474365234,
-                    "y": 5.254366874694824,
-                    "z": 32.83847427368164
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "61cfb81c-26ce-4672-bbef-8f8b61bf872b",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -8.518814086914063,
-                    "y": 6.998375415802002,
-                    "z": 136.235595703125
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "0d4435ad-7df0-42fd-9b0a-3b11383b969b",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 9.007023811340332,
-                    "y": 6.400631427764893,
-                    "z": 16.63302993774414
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "039c9eb5-4938-4a15-9372-926f484ddb31",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 7.058166027069092,
-                    "y": 4.313998222351074,
-                    "z": 48.15019989013672
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "dcffade5-1453-46db-a8ae-e143cb271c7e",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 10.638812065124512,
-                    "y": 5.715381622314453,
-                    "z": 1.8443337678909302
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "e5ff32da-1d2a-4ee4-8696-e933f2ab2d27",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -13.433332443237305,
-                    "y": 4.964094161987305,
-                    "z": 65.34550476074219
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "41204df3-6d03-47a9-945f-c012100cdabd",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 11.872092247009277,
-                    "y": 5.118865013122559,
-                    "z": 83.42649841308594
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "d4de3861-b3f0-4d7f-8bf2-750ae84a1ffe",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -11.359331130981445,
-                    "y": 5.346595764160156,
-                    "z": 96.31146240234375
-                }
-            },
-            "type": "Lantern"
-        },
-        {
-            "Lantern": {
-                "color": {
-                    "w": 1.0,
-                    "x": 0.8576512336730957,
-                    "y": 0.4348592162132263,
-                    "z": 0.1709197610616684
-                },
-                "decay": 1.0,
-                "intensity": 3.019657611846924,
-                "lightLocalPosition": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 20.0
-            },
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "f4de001c-3e69-496d-b73f-c05025602b25",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "lantern.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 2.2827803331126906e+38,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "Lantern",
-            "objectType": 1,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
-            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -0.25800061225891113,
-                    "y": 7.588906288146973,
-                    "z": 171.92958068847656
-                }
-            },
-            "type": "Lantern"
-        },
-        {
             "DiceProjectileEvent": {
                 "doorLGuid": "56a97d8c-2b8b-4f6b-b4b9-865e4691b9d7",
                 "doorRGuid": "7d40025c-5bc5-4cab-8988-5c7d2c5787cb",
@@ -5799,80 +5121,6 @@
                 },
                 "translation": {
                     "x": -5.0,
-                    "y": 0.0,
-                    "z": 25.5423641204834
-                }
-            },
-            "type": "BellProjectileDoor"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 128,
-                "isCollisionEnabled": true,
-                "isDraw": true,
-                "offset": {
-                    "x": -3.0,
-                    "y": 4.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 6.5,
-                    "y": 8.0,
-                    "z": 1.0
-                },
-                "targetType": 1
-            },
-            "guid": "7d40025c-5bc5-4cab-8988-5c7d2c5787cb",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "akamonDoorR.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "DiceProjectileDoorR",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "a6c5a894-55c1-4cea-b2b2-6721cedeb124",
-            "prefabAssetGuid": "bc3889ff-8f96-492f-a27d-19e227432e8d",
-            "prefabSourceGuid": "f2065554-06e1-41f2-947e-17ab0f6a56b3",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": false,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 5.0,
                     "y": 0.0,
                     "z": 25.5423641204834
                 }
@@ -8007,80 +7255,6 @@
                 },
                 "targetType": 0
             },
-            "guid": "310595e4-6d47-45f1-825a-5d97cf6d179e",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "shojiPaper.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "ShojiPaperObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "5ddebe44-cfe2-4ef8-a63c-e666a1ea2817",
-            "prefabAssetGuid": "df8dd86a-38df-445b-8e80-25d721411876",
-            "prefabSourceGuid": "812ee0f0-0b52-424b-8e71-3fdf1bc58078",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": -1.75,
-                    "y": 4.300000190734863,
-                    "z": 0.0
-                }
-            },
-            "type": "ShojiPaperObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
             "guid": "0327f872-05b2-4932-a0f4-15f34c5e8abc",
             "modelConfig": {
                 "blendMode": 5,
@@ -8377,80 +7551,6 @@
                 },
                 "targetType": 0
             },
-            "guid": "3e681c2e-a615-4a23-9684-0a92ffaff10e",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
-                "modelName": "shojiPaper.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "ShojiPaperObject",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "5ddebe44-cfe2-4ef8-a63c-e666a1ea2817",
-            "prefabAssetGuid": "df8dd86a-38df-445b-8e80-25d721411876",
-            "prefabSourceGuid": "f45e0851-b96b-44b5-82b8-39cde0a3357c",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 1.75,
-                    "y": 7.099999904632568,
-                    "z": 0.0
-                }
-            },
-            "type": "ShojiPaperObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
             "guid": "5bd51fce-4f93-4396-b8b2-26d62f0ad80c",
             "modelConfig": {
                 "blendMode": 5,
@@ -8722,6 +7822,906 @@
                 }
             },
             "type": "LuckyCatObject"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "ef87e29e-e8a0-4714-b91d-f7d9ba15afc3",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.175504684448242,
+                    "y": 8.482498168945313,
+                    "z": 106.01519775390625
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "8177d489-9a65-473b-8dd9-5dba5a412a8a",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -10.132442474365234,
+                    "y": 5.254366874694824,
+                    "z": 32.83847427368164
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "61cfb81c-26ce-4672-bbef-8f8b61bf872b",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -8.518814086914063,
+                    "y": 6.998375415802002,
+                    "z": 136.235595703125
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "0d4435ad-7df0-42fd-9b0a-3b11383b969b",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 9.007023811340332,
+                    "y": 6.400631427764893,
+                    "z": 16.63302993774414
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "039c9eb5-4938-4a15-9372-926f484ddb31",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.058166027069092,
+                    "y": 4.313998222351074,
+                    "z": 48.15019989013672
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "dcffade5-1453-46db-a8ae-e143cb271c7e",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 10.638812065124512,
+                    "y": 5.715381622314453,
+                    "z": 1.8443337678909302
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "e5ff32da-1d2a-4ee4-8696-e933f2ab2d27",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -13.433332443237305,
+                    "y": 4.964094161987305,
+                    "z": 65.34550476074219
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "41204df3-6d03-47a9-945f-c012100cdabd",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.872092247009277,
+                    "y": 5.118865013122559,
+                    "z": 83.42649841308594
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "d4de3861-b3f0-4d7f-8bf2-750ae84a1ffe",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -11.359331130981445,
+                    "y": 5.346595764160156,
+                    "z": 96.31146240234375
+                }
+            },
+            "type": "Lantern"
+        },
+        {
+            "Lantern": {
+                "color": {
+                    "w": 1.0,
+                    "x": 0.8576512336730957,
+                    "y": 0.4348592162132263,
+                    "z": 0.1709197610616684
+                },
+                "decay": 1.0,
+                "intensity": 2.700605869293213,
+                "lightLocalPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 20.0
+            },
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "f4de001c-3e69-496d-b73f-c05025602b25",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "f84bb93d-b865-4259-bab2-3ec4d460f2e3",
+                "modelName": "lantern.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 2.2827803331126906e+38,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Lantern",
+            "objectType": 1,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "9a0f09ee-684c-4a24-8a02-9275a9dee822",
+            "prefabSourceGuid": "7487c4cf-8f10-4748-b565-8f7eb7b7eb6a",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -0.25800061225891113,
+                    "y": 7.588906288146973,
+                    "z": 171.92958068847656
+                }
+            },
+            "type": "Lantern"
         }
     ],
     "sceneName": "TestScene",

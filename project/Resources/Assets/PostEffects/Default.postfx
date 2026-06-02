@@ -13,16 +13,21 @@
       },
       {
         "fromPinId": 11,
-        "id": 31,
+        "id": 47,
         "toPinId": 21
       },
       {
         "fromPinId": 22,
-        "id": 32,
+        "id": 51,
+        "toPinId": 49
+      },
+      {
+        "fromPinId": 50,
+        "id": 52,
         "toPinId": 4
       }
     ],
-    "nextId": 33,
+    "nextId": 53,
     "nodes": [
       {
         "boolValue": false,
@@ -73,8 +78,8 @@
         "intValue": 0,
         "outputs": [],
         "position": [
-          990.0,
-          96.0
+          720.0,
+          120.0
         ],
         "properties": {},
         "title": "Output",
@@ -108,8 +113,8 @@
           }
         ],
         "position": [
-          483.0,
-          47.0
+          243.0,
+          494.0
         ],
         "properties": {
           "applyMode": "Always",
@@ -157,8 +162,8 @@
           }
         ],
         "position": [
-          259.0,
-          63.0
+          233.0,
+          286.0
         ],
         "properties": {
           "applyMode": "Always",
@@ -202,8 +207,8 @@
           }
         ],
         "position": [
-          723.0,
-          62.0
+          243.0,
+          670.0
         ],
         "properties": {
           "applyMode": "Always",
@@ -213,17 +218,93 @@
           "enabled": true,
           "floatAnimations": [],
           "parameters": {
-            "radius": 0.5,
-            "strength": 1.0
+            "radius": 0.44999998807907104,
+            "strength": 0.6100000143051147
           }
         },
         "title": "Vignette",
         "type": "Vignette"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 48,
+        "inputs": [
+          {
+            "id": 49,
+            "kind": 0,
+            "name": "In",
+            "valueType": 2
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 50,
+            "kind": 1,
+            "name": "Out",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          227.0,
+          863.0
+        ],
+        "properties": {
+          "applyMode": "Always",
+          "autoDisable": true,
+          "duration": 0.25,
+          "easeIndex": 8,
+          "enabled": true,
+          "floatAnimations": [],
+          "parameters": {
+            "intensity": 1.1699999570846558,
+            "radius": 1.6799999475479126,
+            "softKnee": 0.0,
+            "threshold": -1.0,
+            "tint": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "title": "Bloom",
+        "type": "Bloom"
       }
     ]
   },
   "name": "Default",
   "nodes": [
+    {
+      "applyMode": "Always",
+      "autoDisable": true,
+      "duration": 0.25,
+      "ease": "",
+      "easeIndex": 8,
+      "enabled": true,
+      "floatAnimations": [],
+      "id": 48,
+      "parameters": {
+        "intensity": 1.1699999570846558,
+        "radius": 1.6799999475479126,
+        "softKnee": 0.0,
+        "threshold": -1.0,
+        "tint": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "title": "Bloom",
+      "type": "Bloom"
+    },
     {
       "applyMode": "Always",
       "autoDisable": true,
@@ -268,8 +349,8 @@
       "floatAnimations": [],
       "id": 20,
       "parameters": {
-        "radius": 0.5,
-        "strength": 1.0
+        "radius": 0.44999998807907104,
+        "strength": 0.6100000143051147
       },
       "title": "Vignette",
       "type": "Vignette"

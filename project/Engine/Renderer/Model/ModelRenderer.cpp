@@ -294,6 +294,7 @@ ModelRenderer::StaticBatchItem* ModelRenderer::FindCompatibleStaticBatch(StaticB
 		if(item.cameraDitherEnabled != cameraDitherEnabled) continue;
 		if(base->GetModelData() != model->GetModelData()) continue;
 		if(base->GetTexSrv().ptr != model->GetTexSrv().ptr) continue;
+		if(base->GetNormalMapSrv().ptr != model->GetNormalMapSrv().ptr) continue;
 		if(base->GetEnvMapSrv().ptr != model->GetEnvMapSrv().ptr) continue;
 		if(base->UsesRuntimeMaterialGraph() != model->UsesRuntimeMaterialGraph()) continue;
 		if(base->UsesRuntimeMaterialGraph() && base->GetMaterialGuid() != model->GetMaterialGuid()) continue;
@@ -347,7 +348,6 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 							CalyxEngine::ShadowMapSystem* shadowMapSystem) {
 	(void)rt;
 
-	// Skinned meshes are converted to skinned vertex buffers once per frame.
 	{
 		bool computeSet = false;
 		for(auto& [model, insts] : skinnedModels_) {
@@ -390,7 +390,6 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 			// Skinned Models
 			for(auto& [model, transforms] : skinnedVisibleForShadow_) {
 				if(!model->GetModelData()) continue;
-				// TODO: Skinning update for BLAS if needed (Refitting/Rebuild)
 				model->EnsureRaytracingBLAS(device5.Get(), cmd4.Get());
 
 				if(model->HasBLAS()) {
@@ -503,6 +502,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
 				cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(0));
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
+				cmdList->SetGraphicsRootDescriptorTable(14, model->GetNormalMapSrv());
 
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				model->BindVertexIndexBuffers(cmdList);
@@ -516,6 +516,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 					for(const auto& subMesh : subMeshes) {
 						cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(subMesh.materialIndex));
 						cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(subMesh.materialIndex));
+						cmdList->SetGraphicsRootDescriptorTable(14, model->GetNormalMapSrv(subMesh.materialIndex));
 						cmdList->DrawIndexedInstanced(subMesh.indexCount, need, subMesh.indexStart, 0, 0);
 					}
 				}
@@ -626,6 +627,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
 				cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(0));
 				cmdList->SetGraphicsRootDescriptorTable(6, model->GetEnvMapSrv());
+				cmdList->SetGraphicsRootDescriptorTable(14, model->GetNormalMapSrv());
 				model->SetCommandPalletSrv(7, cmdList);
 
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -640,6 +642,7 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 					for(const auto& subMesh : subMeshes) {
 						cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(subMesh.materialIndex));
 						cmdList->SetGraphicsRootDescriptorTable(12, model->GetMaterialGraphTextureSrvTable(subMesh.materialIndex));
+						cmdList->SetGraphicsRootDescriptorTable(14, model->GetNormalMapSrv(subMesh.materialIndex));
 						cmdList->DrawIndexedInstanced(subMesh.indexCount, need, subMesh.indexStart, 0, 0);
 					}
 				}

@@ -52,8 +52,8 @@ BaseGameObject::BaseGameObject(const std::string&		  modelName,
 }
 
 BaseGameObject::BaseGameObject() {
-	objectModelType_ = ObjectModelType::ModelType_Unknown; // まだ未定
-	SetName("GameObject");								  // 仮の名前
+	objectModelType_ = ObjectModelType::ModelType_Unknown;	// まだ未定
+	SetName("GameObject");								// 仮の名前
 	worldTransform_.Update();
 
 	config_.SetOnApplied([this](const BaseGameObjectConfig&) { this->ApplyConfig(); });

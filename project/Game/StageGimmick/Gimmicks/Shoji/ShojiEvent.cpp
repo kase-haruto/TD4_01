@@ -155,7 +155,8 @@ void ShojiEvent::EventUpdate(float) {
 		}
 		if(openCount_ != count) {
 			if(auto ui = numbersUi_.lock()) {
-				auto textureName = "Numbers/" + std::to_string(eventData_.clearCount - count) + ".png";
+				int clearNum	  = (std::max)(eventData_.clearCount - count, 0);
+				auto textureName = "Numbers/" + std::to_string(clearNum) + ".png";
 				ui->SetTexture(textureName);	
 			}
 		}

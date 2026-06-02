@@ -12,14 +12,6 @@
 
 REGISTER_SCENE_OBJECT(TutorialEvent)
 
-namespace {
-	// 画面中央に表示する想定の初期レイアウト
-	constexpr float kTutorialPosX	= 640.0f;
-	constexpr float kTutorialPosY	= 360.0f;
-	constexpr float kTutorialScaleX = 640.0f;
-	constexpr float kTutorialScaleY = 360.0f;
-} // namespace
-
 TutorialEvent::TutorialEvent(const std::string& name) : StageGimmickEventBase(name) {}
 
 void TutorialEvent::OnCollisionEnter(Collider* other) {
@@ -65,7 +57,8 @@ void TutorialEvent::EventUpdate(float dt) {
 	// dt は時間停止（TimeScale=0）の影響を受けないグローバルdtなので、
 	// 表示中でも各種タイマーは正しく進む
 	if(sprite_) {
-		sprite_->SetPosition({kTutorialPosX, kTutorialPosY});
+		sprite_->SetPosition(spritePosition_);
+		sprite_->SetScale(spriteScale_);
 		sprite_->Update(dt);
 	}
 
@@ -144,8 +137,8 @@ void TutorialEvent::EnsureSprite() {
 	sprite_ = std::make_unique<CalyxEngine::SpriteObject2d>();
 	sprite_->Initialize(jumpTexturePath_);
 	sprite_->SetAnchorPoint({0.5f, 0.5f});
-	sprite_->SetPosition({kTutorialPosX, kTutorialPosY});
-	sprite_->SetScale({kTutorialScaleX, kTutorialScaleY});
+	sprite_->SetPosition(spritePosition_);
+	sprite_->SetScale(spriteScale_);
 	sprite_->SetVisibility(false);
 }
 
@@ -184,6 +177,18 @@ void TutorialEvent::DerivativeGui() {
 		}
 	}
 
+	ImGui::SeparatorText("Sprite Layout");
+	if(ImGui::DragFloat2("Position", &spritePosition_.x, 1.0f)) {
+		if(sprite_) {
+			sprite_->SetPosition(spritePosition_);
+		}
+	}
+	if(ImGui::DragFloat2("Scale", &spriteScale_.x, 1.0f)) {
+		if(sprite_) {
+			sprite_->SetScale(spriteScale_);
+		}
+	}
+
 	ImGui::SeparatorText("Textures");
 	auto editTexturePath = [](const char* label, std::string& path) {
 		std::array<char, 256> buffer{};
@@ -212,6 +217,12 @@ void TutorialEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nloh
 	if(derived->contains("purposeTexture")) {
 		purposeTexturePath_ = derived->at("purposeTexture").get<std::string>();
 	}
+	if(derived->contains("spritePosition")) {
+		spritePosition_ = derived->at("spritePosition").get<CalyxEngine::Vector2>();
+	}
+	if(derived->contains("spriteScale")) {
+		spriteScale_ = derived->at("spriteScale").get<CalyxEngine::Vector2>();
+	}
 }
 
 void TutorialEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
@@ -219,6 +230,8 @@ void TutorialEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& 
 	derived["jumpTexture"]	  = jumpTexturePath_;
 	derived["diveTexture"]	  = diveTexturePath_;
 	derived["purposeTexture"] = purposeTexturePath_;
+	derived["spritePosition"] = spritePosition_;
+	derived["spriteScale"]	  = spriteScale_;
 }
 
 void TutorialEvent::RemapSceneObjectReferences([[maybe_unused]] const std::unordered_map<Guid, Guid>& guidMap) {
