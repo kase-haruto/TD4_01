@@ -59,5 +59,6 @@ private:
 	CalyxEngine::EffectAsset effectData_;
 	CalyxEngine::EffectAsset dangerData_;
 	CalyxEngine::EffectHandle fxHandle_{};
+	bool dangerEffect_ = false;
 
 };

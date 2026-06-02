@@ -3,6 +3,8 @@
 #include "Game/StageGimmick/Base/StageGimmickObjectBase.h"
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
+
 /// <summary>
 /// 飛んでくる弾のオブジェクトクラス
 /// </summary>
@@ -19,7 +21,9 @@ public:
 		return "ProjectileObject";
 	}
 
-	void SetIsFlying(bool isFlying) { isFlying_ = isFlying; }
+	void SetIsFlying(bool isFlying) { 
+		isFlying_ = isFlying;
+	}
 	void SetParam(const CraneProjectileParam& param) {
 		param_ = param;
 	}
@@ -44,12 +48,15 @@ private:
 	bool isFlying_ = false;
 	bool isHit_	   = false;
 	bool isParry_  = false;
+	float effectTime_ = 0.0f;
 
 	// 調整するパラメーター
 	CalyxEngine::Vector3 velocity_;
 	CalyxEngine::Vector3 targetPosition_;
 	CalyxEngine::Quaternion targetRotation_;
 	float targetTime_ = 0.0f;
+
+	CalyxEngine::EffectAsset effectData_;
 
 
 };

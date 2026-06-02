@@ -46,6 +46,8 @@ void ProjectileObject::ObjectInitialize() {
 	isFlying_ = false;
 
 	worldTransform_.inheritScale = false;
+
+	effectData_.Load("CraneStarEffect");
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {
@@ -70,6 +72,13 @@ void ProjectileObject::ObjectUpdate(float dt) {
 			worldTransform_.translation,
 			CalyxEngine::Vector3::Up());
 	} else {
+		if(effectTime_ < 1.0f) {
+			if(effectTime_ == 0.0f) {
+				EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + CalyxEngine::Vector3{0.0f, 0.0f, -2.5f});
+			}
+			effectTime_ += dt;
+			return;
+		}
 		if(param_.targetTime > targetTime_ && !isParry_) {
 			targetTime_ += dt;
 			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");

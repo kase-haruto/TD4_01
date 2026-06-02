@@ -65,7 +65,7 @@ void GroundSpikeEvent::EventInitialize() {
 	}
 	if(predictionObject_.lock()) {
 		predictionObject_.lock()->Initialize();
-		predictionObject_.lock()->SetScale(CalyxEngine::Vector3::One() * 1.2f);
+		predictionObject_.lock()->SetScale(CalyxEngine::Vector3::One() * 1.5f);
 		predictionObject_.lock()->SetParent(targetObject_.lock());
 		predictionObject_.lock()->SetTexture("circle/groundPrediction.png");
 		predictionObject_.lock()->SetIsRotation(true);

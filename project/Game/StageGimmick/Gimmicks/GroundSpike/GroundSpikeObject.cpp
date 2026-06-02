@@ -36,6 +36,8 @@ void GroundSpikeObject::OnCollisionEnter(Collider* other) {
 	if(collider_) {
 		collider_->SetCollisionEnabled(false);
 	}
+	EffectAPI::Stop(fxHandle_);
+	fxHandle_ = {};
 }
 
 void GroundSpikeObject::ObjectInitialize() {
@@ -47,20 +49,24 @@ void GroundSpikeObject::ObjectInitialize() {
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
 	}
-	isSpike_ = false;
-	isBreak_ = false;
+	isSpike_  = false;
+	isBreak_  = false;
 	isBuried_ = false;
 
 	worldTransform_.inheritScale = false;
 
 	effectData_.Load("GroundSpikeEffect");
 	dangerData_.Load("DangerEffect");
-	CalyxEngine::Vector3 offset = worldTransform_.translation + worldTransform_.GetWorldPosition();
-	offset.y = 1.0f;
-	fxHandle_ = EffectAPI::Play(dangerData_, offset);
 }
 
 void GroundSpikeObject::ObjectUpdate(float dt) {
+
+	if(!dangerEffect_) {
+		worldTransform_.Update();
+		const auto position = worldTransform_.GetWorldPosition();
+		fxHandle_ = EffectAPI::Play(dangerData_, {position.x, 1.5f, position.z});
+		dangerEffect_ = true;
+	}
 
 	// 飛び出す時の処理
 	if(isSpike_ && !isBuried_ && param_.popUpHeight > worldTransform_.GetWorldPosition().y) {
@@ -70,9 +76,9 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 		if(param_.popUpHeight <= worldTransform_.translation.y) {
 			auto offset = CalyxEngine::Vector3(0.0f, 1.0f, 0.0f);
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + offset);
+			EffectAPI::Stop(fxHandle_);
+			fxHandle_ = {};
 		}
-		EffectAPI::Stop(fxHandle_);
-		fxHandle_ = {};
 	}
 
 	// 埋まる時の処理
