@@ -28,9 +28,17 @@ void Shockwave::Initialize() {
 	isActive_ = false;
 	isStrong_ = false;
 	isTakeDamageForStage_ = false;
+	isTakeDamageTime_	  = false;
 }
 
 void Shockwave::Update(float dt) {
+	if(damageTimer_ >= 0.0f && isTakeDamageTime_) {
+		damageTimer_ -= dt;
+		if(damageTimer_ < 0.0f) {
+			isTakeDamageTime_ = false;
+			isTakeDamageForStage_ = true;
+		}
+	}
 	if (!isActive_) return;
 
 	timer_ += dt;
@@ -61,11 +69,13 @@ void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier,
 	currentMaxScale_			= param_.endScale * scaleMultiplier;
 	scaleMultiplier_			= scaleMultiplier;
 	timer_						= 0.0f;
+	damageTimer_				= 0.0f;
 	isActive_					= true;
  	isStrong_					= strong;
 	isStrongDamage_				= false;
 	isTakeDamageForStage_		= false;
-	
+	isTakeDamageTime_			= false;
+
 	//SetDrawEnable(true);
 	if (collider_) {
 		collider_->SetCollisionEnabled(true);
@@ -99,10 +109,8 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 	}
 
 	if(auto* projectile = dynamic_cast<ProjectileObject*>(otherObj)) {
-		isTakeDamageForStage_ = true;
-		if(isStrong_) {
-			isStrongDamage_ = true;
-		}
+		isTakeDamageTime_ = true;
+		damageTimer_ = projectile->GetDamageTime();
 	}
 
 }

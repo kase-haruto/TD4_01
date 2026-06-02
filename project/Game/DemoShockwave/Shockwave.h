@@ -58,10 +58,12 @@ private:
 
 	ShockwaveParameter param_;
 	float			   scaleMultiplier_ = 1.0f;
-	float			   timer_			= 0.0f;
+	float			   timer_				 = 0.0f;
 	float			   currentMaxScale_ = 5.0f;
+	float			   damageTimer_			 = 0.0f;
 	bool			   isActive_			 = false;
 	bool			   isStrong_			 = false;
 	bool			   isStrongDamage_		 = false;
 	bool			   isTakeDamageForStage_ = false;
+	bool			   isTakeDamageTime_	 = false;
 };
