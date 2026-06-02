@@ -51,7 +51,7 @@ void DiceProjectileEvent::EventInitialize() {
 	socket_.lock()->Initialize();
 
 	CreateDoors();
-	UpdateDoorOpenRequest();
+	UpdateDoorOpenRequest(0.0f);
 
 	auto childTargets = ResolveLinkedObjects<DiceProjectileObject>(targetObjectGuids_, objectName);
 	if(childTargets.empty()) childTargets = FindOwnedObjectsByClassName<DiceProjectileObject>(objectName);
@@ -127,7 +127,7 @@ void DiceProjectileEvent::EventInitialize() {
 
 }
 
-void DiceProjectileEvent::EventUpdate(float) {
+void DiceProjectileEvent::EventUpdate(float dt) {
 
 	if(targetObjects_.empty()) {
 		if(!hasSerializedEventParam_) {
@@ -141,7 +141,7 @@ void DiceProjectileEvent::EventUpdate(float) {
 		EventInitialize();
 	}
 
-	UpdateDoorOpenRequest();
+	UpdateDoorOpenRequest(dt);
 }
 
 void DiceProjectileEvent::DerivativeGui() {
@@ -252,7 +252,7 @@ void DiceProjectileEvent::CreateDoors() {
 	}
 }
 
-void DiceProjectileEvent::UpdateDoorOpenRequest() {
+void DiceProjectileEvent::UpdateDoorOpenRequest(float dt) {
 	bool shouldOpen = false;
 	if(auto socket = socket_.lock()) {
 		shouldOpen = socket->GetIsCracker();
@@ -274,6 +274,15 @@ void DiceProjectileEvent::UpdateDoorOpenRequest() {
 				textureName = "Numbers/" + std::to_string(number) + ".png";
 			}
 			ui->SetTexture(textureName);
+		}
+	}
+	if(shouldOpen) {
+		if(openCount_ >= eventData_.clearCount) {
+			const float time = 0.5f;
+			clearTime_ += dt;
+			clearTime_	= (std::min)(clearTime_, time);
+			float alpha = 1.0f - (clearTime_ / time);
+			numbersUi_.lock()->SetColor({1.0f, 1.0f, 1.0f, alpha});
 		}
 	}
 	openCount_ = count;

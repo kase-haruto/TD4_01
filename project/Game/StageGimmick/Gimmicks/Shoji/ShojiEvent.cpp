@@ -128,7 +128,7 @@ void ShojiEvent::EventInitialize() {
 	}
 }
 
-void ShojiEvent::EventUpdate(float) {
+void ShojiEvent::EventUpdate(float dt) {
 
 	if(luckyCatObjs_.empty()) {
 		if(!hasSerializedEventParam_) {
@@ -157,10 +157,17 @@ void ShojiEvent::EventUpdate(float) {
 			if(auto ui = numbersUi_.lock()) {
 				int clearNum	  = (std::max)(eventData_.clearCount - count, 0);
 				auto textureName = "Numbers/" + std::to_string(clearNum) + ".png";
-				ui->SetTexture(textureName);	
+				ui->SetTexture(textureName);
 			}
 		}
-		openCount_ = count; 
+		openCount_ = count;
+	} else {
+		if(openCount_ >= eventData_.clearCount) {
+			clearTime_ += dt;
+			clearTime_	= (std::min)(clearTime_, eventParam_.param_.openTimer);
+			float alpha = 1.0f - (clearTime_ / eventParam_.param_.openTimer);
+			numbersUi_.lock()->SetColor({1.0f, 1.0f, 1.0f, alpha});
+		}
 	}
 }
 

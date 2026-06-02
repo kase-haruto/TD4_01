@@ -121,11 +121,14 @@ private:
 	std::weak_ptr<GeneralObject> numbersUi_;
 	Guid						 numbersUiGuid_;
 
+	// イベントのパラメータ
 	ShojiEventParam eventParam_;
 	AllShojiEventData eventData_;
 	bool hasSerializedEventParam_ = false;
 	bool hasSerializedEventData_  = false;
 
+	// 障子が開いているか
 	int	 openCount_ = 0;
 	bool isOpen_ = false;
+	float clearTime_ = 0.0f;
 };

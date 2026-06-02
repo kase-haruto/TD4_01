@@ -102,7 +102,7 @@ private:
 	// 扉生成用関数
 	void CreateDoors();
 	// 扉開閉更新用関数
-	void UpdateDoorOpenRequest();
+	void UpdateDoorOpenRequest(float dt);
 
 private:
 	
@@ -126,6 +126,7 @@ private:
 	Guid						 gateGuid_;
 	std::weak_ptr<GeneralObject> numbersUi_;
 	Guid						 numbersUiGuid_;
+	float clearTime_ = 0.0f;
 
 	// パラメータ
 	DiceProjectileEventParam eventParam_;
