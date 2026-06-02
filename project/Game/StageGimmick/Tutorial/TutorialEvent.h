@@ -119,6 +119,10 @@ private:
 	std::string diveTexturePath_	= "Textures/uvChecker.dds";
 	std::string purposeTexturePath_ = "Textures/uvChecker.dds";
 
+	// スプライトの表示レイアウト（GUIで変更・保存可）
+	CalyxEngine::Vector2 spritePosition_ = {640.0f, 360.0f};
+	CalyxEngine::Vector2 spriteScale_	 = {640.0f, 360.0f};
+
 	// 進行状態
 	TutorialState state_	 = TutorialState::Idle;
 	DivePhase	  divePhase_ = DivePhase::WaitFirstInput;
