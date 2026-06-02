@@ -71,7 +71,6 @@ private:
 	std::weak_ptr<PredictionCircle> predictionObject_;
 	Guid predictionObjectGuid_;
 
-
 	GroundSpikeEventParam eventParam_;
 	bool hasSerializedEventParam_ = false;
 

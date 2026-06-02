@@ -57,5 +57,7 @@ private:
 	GroundSpikeParam param_;
 
 	CalyxEngine::EffectAsset effectData_;
+	CalyxEngine::EffectAsset dangerData_;
+	CalyxEngine::EffectHandle fxHandle_{};
 
 };

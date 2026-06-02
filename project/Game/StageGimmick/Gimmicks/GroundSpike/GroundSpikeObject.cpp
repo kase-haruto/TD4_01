@@ -54,6 +54,10 @@ void GroundSpikeObject::ObjectInitialize() {
 	worldTransform_.inheritScale = false;
 
 	effectData_.Load("GroundSpikeEffect");
+	dangerData_.Load("DangerEffect");
+	CalyxEngine::Vector3 offset = worldTransform_.translation + worldTransform_.GetWorldPosition();
+	offset.y = 1.0f;
+	fxHandle_ = EffectAPI::Play(dangerData_, offset);
 }
 
 void GroundSpikeObject::ObjectUpdate(float dt) {
@@ -67,6 +71,8 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 			auto offset = CalyxEngine::Vector3(0.0f, 1.0f, 0.0f);
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + offset);
 		}
+		EffectAPI::Stop(fxHandle_);
+		fxHandle_ = {};
 	}
 
 	// 埋まる時の処理
