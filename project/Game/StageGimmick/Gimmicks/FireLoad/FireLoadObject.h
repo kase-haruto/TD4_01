@@ -59,6 +59,7 @@ private:
 	bool isBurn_ = false;
 	bool isIgnition_ = false;
 
-	CalyxEngine::EffectAsset effectData_;
+	CalyxEngine::EffectAsset  effectData_;
+	CalyxEngine::EffectAsset  smokeData_;
 	CalyxEngine::EffectHandle fxHandle_{};
 };

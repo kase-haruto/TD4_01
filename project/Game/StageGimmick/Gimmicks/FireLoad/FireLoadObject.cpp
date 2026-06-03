@@ -38,6 +38,7 @@ void FireLoadObject::OnCollisionEnter(Collider* other) {
 		BaseGameObject::SetDrawEnable(false);
 	}
 	EffectAPI::Stop(fxHandle_);
+	EffectAPI::Play(smokeData_, worldTransform_.GetWorldPosition());
 	fxHandle_ = {};
 }
 
@@ -53,6 +54,7 @@ void FireLoadObject::ObjectInitialize() {
 	}
 
 	effectData_.Load("FireLoadEffect");
+	smokeData_.Load("FireSmoke");
 
 	defaultScale_ = {1.0f, 1.0f, 1.0f};
 }

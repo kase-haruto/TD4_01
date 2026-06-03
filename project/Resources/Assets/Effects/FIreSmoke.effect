@@ -4,15 +4,15 @@
       "emitter": {
         "autoDestroy": false,
         "billboardMode": 1,
-        "blendMode": 5,
+        "blendMode": 1,
         "cameraDitherEnabled": false,
         "cameraDitherFar": 20.0,
         "cameraDitherNear": 0.0,
         "color": {
           "w": 1.0,
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
+          "x": 0.22064054012298584,
+          "y": 0.19751213490962982,
+          "z": 0.1476171612739563
         },
         "direction": {
           "enabled": false,
@@ -42,19 +42,19 @@
             "mode": 0
           }
         },
-        "emitCount": 64,
+        "emitCount": 12,
         "emitDelay": 0.0,
         "emitDuration": -1.0,
         "emitRate": 0.0,
-        "emitterShape": 3,
+        "emitterShape": 4,
         "followOneShot": false,
         "isComplement": true,
         "isDrawEnable": true,
         "isOneShot": true,
         "lifetime": {
           "constant": 1.0,
-          "max": 2.0,
-          "min": 1.0,
+          "max": 1.1799999475479126,
+          "min": 0.800000011920929,
           "mode": 1
         },
         "modelGuid": "00000000-0000-0000-0000-000000000000",
@@ -63,20 +63,20 @@
           {
             "blend": 0,
             "clamp01": true,
-            "ease": 1,
+            "ease": 0,
             "enabled": true,
             "end": [
-              1.0,
-              1.0,
+              0.20000000298023224,
+              0.20000000298023224,
               1.0,
               1.0
             ],
-            "guid": "8e9fd09c-3a23-4fec-854f-0d916231f250",
+            "guid": "7b92bdda-40e7-444f-88b7-4a2e66db3d4f",
             "invert": false,
             "name": "OverLifetimeModule",
             "start": [
-              0.0,
-              0.0,
+              1.0,
+              1.0,
               0.0,
               1.0
             ],
@@ -84,20 +84,20 @@
           },
           {
             "blend": 0,
-            "clamp01": false,
+            "clamp01": true,
             "ease": 6,
             "enabled": true,
             "end": [
-              1.5,
+              0.0,
               1.0,
               1.0,
               1.0
             ],
-            "guid": "277df4cc-bbb4-42d2-967e-314620615d00",
-            "invert": true,
+            "guid": "4bd8fc98-7659-4ade-8127-1b782c500f80",
+            "invert": false,
             "name": "OverLifetimeModule",
             "start": [
-              0.0,
+              1.0,
               0.0,
               0.0,
               1.0
@@ -105,12 +105,17 @@
             "target": 5
           }
         ],
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
         "position": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
         },
-        "randomSpinEmit": true,
+        "randomSpinEmit": false,
         "rotation": {
           "w": 1.0,
           "x": 0.0,
@@ -135,28 +140,28 @@
           },
           "mode": 0
         },
-        "shapeAngle": 5.0,
-        "shapeRadius": 0.30000001192092896,
+        "shapeAngle": 30.0,
+        "shapeRadius": 1.0,
         "shapeSize": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
+          "x": 0.5,
+          "y": 0.5,
+          "z": 0.5
         },
         "spin": {
           "constant": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0
+            "z": -0.8500000238418579
           },
           "max": {
             "x": 0.0,
             "y": 0.0,
-            "z": 1.0
+            "z": 0.9700000286102295
           },
           "min": {
             "x": 0.0,
             "y": 0.0,
-            "z": -1.0
+            "z": -0.9399999976158142
           },
           "mode": 1
         },
@@ -169,14 +174,14 @@
             "z": 1.0
           },
           "max": {
-            "x": 0.5,
-            "y": 2.0,
-            "z": 0.5
+            "x": 0.6399999856948853,
+            "y": 3.9600000381469727,
+            "z": 0.75
           },
           "min": {
-            "x": -0.5,
-            "y": 0.5,
-            "z": -0.5
+            "x": -0.550000011920929,
+            "y": 1.6299999952316284,
+            "z": -0.5799999833106995
           },
           "mode": 1
         },
@@ -212,6 +217,6 @@
       }
     }
   ],
-  "name": "FIreSmoke",
+  "name": "FireSmoke",
   "type": "EffectAsset"
 }
