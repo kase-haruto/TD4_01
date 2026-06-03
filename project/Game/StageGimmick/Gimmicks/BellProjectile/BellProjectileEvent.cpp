@@ -69,7 +69,7 @@ void BellProjectileEvent::EventInitialize() {
 
 	// 扉(左)
 	const std::string doorLName = "BellProjectileDoorL";
-	auto doorL = ResolveLinkedObject<BellProjectileDoor>(doorLGuid_, doorLName);
+	auto			  doorL		= ResolveLinkedObjectByName<BellProjectileDoor>(doorLGuid_, doorLName);
 	if(!doorL) {
 		for(const auto& child : GetChildren()) {
 			if(child && child->GetName() == doorLName) {
@@ -100,7 +100,7 @@ void BellProjectileEvent::EventInitialize() {
 
 	// 扉(右)
 	const std::string doorRName = "BellProjectileDoorR";
-	auto doorR = ResolveLinkedObject<BellProjectileDoor>(doorRGuid_, doorRName);
+	auto			  doorR		= ResolveLinkedObjectByName<BellProjectileDoor>(doorRGuid_, doorRName);
 	if(!doorR) {
 		for(const auto& child : GetChildren()) {
 			if(child && child->GetName() == doorRName) {
