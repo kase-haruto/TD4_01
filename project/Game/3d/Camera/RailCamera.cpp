@@ -31,7 +31,6 @@ void RailCamera::Initialize() {
 	BaseCamera::SetName("RailCamera");
 
 	// ==== 初期値設定 ====
-	speed_		   = 5.0f; // 速度（距離単位 / 秒）
 	lookAhead_	   = 2.0f;	// 進行方向の先読み距離
 	tiltAngle_	   = 0.3f;	// バンク角の最大値（ラジアン）
 	tiltLerpSpeed_ = 10.0f; // バンク補間速度
@@ -46,6 +45,7 @@ void RailCamera::Initialize() {
 		spline_.closed = false;
 		spline_.BuildArcTable(arcSamplesPerSeg_);
 	}
+	param_.LoadParams();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ void RailCamera::UpdateOrientationFromPath(float dt) {
 /////////////////////////////////////////////////////////////////////////////////////////
 void RailCamera::Update(float dt) {
 	// ==== 走行距離を更新（等速） ====
-	float move		   = (std::max)(0.0f, speed_) * dt;
+	float move		   = (std::max)(0.0f, param_.speed) * dt;
 	float nextTraveled = traveled_ + move;
 
 	traveled_			 = nextTraveled;
@@ -176,8 +176,8 @@ void RailCamera::Update(float dt) {
 void RailCamera::ShowGui() {
 #if defined(_DEBUG) || defined(DEVELOP)
 	worldTransform_.ShowImGui();
+	param_.ShowGui();
 	if(ImGui::CollapsingHeader("RailCamera")) {
-		ImGui::DragFloat("Speed (units/s)", &speed_, 0.1f, 0.0f, 1000.0f);
 		ImGui::DragFloat("LookAhead", &lookAhead_, 0.01f, 0.0f, 100.0f);
 		ImGui::DragFloat("TiltAngle (rad)", &tiltAngle_, 0.01f, 0.0f, 1.57f);
 		ImGui::DragFloat("TiltLerp", &tiltLerpSpeed_, 0.1f, 0.0f, 50.0f);
