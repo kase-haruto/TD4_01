@@ -17,6 +17,7 @@
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Serializer/SceneSerializer.h>
+#include <Engine/Graphics/Camera/Manager/CameraManager.h>
 // lib
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -91,14 +92,6 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 
 	SelectUpdate(dt);
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
-		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
-		});
-	}
-
 	// 衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }
@@ -121,8 +114,11 @@ void SelectScene::CleanUp() {
 	CollisionManager::GetInstance()->ClearColliders();
 }
 
-void SelectScene::SelectUpdate(float) {
+void SelectScene::SelectUpdate(float dt) {
 	const int maxStages = 5;
+
+	Camera3d*			 cam = CameraManager::GetMain3d();
+	CalyxEngine::Vector3 pos = cam->GetTranslate();
 
 	// 左右入力によるステージ選択
 	if(CalyxFoundation::Input::TriggerKey(DIK_A) || CalyxFoundation::Input::TriggerKey(DIK_LEFT) ||
@@ -134,16 +130,6 @@ void SelectScene::SelectUpdate(float) {
 		selectedIndex_ = (selectedIndex_ + 1) % maxStages;
 	}
 
-	// 決定操作
-	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
-		gamePayload_ = BuildGamePayload(selectedIndex_);
-		IsPhase_	 = true;
-		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
-		});
-	}
-
 	// 選択中のステージに応じて背景色を変更（デバッグ用フィードバック）
 	switch(selectedIndex_) {
 	case 0: pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f}); break;
@@ -153,6 +139,25 @@ void SelectScene::SelectUpdate(float) {
 	case 4: pauseBg_->SetColor({1.0f, 0.0f, 1.0f, 1.0f}); break;
 	}
 	pauseBg_->Update();
+
+
+	float targetX = cameraBaseX_ + selectedIndex_ * cameraSpacing_;
+	float t = 1.0f - std::exp(-cameraLerpRate_ * dt);
+	pos.x += (targetX - pos.x) * t;
+	cam->SetCamera(pos, cam->GetRotate());
+
+	const float settleThreshold = 0.05f;
+	bool		cameraSettled	= std::fabs(targetX - pos.x) <= settleThreshold;
+
+	// 決定操作
+	if(cameraSettled && CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
+		gamePayload_ = BuildGamePayload(selectedIndex_);
+		IsPhase_	 = true;
+		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
+		});
+	}
 }
 
 void SelectScene::PhaseUpdate(float) {

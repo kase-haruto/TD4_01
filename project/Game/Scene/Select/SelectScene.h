@@ -62,6 +62,10 @@ private:
 	std::unique_ptr<CalyxEngine::IScenePayload> gamePayload_;
 	int selectedIndex_ = 0;
 
+	float cameraBaseX_	  = 0.0f;
+	float cameraSpacing_  = 45.548f;
+	float cameraLerpRate_ = 5.0f; 
+
 	SceneType preType_	 = SceneType::TITLE;
 	bool	  IsPhase_	 = false;
 	bool	  IsOpening_ = false;
