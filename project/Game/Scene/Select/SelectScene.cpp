@@ -50,10 +50,6 @@ void SelectScene::Initialize() {
 	//=========================
 	// グラフィック関連
 	//=========================
-	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
-	pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
-	pauseBg_->Update();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	if(preType_ == SceneType::TITLE) {
@@ -101,7 +97,6 @@ void SelectScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoS
 	//========================================================//
 	//	sprite の 登録
 	//========================================================//
-	spriteRenderer_->Register(pauseBg_.get());
 	transitionControl_->Draw(spriteRenderer_.get());
 
 	// シーン上のオブジェクトの描画
@@ -129,17 +124,6 @@ void SelectScene::SelectUpdate(float dt) {
 	   CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::DPAD_RIGHT)) {
 		selectedIndex_ = (selectedIndex_ + 1) % maxStages;
 	}
-
-	// 選択中のステージに応じて背景色を変更（デバッグ用フィードバック）
-	switch(selectedIndex_) {
-	case 0: pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f}); break;
-	case 1: pauseBg_->SetColor({1.0f, 0.0f, 0.0f, 1.0f}); break;
-	case 2: pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f}); break;
-	case 3: pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f}); break;
-	case 4: pauseBg_->SetColor({1.0f, 0.0f, 1.0f, 1.0f}); break;
-	}
-	pauseBg_->Update();
-
 
 	float targetX = cameraBaseX_ + selectedIndex_ * cameraSpacing_;
 	float t = 1.0f - std::exp(-cameraLerpRate_ * dt);
