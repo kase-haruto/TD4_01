@@ -22,7 +22,7 @@ void CalyxEngine::AssetManager::Initialize(ImGuiManager* imgui) {
 
 	dataAssetManager_ = std::make_unique<DataAssetManager>();
 
-	audioManager_ = std::make_unique<Audio>();
+	audioManager_ = std::make_unique<::Audio>();
 	audioManager_->Initialize();
 }
 

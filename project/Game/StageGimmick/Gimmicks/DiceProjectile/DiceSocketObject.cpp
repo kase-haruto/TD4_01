@@ -64,6 +64,8 @@ void DiceSocketObject::ObjectInitialize() {
 
 	effectLeftData_.Load("CrackerLeftEffect");
 	effectRightData_.Load("CrackerRightEffect");
+
+	AudioAPI::Load(socketAudio_, "test");
 }
 
 void DiceSocketObject::ObjectUpdate(float dt) {
@@ -78,6 +80,7 @@ void DiceSocketObject::ObjectUpdate(float dt) {
 			EffectAPI::Play(effectRightData_, offset);
 			offset.x *= -1.0f;
 			EffectAPI::Play(effectLeftData_, offset);
+			AudioAPI::Play(socketAudio_, false, 0.5f);
 		}
 	}
 }

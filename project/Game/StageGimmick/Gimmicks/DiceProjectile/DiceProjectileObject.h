@@ -84,4 +84,6 @@ private:
 
 	CalyxEngine::EffectAsset effectData_;
 
+	CalyxEngine::Audio hitAudio_;
+
 };

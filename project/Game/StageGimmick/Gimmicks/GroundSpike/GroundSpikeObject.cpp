@@ -57,6 +57,8 @@ void GroundSpikeObject::ObjectInitialize() {
 
 	effectData_.Load("GroundSpikeEffect");
 	dangerData_.Load("DangerEffect");
+
+	AudioAPI::Load(spikeAudio_, "test");
 }
 
 void GroundSpikeObject::ObjectUpdate(float dt) {
@@ -78,6 +80,7 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + offset);
 			EffectAPI::Stop(fxHandle_);
 			fxHandle_ = {};
+			AudioAPI::Play(spikeAudio_, false, 0.5f);
 		}
 	}
 

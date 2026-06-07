@@ -61,4 +61,6 @@ private:
 	CalyxEngine::EffectHandle fxHandle_{};
 	bool dangerEffect_ = false;
 
+	CalyxEngine::Audio spikeAudio_;
+
 };

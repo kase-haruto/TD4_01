@@ -63,4 +63,6 @@ private:
 	CalyxEngine::EffectAsset effectLeftData_;
 	CalyxEngine::EffectAsset effectRightData_;
 
+	CalyxEngine::Audio socketAudio_;
+
 };

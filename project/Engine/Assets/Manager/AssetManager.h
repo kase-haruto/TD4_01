@@ -32,6 +32,7 @@ namespace CalyxEngine {
 		ModelManager*     GetModelManager() const { return modelManager_.get(); }
 		TextureManager*   GetTextureManager() const { return textureManager_.get(); }
 		DataAssetManager* GetDataAssetManager() const { return dataAssetManager_.get(); }
+		::Audio*			  GetAudioManager() const { return audioManager_.get(); }
 
 	private:
 		//===================================================================*/
@@ -46,7 +47,7 @@ namespace CalyxEngine {
 		std::unique_ptr<ModelManager>     modelManager_;
 		std::unique_ptr<TextureManager>   textureManager_;
 		std::unique_ptr<DataAssetManager> dataAssetManager_;
-		std::unique_ptr<Audio>            audioManager_;
+		std::unique_ptr<::Audio>            audioManager_;
 
 	};
 

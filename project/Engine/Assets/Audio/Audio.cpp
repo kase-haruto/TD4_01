@@ -2,6 +2,65 @@
 #include <Engine/Foundation/Debug/CxAssert.h>
 #include <stdexcept>
 #include <iostream>   // デバッグ用などに
+#include <array>
+#include <cctype>
+#include <system_error>
+
+namespace {
+	std::string ToLowerExtension(std::filesystem::path path) {
+		std::string ext = path.extension().string();
+		for(char& c : ext) {
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		}
+		return ext;
+	}
+
+	bool IsSupportedAudioExtension(const std::filesystem::path& path) {
+		const std::string ext = ToLowerExtension(path);
+		return ext == ".wav" || ext == ".mp3" || ext == ".m4a";
+	}
+
+	std::filesystem::path ResolveAudioAssetPath(const std::filesystem::path& path) {
+		if(path.empty()) return {};
+
+		if(path.has_extension()) {
+			if(!IsSupportedAudioExtension(path)) return {};
+			if(std::filesystem::exists(path)) return path;
+
+			const std::array<std::filesystem::path, 3> roots = {
+				std::filesystem::path("Resources/Assets/Audio"),
+				std::filesystem::path("Resources/Assets/Audios"),
+				std::filesystem::path("Resources/Assets/Sounds"),
+			};
+
+			if(!path.has_parent_path()) {
+				for(const auto& root : roots) {
+					std::filesystem::path candidate = root / path;
+					if(std::filesystem::exists(candidate)) return candidate;
+				}
+			}
+
+			return {};
+		}
+
+		const std::array<std::filesystem::path, 3> roots = {
+			std::filesystem::path("Resources/Assets/Audio"),
+			std::filesystem::path("Resources/Assets/Audios"),
+			std::filesystem::path("Resources/Assets/Sounds"),
+		};
+		const std::array<const char*, 3> extensions = {".wav", ".mp3", ".m4a"};
+
+		for(const auto& root : roots) {
+			for(const char* ext : extensions) {
+				std::filesystem::path candidate = root / path;
+				candidate += ext;
+				if(std::filesystem::exists(candidate)) return candidate;
+			}
+		}
+
+		return {};
+	}
+} // namespace
 
 /////////////////////////////////////////////////////////////////////////////////////
 // 初期化
@@ -26,6 +85,44 @@ void Audio::Initialize(){
 // StartUpLoad
 /////////////////////////////////////////////////////////////////////////////////////
 void Audio::StartUpLoad(){
+	LoadAllFromDirectory("Resources/Assets");
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// LoadAllFromDirectory
+/////////////////////////////////////////////////////////////////////////////////////
+void Audio::LoadAllFromDirectory(const std::filesystem::path& directoryPath) {
+	std::error_code ec;
+	if(!std::filesystem::exists(directoryPath, ec) || !std::filesystem::is_directory(directoryPath, ec)) {
+		return;
+	}
+
+	std::filesystem::recursive_directory_iterator it(
+		directoryPath,
+		std::filesystem::directory_options::skip_permission_denied,
+		ec);
+	const std::filesystem::recursive_directory_iterator end;
+	if(ec) {
+		return;
+	}
+
+	for(; it != end; it.increment(ec)) {
+		if(ec) {
+			break;
+		}
+
+		if(!it->is_regular_file(ec) || ec) {
+			ec.clear();
+			continue;
+		}
+
+		const std::filesystem::path& path = it->path();
+		if(!IsSupportedAudioExtension(path)) {
+			continue;
+		}
+
+		Load(path.generic_string());
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +298,9 @@ void Audio::Load(const std::string& filename){
 			CX_CHECK(false && "No valid extension found.", "Assertion failed");
 		}
 		std::string extension = filename.substr(pos + 1);
+		for(char& c : extension) {
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		}
 
 		// 拡張子で振り分け
 		if (extension == "wav"){
@@ -397,6 +497,13 @@ SoundData Audio::LoadMP3(const wchar_t* filename){
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
+// 音声がロード済みか
+/////////////////////////////////////////////////////////////////////////////////////
+bool Audio::IsLoadedAudio(const std::string& filename) const {
+	return audios_.find(filename) != audios_.end();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
 // 音声アンロード
 /////////////////////////////////////////////////////////////////////////////////////
 void Audio::UnloadAudio(const std::string& filename){
@@ -435,4 +542,18 @@ void Audio::UnloadAllAudio(){
 void Audio::UnloadAudio(SoundData* soundData){
 	soundData->buffer.clear();
 	soundData->wfex = {};
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// CalyxEngine::Audio - オーディオアセット参照のロード
+/////////////////////////////////////////////////////////////////////////////////////
+bool CalyxEngine::Audio::Load(const std::filesystem::path& path) {
+	const std::filesystem::path resolvedPath = ResolveAudioAssetPath(path);
+	if(resolvedPath.empty()) {
+		filename_.clear();
+		return false;
+	}
+
+	filename_ = resolvedPath.generic_string();
+	return true;
 }

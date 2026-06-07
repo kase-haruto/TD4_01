@@ -21,6 +21,7 @@
 // file
 /////////////////////////////////////////////////////////////////////////////////////
 #include <fstream>
+#include <filesystem>
 
 /////////////////////////////////////////////////////////////////////////////////////
 // ComPtr
@@ -36,6 +37,7 @@ using Microsoft::WRL::ComPtr;
 /////////////////////////////////////////////////////////////////////////////////////
 // STL
 /////////////////////////////////////////////////////////////////////////////////////
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -97,9 +99,14 @@ public: // 初期化に関する関数
 	 */
 	void Initialize();
 	/**
-	 * \brief ロード開始
+	 * \brief 起動時に音声アセットをまとめてロード
 	 */
 	void StartUpLoad();
+	/**
+	 * \brief 指定ディレクトリ以下の対応音声をまとめてロード
+	 * \param directoryPath 検索するディレクトリ
+	 */
+	void LoadAllFromDirectory(const std::filesystem::path& directoryPath);
 	/**
 	 * \brief Media Foundationの初期化
 	 * \return 成功したか
@@ -146,6 +153,12 @@ public: // エンジンで利用できる関数
 	 * \param filename ファイル名
 	 */
 	 void Load(const std::string& filename);
+	 /**
+	  * \brief 音声がロード済みか
+	  * \param filename ファイル名
+	  * \return ロード済みか
+	  */
+	 bool IsLoadedAudio(const std::string& filename) const;
 	/**
 	 * \brief 音声をアンロード
 	 * \param filename ファイル名
@@ -182,3 +195,26 @@ private:
 
 	 const std::string directoryPath_; //< 音声ファイルディレクトリパス
 };
+namespace CalyxEngine {
+
+	/*-----------------------------------------------------------------------------------------
+	 * Audio
+	 * - SceneObjectではない、再利用可能なオーディオ参照データ
+	 * - EffectAssetと同じようにメンバとして保持し、AudioAPI経由で再生する
+	 *---------------------------------------------------------------------------------------*/
+	class Audio {
+	public:
+		Audio() = default;
+		explicit Audio(const std::filesystem::path& path) { Load(path); }
+
+		bool Load(const std::filesystem::path& path);
+		void Clear() { filename_.clear(); }
+
+		const std::string& GetFilename() const { return filename_; }
+		bool			   IsValid() const { return !filename_.empty(); }
+
+	private:
+		std::string filename_;
+	};
+
+} // namespace CalyxEngine

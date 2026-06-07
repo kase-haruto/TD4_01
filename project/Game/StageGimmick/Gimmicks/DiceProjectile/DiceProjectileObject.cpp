@@ -51,6 +51,8 @@ void DiceProjectileObject::ObjectInitialize() {
 	isParry_ = false;
 
 	effectData_.Load("DiceStarEffect");
+
+	AudioAPI::Load(hitAudio_, "test");
 }
 
 void DiceProjectileObject::SameNumberRotation() {
@@ -126,6 +128,7 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 			parryCurveInit_		  = false;
 			auto offset			  = CalyxEngine::Vector3::Up() + CalyxEngine::Vector3::Forward();
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
+			AudioAPI::Play(hitAudio_, false, 0.5f);
 			return;
 		}
 	}
