@@ -38,7 +38,7 @@ namespace CalyxEngine {
 		};
 
 		// メッセージの追加
-		static void AddMessage(const std::string& title, const std::string& body, const ImVec4& color = ImVec4(1, 1, 1, 1)) {
+		static void AddMessage(const std::string& title, const std::string& body, const ImVec4& color = ImVec4(1, 1, 0, 1)) {
 			GetInstance().messages_.push_back({title, body, color});
 		}
 

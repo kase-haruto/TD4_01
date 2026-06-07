@@ -63,7 +63,7 @@ namespace CalyxEngine {
 				 std::make_unique<TitleScene>());
 
 		SetCurrent(idToIndex_.at(
-			GameSceneUtil::ToSceneId(SceneType::TEST)));
+			GameSceneUtil::ToSceneId(SceneType::TITLE)));
 
 #if defined(_DEBUG) || defined(DEVELOP)
 		pickingPass_ = std::make_unique<CalyxEngine::PickingPass>();
