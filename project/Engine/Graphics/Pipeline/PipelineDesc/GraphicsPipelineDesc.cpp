@@ -84,6 +84,15 @@ bool GraphicsPipelineDesc::operator==(const GraphicsPipelineDesc& o) const noexc
 		   depth_.DepthEnable == o.depth_.DepthEnable &&
 		   depth_.DepthWriteMask == o.depth_.DepthWriteMask &&
 		   depth_.DepthFunc == o.depth_.DepthFunc &&
+		   // ステンシル状態もキャッシュキーに含める。穴マスク/レシーバーは Object3D とシェーダーを共有する場合があるが、
+		   // 深度ステンシルテストは別の GPU 状態になる。
+		   depth_.StencilEnable == o.depth_.StencilEnable &&
+		   depth_.StencilReadMask == o.depth_.StencilReadMask &&
+		   depth_.StencilWriteMask == o.depth_.StencilWriteMask &&
+		   depth_.FrontFace.StencilFunc == o.depth_.FrontFace.StencilFunc &&
+		   depth_.FrontFace.StencilPassOp == o.depth_.FrontFace.StencilPassOp &&
+		   depth_.BackFace.StencilFunc == o.depth_.BackFace.StencilFunc &&
+		   depth_.BackFace.StencilPassOp == o.depth_.BackFace.StencilPassOp &&
 		   sampleCount_ == o.sampleCount_ &&
 		   rtvFormats_ == o.rtvFormats_ &&
 		   inputElems_.size() == o.inputElems_.size() && 
@@ -110,6 +119,14 @@ size_t GraphicsPipelineDesc::Hash() const noexcept {
 	HashCombine(h, depth_.DepthEnable);
 	HashCombine(h, depth_.DepthWriteMask);
 	HashCombine(h, depth_.DepthFunc);
+	// Always/Replace と NotEqual/Keep の派生 PSO が衝突しないよう、ステンシル関連もハッシュに含める。
+	HashCombine(h, depth_.StencilEnable);
+	HashCombine(h, depth_.StencilReadMask);
+	HashCombine(h, depth_.StencilWriteMask);
+	HashCombine(h, depth_.FrontFace.StencilFunc);
+	HashCombine(h, depth_.FrontFace.StencilPassOp);
+	HashCombine(h, depth_.BackFace.StencilFunc);
+	HashCombine(h, depth_.BackFace.StencilPassOp);
 
 	HashCombine(h, sampleCount_);
 

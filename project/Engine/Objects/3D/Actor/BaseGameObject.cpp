@@ -178,6 +178,11 @@ void BaseGameObject::ShowGui() {
 		if(ImGui::TreeNodeEx("Draw Config", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 			GuiCmd::CheckBox("Camera Dither", drawConfig_.cameraDitherEnabled);
 			GuiCmd::CheckBox("Cast Shadow", drawConfig_.castShadow);
+			int surfaceStencilRole = static_cast<int>(drawConfig_.surfaceStencilRole);
+			const char* stencilRoleItems[] = {"None", "Hole Mask", "Hole Receiver"};
+			if(GuiCmd::Combo("Surface Stencil Role", surfaceStencilRole, stencilRoleItems, 3)) {
+				drawConfig_.surfaceStencilRole = static_cast<SurfaceStencilRole>(surfaceStencilRole);
+			}
 			GuiCmd::CheckBox("Enable Outline", drawConfig_.outline.enabled);
 			GuiCmd::DragFloat("Outline Thickness", drawConfig_.outline.thickness, 0.001f, 0.0f, 1.0f);
 			ImGui::ColorEdit4("Outline Color", &drawConfig_.outline.color.x);
@@ -222,6 +227,7 @@ void BaseGameObject::ApplyConfig() {
 		collider_->ApplyConfig(cfg.colliderConfig);
 	worldTransform_.ApplyConfig(cfg.transform);
 	drawConfig_.cameraDitherEnabled = cfg.cameraDitherEnabled;
+	drawConfig_.surfaceStencilRole = static_cast<SurfaceStencilRole>(cfg.surfaceStencilRole);
 	drawConfig_.outline.enabled	 = cfg.outlineEnabled;
 	drawConfig_.outline.thickness = cfg.outlineThickness;
 	drawConfig_.outline.color	 = cfg.outlineColor;
@@ -243,6 +249,7 @@ void BaseGameObject::ExtractConfig() {
 	cfg.guid	   = id_;
 	cfg.parentGuid = parentId_;
 	cfg.cameraDitherEnabled = drawConfig_.cameraDitherEnabled;
+	cfg.surfaceStencilRole = static_cast<int>(drawConfig_.surfaceStencilRole);
 	cfg.outlineEnabled	 = drawConfig_.outline.enabled;
 	cfg.outlineThickness = drawConfig_.outline.thickness;
 	cfg.outlineColor	 = drawConfig_.outline.color;

@@ -86,6 +86,10 @@ public:
 		BlendMode blend,
 		Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,
 		std::size_t shaderHash);
+	PipelineSet		   GetGeneratedMaterialHoleReceiverObjectPipelineSet(
+		BlendMode blend,
+		Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,
+		std::size_t shaderHash);
 	PipelineSet		   GetGeneratedMaterialSkinnedPipelineSet(
 		BlendMode blend,
 		Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,

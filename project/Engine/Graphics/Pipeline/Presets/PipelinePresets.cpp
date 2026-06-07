@@ -63,6 +63,53 @@ GraphicsPipelineDesc PipelinePresets::MakeObject3D(BlendMode mode) {
 	return desc;
 }
 
+GraphicsPipelineDesc PipelinePresets::MakeHoleMaskObject3D() {
+	GraphicsPipelineDesc desc = MakeObject3D(BlendMode::NONE);
+
+	// マスクパスはステンシル参照値だけを書き込み、色と深度は書き込まない。
+	// 手前の形状に隠れたマスクが穴を開けないよう、深度テストは維持する。
+	D3D12_DEPTH_STENCIL_DESC depthDesc = {};
+	depthDesc.DepthEnable = TRUE;
+	depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	depthDesc.StencilEnable = TRUE;
+	depthDesc.StencilReadMask = 0xff;
+	depthDesc.StencilWriteMask = 0xff;
+	depthDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	depthDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+	depthDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.BackFace = depthDesc.FrontFace;
+
+	desc.PS(L"HoleMask.PS.hlsl")
+		.CullNone()
+		.DepthState(depthDesc);
+	// カラー書き込み無効相当。ピクセルシェーダーはマスク形状をアルファクリップするためだけに使う。
+	for(auto& rt : desc.blend_.RenderTarget) {
+		rt.RenderTargetWriteMask = 0;
+	}
+
+	return desc;
+}
+
+GraphicsPipelineDesc PipelinePresets::MakeHoleReceiverObject3D(BlendMode mode) {
+	GraphicsPipelineDesc desc = MakeObject3D(mode);
+
+	// レシーバーパスは、マスクがステンシル参照値を書いていない場所だけ通常の Object3D シェーディングを描画する。
+	D3D12_DEPTH_STENCIL_DESC depthDesc = desc.depth_;
+	depthDesc.StencilEnable = TRUE;
+	depthDesc.StencilReadMask = 0xff;
+	depthDesc.StencilWriteMask = 0x00;
+	depthDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NOT_EQUAL;
+	depthDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
+	depthDesc.BackFace = depthDesc.FrontFace;
+	desc.DepthState(depthDesc);
+
+	return desc;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //		wireframe object3D
 /////////////////////////////////////////////////////////////////////////////////////////

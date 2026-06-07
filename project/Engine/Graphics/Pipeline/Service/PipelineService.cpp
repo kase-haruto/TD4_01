@@ -63,6 +63,8 @@ void PipelineService::RegisterAllPipelines() {
 		//						Object3D Pipelines
 		//===================================================================*/
 		regObj(PipelineTag::Object::Object3d, mode, PipelinePresets::MakeObject3D);
+		// レシーバーは Object3D と同じマテリアル/シェーディング経路を使い、ステンシル NotEqual だけを追加する。
+		regObj(PipelineTag::Object::HoleReceiverObject3D, mode, PipelinePresets::MakeHoleReceiverObject3D);
 		
 		//===================================================================*/
 		//						SkinObject3D Pipelines
@@ -82,6 +84,8 @@ void PipelineService::RegisterAllPipelines() {
 		regObj(PipelineTag::Object::GpuParticle, mode, PipelinePresets::MakeGpuParticle);
 	}
 	regObjNoBlend(PipelineTag::Object::EditorInfiniteGrid, PipelinePresets::MakeEditorInfiniteGrid);
+	// マスクはステンシルだけを書き込むため、ブレンド派生 PSO を持たない。
+	regObjNoBlend(PipelineTag::Object::HoleMaskObject3D, PipelinePresets::MakeHoleMaskObject3D);
 
 	//========================= Shadow ===================================
 	regObjNoBlend(PipelineTag::Object::OutlineObject3D, PipelinePresets::MakeOutlineObject3D);
@@ -172,6 +176,28 @@ PipelineSet PipelineService::GetGeneratedMaterialObjectPipelineSet(
 	}
 
 	GraphicsPipelineDesc desc = PipelinePresets::MakeObject3D(blend);
+	auto pipeline = factory_->CreateWithPixelShaderBlob(desc, pixelShader);
+	PipelineSet set{
+		pipeline->GetPipelineState().Get(),
+		pipeline->GetRootSignature().Get()};
+	generatedMaterialPipelines_[key] = std::move(pipeline);
+	return set;
+}
+
+PipelineSet PipelineService::GetGeneratedMaterialHoleReceiverObjectPipelineSet(
+	BlendMode blend,
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShader,
+	std::size_t shaderHash) {
+	// ステンシル状態は PSO 作成時に固定されるため、ランタイムマテリアルグラフのレシーバーも専用 PSO を持つ。
+	GeneratedMaterialPipelineKey key{PipelineTag::Object::HoleReceiverObject3D, blend, shaderHash};
+	auto it = generatedMaterialPipelines_.find(key);
+	if(it != generatedMaterialPipelines_.end()) {
+		return {
+			it->second->GetPipelineState().Get(),
+			it->second->GetRootSignature().Get()};
+	}
+
+	GraphicsPipelineDesc desc = PipelinePresets::MakeHoleReceiverObject3D(blend);
 	auto pipeline = factory_->CreateWithPixelShaderBlob(desc, pixelShader);
 	PipelineSet set{
 		pipeline->GetPipelineState().Get(),

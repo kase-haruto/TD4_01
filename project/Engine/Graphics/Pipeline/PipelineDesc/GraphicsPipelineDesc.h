@@ -77,7 +77,8 @@ public:
 	std::vector<D3D12_INPUT_ELEMENT_DESC> inputElems_;
 
 	// render target format --------------------------------------------//
-	DXGI_FORMAT				 dsvFormat_	  = DXGI_FORMAT_D32_FLOAT;
+	// メイン描画先は表面穴マスクでステンシルを使う。深度専用パスは個別に上書きする。
+	DXGI_FORMAT				 dsvFormat_	  = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	std::vector<DXGI_FORMAT> rtvFormats_  = {DXGI_FORMAT_R8G8B8A8_UNORM};
 	UINT					 sampleCount_ = 1;
 
