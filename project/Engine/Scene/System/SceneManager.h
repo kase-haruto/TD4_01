@@ -49,6 +49,7 @@ namespace CalyxEngine {
 
 		void BindPlaySession(CalyxEngine::PlaySession* ps) { pPlaySession_ = ps; }
 		void SetEditorPreviewContext(SceneContext* ctx) { editorPreviewCtx_ = ctx; }
+		void SetEditorViewportRenderState(bool renderDebugView, bool renderPicking);
 
 		SceneContext* ActiveCtx() const;
 		bool		  ActiveRuntimeFlag() const;
@@ -127,6 +128,8 @@ namespace CalyxEngine {
 		SceneContext* lastBoundCtx_	  = nullptr;
 		uint64_t	  lastRuntimeGen_ = 0;
 		SceneContext* editorPreviewCtx_ = nullptr;
+		bool		  renderDebugView_ = true;
+		bool		  renderPicking_	= true;
 
 		std::unique_ptr<SceneTransitionService> transitionService_;
 

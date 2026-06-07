@@ -29,6 +29,35 @@
 
 #include <Engine/Editor/PickingPass.h>
 
+#include <algorithm>
+#include <cmath>
+
+namespace {
+	constexpr uint32_t kMaxViewportRenderWidth = 1920;
+	constexpr uint32_t kMaxViewportRenderHeight = 1080;
+
+	uint32_t ToRenderExtent(float value) {
+		return static_cast<uint32_t>((std::max)(1.0f, std::ceil(value)));
+	}
+
+	void ResizeTargetToViewport(IRenderTarget* rt, const CalyxEngine::Vector2& size) {
+		if(!rt || size.x <= 0.0f || size.y <= 0.0f) return;
+
+		uint32_t width = ToRenderExtent(size.x);
+		uint32_t height = ToRenderExtent(size.y);
+		const float scale = (std::min)(
+			static_cast<float>(kMaxViewportRenderWidth) / static_cast<float>(width),
+			static_cast<float>(kMaxViewportRenderHeight) / static_cast<float>(height));
+
+		if(scale < 1.0f) {
+			width = (std::max)(1u, static_cast<uint32_t>(std::floor(static_cast<float>(width) * scale)));
+			height = (std::max)(1u, static_cast<uint32_t>(std::floor(static_cast<float>(height) * scale)));
+		}
+
+		rt->Resize(width, height);
+	}
+}
+
 namespace CalyxEngine {
 	SceneManager::SceneManager(CalyxEngine::DxCore* dx)
 		: dx_(dx) {
@@ -226,24 +255,28 @@ namespace CalyxEngine {
 
 		CameraManager::SetTypeStatic(CameraType::Default);
 		auto* offscreen = dx_->GetRenderTargetCollection().Get("Offscreen");
+		ResizeTargetToViewport(offscreen, CameraManager::GetViewportSizeStatic(ViewportType::VIEWPORT_MAIN));
 		DrawForRenderTarget(offscreen, cmd, pso);
 
 #if defined(_DEBUG) || defined(DEVELOP)
 		auto* debugRT = dx_->GetRenderTargetCollection().Get("DebugView");
-		if(editorPreviewCtx_) {
-			DrawEditorPreview(debugRT, cmd, pso);
-		} else {
-			if(auto* ctx = ActiveCtx()) ctx->MakeCurrent();
-			CameraManager::SetTypeStatic(CameraType::Debug);
-			DrawForRenderTarget(debugRT, cmd, pso);
+		if(renderDebugView_) {
+			ResizeTargetToViewport(debugRT, CameraManager::GetViewportSizeStatic(ViewportType::VIEWPORT_DEBUG));
+			if(editorPreviewCtx_) {
+				DrawEditorPreview(debugRT, cmd, pso);
+			} else {
+				if(auto* ctx = ActiveCtx()) ctx->MakeCurrent();
+				CameraManager::SetTypeStatic(CameraType::Debug);
+				DrawForRenderTarget(debugRT, cmd, pso);
 
-			if(pickingPass_ && debugRT) {
-				auto vp = debugRT->GetViewport();
-				pickingPass_->Resize(static_cast<int32_t>(vp.Width), static_cast<int32_t>(vp.Height));
-				if(auto* renderer = slots_[currentIdx_].scene->GetModelRenderer()) {
-					pickingPass_->Render(cmd, renderer, pso);
+				if(renderPicking_ && pickingPass_ && debugRT) {
+					auto vp = debugRT->GetViewport();
+					pickingPass_->Resize(static_cast<int32_t>(vp.Width), static_cast<int32_t>(vp.Height));
+					if(auto* renderer = slots_[currentIdx_].scene->GetModelRenderer()) {
+						pickingPass_->Render(cmd, renderer, pso);
+					}
+					debugRT->SetRenderTarget(cmd);
 				}
-				debugRT->SetRenderTarget(cmd);
 			}
 		}
 
@@ -266,6 +299,11 @@ namespace CalyxEngine {
 		}
 
 		PrimitiveDrawer::GetInstance()->ClearMesh();
+	}
+
+	void SceneManager::SetEditorViewportRenderState(bool renderDebugView, bool renderPicking) {
+		renderDebugView_ = renderDebugView;
+		renderPicking_	 = renderDebugView && renderPicking;
 	}
 
 	void SceneManager::DrawEditorPreview(IRenderTarget*				rt,

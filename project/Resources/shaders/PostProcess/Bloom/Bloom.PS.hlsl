@@ -27,37 +27,37 @@ float3 ExtractBloom(float3 color) {
 	return color;
 }
 
-float3 SampleGaussianGrid(float2 uv, float2 texelSize, float spread, float sigma) {
-	float3 bloom = float3(0,0,0);
-	float totalWeight = 0.0f;
-
-	const int samples = 5;
-	for (int x = -samples; x <= samples; ++x) {
-		for (int y = -samples; y <= samples; ++y) {
-			float2 offset = float2(float(x), float(y));
-			float2 sampleUV = uv + offset * texelSize * spread;
-			
-			float weight = exp(-(dot(offset, offset) / (2.0f * sigma * sigma)));
-			
-			bloom += ExtractBloom(gBloomMask.Sample(gSampler, sampleUV).rgb) * weight;
-			totalWeight += weight;
-		}
-	}
-
-	return bloom / max(totalWeight, 0.0001f);
-}
-
 float3 SampleBloom(float2 uv, float2 texelSize) {
 	float bloomRadius = max(radius, 0.0f);
 	if(bloomRadius <= 0.001f) {
 		return ExtractBloom(gBloomMask.Sample(gSampler, uv).rgb);
 	}
 
-	float3 nearBloom = SampleGaussianGrid(uv, texelSize, bloomRadius * 2.0f, 2.0f);
-	float3 midBloom = SampleGaussianGrid(uv, texelSize, bloomRadius * 5.0f, 2.6f);
-	float3 farBloom = SampleGaussianGrid(uv, texelSize, bloomRadius * 11.0f, 3.2f);
+	// Keep bloom in a single fullscreen pass, but avoid the previous 363 taps/pixel
+	// Gaussian grid. Linear filtering plus a compact radial kernel gives a similar
+	// soft spread at a fraction of the texture bandwidth.
+	float2 nearStep = texelSize * bloomRadius * 2.0f;
+	float2 midStep = texelSize * bloomRadius * 5.0f;
+	float2 farStep = texelSize * bloomRadius * 10.0f;
 
-	return nearBloom * 0.45f + midBloom * 0.35f + farBloom * 0.20f;
+	float3 bloom = ExtractBloom(gBloomMask.Sample(gSampler, uv).rgb) * 0.18f;
+
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2( nearStep.x, 0.0f)).rgb) * 0.08f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(-nearStep.x, 0.0f)).rgb) * 0.08f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(0.0f,  nearStep.y)).rgb) * 0.08f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(0.0f, -nearStep.y)).rgb) * 0.08f;
+
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2( midStep.x,  midStep.y)).rgb) * 0.07f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(-midStep.x,  midStep.y)).rgb) * 0.07f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2( midStep.x, -midStep.y)).rgb) * 0.07f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(-midStep.x, -midStep.y)).rgb) * 0.07f;
+
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2( farStep.x, 0.0f)).rgb) * 0.06f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(-farStep.x, 0.0f)).rgb) * 0.06f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(0.0f,  farStep.y)).rgb) * 0.06f;
+	bloom += ExtractBloom(gBloomMask.Sample(gSampler, uv + float2(0.0f, -farStep.y)).rgb) * 0.06f;
+
+	return bloom;
 }
 
 PixelShaderOutput main(VertexShaderOutput input) {
@@ -69,6 +69,11 @@ PixelShaderOutput main(VertexShaderOutput input) {
 	float2 texelSize = 1.0f / float2(max(width, 1), max(height, 1));
 
 	float4 baseColor = gSceneColor.Sample(gSampler, input.texcoord);
+	if(intensity <= 0.001f) {
+		output.color = baseColor;
+		return output;
+	}
+
 	float3 bloom = SampleBloom(input.texcoord, texelSize) * tint * intensity;
 
 	output.color = float4(saturate(baseColor.rgb + bloom), baseColor.a);
