@@ -14,6 +14,7 @@
 #include <Engine/Application/UI/Panels/HierarchyPanel.h>
 #include <Engine/Application/UI/Panels/InspectorPanel.h>
 #include <Engine/Editor/SceneSwitchOverlay.h>
+#include <Engine/Scene/System/SceneManager.h>
 
 // lib
 #include <externals/imgui/ImGuizmo.h>
@@ -51,6 +52,9 @@ namespace CalyxEngine {
 		levelEditor_->RenderMenu();
 
 		if(levelEditor_->ShouldRenderRuntimeFullscreen()) {
+			if(auto* sceneManager = levelEditor_->GetSceneManager()) {
+				sceneManager->SetEditorViewportRenderState(false, false);
+			}
 			levelEditor_->RenderRuntimeFullscreenViewport(reinterpret_cast<ImTextureID>(mainViewportTextureID_));
 			levelEditor_->RenderSettingsWindow();
 			DebugTextOverlay::RenderGlobalPopups();
@@ -60,6 +64,9 @@ namespace CalyxEngine {
 
 		// === 設定が有効な場合だけ、Gameモード中はUIなど表示しない ===
 		if(levelEditor_->ShouldHideEditorUiInGameMode()) {
+			if(auto* sceneManager = levelEditor_->GetSceneManager()) {
+				sceneManager->SetEditorViewportRenderState(false, false);
+			}
 			levelEditor_->RenderSettingsWindow();
 			DebugTextOverlay::RenderGlobalPopups();
 			DebugTextOverlay::RenderFatalAssertWindow();
@@ -67,6 +74,11 @@ namespace CalyxEngine {
 		}
 
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+		if(auto* sceneManager = levelEditor_->GetSceneManager()) {
+			const bool renderDebugView = levelEditor_->IsDebugViewportVisible();
+			sceneManager->SetEditorViewportRenderState(renderDebugView, renderDebugView);
+		}
 
 		levelEditor_->RenderViewport(ViewportType::VIEWPORT_MAIN, reinterpret_cast<ImTextureID>(mainViewportTextureID_));
 		levelEditor_->RenderViewport(ViewportType::VIEWPORT_DEBUG, reinterpret_cast<ImTextureID>(debugViewportTextureID_));
