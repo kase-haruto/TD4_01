@@ -1,6 +1,80 @@
 {
     "objects": [
         {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "b494d58d-febe-424e-b565-15007d830eaf",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "39d27b4a-4bd3-4e4f-ba6a-4644a794e965",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390848159790039,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
             "color": {
                 "w": 1.0,
                 "x": 1.0,
@@ -39,6 +113,80 @@
                 }
             },
             "type": "DirectionalLight"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "95852b4e-4051-46ed-a891-0f3da6bc1cdc",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2a2d073b-8cf7-4851-a6f7-14f822bd30c0",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -5.727685451507568,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
         },
         {
             "color": {
@@ -83,52 +231,7 @@
             "type": "PointLight"
         },
         {
-            "guid": "dbf60d7f-a6b9-4240-ab76-0d9363925db4",
-            "name": "MainCamera",
-            "objectType": 0,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "serializableParams": {
-                "Engine/Camera/Follow/Camera": {
-                    "fields": {
-                        "DistanceBack": 13.0,
-                        "Enabled": true,
-                        "ExtraPitchDeg": -10.0,
-                        "HeightOffset": 4.0,
-                        "LookAtOffset": [
-                            0.0,
-                            1.5,
-                            0.0
-                        ],
-                        "PosSmoothTime": 0.7799999713897705,
-                        "RotTimeConstant": 0.5199999809265137,
-                        "SideOffset": 0.0
-                    }
-                }
-            },
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "Camera3d"
-        },
-        {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -193,11 +296,57 @@
                 },
                 "translation": {
                     "x": 0.0,
-                    "y": -3.0,
+                    "y": -7.0,
                     "z": 0.0
                 }
             },
             "type": "BaseGameObject"
+        },
+        {
+            "guid": "dbf60d7f-a6b9-4240-ab76-0d9363925db4",
+            "name": "MainCamera",
+            "objectType": 0,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "serializableParams": {
+                "Engine/Camera/Follow/Camera": {
+                    "fields": {
+                        "DistanceBack": 13.0,
+                        "Enabled": true,
+                        "ExtraPitchDeg": -10.0,
+                        "HeightOffset": 4.0,
+                        "LookAtOffset": [
+                            0.0,
+                            1.5,
+                            0.0
+                        ],
+                        "PosSmoothTime": 0.7799999713897705,
+                        "RotTimeConstant": 0.5199999809265137,
+                        "SideOffset": 0.0
+                    }
+                }
+            },
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 45.54802322387695,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "Camera3d"
         },
         {
             "guid": "5f4c760f-44bb-4e49-960c-4318c5ac3130",
@@ -209,10 +358,10 @@
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 0.9936224222183228,
-                    "x": 0.10974130779504776,
-                    "y": 0.025757381692528725,
-                    "z": -0.002844791626557708
+                    "w": 0.9740453362464905,
+                    "x": 0.22037382423877716,
+                    "y": 0.05040814355015755,
+                    "z": -0.011404639109969139
                 },
                 "scale": {
                     "x": 1.0,
@@ -220,14 +369,15 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": 5.439367294311523,
-                    "y": 14.49215316772461,
-                    "z": -8.105113983154297
+                    "x": 106.50178527832031,
+                    "y": 70.26237487792969,
+                    "z": -67.49415588378906
                 }
             },
             "type": "DebugCamera"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -250,11 +400,11 @@
                 },
                 "targetType": 0
             },
-            "guid": "2688ac79-fc00-4176-ae77-07ce65fe6d1f",
+            "guid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "tatami.obj",
+                "modelName": "frame.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -264,7 +414,7 @@
                     }
                 }
             },
-            "name": "tatami",
+            "name": "Stage_1",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -275,8 +425,8 @@
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "faa630f1-bf85-437b-b3b5-32928d0500aa",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -293,14 +443,15 @@
                     "z": 3.0
                 },
                 "translation": {
-                    "x": -16.850444793701172,
-                    "y": -3.0044686794281006,
-                    "z": 25.194433212280273
+                    "x": 0.0,
+                    "y": 15.579999923706055,
+                    "z": 38.74979782104492
                 }
             },
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -323,7 +474,7 @@
                 },
                 "targetType": 0
             },
-            "guid": "fc3c5eeb-bc91-4961-8113-17d399b8a882",
+            "guid": "69e04633-f75b-4337-b3b9-40b9974892e7",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -347,9 +498,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "3e8f0bc4-542a-4392-9ec9-2b45158e9d3e",
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1a495996-3ddc-452e-ba11-13a3a2f37858",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -374,6 +525,7 @@
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -396,7 +548,155 @@
                 },
                 "targetType": 0
             },
-            "guid": "e1e6bac4-289f-42f2-b12b-0203d40af5c2",
+            "guid": "f64680bf-227d-4836-b322-9003eb4125a6",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "selectWall.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "selectWall",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "623851ad-3df3-4031-a8ff-1b543c1d3a01",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.949999988079071,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.6124966740608215
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "bbb30f5f-47b9-4d3c-94b2-9c4eef9c1be8",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2a2d073b-8cf7-4851-a6f7-14f822bd30c0",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -5.727685451507568,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "8dae64b6-2ad5-4e37-a00c-4d78578e2c54",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -420,9 +720,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "27953b66-6067-4965-a9b9-6f9e813b13e9",
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1a495996-3ddc-452e-ba11-13a3a2f37858",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -439,7 +739,7 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": 11.390848159790039,
+                    "x": 3.7720019817352295,
                     "y": 0.0,
                     "z": 0.0
                 }
@@ -447,6 +747,7 @@
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -469,7 +770,7 @@
                 },
                 "targetType": 0
             },
-            "guid": "9495ba60-96b3-4f73-bfe1-7ee1e708a6ed",
+            "guid": "de1a1120-2dae-4a90-8eb1-b9bcd391f0b1",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -493,82 +794,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "61b59b28-9353-421a-86b0-ea767271ccf0",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 7.550786018371582,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "eee30708-fab4-4c3d-89f6-49351f4dc080",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "tatami.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "tatami",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "e87e0773-6427-4ab6-881e-861d89e4290c",
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2e238fd4-660a-47d9-8b99-d40eb0184549",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -593,6 +821,7 @@
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -615,7 +844,375 @@
                 },
                 "targetType": 0
             },
-            "guid": "16b28b42-a16c-437b-a4d9-1795c15178fd",
+            "guid": "13a1a930-26c6-4992-ac0f-4a7571301fd5",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiL_1",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3f859a97-682d-46b5-b7ef-53303ebe05d7",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -1.9257389307022095,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "f9b52372-b4a9-4310-8020-c96028397d2d",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "roomWall.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "roomWall",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.7071068286895752,
+                    "x": 0.0,
+                    "y": 0.7071068286895752,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 2.799999952316284,
+                    "y": 2.799999952316284,
+                    "z": 2.0
+                },
+                "translation": {
+                    "x": 205.09092712402344,
+                    "y": 6.196000099182129,
+                    "z": 17.023000717163086
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "8292032a-dc2e-404c-b9a6-25a6e651755c",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "bffb4f0d-0f78-4d63-9ad0-c570dad24bbb",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 5.648428440093994,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "c59be44e-394a-4801-94d9-96370487b5b7",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "bffb4f0d-0f78-4d63-9ad0-c570dad24bbb",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 5.648428440093994,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "53f1c70c-e378-427d-82c1-ee9137151248",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiL_4",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "966e9cfc-caec-4503-896f-937f56072863",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3f859a97-682d-46b5-b7ef-53303ebe05d7",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -1.9257389307022095,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "6c276b5c-142e-49dc-a1b9-dc9c92aaae66",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -639,9 +1236,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "1076776f-d785-46b2-b8c5-83b1ca9048c4",
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "c98adce9-26de-4db0-bdb2-4c8f1a518e12",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -666,6 +1263,7 @@
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -688,11 +1286,11 @@
                 },
                 "targetType": 0
             },
-            "guid": "1e526b54-8ce6-4830-a558-ad2dab43fc9b",
+            "guid": "a565a39a-56d0-4a80-bc8e-a0a542c8b429",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "tatami.obj",
+                "modelName": "roomWall.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -702,7 +1300,7 @@
                     }
                 }
             },
-            "name": "tatami",
+            "name": "roomWall",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -712,9 +1310,81 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "595c5162-37b2-4582-9ab5-b96fc8f84ef8",
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.7071068286895752,
+                    "x": 0.0,
+                    "y": -0.7071068286895752,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 2.799999952316284,
+                    "y": 2.799999952316284,
+                    "z": 2.0
+                },
+                "translation": {
+                    "x": -23.45825958251953,
+                    "y": 6.196123123168945,
+                    "z": 17.022890090942383
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "5650010f-f766-4878-ae17-e3ec895c4cc3",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiR_1",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -726,19 +1396,20 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
                 },
                 "translation": {
-                    "x": 7.551000118255615,
-                    "y": 0.0,
-                    "z": -6.381999969482422
+                    "x": 1.8585904836654663,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
                 }
             },
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -761,7 +1432,7 @@
                 },
                 "targetType": 0
             },
-            "guid": "13e25aba-802d-414b-829b-b9dc9f71bf26",
+            "guid": "875a52d9-6d4f-40b6-a9ce-ec103cc11a9a",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -785,9 +1456,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9d061b06-d13a-4485-882b-215c146551d1",
-            "prefabAssetGuid": "7ad56302-be0e-4011-a9c8-75aa403184dc",
-            "prefabSourceGuid": "1570cc27-2d1f-4d1e-a519-5443341776bf",
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1871d1e9-3b71-44a5-b752-1c9eac0f3159",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -812,6 +1483,7 @@
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -834,7 +1506,1117 @@
                 },
                 "targetType": 0
             },
-            "guid": "06afc0bf-89c8-4014-962b-7ef98c792296",
+            "guid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "be9df99a-e62d-4e6d-ae2b-40be460c28c8",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -5.715138912200928,
+                    "y": -7.320104122161865,
+                    "z": -2.518946886062622
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "8e98b232-9724-4f64-ab30-1a1889be861c",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "39d27b4a-4bd3-4e4f-ba6a-4644a794e965",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390848159790039,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "aaddf639-e561-4c96-b424-ad6425049d36",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "39d27b4a-4bd3-4e4f-ba6a-4644a794e965",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390848159790039,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "434e3d9f-ec9e-4d0e-821e-f36c8f7d9c98",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1871d1e9-3b71-44a5-b752-1c9eac0f3159",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 3.7720000743865967,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "cdedfe9c-bd44-4915-a481-a4cfeea745c2",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2d7fa99a-df0c-4e3b-b532-2c6134221704",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.550786018371582,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "3c8131fd-ebb9-47d1-811a-439369abfb2b",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "201d9418-732f-46f7-8af3-ac19e910a18d",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.551000118255615,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "9bceb204-ed30-46f6-9ac9-961a5acf7f43",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1871d1e9-3b71-44a5-b752-1c9eac0f3159",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 3.7720000743865967,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "864e0e68-6753-4b29-aa75-2f6109cf257f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "fa2e44f6-c585-4955-8547-5c40a410756b",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2e238fd4-660a-47d9-8b99-d40eb0184549",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": -6.381690979003906
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "65897a6e-e841-4be9-8e25-9233945d5ef1",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "bffb4f0d-0f78-4d63-9ad0-c570dad24bbb",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 5.648428440093994,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "2a9e95ca-1768-46a8-bbfe-9381b90fe3d0",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2d7fa99a-df0c-4e3b-b532-2c6134221704",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.550786018371582,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "897caf1b-327d-4e3d-b992-789c19774682",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "201d9418-732f-46f7-8af3-ac19e910a18d",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.551000118255615,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "57411414-d9b7-45f4-9fb0-c7ee2dc1ee6f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1a495996-3ddc-452e-ba11-13a3a2f37858",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 3.7720019817352295,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "frame.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Stage_2",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 3.0,
+                    "y": 3.0,
+                    "z": 3.0
+                },
+                "translation": {
+                    "x": 45.5482063293457,
+                    "y": 15.579999923706055,
+                    "z": 38.75
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "deac099b-edd3-4b2a-86f9-1210328c913f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "201d9418-732f-46f7-8af3-ac19e910a18d",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.551000118255615,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "6721903c-f98e-4cba-b769-53fe33084654",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiL_2",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3f859a97-682d-46b5-b7ef-53303ebe05d7",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -1.9257389307022095,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "6c14443a-6eb8-4975-83ff-bb803a08a183",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -858,9 +2640,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9825ed06-9ad4-4c00-b816-92ebe7b21a5e",
-            "prefabAssetGuid": "1cdba8be-6748-47cc-a230-7c3fcf3ec04a",
-            "prefabSourceGuid": "d746d0b0-c362-4964-bf90-849afe2f59ae",
+            "parentGuid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "623851ad-3df3-4031-a8ff-1b543c1d3a01",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -872,19 +2654,20 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 1.399999976158142,
-                    "y": 1.399999976158142,
+                    "x": 0.949999988079071,
+                    "y": 1.0,
                     "z": 1.0
                 },
                 "translation": {
-                    "x": 8.443246841430664,
-                    "y": 10.234044075012207,
-                    "z": 0.21356201171875
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.6124966740608215
                 }
             },
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -907,7 +2690,377 @@
                 },
                 "targetType": 0
             },
-            "guid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+            "guid": "caf27731-01c4-4ac4-a17a-ae3dcf3aa991",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiR_2",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 1.8585904836654663,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "be9df99a-e62d-4e6d-ae2b-40be460c28c8",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -5.715138912200928,
+                    "y": -7.320104122161865,
+                    "z": -2.518946886062622
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "8b2161e5-e636-4990-b5cb-db7911732ddf",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2d7fa99a-df0c-4e3b-b532-2c6134221704",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.550786018371582,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "3bbc0f6c-f68c-4bdb-b3bf-b49f53874099",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "c98adce9-26de-4db0-bdb2-4c8f1a518e12",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390999794006348,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "867e5516-80f3-49f1-8bdf-8080efaef5ac",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "selectWall.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "selectWall",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "623851ad-3df3-4031-a8ff-1b543c1d3a01",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.949999988079071,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.6124966740608215
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "63f35506-1eca-42ea-bf3f-b1ac56f47171",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -931,9 +3084,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "prefabAssetGuid": "1cdba8be-6748-47cc-a230-7c3fcf3ec04a",
-            "prefabSourceGuid": "9053b94f-b1ca-43f0-b134-18ace7359185",
+            "parentGuid": "966e9cfc-caec-4503-896f-937f56072863",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "bffb4f0d-0f78-4d63-9ad0-c570dad24bbb",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -945,19 +3098,20 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 2.0,
-                    "y": 2.0,
-                    "z": 2.0
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
                 },
                 "translation": {
-                    "x": -16.850000381469727,
-                    "y": -2.4093034267425537,
-                    "z": 34.47945785522461
+                    "x": 5.648428440093994,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
                 }
             },
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -980,11 +3134,11 @@
                 },
                 "targetType": 0
             },
-            "guid": "083e1fba-fb95-4d82-9cec-14dadca9b87e",
+            "guid": "b38246f3-1e9b-478d-be9c-3541695b3dbe",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "shojiFull.obj",
+                "modelName": "tatami.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -994,7 +3148,7 @@
                     }
                 }
             },
-            "name": "shojiFull",
+            "name": "tatami",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -1004,9 +3158,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9825ed06-9ad4-4c00-b816-92ebe7b21a5e",
-            "prefabAssetGuid": "1cdba8be-6748-47cc-a230-7c3fcf3ec04a",
-            "prefabSourceGuid": "d4168e6a-1178-4b6c-bb5e-8ac5a6334e51",
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1871d1e9-3b71-44a5-b752-1c9eac0f3159",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -1023,14 +3177,15 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": 16.934206008911133,
+                    "x": 3.7720000743865967,
                     "y": 0.0,
-                    "z": 0.0
+                    "z": -6.381999969482422
                 }
             },
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -1053,153 +3208,7 @@
                 },
                 "targetType": 0
             },
-            "guid": "6454d3d7-dde6-4ea5-bb16-53ce00f36feb",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "shojiFull.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "shojiFull",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9825ed06-9ad4-4c00-b816-92ebe7b21a5e",
-            "prefabAssetGuid": "1cdba8be-6748-47cc-a230-7c3fcf3ec04a",
-            "prefabSourceGuid": "a44aa254-8831-4c63-8172-e2caee7cbe49",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 5.64762544631958,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "e357b9fa-1d4b-44a9-b1ed-3dd8ced77e50",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "shojiFull.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "shojiFull",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9825ed06-9ad4-4c00-b816-92ebe7b21a5e",
-            "prefabAssetGuid": "1cdba8be-6748-47cc-a230-7c3fcf3ec04a",
-            "prefabSourceGuid": "d9f4a15a-b147-4f3f-9795-110abd0ab5f6",
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 11.29727840423584,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "guid": "f00c6ba5-8882-4535-add6-fded21ee3b9d",
+            "guid": "966e9cfc-caec-4503-896f-937f56072863",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
@@ -1213,7 +3222,7 @@
                     }
                 }
             },
-            "name": "frame",
+            "name": "Stage_4",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -1223,9 +3232,9 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "9825ed06-9ad4-4c00-b816-92ebe7b21a5e",
-            "prefabAssetGuid": "1cdba8be-6748-47cc-a230-7c3fcf3ec04a",
-            "prefabSourceGuid": "09d94435-bc6d-425b-af55-f73b8eb65bd9",
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -1237,14 +3246,2308 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 1.5,
-                    "y": 1.5,
-                    "z": 1.5
+                    "x": 3.0,
+                    "y": 3.0,
+                    "z": 3.0
                 },
                 "translation": {
-                    "x": 8.428478240966797,
-                    "y": 10.450196266174316,
-                    "z": -0.2517509460449219
+                    "x": 136.6439971923828,
+                    "y": 15.579999923706055,
+                    "z": 38.75
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "57225d4f-b9e3-4243-827d-f12ecb348051",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "6368b09c-004f-470c-a0ef-c03ebd24faf7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2e238fd4-660a-47d9-8b99-d40eb0184549",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": -6.381690979003906
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "3b591b42-91de-42a5-a0a4-8f9101b394e9",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2a2d073b-8cf7-4851-a6f7-14f822bd30c0",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -5.727685451507568,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "efbe307c-d4ba-464f-a7e2-93cc28af698d",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiL_3",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3f859a97-682d-46b5-b7ef-53303ebe05d7",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -1.9257389307022095,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "375088d8-1631-4bc9-a18d-c14f12907e60",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiR_4",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "966e9cfc-caec-4503-896f-937f56072863",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 1.8585904836654663,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "280618be-47b0-4037-b5b1-20cda744f567",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "c98adce9-26de-4db0-bdb2-4c8f1a518e12",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390999794006348,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "70d3e47f-afa2-4fc1-b76a-c9dc21c1d6a3",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiR_3",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 1.8585904836654663,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "frame.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Stage_3",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 3.0,
+                    "y": 3.0,
+                    "z": 3.0
+                },
+                "translation": {
+                    "x": 91.09600067138672,
+                    "y": 15.579999923706055,
+                    "z": 38.75
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "5004234d-53fd-4739-9263-2543edefaf5f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1a495996-3ddc-452e-ba11-13a3a2f37858",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 3.7720019817352295,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "be9df99a-e62d-4e6d-ae2b-40be460c28c8",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -5.715138912200928,
+                    "y": -7.320104122161865,
+                    "z": -2.518946886062622
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "926449a6-f187-492f-a937-4f439e3efa02",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "bffb4f0d-0f78-4d63-9ad0-c570dad24bbb",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 5.648428440093994,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "42a9eea0-eb6d-455d-9aec-03a1983fea31",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2d7fa99a-df0c-4e3b-b532-2c6134221704",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.550786018371582,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "7dfde8c8-e0cd-459e-8979-2b51a205411d",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "4c0d3a36-060e-4f6f-b876-0e79832be02a",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2e238fd4-660a-47d9-8b99-d40eb0184549",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": -6.381690979003906
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "f18176cc-0cfd-4e40-ba24-834dd3c0ad22",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "selectWall.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "selectWall",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "966e9cfc-caec-4503-896f-937f56072863",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "623851ad-3df3-4031-a8ff-1b543c1d3a01",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.949999988079071,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.6124966740608215
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "966e9cfc-caec-4503-896f-937f56072863",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "be9df99a-e62d-4e6d-ae2b-40be460c28c8",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -5.715138912200928,
+                    "y": -7.320104122161865,
+                    "z": -2.518946886062622
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "ea2b4c5c-ccc0-4247-9c36-439d3119a7d9",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "201d9418-732f-46f7-8af3-ac19e910a18d",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.551000118255615,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "b3711fa7-79ad-42c7-a5dd-b324359879de",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "966e9cfc-caec-4503-896f-937f56072863",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2a2d073b-8cf7-4851-a6f7-14f822bd30c0",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -5.727685451507568,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "f081b733-e182-4b72-8255-78949595e186",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "39d27b4a-4bd3-4e4f-ba6a-4644a794e965",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390848159790039,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "9efbeaa3-b38c-4853-985b-43354c30fcb6",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "b3c34687-e6de-4dc9-a752-5528be611edc",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "c98adce9-26de-4db0-bdb2-4c8f1a518e12",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390999794006348,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "be9df99a-e62d-4e6d-ae2b-40be460c28c8",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -5.715138912200928,
+                    "y": -7.320104122161865,
+                    "z": -2.518946886062622
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "10ee61af-cbd3-462d-ad12-a5b70ca81de6",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "shojiFull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2a2d073b-8cf7-4851-a6f7-14f822bd30c0",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -5.727685451507568,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "frame.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Stage_5",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 3.0,
+                    "y": 3.0,
+                    "z": 3.0
+                },
+                "translation": {
+                    "x": 182.19200134277344,
+                    "y": 15.579999923706055,
+                    "z": 38.75
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "a5505858-4a1d-45e1-943a-5aa65ef9b3fb",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2d7fa99a-df0c-4e3b-b532-2c6134221704",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.550786018371582,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "1ec46106-b3c5-4457-90d2-0720ef861e37",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "selectWall.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "selectWall",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "623851ad-3df3-4031-a8ff-1b543c1d3a01",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.949999988079071,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.6124966740608215
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "500b9d24-9028-40ed-8933-fa7c0516db32",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiL_5",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "3f859a97-682d-46b5-b7ef-53303ebe05d7",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": -1.9257389307022095,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "20340438-12a0-41dc-b2a6-8322cbd7a519",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiR_5",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 1.8585904836654663,
+                    "y": -7.09185266494751,
+                    "z": 0.5036017298698425
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "69102dc1-43f4-4afe-9ec5-b4f5d7557e5b",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1a495996-3ddc-452e-ba11-13a3a2f37858",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 3.7720019817352295,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "07fd8a59-21c7-4c6c-a630-7a6c443a6193",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "39d27b4a-4bd3-4e4f-ba6a-4644a794e965",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390848159790039,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "5a31ef2a-7545-4dbd-bb8b-a606b28a29f1",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "c98adce9-26de-4db0-bdb2-4c8f1a518e12",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 11.390999794006348,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "887c2bab-3a86-418a-b710-9123e8739103",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "201d9418-732f-46f7-8af3-ac19e910a18d",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 7.551000118255615,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "d55598f7-7480-46f4-9df7-425a717c38f5",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "1871d1e9-3b71-44a5-b752-1c9eac0f3159",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 3.7720000743865967,
+                    "y": 0.0,
+                    "z": -6.381999969482422
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "9d65d7bd-64da-4cc4-af0e-fbecd0e2ff97",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "tatami.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "tatami",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "5bcbb1cc-11c1-4b21-879a-a6c5f16432b9",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "2e238fd4-660a-47d9-8b99-d40eb0184549",
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": -6.381690979003906
                 }
             },
             "type": "BaseGameObject"

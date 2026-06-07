@@ -17,6 +17,7 @@
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
 #include <Engine/Scene/Context/SceneContext.h>
 #include <Engine/Scene/Serializer/SceneSerializer.h>
+#include <Engine/Graphics/Camera/Manager/CameraManager.h>
 // lib
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -49,10 +50,6 @@ void SelectScene::Initialize() {
 	//=========================
 	// グラフィック関連
 	//=========================
-	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
-	pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
-	pauseBg_->Update();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	if(preType_ == SceneType::TITLE) {
@@ -76,6 +73,9 @@ void SelectScene::Initialize() {
 	}
 	IsOpening_ = true;
 	IsPhase_   = false;
+
+	shoujiOpenTime_ = 2.0f;
+	isShoujiOpen_ = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -91,14 +91,6 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 
 	SelectUpdate(dt);
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_7)) {
-		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST));
-		});
-	}
-
 	// 衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }
@@ -108,7 +100,6 @@ void SelectScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoS
 	//========================================================//
 	//	sprite の 登録
 	//========================================================//
-	spriteRenderer_->Register(pauseBg_.get());
 	transitionControl_->Draw(spriteRenderer_.get());
 
 	// シーン上のオブジェクトの描画
@@ -121,8 +112,16 @@ void SelectScene::CleanUp() {
 	CollisionManager::GetInstance()->ClearColliders();
 }
 
-void SelectScene::SelectUpdate(float) {
+void SelectScene::SelectUpdate(float dt) {
+	if(isShoujiOpen_) {
+		ShoujiOpen(dt);
+		return;
+	}
+
 	const int maxStages = 5;
+
+	Camera3d*			 cam = CameraManager::GetMain3d();
+	CalyxEngine::Vector3 pos = cam->GetTranslate();
 
 	// 左右入力によるステージ選択
 	if(CalyxFoundation::Input::TriggerKey(DIK_A) || CalyxFoundation::Input::TriggerKey(DIK_LEFT) ||
@@ -134,29 +133,67 @@ void SelectScene::SelectUpdate(float) {
 		selectedIndex_ = (selectedIndex_ + 1) % maxStages;
 	}
 
+	float targetX = cameraBaseX_ + selectedIndex_ * cameraSpacing_;
+	float t = 1.0f - std::exp(-cameraLerpRate_ * dt);
+	pos.x += (targetX - pos.x) * t;
+	cam->SetCamera(pos, cam->GetRotate());
+
+	const float settleThreshold = 0.05f;
+	bool		cameraSettled	= std::fabs(targetX - pos.x) <= settleThreshold;
+
 	// 決定操作
-	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
-		gamePayload_ = BuildGamePayload(selectedIndex_);
-		IsPhase_	 = true;
+	if(cameraSettled && CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
+		const std::string suffix = std::to_string(selectedIndex_ + 1);
+
+		// 選択中ステージの障子(左右)を取得して初期Xを記録
+		stageFrame_ = sceneContext_->GetObjectLibrary()->FindByName("Stage_" + suffix);
+		if(stageFrame_) {
+			for(auto& child : stageFrame_->GetChildren()) {
+				if(child->GetName() == "ShoujiL_" + suffix) {
+					shoujiL_ = child;
+					lBase_	 = shoujiL_->GetWorldTransform().translation.x;
+				} else if(child->GetName() == "ShoujiR_" + suffix) {
+					shoujiR_ = child;
+					rBase_	 = shoujiR_->GetWorldTransform().translation.x;
+				}
+			}
+		}
+
+		// 遷移用ペイロードを用意し、障子オープン演出へ移行
+		gamePayload_  = BuildGamePayload(selectedIndex_);
+		isShoujiOpen_ = true;
+	}
+}
+
+void SelectScene::PhaseUpdate(float) {
+
+}
+
+void SelectScene::ShoujiOpen(float dt) {
+	float t = 1.0f - std::exp(-openRate_ * dt);
+
+	// 左の障子は -X、右の障子は +X へスライド
+	if(shoujiL_) {
+		auto& lt	   = shoujiL_->GetWorldTransform().translation;
+		float targetLX = lBase_ - openDistance_;
+		lt.x += (targetLX - lt.x) * t;
+	}
+	if(shoujiR_) {
+		auto& rt	   = shoujiR_->GetWorldTransform().translation;
+		float targetRX = rBase_ + openDistance_;
+		rt.x += (targetRX - rt.x) * t;
+	}
+
+	// 開き切るまでの時間をカウント
+	shoujiOpenTime_ -= dt;
+	if(shoujiOpenTime_ <= 0.0f) {
+		// 開き終わったらシーン遷移を開始
+		IsPhase_ = true;
 		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
 		});
 	}
-
-	// 選択中のステージに応じて背景色を変更（デバッグ用フィードバック）
-	switch(selectedIndex_) {
-	case 0: pauseBg_->SetColor({0.0f, 0.0f, 1.0f, 1.0f}); break;
-	case 1: pauseBg_->SetColor({1.0f, 0.0f, 0.0f, 1.0f}); break;
-	case 2: pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f}); break;
-	case 3: pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f}); break;
-	case 4: pauseBg_->SetColor({1.0f, 0.0f, 1.0f, 1.0f}); break;
-	}
-	pauseBg_->Update();
-}
-
-void SelectScene::PhaseUpdate(float) {
-
 }
 
 std::unique_ptr<GameTransitionPayload> SelectScene::BuildGamePayload(int num) {

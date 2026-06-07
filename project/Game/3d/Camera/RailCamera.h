@@ -91,7 +91,7 @@ public:
 	 * \brief 移動速度を設定
 	 * \param s 速度（単位: ユニット/秒）
 	 */
-	void SetSpeed(float s) { speed_ = s; }
+	void SetSpeed(float s) { param_.speed = s; }
 	/**
 	 * \brief 先読み距離を設定
 	 * \param d 距離（向き計算用）
@@ -160,9 +160,20 @@ private:
 	int		   arcSamplesPerSeg_ = 32; // 1セグメント間で32分割
 	float	   totalLength_		 = 0.0f;
 
+	struct RailCameraParam : public CalyxEngine::SerializableObject {
+		RailCameraParam() {
+			AddField("speed",speed).Category("movement").Tooltip("移動速度（単位: ユニット/秒）");
+		}
+
+		CalyxEngine::ParamPath GetParamPath() const override {
+			return{CalyxEngine::ParamDomain::Game,"RailCamera","Camera"};
+		}
+
+		float speed = 5.0f;
+	}param_;
+
 	// 状態
 	float traveled_	 = 0.0f;  // 走行弧長（0〜totalLength）
-	float speed_	 = 20.0f; // 等速（弧長ベース）
 	float lookAhead_ = 2.0f;  // 先読み距離（向き用）
 
 	// ロール（左右傾き）
