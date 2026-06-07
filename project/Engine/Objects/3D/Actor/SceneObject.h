@@ -38,11 +38,20 @@ struct OutlineSettings {
 	CalyxEngine::Vector4 color	 = {0.02f, 0.02f, 0.025f, 1.0f};
 };
 
+enum class SurfaceStencilRole : uint32_t {
+	None = 0,
+	// オブジェクトのメッシュ/アルファテクスチャを使ってステンシル=1 を書き込む。見える色は描画しない。
+	HoleMask,
+	// ステンシルが 1 ではない場所だけ通常シェーディングを描画し、見た目の切り抜きを作る。
+	HoleReceiver,
+};
+
 struct DrawConfig {
 	bool drawEnable = true;
 	bool pickable = true;
 	bool castShadow = true;
 	bool cameraDitherEnabled = true;
+	SurfaceStencilRole surfaceStencilRole = SurfaceStencilRole::None;
 	OutlineSettings outline{};
 };
 
@@ -152,6 +161,7 @@ public:
 	bool											 IsTransient() const { return isTransient_; }
 	bool											 IsCastShadow() const { return drawConfig_.castShadow; }
 	bool											 IsCameraDitherEnabled() const { return drawConfig_.cameraDitherEnabled; }
+	SurfaceStencilRole								 GetSurfaceStencilRole() const { return drawConfig_.surfaceStencilRole; }
 	const DrawConfig&								 GetDrawConfig() const { return drawConfig_; }
 	bool											 IsOutlineEnabled() const { return drawConfig_.outline.enabled; }
 	const OutlineSettings&							 GetOutlineSettings() const { return drawConfig_.outline; }
@@ -175,6 +185,7 @@ public:
 	void		 SetTransient(bool enable) { isTransient_ = enable; }
 	void		 SetCastShadow(bool enable) { drawConfig_.castShadow = enable; }
 	void		 SetCameraDitherEnabled(bool enable) { drawConfig_.cameraDitherEnabled = enable; }
+	void		 SetSurfaceStencilRole(SurfaceStencilRole role) { drawConfig_.surfaceStencilRole = role; }
 	void		 SetOutlineEnabled(bool enable) { drawConfig_.outline.enabled = enable; }
 	void		 SetOutlineThickness(float thickness) { drawConfig_.outline.thickness = thickness; }
 	void		 SetOutlineColor(const CalyxEngine::Vector4& color) { drawConfig_.outline.color = color; }
