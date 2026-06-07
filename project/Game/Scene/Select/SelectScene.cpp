@@ -73,6 +73,9 @@ void SelectScene::Initialize() {
 	}
 	IsOpening_ = true;
 	IsPhase_   = false;
+
+	shoujiOpenTime_ = 2.0f;
+	isShoujiOpen_ = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +113,11 @@ void SelectScene::CleanUp() {
 }
 
 void SelectScene::SelectUpdate(float dt) {
+	if(isShoujiOpen_) {
+		ShoujiOpen(dt);
+		return;
+	}
+
 	const int maxStages = 5;
 
 	Camera3d*			 cam = CameraManager::GetMain3d();
@@ -135,17 +143,57 @@ void SelectScene::SelectUpdate(float dt) {
 
 	// 決定操作
 	if(cameraSettled && CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
-		gamePayload_ = BuildGamePayload(selectedIndex_);
-		IsPhase_	 = true;
-		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
-		});
+		const std::string suffix = std::to_string(selectedIndex_ + 1);
+
+		// 選択中ステージの障子(左右)を取得して初期Xを記録
+		stageFrame_ = sceneContext_->GetObjectLibrary()->FindByName("Stage_" + suffix);
+		if(stageFrame_) {
+			for(auto& child : stageFrame_->GetChildren()) {
+				if(child->GetName() == "ShoujiL_" + suffix) {
+					shoujiL_ = child;
+					lBase_	 = shoujiL_->GetWorldTransform().translation.x;
+				} else if(child->GetName() == "ShoujiR_" + suffix) {
+					shoujiR_ = child;
+					rBase_	 = shoujiR_->GetWorldTransform().translation.x;
+				}
+			}
+		}
+
+		// 遷移用ペイロードを用意し、障子オープン演出へ移行
+		gamePayload_  = BuildGamePayload(selectedIndex_);
+		isShoujiOpen_ = true;
 	}
 }
 
 void SelectScene::PhaseUpdate(float) {
 
+}
+
+void SelectScene::ShoujiOpen(float dt) {
+	float t = 1.0f - std::exp(-openRate_ * dt);
+
+	// 左の障子は -X、右の障子は +X へスライド
+	if(shoujiL_) {
+		auto& lt	   = shoujiL_->GetWorldTransform().translation;
+		float targetLX = lBase_ - openDistance_;
+		lt.x += (targetLX - lt.x) * t;
+	}
+	if(shoujiR_) {
+		auto& rt	   = shoujiR_->GetWorldTransform().translation;
+		float targetRX = rBase_ + openDistance_;
+		rt.x += (targetRX - rt.x) * t;
+	}
+
+	// 開き切るまでの時間をカウント
+	shoujiOpenTime_ -= dt;
+	if(shoujiOpenTime_ <= 0.0f) {
+		// 開き終わったらシーン遷移を開始
+		IsPhase_ = true;
+		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
+		});
+	}
 }
 
 std::unique_ptr<GameTransitionPayload> SelectScene::BuildGamePayload(int num) {

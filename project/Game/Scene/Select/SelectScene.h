@@ -45,6 +45,7 @@ private:
 
 	void SelectUpdate(float dt);
 	void PhaseUpdate(float dt);
+	void ShoujiOpen(float dt);
 	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
 
 private:
@@ -64,6 +65,16 @@ private:
 	float cameraBaseX_	  = 0.0f;
 	float cameraSpacing_  = 45.548f;
 	float cameraLerpRate_ = 5.0f; 
+
+	bool						 isShoujiOpen_	 = false;
+	float						 shoujiOpenTime_ = 2.0f;
+	float						 openRate_		 = 3.0f;
+	float						 openDistance_	 = 4.0f;
+	float						 lBase_			 = 0.0f;
+	float						 rBase_			 = 0.0f;
+	std::shared_ptr<SceneObject> stageFrame_;
+	std::shared_ptr<SceneObject> shoujiL_;
+	std::shared_ptr<SceneObject> shoujiR_;
 
 	SceneType preType_	 = SceneType::TITLE;
 	bool	  IsPhase_	 = false;
