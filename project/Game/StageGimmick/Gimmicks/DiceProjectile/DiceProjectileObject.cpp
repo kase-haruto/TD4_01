@@ -31,8 +31,8 @@ void DiceProjectileObject::OnCollisionEnter(Collider* other) {
 	targetPos_.y = 6.1f;
 	// 収納箱の数をプラスする
 	socket_->AddDiceSocketCount();
-	worldTransform_.scale = param_.hitScale;
 	if(socket_ && socket_->GetClearCount() >= socket_->GetDiceSocketCount()) {
+		worldTransform_.scale = param_.hitScale;
 		isParry_ = true;
 	} else {
 		isSocket_ = true;
