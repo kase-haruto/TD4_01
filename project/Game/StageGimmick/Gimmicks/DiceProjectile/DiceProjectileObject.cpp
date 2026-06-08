@@ -32,7 +32,12 @@ void DiceProjectileObject::OnCollisionEnter(Collider* other) {
 	// 収納箱の数をプラスする
 	socket_->AddDiceSocketCount();
 	worldTransform_.scale = param_.hitScale;
-	isParry_ = true;
+	if(socket_ && socket_->GetClearCount() >= socket_->GetDiceSocketCount()) {
+		isParry_ = true;
+	} else {
+		isSocket_ = true;
+		isDelete_ = true;
+	}
 }
 
 void DiceProjectileObject::ObjectInitialize() {
@@ -64,7 +69,11 @@ void DiceProjectileObject::SameNumberRotation() {
 void DiceProjectileObject::ObjectUpdate(float dt) {
 
 	// スケールを戻す処理
-	ChangeScale();
+	if(!isDelete_) {
+		ChangeScale();
+	} else {
+		SmoleChangeScale();
+	}
 	// 収納したら回転を戻す
 	if(isSocket_) {
 		// 回転を元に戻す
@@ -73,7 +82,7 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 	}
 
 	// 回転の処理を加える
-	if(!isParry_) {
+	if(!isParry_ && !isDelete_) {
 		time_ += dt;
 		if(time_ >= (std::numbers::pi_v<float> * 2.0f)) {
 			time_ = 0.0f;
@@ -81,6 +90,10 @@ void DiceProjectileObject::ObjectUpdate(float dt) {
 		float angle				 = time_ * param_.rotateSpeed;
 		auto  rotation			 = CalyxEngine::Quaternion::MakeRotateAxisQuaternion(CalyxEngine::Vector3::One(), angle);
 		worldTransform_.rotation = rotation;
+		if(socket_ && socket_->GetClearCount() < socket_->GetDiceSocketCount()) {
+			isSocket_ = true;
+			isDelete_ = true;
+		}
 	}
 
 	// 飛んでいなければ更新を飛ばす

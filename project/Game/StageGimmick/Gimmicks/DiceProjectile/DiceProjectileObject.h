@@ -58,6 +58,10 @@ private:
 		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
 			worldTransform_.scale, CalyxEngine::Vector3::One() * param_.scale, 0.1f);
 	}
+	void SmoleChangeScale() {
+		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
+			CalyxEngine::Vector3::Zero(), worldTransform_.scale, 0.1f);
+	}
 
 private:
 
@@ -79,6 +83,7 @@ private:
 	bool isFlying_ = false;
 	bool isParry_   = false;
 	bool isSocket_ = false;
+	bool isDelete_	= false;
 	// 回転時間
 	float time_ = 0.0f;
 

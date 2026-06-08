@@ -27,10 +27,11 @@ public:
 	const bool GetIsCracker() const { return isCracker_; }
 	// クリアの数をセット
 	void SetClearCount(uint32_t count) { clearCount_ = count; }
+	const uint32_t GetClearCount() const { return clearCount_; }
 	// 収納箱の数を加算する
 	void AddDiceSocketCount() {	diceSocketCount_++; }
 	// 収納箱の数を取得
-	const uint32_t GetDiceSocketCount() { return diceSocketCount_; }
+	const uint32_t GetDiceSocketCount() const { return diceSocketCount_; }
 	// 今収納可能な座標を取得
 	const CalyxEngine::Vector3 GetSocketPos();
 	// ゾロ目用の回転を取得する
