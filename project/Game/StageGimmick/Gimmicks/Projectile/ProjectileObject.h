@@ -58,5 +58,7 @@ private:
 
 	CalyxEngine::EffectAsset effectData_;
 
+	CalyxEngine::Audio startAudio_;
+	CalyxEngine::Audio parryAudio_;
 
 };

@@ -52,6 +52,8 @@ void BellProjectileObject::ObjectInitialize() {
 	isFlying_					 = false;
 	isParry_					 = false;
 	isRing_ = false;
+
+	AudioAPI::Load(bellAudio_, "test");
 }
 
 void BellProjectileObject::ObjectUpdate(float dt) {
@@ -87,6 +89,7 @@ void BellProjectileObject::ObjectUpdate(float dt) {
 			if(collider_) {
 				collider_->SetCollisionEnabled(false);
 			}
+			AudioAPI::Play(bellAudio_, false, 0.5f);
 			return;
 		}
 	}

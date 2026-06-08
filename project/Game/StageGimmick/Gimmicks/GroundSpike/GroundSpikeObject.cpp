@@ -26,7 +26,7 @@ void GroundSpikeObject::OnCollisionEnter(Collider* other) {
 		return;
 	}
 
-	if(!isSpike_ || isBreak_ || isBuried_) return;
+	if(isBreak_ || isBuried_) return;
 	if(auto* wave = dynamic_cast<Shockwave*>(otherObj)) {
 		if(wave->IsStrong()) {
 			isBreak_ = true;
@@ -71,11 +71,12 @@ void GroundSpikeObject::ObjectUpdate(float dt) {
 	}
 
 	// 飛び出す時の処理
-	if(isSpike_ && !isBuried_ && param_.popUpHeight > worldTransform_.GetWorldPosition().y) {
+	if(isSpike_ && !isBuried_) {
 		float y = worldTransform_.translation.y;
 		y += param_.popUpSpeed * dt;
 		worldTransform_.translation.y = y;
-		if(param_.popUpHeight <= worldTransform_.translation.y) {
+		if(param_.popUpHeight <= worldTransform_.GetWorldPosition().y) {
+			isSpike_	= false;
 			auto offset = CalyxEngine::Vector3(0.0f, 1.0f, 0.0f);
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + offset);
 			EffectAPI::Stop(fxHandle_);

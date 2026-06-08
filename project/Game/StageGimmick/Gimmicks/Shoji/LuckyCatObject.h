@@ -88,4 +88,6 @@ private:
 
 	CalyxEngine::EffectAsset  effectData_;
 
+	CalyxEngine::Audio shojiAudio_;
+
 };

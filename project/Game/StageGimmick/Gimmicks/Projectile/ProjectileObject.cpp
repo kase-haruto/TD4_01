@@ -48,11 +48,19 @@ void ProjectileObject::ObjectInitialize() {
 	worldTransform_.inheritScale = false;
 
 	effectData_.Load("CraneStarEffect");
+
+	AudioAPI::Load(startAudio_, "test");
+	AudioAPI::Load(parryAudio_, "test");
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {
 
 	if(worldTransform_.translation.y > param_.parryPositionY) {
+		return;
+	}
+
+	if(worldTransform_.GetWorldPosition().y < 0.0f) {
+		velocity_ = CalyxEngine::Vector3::Zero();
 		return;
 	}
 
@@ -75,14 +83,15 @@ void ProjectileObject::ObjectUpdate(float dt) {
 		if(effectTime_ < 1.0f) {
 			if(effectTime_ == 0.0f) {
 				EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + CalyxEngine::Vector3{0.0f, 0.0f, -2.5f});
+				AudioAPI::Play(startAudio_, false, 0.5f);
 			}
 			effectTime_ += dt;
 			return;
 		}
 		if(param_.targetTime > targetTime_ && !isParry_) {
 			targetTime_ += dt;
-			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer");
-			velocity_	= player->GetWorldTransform().GetWorldPosition() - GetWorldTransform().GetWorldPosition();
+			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer")->GetWorldTransform().GetWorldPosition();
+			velocity_	= CalyxEngine::Vector3{player.x, 0.0f, player.z} - GetWorldTransform().GetWorldPosition();
 		}
 		if(isParry_) {
 			// パリーされたらターゲット方向に時間で飛んでいく
@@ -91,6 +100,9 @@ void ProjectileObject::ObjectUpdate(float dt) {
 				targetTime_ += dt;
 				targetTime_ = std::clamp(targetTime_, 0.0f, param_.parryTime);
 				float t = targetTime_ / param_.parryTime;
+				if(t == 1.0f) {
+					AudioAPI::Play(parryAudio_, false, 0.5f);
+				}
 
 				//移動処理
 				worldTransform_.translation = CalyxEngine::Vector3::Lerp(

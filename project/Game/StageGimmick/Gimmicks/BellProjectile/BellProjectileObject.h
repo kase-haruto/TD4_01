@@ -3,6 +3,7 @@
 #include "Game\StageGimmick\Parameters\StageGimmickParam.h"
 #include "Engine\Foundation\Utility\Ease\CxEase.h"
 
+#include "Engine\Scene\Utility\SceneUtility.h"
 
 class BellProjectileTarget;
 
@@ -62,4 +63,6 @@ private:
 	bool isFlying_ = false;
 	bool isParry_  = false;
 	bool isRing_ = false;
+
+	CalyxEngine::Audio bellAudio_;
 };

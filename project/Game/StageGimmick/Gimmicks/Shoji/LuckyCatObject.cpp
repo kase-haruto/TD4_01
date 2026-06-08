@@ -64,6 +64,8 @@ void LuckyCatObject::ObjectInitialize() {
 	worldTransform_.inheritScale = false;
 
 	effectData_.Load("StarEffect");
+
+	AudioAPI::Load(shojiAudio_, "test");
 }
 
 void LuckyCatObject::ObjectUpdate(float dt) {
@@ -135,6 +137,7 @@ void LuckyCatObject::ObjectUpdate(float dt) {
 			worldTransform_.translation = parryP2_ + CalyxEngine::Vector3{0.0f, 0.0f, -0.5f};
 			isShoji_			  = true;
 			parryCurveInit_		  = false;
+			AudioAPI::Play(shojiAudio_, false, 0.5f);
 			return;
 		}
 	}

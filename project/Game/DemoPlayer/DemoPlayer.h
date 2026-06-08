@@ -154,4 +154,7 @@ private:
 	CalyxEngine::EffectAsset rollingEffect_;
 	CalyxEngine::EffectHandle rollingFxHandle_{};
 	CalyxEngine::EffectAsset  jumpEffect_;
+
+	CalyxEngine::Audio playerAudio_;
+	CalyxEngine::Audio damageAudio_;
 };
