@@ -75,6 +75,7 @@ private:
 	std::shared_ptr<SceneObject> stageFrame_;
 	std::shared_ptr<SceneObject> shoujiL_;
 	std::shared_ptr<SceneObject> shoujiR_;
+	std::shared_ptr<SceneObject> oni_;
 
 	SceneType preType_	 = SceneType::TITLE;
 	bool	  IsPhase_	 = false;
