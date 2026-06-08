@@ -60,7 +60,7 @@ private:
 	}
 	void SmoleChangeScale() {
 		worldTransform_.scale = CalyxEngine::Vector3::Lerp(
-			CalyxEngine::Vector3::Zero(), worldTransform_.scale, 0.1f);
+			worldTransform_.scale, CalyxEngine::Vector3::Zero(), 0.1f);
 	}
 
 private:
