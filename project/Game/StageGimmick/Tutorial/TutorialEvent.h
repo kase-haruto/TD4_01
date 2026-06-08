@@ -115,13 +115,16 @@ private:
 	std::unique_ptr<CalyxEngine::SpriteObject2d> sprite_ = nullptr;
 
 	// typeごとのテクスチャパス（仮、GUIで変更可）
-	std::string jumpTexturePath_	= "Textures/uvChecker.dds";
-	std::string diveTexturePath_	= "Textures/uvChecker.dds";
-	std::string purposeTexturePath_ = "Textures/uvChecker.dds";
+	std::string jumpTexturePath_	   = "Textures/tutorial/key_rule01.png";
+	std::string diveTexturePath_	   = "Textures/tutorial/key_rule02.png";
+	std::string purposeTexturePath_	   = "Textures/tutorial/key_rule03.png";
+	std::string jumpTexturePadPath_	   = "Textures/tutorial/cont_rule01.png";
+	std::string diveTexturePadPath_	   = "Textures/tutorial/cont_rule01.png";
+	std::string purposeTexturePadPath_ = "Textures/tutorial/cont_rule01.png";
 
 	// スプライトの表示レイアウト（GUIで変更・保存可）
-	CalyxEngine::Vector2 spritePosition_ = {640.0f, 360.0f};
-	CalyxEngine::Vector2 spriteScale_	 = {640.0f, 360.0f};
+	CalyxEngine::Vector2 spritePosition_ = {960.0f, 360.0f};
+	CalyxEngine::Vector2 spriteScale_	 = {640.0f, 600.0f};
 
 	// 進行状態
 	TutorialState state_	 = TutorialState::Idle;
