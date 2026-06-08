@@ -45,6 +45,7 @@ public:
 private:
 
 	void PhaseUpdate(float dt);
+	void UpdateInputDevice();
 	std::unique_ptr<TransitionPayload> BuildNowTypePayload(SceneType Type);
 
 private:
@@ -56,9 +57,12 @@ private:
 	std::unique_ptr<Sprite>			testSprite_;
 	std::shared_ptr<CalyxHuman>		animationHuman_;
 
-	std::unique_ptr<Sprite> pauseBg_ = nullptr;
+	std::unique_ptr<Sprite>			   pauseBg_			  = nullptr;
+	std::unique_ptr<Sprite>			   pressButton_		  = nullptr;
+	std::unique_ptr<Sprite>			   pressKey_		  = nullptr;
 	std::unique_ptr<TransitionControl> transitionControl_ = nullptr;
 
+	bool										isPad_ = false;
 	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
 
 	SceneType preType_	 = SceneType::SELECT;

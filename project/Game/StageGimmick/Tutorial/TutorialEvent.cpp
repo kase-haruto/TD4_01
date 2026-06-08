@@ -32,6 +32,10 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 	inputBlockTimer_ = eventData_.inputBlockDuration;
 
 	ApplyTextureForType();
+
+	if(spritePad_) {
+		spritePad_->SetVisibility(true);
+	}
 	if(sprite_) {
 		sprite_->SetVisibility(true);
 	}
@@ -56,6 +60,12 @@ void TutorialEvent::EventUpdate(float dt) {
 	// スプライトの更新（生成済みのときのみ）
 	// dt は時間停止（TimeScale=0）の影響を受けないグローバルdtなので、
 	// 表示中でも各種タイマーは正しく進む
+
+	if(spritePad_) {
+		spritePad_->SetPosition(spritePosition_);
+		spritePad_->SetScale(spriteScale_);
+		spritePad_->Update(dt);
+	}
 	if(sprite_) {
 		sprite_->SetPosition(spritePosition_);
 		sprite_->SetScale(spriteScale_);
@@ -65,6 +75,9 @@ void TutorialEvent::EventUpdate(float dt) {
 	if(state_ != TutorialState::Active) {
 		return;
 	}
+
+	// 入力デバイスの切り替え判定
+	UpdateInputDevice();
 
 	// 連打対策：一定時間は入力を反映しない
 	if(inputBlockTimer_ > 0.0f) {
@@ -124,6 +137,9 @@ void TutorialEvent::Finish() {
 	if(sprite_) {
 		sprite_->SetVisibility(false);
 	}
+	if(spritePad_) {
+		spritePad_->SetVisibility(false);
+	}
 }
 
 bool TutorialEvent::IsConfirmTriggered() {
@@ -132,14 +148,89 @@ bool TutorialEvent::IsConfirmTriggered() {
 		   Input::TriggerKey(DIK_SPACE);
 }
 
+void TutorialEvent::UpdateInputDevice() {
+	using CalyxFoundation::Input;
+	using CalyxFoundation::PadButton;
+
+	// チェック対象のパッドボタン一覧（PadButtonはXInputのビットフラグなので明示列挙）
+	static constexpr PadButton kButtons[] = {
+		PadButton::A,
+		PadButton::B,
+		PadButton::X,
+		PadButton::Y,
+		PadButton::LB,
+		PadButton::RB,
+		PadButton::BACK,
+		PadButton::START,
+		PadButton::L_STICK,
+		PadButton::R_STICK,
+		PadButton::DPAD_UP,
+		PadButton::DPAD_DOWN,
+		PadButton::DPAD_LEFT,
+		PadButton::DPAD_RIGHT,
+	};
+
+	// いずれかのボタンに触れたらパッド表示に切り替え
+	for(PadButton button : kButtons) {
+		if(Input::PushGamepadButton(button)) {
+			isPad_ = true;
+			if(spritePad_) {
+				spritePad_->SetVisibility(true);
+			}
+			if(sprite_) {
+				sprite_->SetVisibility(false);
+			}
+			return;
+		}
+	}
+
+	 // トリガー・スティックも「パッドに触った」として扱う
+	constexpr float kTriggerThreshold = 0.1f;
+	if(Input::GetLeftTrigger() > kTriggerThreshold ||
+	   Input::GetRightTrigger() > kTriggerThreshold ||
+	   Input::IsLeftStickMoved()) {
+		isPad_ = true;
+		if(spritePad_) {
+			spritePad_->SetVisibility(true);
+		}
+		if(sprite_) {
+			sprite_->SetVisibility(false);
+		}
+		return;
+	}
+
+	// キーボードに触れたらキーボード表示に戻す（任意：不要なら削除）
+	for(uint32_t key = 0; key < 256; ++key) {
+		if(Input::PushKey(key)) {
+			isPad_ = false;
+			if(spritePad_) {
+				spritePad_->SetVisibility(false);
+			}
+			if(sprite_) {
+				sprite_->SetVisibility(true);
+			}
+			return;
+		}
+	}
+}
+
 void TutorialEvent::EnsureSprite() {
-	if(sprite_) return;
-	sprite_ = std::make_unique<CalyxEngine::SpriteObject2d>();
-	sprite_->Initialize(jumpTexturePath_);
-	sprite_->SetAnchorPoint({0.5f, 0.5f});
-	sprite_->SetPosition(spritePosition_);
-	sprite_->SetScale(spriteScale_);
-	sprite_->SetVisibility(false);
+	if(!sprite_) {
+		sprite_ = std::make_unique<CalyxEngine::SpriteObject2d>();
+		sprite_->Initialize(jumpTexturePath_);
+		sprite_->SetAnchorPoint({0.5f, 0.5f});
+		sprite_->SetPosition(spritePosition_);
+		sprite_->SetScale(spriteScale_);
+		sprite_->SetVisibility(false);
+	}
+	if(!spritePad_) {
+		spritePad_ = std::make_unique<CalyxEngine::SpriteObject2d>();
+		spritePad_->Initialize(jumpTexturePath_);
+		spritePad_->SetAnchorPoint({0.5f, 0.5f});
+		spritePad_->SetPosition(spritePosition_);
+		spritePad_->SetScale(spriteScale_);
+		spritePad_->SetVisibility(false);
+	}
 }
 
 void TutorialEvent::ApplyTextureForType() {
@@ -147,19 +238,34 @@ void TutorialEvent::ApplyTextureForType() {
 	switch(static_cast<TutorialType>(eventData_.type)) {
 	case Jump:
 		sprite_->SetTexture(jumpTexturePath_);
+		spritePad_->SetTexture(jumpTexturePadPath_);
 		break;
 	case Dive:
 		sprite_->SetTexture(diveTexturePath_);
+		spritePad_->SetTexture(diveTexturePadPath_);
 		break;
 	case Purpose:
 		sprite_->SetTexture(purposeTexturePath_);
+		spritePad_->SetTexture(purposeTexturePadPath_);
 		break;
 	}
 }
 
 void TutorialEvent::DrawSprite(SpriteRenderer* renderer) const {
-	if(sprite_ && renderer && state_ == TutorialState::Active) {
-		sprite_->Draw(renderer);
+	if(isPad_) {
+		if(spritePad_ && renderer && state_ == TutorialState::Active) {
+			spritePad_->Draw(renderer);
+		}
+		if(sprite_ && renderer && state_ == TutorialState::Active) {
+			sprite_->Draw(renderer);
+		}
+	} else {
+		if(sprite_ && renderer && state_ == TutorialState::Active) {
+			sprite_->Draw(renderer);
+		}
+		if(spritePad_ && renderer && state_ == TutorialState::Active) {
+			spritePad_->Draw(renderer);
+		}
 	}
 }
 
@@ -182,10 +288,16 @@ void TutorialEvent::DerivativeGui() {
 		if(sprite_) {
 			sprite_->SetPosition(spritePosition_);
 		}
+		if(spritePad_) {
+			spritePad_->SetPosition(spritePosition_);
+		}
 	}
 	if(ImGui::DragFloat2("Scale", &spriteScale_.x, 1.0f)) {
 		if(sprite_) {
 			sprite_->SetScale(spriteScale_);
+		}
+		if(spritePad_) {
+			spritePad_->SetScale(spriteScale_);
 		}
 	}
 
