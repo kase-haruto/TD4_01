@@ -76,6 +76,14 @@ void SelectScene::Initialize() {
 
 	shoujiOpenTime_ = 2.0f;
 	isShoujiOpen_ = false;
+
+	oni_ = std::static_pointer_cast<GeneralObject>(sceneContext_->GetObjectLibrary()->FindByName("oni"));
+	if(oni_) {
+		// oni のアニメーションをループさせない
+		if(auto* anim = oni_->AnimationModel()) {
+			anim->SetCurrentLoop(false);
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +166,6 @@ void SelectScene::SelectUpdate(float dt) {
 				}
 			}
 		}
-		oni_ = sceneContext_->GetObjectLibrary()->FindByName("oni");
 
 		// 遷移用ペイロードを用意し、障子オープン演出へ移行
 		gamePayload_  = BuildGamePayload(selectedIndex_);

@@ -527,6 +527,11 @@ namespace CalyxEngine {
 		stIt->second.loop = isLoop;
 	}
 
+	void AnimationModel::SetCurrentLoop(bool isLoop) {
+		if(currentAnimation_) currentAnimation_->loop = isLoop;
+		if(nextAnimation_) nextAnimation_->loop = isLoop;
+	}
+
 	bool AnimationModel::IsAnimationFinished() const {
 		if(!currentAnimation_) return false;
 

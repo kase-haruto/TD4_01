@@ -15,6 +15,7 @@
 
 #include <Game\Scene\Game\GameTransitionPayload.h>
 #include <Game/Scene/Transition/TransitionControl.h>
+#include <Game\StageGimmick\Base\GeneralObject.h>
 
 /// デバッグ関連///
 #ifdef _DEBUG
@@ -75,7 +76,7 @@ private:
 	std::shared_ptr<SceneObject> stageFrame_;
 	std::shared_ptr<SceneObject> shoujiL_;
 	std::shared_ptr<SceneObject> shoujiR_;
-	std::shared_ptr<SceneObject> oni_;
+	std::shared_ptr<GeneralObject> oni_;
 
 	SceneType preType_	 = SceneType::TITLE;
 	bool	  IsPhase_	 = false;
