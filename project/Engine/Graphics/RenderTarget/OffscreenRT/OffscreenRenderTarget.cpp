@@ -29,11 +29,13 @@ void OffscreenRenderTarget::Initialize(ID3D12Device* device, uint32_t width, uin
 
 	if(!depthResource_) {
 		depthResource_ = std::make_unique<DxGpuResource>();
-		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R32_TYPELESS);
+		// 表面穴表現でステンシルを使うため、メインのオフスクリーン深度は深度専用 D32 ではなく D24S8 にする。
+		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R24G8_TYPELESS);
 		depthResource_->CreateDSV(device, dsvHandle_.cpu);
 		depthResource_->CreateSRV(device);
 	} else {
-		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R32_TYPELESS);
+		// PSO 側が D24_UNORM_S8_UINT の DSV を前提にするため、リサイズ時もステンシル対応を維持する。
+		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R24G8_TYPELESS);
 		depthResource_->CreateDSV(device, dsvHandle_.cpu);
 		depthResource_->UpdateSRV(device);
 	}
@@ -95,7 +97,14 @@ void OffscreenRenderTarget::Clear(ID3D12GraphicsCommandList* commandList) {
 	}
 
 	depthResource_->Transition(commandList, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	commandList->ClearDepthStencilView(dsvHandle_.cpu, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	// 古い穴マスクが次のシーン描画へ残らないよう、ステンシルも毎フレーム消去する。
+	commandList->ClearDepthStencilView(
+		dsvHandle_.cpu,
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+		1.0f,
+		0,
+		0,
+		nullptr);
 }
 
 void OffscreenRenderTarget::SetRenderTarget(ID3D12GraphicsCommandList* commandList) {
@@ -194,11 +203,13 @@ void OffscreenRenderTarget::InitializeMRT(ID3D12Device* device, uint32_t width, 
 
 	if(!depthResource_) {
 		depthResource_ = std::make_unique<DxGpuResource>();
-		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R32_TYPELESS);
+		// メイン 3D パスは MRT に描画するため、MRT オフスクリーン側にもステンシルが必要。
+		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R24G8_TYPELESS);
 		depthResource_->CreateDSV(device, dsvHandle_.cpu);
 		depthResource_->CreateSRV(device);
 	} else {
-		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R32_TYPELESS);
+		// GraphicsPipelineDesc::dsvFormat_ と DSV 形式を一致させる。
+		depthResource_->InitializeAsDepthStencil(device, width, height, DXGI_FORMAT_R24G8_TYPELESS);
 		depthResource_->CreateDSV(device, dsvHandle_.cpu);
 		depthResource_->UpdateSRV(device);
 	}

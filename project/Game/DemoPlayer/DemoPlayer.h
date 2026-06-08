@@ -58,6 +58,7 @@ private:
 		float jumpForce = 15.0f;
 		float diveForce = -30.0f;
 		float gravity	= 40.0f;
+		float limit	= 10.0f;
 
 		float stiffness = 400.0f;
 		float damping	= 20.0f;
@@ -91,6 +92,7 @@ private:
 			AddField("Jump Force", jumpForce).Category("Move Param").Tooltip("ジャンプの初速");
 			AddField("Dive Force", diveForce).Category("Move Param").Tooltip("ダイブの初速");
 			AddField("Gravity", gravity).Category("Move Param").Tooltip("重力加速度");
+			AddField("MoveLimit", limit).Category("Move Param").Tooltip("左右移動限界");
 			AddField("Stiffness", stiffness).Category("Pop Scale").Tooltip("ポップスケールの硬さ（大きいほど速く元に戻る）");
 			AddField("Damping", damping).Category("Pop Scale").Tooltip("ポップスケールの減衰（大きいほど揺れが早く収まる）");
 			AddField("Dive Rotation Time", diveRotationTime).Category("Move Param");

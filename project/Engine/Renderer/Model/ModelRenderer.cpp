@@ -260,11 +260,19 @@ void ModelRenderer::BuildStaticBatches() {
 	for(auto& [model, insts] : staticModels_) {
 		if(!model->GetModelData() || !model->GetIsDrawEnable()) continue;
 
-		PipelineKey key{PipelineTag::Object::Object3d, model->GetBlendMode()};
-		auto&		batch = staticBatches_[key];
-
 		for(auto& inst : insts) {
 			if(!inst.visible) continue;
+
+			// SurfaceStencilRole は、このインスタンスが入る PSO バケットだけを変える。
+			// 互換性のあるモデルとは引き続きバッチ化されるため、通常オブジェクトの追加負荷はこの enum 確認のみ。
+			const SurfaceStencilRole stencilRole = inst.owner ? inst.owner->GetSurfaceStencilRole() : SurfaceStencilRole::None;
+			PipelineKey key{PipelineTag::Object::Object3d, model->GetBlendMode()};
+			if(stencilRole == SurfaceStencilRole::HoleMask) {
+				key = PipelineKey{PipelineTag::Object::HoleMaskObject3D, BlendMode::NONE};
+			} else if(stencilRole == SurfaceStencilRole::HoleReceiver) {
+				key = PipelineKey{PipelineTag::Object::HoleReceiverObject3D, model->GetBlendMode()};
+			}
+			auto& batch = staticBatches_[key];
 
 			const bool cameraDitherEnabled = !inst.owner || inst.owner->IsCameraDitherEnabled();
 			auto* item = FindCompatibleStaticBatch(batch, model, cameraDitherEnabled);
@@ -446,6 +454,11 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 			if(!hasLast || !(key == lastKey)) {
 				const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 				psoService->SetCommand(ps, cmdList);
+				// HoleMask はステンシルを 1 に置き換え、HoleReceiver は同じ参照値と比較してその場所を描画しない。
+				cmdList->OMSetStencilRef(
+					key.tag == PipelineTag::Object::HoleMaskObject3D || key.tag == PipelineTag::Object::HoleReceiverObject3D
+						? 1
+						: 0);
 
 				if(!bindObject3DPassResources()) continue;
 
@@ -459,17 +472,26 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				auto&	   visible = item.transforms;
 				if(!model || visible.empty()) continue;
 
-				if(model->UsesRuntimeMaterialGraph()) {
+				const bool allowGeneratedMaterial =
+					key.tag == PipelineTag::Object::Object3d ||
+					key.tag == PipelineTag::Object::HoleReceiverObject3D;
+				if(allowGeneratedMaterial && model->UsesRuntimeMaterialGraph()) {
 					if(auto material = model->GetMaterialAsset()) {
 						CalyxEngine::MaterialGraphRuntimeShader shader = runtimeMaterialShaderCache_.GetOrCompileObject3DPixelShader(*material);
 						if(shader.pixelShader) {
-							const auto generatedSet = psoService->GetGeneratedMaterialObjectPipelineSet(model->GetBlendMode(), shader.pixelShader, shader.hash);
+							const auto generatedSet =
+								key.tag == PipelineTag::Object::HoleReceiverObject3D
+									? psoService->GetGeneratedMaterialHoleReceiverObjectPipelineSet(model->GetBlendMode(), shader.pixelShader, shader.hash)
+									: psoService->GetGeneratedMaterialObjectPipelineSet(model->GetBlendMode(), shader.pixelShader, shader.hash);
 							psoService->SetCommand(generatedSet, cmdList);
+							// 生成マテリアル PSO はピクセルシェーダーだけを差し替えるため、ステンシル参照値はここで合わせる。
+							cmdList->OMSetStencilRef(key.tag == PipelineTag::Object::HoleReceiverObject3D ? 1 : 0);
 							if(!bindObject3DPassResources()) continue;
 							usingGeneratedPipeline = true;
 						} else if(usingGeneratedPipeline) {
 							const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 							psoService->SetCommand(ps, cmdList);
+							cmdList->OMSetStencilRef(key.tag == PipelineTag::Object::HoleReceiverObject3D ? 1 : 0);
 							if(!bindObject3DPassResources()) continue;
 							usingGeneratedPipeline = false;
 						}
@@ -477,6 +499,10 @@ void ModelRenderer::DrawAll(ID3D12GraphicsCommandList*		cmdList,
 				} else if(usingGeneratedPipeline) {
 					const auto ps = psoService->GetPipelineSet(key.tag, key.blend);
 					psoService->SetCommand(ps, cmdList);
+					cmdList->OMSetStencilRef(
+						key.tag == PipelineTag::Object::HoleMaskObject3D || key.tag == PipelineTag::Object::HoleReceiverObject3D
+							? 1
+							: 0);
 					if(!bindObject3DPassResources()) continue;
 					usingGeneratedPipeline = false;
 				}

@@ -139,7 +139,7 @@ void OutlineRenderer::EnsureResources(ID3D12Device* device, const D3D12_VIEWPORT
 	}
 	compositeResource_.SetCurrentState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-	selectionDepthResource_.InitializeAsDepthStencil(device, width_, height_, DXGI_FORMAT_D32_FLOAT, L"OutlineSelectionDepth");
+	selectionDepthResource_.InitializeAsDepthStencil(device, width_, height_, DXGI_FORMAT_R24G8_TYPELESS, L"OutlineSelectionDepth");
 	selectionDepthResource_.CreateDSV(device, selectionDepthDsv_.cpu);
 	selectionDepthResource_.SetCurrentState(D3D12_RESOURCE_STATE_DEPTH_WRITE);
 }
@@ -162,7 +162,13 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 	cmdList->RSSetScissorRects(1, &scissor);
 	if(targetOwner) {
 		selectionDepthResource_.Transition(cmdList, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		cmdList->ClearDepthStencilView(selectionDepthDsv_.cpu, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		cmdList->ClearDepthStencilView(
+			selectionDepthDsv_.cpu,
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+			1.0f,
+			0,
+			0,
+			nullptr);
 	} else if(IsDitherEnabledForTarget(*rt)) {
 		RenderDitherDepthOccluders(cmdList, device, rt, psoService, camera, modelRenderer);
 	}

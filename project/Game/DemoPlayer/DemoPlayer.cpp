@@ -181,15 +181,6 @@ void DemoPlayer::Move(float dt) {
 		horizonVelocity.Normalize();
 	}
 
-#ifdef DEVELOP
-	if(CalyxFoundation::Input::PushKey(DIK_L)) {
-		worldTransform_.translation = {0.0f, worldTransform_.translation.y, 0.0f};
-	}
-	if(CalyxFoundation::Input::PushKey(DIK_K)) {
-		TakeDamage(1);
-	}
-#endif
-
 	CalyxEngine::Vector3 horizonRotateV = horizonVelocity;
 	horizonRotateV.z += 1.0f;
 	if(horizonRotateV.Length() > 0.0f) {
@@ -229,6 +220,11 @@ void DemoPlayer::Move(float dt) {
 	worldTransform_.rotation			 = baseRotation_ * flipRotation;
 
 	worldTransform_.translation += velocity_ * dt;
+	if(worldTransform_.translation.x < -param_.limit) {
+		worldTransform_.translation.x = -param_.limit;
+	} else if(worldTransform_.translation.x > param_.limit) {
+		worldTransform_.translation.x = param_.limit;
+	}
 }
 
 DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {

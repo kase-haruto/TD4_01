@@ -20,7 +20,10 @@ struct PipelineSet {
 
 namespace PipelineTag {
 	enum class Object :std::uint16_t {
+		// レシーバーがステンシル値を参照できるよう、穴マスクは通常 Object3D バッチより先に並べる。
+		HoleMaskObject3D,
 		Object3d,
+		HoleReceiverObject3D,
 		SkinningObject3D,
 		WireframeObject3D,
 		WireframeSkinnedObject3D,
