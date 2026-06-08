@@ -1,0 +1,344 @@
+{
+  "fields": {
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "emissiveColor": [
+      1.0,
+      0.26274511218070984,
+      0.08627451211214066,
+      1.0
+    ],
+    "emissiveIntensity": 6.150000095367432,
+    "envirometCoefficient": 0.5,
+    "isReflect": false,
+    "lightingMode": 0,
+    "normalMapFlipY": false,
+    "normalMapGuid": "00000000-0000-0000-0000-000000000000",
+    "normalMapStrength": 1.0,
+    "objectTextureGuid": "00000000-0000-0000-0000-000000000000",
+    "roughness": 0.5,
+    "shininess": 20.0,
+    "toonBaseColor": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "toonBaseFeather": 0.029999999329447746,
+    "toonBaseStep": 0.25,
+    "toonEdgeSoftness": 0.029999999329447746,
+    "toonHighlightColor": [
+      1.149999976158142,
+      1.100000023841858,
+      1.0,
+      1.0
+    ],
+    "toonMidShadowColor": [
+      0.7200000286102295,
+      0.7599999904632568,
+      0.8600000143051147,
+      1.0
+    ],
+    "toonShadeFeather": 0.029999999329447746,
+    "toonShadeStep": -0.15000000596046448,
+    "toonShadowColor": [
+      0.41999998688697815,
+      0.46000000834465027,
+      0.5799999833106995,
+      1.0
+    ],
+    "toonSpecularIntensity": 0.3499999940395355,
+    "toonSpecularSoftness": 0.019999999552965164,
+    "toonSpecularThreshold": 0.9599999785423279,
+    "toonThreshold1": -0.15000000596046448,
+    "toonThreshold2": 0.25,
+    "toonThreshold3": 0.8199999928474426,
+    "useNormalMap": false
+  },
+  "graph": {
+    "links": [
+      {
+        "fromPinId": 8,
+        "id": 16,
+        "toPinId": 12
+      },
+      {
+        "fromPinId": 14,
+        "id": 29,
+        "toPinId": 20
+      },
+      {
+        "fromPinId": 32,
+        "id": 33,
+        "toPinId": 22
+      },
+      {
+        "fromPinId": 28,
+        "id": 34,
+        "toPinId": 2
+      },
+      {
+        "fromPinId": 18,
+        "id": 35,
+        "toPinId": 21
+      }
+    ],
+    "nextId": 36,
+    "nodes": [
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 1,
+        "inputs": [
+          {
+            "id": 2,
+            "kind": 0,
+            "name": "Surface",
+            "valueType": 5
+          }
+        ],
+        "intValue": 0,
+        "outputs": [],
+        "position": [
+          1223.0,
+          -256.0
+        ],
+        "properties": {},
+        "title": "Output",
+        "type": "Output"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 7,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 8,
+            "kind": 1,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "position": [
+          170.0,
+          -307.0
+        ],
+        "properties": {},
+        "title": "Object Texture",
+        "type": "ObjectTexture"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 11,
+        "inputs": [
+          {
+            "id": 12,
+            "kind": 0,
+            "name": "Texture",
+            "valueType": 6
+          },
+          {
+            "id": 13,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 14,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          },
+          {
+            "id": 15,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          456.0,
+          -308.0
+        ],
+        "properties": {},
+        "title": "Texture Sample",
+        "type": "TextureSample"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          0.26274511218070984,
+          0.08627451211214066,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 17,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 18,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          433.0,
+          -41.0
+        ],
+        "properties": {},
+        "title": "Emissive Color",
+        "type": "Color"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 19,
+        "inputs": [
+          {
+            "id": 20,
+            "kind": 0,
+            "name": "Base Color",
+            "valueType": 2
+          },
+          {
+            "id": 21,
+            "kind": 0,
+            "name": "Emissive",
+            "valueType": 2
+          },
+          {
+            "id": 22,
+            "kind": 0,
+            "name": "Emissive Intensity",
+            "valueType": 1
+          },
+          {
+            "id": 23,
+            "kind": 0,
+            "name": "Shininess",
+            "valueType": 1
+          },
+          {
+            "id": 24,
+            "kind": 0,
+            "name": "Roughness",
+            "valueType": 1
+          },
+          {
+            "id": 25,
+            "kind": 0,
+            "name": "Reflect",
+            "valueType": 3
+          },
+          {
+            "id": 26,
+            "kind": 0,
+            "name": "Normal Map",
+            "valueType": 2
+          },
+          {
+            "id": 27,
+            "kind": 0,
+            "name": "Normal Strength",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 28,
+            "kind": 1,
+            "name": "Surface",
+            "valueType": 5
+          }
+        ],
+        "position": [
+          823.0,
+          -276.0
+        ],
+        "properties": {
+          "emissiveColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "emissiveIntensity": 0.0,
+          "lightingMode": 0.0,
+          "roughness": 0.5,
+          "shininess": 20.0
+        },
+        "title": "Lit Master",
+        "type": "LitMaster"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 6.150000095367432,
+        "id": 31,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 32,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          432.0,
+          103.0
+        ],
+        "properties": {},
+        "title": "Emissive Intensity",
+        "type": "Float"
+      }
+    ]
+  },
+  "guid": "4966c2d6-9cae-48fa-9695-84ad8d57a2ec",
+  "name": "EmissivCandle",
+  "type": "MaterialAsset"
+}
