@@ -139,6 +139,7 @@ void DroolRainEvent::EventInitialize() {
 			targetObject->SetName(predictionCircleName);
 			targetObject->SetParent(targetObjects_[i].lock());
 			targetObject->Initialize();
+			targetObject->SetColor({0.0f, 0.5f, 1.0f, 1.0f});
 			predictionCircles_[i] = (targetObject);
 			predictionCircleGuids_[i] = targetObject->GetGuid();
 		}
@@ -210,6 +211,7 @@ void DroolRainEvent::AddDroolObject() {
 	if(predictionCircle) {
 		predictionCircle->SetParent(targetObject);
 		predictionCircle->Initialize();
+		predictionCircle->SetColor({0.0f, 0.5f, 1.0f, 1.0f});
 	}
 
 	targetObjects_.push_back(targetObject);
