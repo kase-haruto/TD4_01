@@ -532,6 +532,12 @@ namespace CalyxEngine {
 		if(nextAnimation_) nextAnimation_->loop = isLoop;
 	}
 
+	void AnimationModel::ResetCurrentTime() {
+		animationTime_ = 0.0f;
+		if(currentAnimation_) currentAnimation_->currentTime = 0.0f;
+		if(nextAnimation_) nextAnimation_->currentTime = 0.0f;
+	}
+
 	bool AnimationModel::IsAnimationFinished() const {
 		if(!currentAnimation_) return false;
 

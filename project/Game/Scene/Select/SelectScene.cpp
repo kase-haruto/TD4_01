@@ -99,6 +99,18 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 
 	SelectUpdate(dt);
 
+	// あとで削除
+	if(oni_) {
+		// Ctrl + 0 で アニメーション再生時間を0に
+		if((CalyxFoundation::Input::PushKey(DIK_LCONTROL) || CalyxFoundation::Input::PushKey(DIK_RCONTROL)) &&
+		   CalyxFoundation::Input::TriggerKey(DIK_0)) {
+			if(auto* anim = oni_->AnimationModel()) {
+				anim->ResetCurrentTime();
+			}
+		}
+	}
+
+
 	// 衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }

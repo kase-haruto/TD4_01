@@ -44,6 +44,8 @@ namespace CalyxEngine {
 		void SetLoop(int16_t id,bool isLoop);
 		// 現在再生中のアニメーションのループ設定
 		void SetCurrentLoop(bool isLoop);
+		// 現在再生中のアニメーションの再生時間を先頭に戻す
+		void ResetCurrentTime();
 		// アニメーション終了判定
 		bool IsAnimationFinished() const;
 
