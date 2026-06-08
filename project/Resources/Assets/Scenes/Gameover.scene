@@ -43,22 +43,22 @@
         {
             "color": {
                 "w": 1.0,
-                "x": 1.0,
-                "y": 1.0,
+                "x": 0.4590747356414795,
+                "y": 0.9595749974250793,
                 "z": 1.0
             },
-            "decay": 1.0,
+            "decay": 0.009999999776482582,
             "guid": "4bb6f82a-f95a-42fd-804a-30b34317adfb",
-            "intensity": 0.25,
+            "intensity": 1.0,
             "name": "PointLight",
             "objectType": 0,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
             "position": {
                 "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
+                "y": -0.5,
+                "z": 0.8999999761581421
             },
-            "radius": 20.0,
+            "radius": 7.0,
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -76,24 +76,117 @@
                 },
                 "translation": {
                     "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
+                    "y": -0.5,
+                    "z": 0.8999999761581421
                 }
             },
             "type": "PointLight"
+        },
+        {
+            "cameraDitherEnabled": false,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "cc85c367-38e1-4da9-b392-eed92933e944",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "e8c0b3fe-57e0-46ac-a19e-f076814ef683",
+                "modelName": "plane.obj",
+                "textureGuid": "bfdc462d-81f1-4c5f-95ee-bb3ee3fc53e1",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 14.0,
+                        "y": 154.0
+                    }
+                }
+            },
+            "name": "ground",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": false,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "prefabAssetGuid": "08e15eba-3ed0-491e-a1d8-3094e9d5d5d1",
+            "prefabSourceGuid": "6fa81461-886a-4dd1-b7c9-42be5bbe2226",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.7071068286895752,
+                    "x": 0.7071068286895752,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 100.0,
+                    "y": 1100.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": -5.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
         },
         {
             "guid": "7ada1448-9201-49c1-b705-febb3cf978e2",
             "name": "MainCamera",
             "objectType": 0,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "serializableParams": {
+                "Engine/Camera/Follow/Camera": {
+                    "fields": {
+                        "DistanceBack": 13.0,
+                        "Enabled": true,
+                        "ExtraPitchDeg": -10.0,
+                        "HeightOffset": 4.0,
+                        "LookAtOffset": [
+                            0.0,
+                            1.5,
+                            0.0
+                        ],
+                        "PosSmoothTime": 0.7799999713897705,
+                        "RotTimeConstant": 0.5199999809265137,
+                        "SideOffset": 0.0
+                    }
+                }
+            },
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
+                    "w": 0.9971888065338135,
+                    "x": 0.07492970675230026,
                     "y": 0.0,
                     "z": 0.0
                 },
@@ -104,8 +197,8 @@
                 },
                 "translation": {
                     "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
+                    "y": -0.5,
+                    "z": -9.0
                 }
             },
             "type": "Camera3d"
@@ -120,10 +213,10 @@
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 0.18927080929279327,
-                    "x": 0.011844818480312824,
-                    "y": 0.979936420917511,
-                    "z": -0.06132572889328003
+                    "w": 0.971961498260498,
+                    "x": 0.13449439406394958,
+                    "y": -0.1910579651594162,
+                    "z": 0.026437493041157722
                 },
                 "scale": {
                     "x": 1.0,
@@ -131,9 +224,9 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": -19.76792335510254,
-                    "y": 10.670080184936523,
-                    "z": 49.26448059082031
+                    "x": 1.2967805862426758,
+                    "y": -2.5072150230407715,
+                    "z": -5.730496406555176
                 }
             },
             "type": "DebugCamera"
@@ -187,6 +280,7 @@
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
@@ -211,7 +305,7 @@
             "type": "BaseGameObject"
         },
         {
-            "cameraDitherEnabled": true,
+            "cameraDitherEnabled": false,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -234,11 +328,11 @@
                 },
                 "targetType": 0
             },
-            "guid": "ad122c91-b05d-4dd6-aac4-947ab31763dd",
+            "guid": "667f07e6-806d-418c-aa49-50b4355a3bd7",
             "modelConfig": {
                 "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "plane.obj",
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "rib.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -248,7 +342,7 @@
                     }
                 }
             },
-            "name": "plane",
+            "name": "rib",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -259,25 +353,318 @@
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 0.7071068286895752,
-                    "x": 0.7071068286895752,
+                    "w": 1.0,
+                    "x": 8.798035196377896e-06,
+                    "y": 9.09682858036831e-05,
+                    "z": -0.00014645712508354336
+                },
+                "scale": {
+                    "x": 1.5,
+                    "y": 1.5,
+                    "z": 1.5
+                },
+                "translation": {
+                    "x": 0.00018461456056684256,
+                    "y": -4.100242614746094,
+                    "z": -0.0001399243192281574
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": false,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
                 },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "af5cd13c-873f-4e68-97b5-ffb4f52d252a",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "bone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "bone",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.567853569984436,
+                    "x": 0.5617787837982178,
+                    "y": -0.4274766445159912,
+                    "z": 0.4233328700065613
+                },
                 "scale": {
-                    "x": 100.0,
-                    "y": 100.0,
+                    "x": 1.0,
+                    "y": 1.0,
                     "z": 1.0
                 },
                 "translation": {
+                    "x": -0.7000000476837158,
+                    "y": -4.849999904632568,
+                    "z": -1.8000001907348633
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": false,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
                     "x": 0.0,
-                    "y": -5.0,
+                    "y": 0.0,
                     "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "e03c3af4-9507-415a-b4a8-b68fae9fc616",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "bone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "bone",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.7562557458877563,
+                    "x": -0.6370026469230652,
+                    "y": -0.11413367092609406,
+                    "z": -0.09632451087236404
+                },
+                "scale": {
+                    "x": 0.9999999403953552,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": -1.600184679031372,
+                    "y": -4.739756107330322,
+                    "z": -0.9998601675033569
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": false,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "0987f5f9-fd11-41c0-9a55-17043d2867b0",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "skull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "skull",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.2562723755836487,
+                    "x": -0.0413571298122406,
+                    "y": 0.9533846378326416,
+                    "z": 0.15385660529136658
+                },
+                "scale": {
+                    "x": 1.2000000476837158,
+                    "y": 1.2000000476837158,
+                    "z": 1.2000000476837158
+                },
+                "translation": {
+                    "x": -0.8000000715255737,
+                    "y": -4.670000076293945,
+                    "z": -2.640000104904175
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": false,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "0f2d8684-86fa-47a2-9b3b-881735b1f721",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "bone.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "bone",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": -0.45473194122314453,
+                    "x": -0.37263479828834534,
+                    "y": 0.6252864599227905,
+                    "z": -0.5132046341896057
+                },
+                "scale": {
+                    "x": 1.0000003576278687,
+                    "y": 1.0000003576278687,
+                    "z": 1.0000003576278687
+                },
+                "translation": {
+                    "x": 0.7000001668930054,
+                    "y": -4.71999979019165,
+                    "z": -1.8000001907348633
                 }
             },
             "type": "BaseGameObject"
@@ -306,11 +693,11 @@
                 },
                 "targetType": 0
             },
-            "guid": "9e3f8ef3-e4fe-44b4-bac7-283296cb0a4a",
+            "guid": "6e98a9d0-143f-476f-818a-4e664d1723ff",
             "modelConfig": {
                 "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "player.obj",
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "bone.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -320,7 +707,7 @@
                     }
                 }
             },
-            "name": "player",
+            "name": "bone",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -331,15 +718,89 @@
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
             "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
             "transform": {
                 "inheritRotate": true,
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 1.0,
+                    "w": 0.6932875514030457,
+                    "x": -0.14042448997497559,
+                    "y": 0.6927357912063599,
+                    "z": 0.1405363380908966
+                },
+                "scale": {
+                    "x": 1.2000000476837158,
+                    "y": 1.2000000476837158,
+                    "z": 1.2000000476837158
+                },
+                "translation": {
+                    "x": 1.2000000476837158,
+                    "y": -4.050000190734863,
+                    "z": -0.6000000238418579
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "guid": "1582ef8e-59d6-4af1-a75a-884bd1e55a8f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "49254a2c-cea5-4853-ad63-a9e2bf756457",
+                "modelName": "Hammer.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "Hammer",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.7413693070411682,
+                    "x": -0.17545358836650848,
+                    "y": 0.2125842124223709,
+                    "z": -0.6118786931037903
                 },
                 "scale": {
                     "x": 1.0,
@@ -347,9 +808,9 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": 0.0,
-                    "y": -5.0,
-                    "z": 12.0
+                    "x": 2.000000238418579,
+                    "y": -4.840000152587891,
+                    "z": -0.9000000357627869
                 }
             },
             "type": "BaseGameObject"

@@ -13,4 +13,5 @@ enum class SceneType : int8_t {
 	GAMEOVER,
 	TITLE,
 	SELECT,
+	GAME
 };

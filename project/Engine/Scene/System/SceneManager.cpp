@@ -26,6 +26,7 @@
 #include "Game/Scene/Gameover/GameoverScene.h"
 #include "Game/Scene/Select/SelectScene.h"
 #include "Game/Scene/Title/TitleScene.h"
+#include "Game/Scene/Game/GameScene.h"
 
 #include <Engine/Editor/PickingPass.h>
 
@@ -90,6 +91,9 @@ namespace CalyxEngine {
 
 		AddScene(GameSceneUtil::ToSceneId(SceneType::TITLE),
 				 std::make_unique<TitleScene>());
+
+		AddScene(GameSceneUtil::ToSceneId(SceneType::GAME),
+				 std::make_unique<GameScene>());
 
 		SetCurrent(idToIndex_.at(
 			GameSceneUtil::ToSceneId(SceneType::TITLE)));

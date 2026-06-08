@@ -15,13 +15,13 @@
           "z": 1.0
         },
         "direction": {
-          "enabled": false,
-          "rotateToDirection": false,
+          "enabled": true,
+          "rotateToDirection": true,
           "speed": {
-            "constant": 1.0,
-            "max": 1.0,
-            "min": 0.0,
-            "mode": 0
+            "constant": 12.0,
+            "max": 14.0,
+            "min": 13.0,
+            "mode": 1
           },
           "vector": {
             "constant": {
@@ -30,23 +30,23 @@
               "z": 0.0
             },
             "max": {
-              "x": 1.0,
-              "y": 0.0,
-              "z": 1.0
+              "x": 4.5,
+              "y": 4.5,
+              "z": 4.5
             },
             "min": {
-              "x": -1.0,
-              "y": 0.0,
-              "z": -1.0
+              "x": -4.5,
+              "y": 4.0,
+              "z": -4.5
             },
-            "mode": 0
+            "mode": 1
           }
         },
         "emitCount": 12,
         "emitDelay": 0.0,
         "emitDuration": -1.0,
         "emitRate": 0.009999999776482582,
-        "emitterShape": 3,
+        "emitterShape": 0,
         "followOneShot": false,
         "isComplement": true,
         "isDrawEnable": true,
@@ -114,12 +114,23 @@
             "target": 5
           }
         ],
+        "offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
         "position": {
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
         },
         "randomSpinEmit": false,
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
         "scale": {
           "constant": {
             "x": 0.0,
@@ -182,6 +193,11 @@
             "z": -4.5
           },
           "mode": 1
+        },
+        "worldScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
         }
       },
       "isDrawEnable": true,
