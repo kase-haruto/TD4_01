@@ -48,11 +48,23 @@ void TitleScene::Initialize() {
 	//=========================
 	// グラフィック関連
 	//=========================
-	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({640.0f, 0.0f}, {320.0f, 180.0f});
+	pauseBg_ = std::make_unique<Sprite>("Textures/Title/title.png");
+	pauseBg_->Initialize({640.0f, -50.0f}, {960.0f, 540.0f});
 	pauseBg_->SetAnchorPoint({0.5f, 0.0f});
-	pauseBg_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+	pauseBg_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	pauseBg_->Update();
+
+	pressButton_ = std::make_unique<Sprite>("Textures/Title/titleUI_cont.png");
+	pressButton_->Initialize({640.0f, 250.0f}, {640.0f, 360.0f});
+	pressButton_->SetAnchorPoint({0.5f, 0.0f});
+	pressButton_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	pressButton_->Update();
+
+	pressKey_ = std::make_unique<Sprite>("Textures/Title/titleUI_key.png");
+	pressKey_->Initialize({640.0f, 250.0f}, {640.0f, 360.0f});
+	pressKey_->SetAnchorPoint({0.5f, 0.0f});
+	pressKey_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	pressKey_->Update();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	if(preType_ == SceneType::SELECT) {
@@ -82,6 +94,8 @@ void TitleScene::Update([[maybe_unused]] float dt) {
 		return;
 	}
 
+	UpdateInputDevice();
+
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
 		payload_ = BuildNowTypePayload(SceneType::TITLE);
@@ -101,6 +115,12 @@ void TitleScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSe
 	//	spriteの登録
 	//========================================================//
 	spriteRenderer_->Register(pauseBg_.get());
+
+	if(isPad_) {
+		spriteRenderer_->Register(pressButton_.get());
+	} else {
+		spriteRenderer_->Register(pressKey_.get());
+	}
 
 	transitionControl_->Draw(spriteRenderer_.get());
 
@@ -124,6 +144,54 @@ void TitleScene::OnPayload(std::unique_ptr<CalyxEngine::IScenePayload> payload) 
 }
 
 void TitleScene::PhaseUpdate(float) {
+}
+
+void TitleScene::UpdateInputDevice() {
+	using CalyxFoundation::Input;
+	using CalyxFoundation::PadButton;
+
+	// チェック対象のパッドボタン一覧（PadButtonはXInputのビットフラグなので明示列挙）
+	static constexpr PadButton kButtons[] = {
+		PadButton::A,
+		PadButton::B,
+		PadButton::X,
+		PadButton::Y,
+		PadButton::LB,
+		PadButton::RB,
+		PadButton::BACK,
+		PadButton::START,
+		PadButton::L_STICK,
+		PadButton::R_STICK,
+		PadButton::DPAD_UP,
+		PadButton::DPAD_DOWN,
+		PadButton::DPAD_LEFT,
+		PadButton::DPAD_RIGHT,
+	};
+
+	// いずれかのボタンに触れたらパッド表示に切り替え
+	for(PadButton button : kButtons) {
+		if(Input::PushGamepadButton(button)) {
+			isPad_ = true;
+			return;
+		}
+	}
+
+	// トリガー・スティックも「パッドに触った」として扱う
+	constexpr float kTriggerThreshold = 0.1f;
+	if(Input::GetLeftTrigger() > kTriggerThreshold ||
+	   Input::GetRightTrigger() > kTriggerThreshold ||
+	   Input::IsLeftStickMoved()) {
+		isPad_ = true;
+		return;
+	}
+
+	// キーボードに触れたらキーボード表示に戻す（任意：不要なら削除）
+	for(uint32_t key = 0; key < 256; ++key) {
+		if(Input::PushKey(key)) {
+			isPad_ = false;
+			return;
+		}
+	}
 }
 
 std::unique_ptr<TransitionPayload> TitleScene::BuildNowTypePayload(SceneType Type) {
