@@ -83,6 +83,8 @@ private:
 
 	// 確定入力（Aボタン または スペース）が押された瞬間か
 	static bool IsConfirmTriggered();
+	// 入力デバイスの切り替え判定（Padに触ったらisPad_=true、キーボード入力でfalse）
+	void UpdateInputDevice();
 
 	struct TutorialEventData : public CalyxEngine::SerializableObject {
 
@@ -113,6 +115,7 @@ private:
 
 	// 表示用スプライト
 	std::unique_ptr<CalyxEngine::SpriteObject2d> sprite_ = nullptr;
+	std::unique_ptr<CalyxEngine::SpriteObject2d> spritePad_ = nullptr;
 
 	// typeごとのテクスチャパス（仮、GUIで変更可）
 	std::string jumpTexturePath_	   = "Textures/tutorial/key_rule01.png";
@@ -129,6 +132,7 @@ private:
 	// 進行状態
 	TutorialState state_	 = TutorialState::Idle;
 	DivePhase	  divePhase_ = DivePhase::WaitFirstInput;
+	bool		  isPad_	 = false;
 
 	float lastDt_ = 0.0f;
 	// 入力ブロックタイマー（連打対策）
