@@ -62,10 +62,11 @@ private:
 	enum class TutorialState {
 		Idle,	  //< 未発火
 		Active,	  //< 表示中（時間停止）
+		Closing,  //< 解除後、縮小アニメーション中
 		Finished, //< 完了（再発火しない）
 	};
 
-	// Dive専用のサブ進行状態
+	// Dive専用進行状態
 	enum class DivePhase {
 		WaitFirstInput,	 //< 1回目の入力待ち
 		Playing,		 //< 一瞬だけ時間を進めている
@@ -76,6 +77,14 @@ private:
 	void EnsureSprite();
 	// typeに応じてテクスチャを差し替える
 	void ApplyTextureForType();
+	// ポップインアニメーションを開始
+	void StartPopIn();
+	// ポップアウトアニメーションを開始
+	void StartPopOut();
+	// 現在の表示スケール倍率を返す
+	float CurrentPopScale() const;
+	// ease-out-back イージング
+	static float EaseOutBack(float t);
 	// Diveの進行更新
 	void UpdateDive(float dt);
 	// チュートリアル完了（時間を戻して解除）
@@ -122,8 +131,8 @@ private:
 	std::string diveTexturePath_	   = "Textures/tutorial/key_rule02.png";
 	std::string purposeTexturePath_	   = "Textures/tutorial/key_rule03.png";
 	std::string jumpTexturePadPath_	   = "Textures/tutorial/cont_rule01.png";
-	std::string diveTexturePadPath_	   = "Textures/tutorial/cont_rule01.png";
-	std::string purposeTexturePadPath_ = "Textures/tutorial/cont_rule01.png";
+	std::string diveTexturePadPath_	   = "Textures/tutorial/cont_rule02.png";
+	std::string purposeTexturePadPath_ = "Textures/tutorial/cont_rule03.png";
 
 	// スプライトの表示レイアウト（GUIで変更・保存可）
 	CalyxEngine::Vector2 spritePosition_ = {960.0f, 360.0f};
@@ -139,4 +148,12 @@ private:
 	float inputBlockTimer_ = 0.0f;
 	// Diveの時間再開タイマー
 	float diveResumeTimer_ = 0.0f;
+
+	// ポップイン（中央から拡大して出てくる）アニメーション
+	float popInTimer_	 = 0.0f;  //< 残り時間（0で完了）
+	float popInDuration_ = 0.25f; //< 拡大にかける時間
+
+	// ポップアウト（中央へ縮小して消える）アニメーション
+	float popOutTimer_	  = 0.0f;  //< 残り時間（0で完了）
+	float popOutDuration_ = 0.2f;  //< 縮小にかける時間
 };

@@ -33,6 +33,9 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 
 	ApplyTextureForType();
 
+	// 中央から拡大して出すアニメーションを開始
+	StartPopIn();
+
 	if(spritePad_) {
 		spritePad_->SetVisibility(true);
 	}
@@ -57,18 +60,32 @@ void TutorialEvent::EventUpdate(float dt) {
 	}
 	if(state_ == TutorialState::Idle) lastDt_ = dt;
 
-	// スプライトの更新（生成済みのときのみ）
-	// dt は時間停止（TimeScale=0）の影響を受けないグローバルdtなので、
-	// 表示中でも各種タイマーは正しく進む
+	// ポップイン/アウトの進行
+	if(popInTimer_ > 0.0f) {
+		popInTimer_ -= dt;
+		if(popInTimer_ < 0.0f) popInTimer_ = 0.0f;
+	}
+	if(state_ == TutorialState::Closing && popOutTimer_ > 0.0f) {
+		popOutTimer_ -= dt;
+		if(popOutTimer_ <= 0.0f) {
+			// 縮小しきったので非表示にして完了
+			popOutTimer_ = 0.0f;
+			state_		 = TutorialState::Finished;
+			if(sprite_) sprite_->SetVisibility(false);
+			if(spritePad_) spritePad_->SetVisibility(false);
+		}
+	}
+	const float popScale = CurrentPopScale();
+	const CalyxEngine::Vector2 animScale = {spriteScale_.x * popScale, spriteScale_.y * popScale};
 
 	if(spritePad_) {
 		spritePad_->SetPosition(spritePosition_);
-		spritePad_->SetScale(spriteScale_);
+		spritePad_->SetScale(animScale);
 		spritePad_->Update(dt);
 	}
 	if(sprite_) {
 		sprite_->SetPosition(spritePosition_);
-		sprite_->SetScale(spriteScale_);
+		sprite_->SetScale(animScale);
 		sprite_->Update(dt);
 	}
 
@@ -132,14 +149,10 @@ void TutorialEvent::UpdateDive(float dt) {
 }
 
 void TutorialEvent::Finish() {
+	// 時間は通常に戻す、スプライトはまだ消さず縮小アニメーションへ移行する
 	ClockManager::GetInstance()->SetTimeScale(1.0f);
-	state_ = TutorialState::Finished;
-	if(sprite_) {
-		sprite_->SetVisibility(false);
-	}
-	if(spritePad_) {
-		spritePad_->SetVisibility(false);
-	}
+	state_ = TutorialState::Closing;
+	StartPopOut();
 }
 
 bool TutorialEvent::IsConfirmTriggered() {
@@ -214,6 +227,38 @@ void TutorialEvent::UpdateInputDevice() {
 	}
 }
 
+void TutorialEvent::StartPopIn() {
+	popInTimer_ = popInDuration_;
+}
+
+void TutorialEvent::StartPopOut() {
+	popOutTimer_ = popOutDuration_;
+}
+
+float TutorialEvent::EaseOutBack(float t) {
+	t = std::clamp(t, 0.0f, 1.0f);
+	constexpr float c1 = 1.70158f;
+	constexpr float c3 = c1 + 1.0f;
+	const float p = t - 1.0f;
+	return 1.0f + c3 * p * p * p + c1 * p * p;
+}
+
+float TutorialEvent::CurrentPopScale() const {
+	if(state_ == TutorialState::Closing) {
+		if(popOutDuration_ <= 0.0f) return 0.0f;
+		// 残り時間の割合 : 1(開始) -> 0(完了)
+		const float remain = std::clamp(popOutTimer_ / popOutDuration_, 0.0f, 1.0f);
+		return EaseOutBack(remain);
+	}
+
+	// 拡大中：0 -> 1
+	if(popInDuration_ <= 0.0f || popInTimer_ <= 0.0f) {
+		return 1.0f;
+	}
+	const float t = 1.0f - (popInTimer_ / popInDuration_);
+	return EaseOutBack(t);
+}
+
 void TutorialEvent::EnsureSprite() {
 	if(!sprite_) {
 		sprite_ = std::make_unique<CalyxEngine::SpriteObject2d>();
@@ -252,18 +297,23 @@ void TutorialEvent::ApplyTextureForType() {
 }
 
 void TutorialEvent::DrawSprite(SpriteRenderer* renderer) const {
+	// Active、Closing中描画する
+	const bool visible = (state_ == TutorialState::Active || state_ == TutorialState::Closing);
+	if(!renderer || !visible) {
+		return;
+	}
 	if(isPad_) {
-		if(spritePad_ && renderer && state_ == TutorialState::Active) {
+		if(spritePad_) {
 			spritePad_->Draw(renderer);
 		}
-		if(sprite_ && renderer && state_ == TutorialState::Active) {
+		if(sprite_) {
 			sprite_->Draw(renderer);
 		}
 	} else {
-		if(sprite_ && renderer && state_ == TutorialState::Active) {
+		if(sprite_) {
 			sprite_->Draw(renderer);
 		}
-		if(spritePad_ && renderer && state_ == TutorialState::Active) {
+		if(spritePad_) {
 			spritePad_->Draw(renderer);
 		}
 	}
@@ -300,6 +350,8 @@ void TutorialEvent::DerivativeGui() {
 			spritePad_->SetScale(spriteScale_);
 		}
 	}
+	ImGui::DragFloat("PopIn Duration", &popInDuration_, 0.01f, 0.0f, 2.0f);
+	ImGui::DragFloat("PopOut Duration", &popOutDuration_, 0.01f, 0.0f, 2.0f);
 
 	ImGui::SeparatorText("Textures");
 	auto editTexturePath = [](const char* label, std::string& path) {
@@ -335,6 +387,12 @@ void TutorialEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nloh
 	if(derived->contains("spriteScale")) {
 		spriteScale_ = derived->at("spriteScale").get<CalyxEngine::Vector2>();
 	}
+	if(derived->contains("popInDuration")) {
+		popInDuration_ = derived->at("popInDuration").get<float>();
+	}
+	if(derived->contains("popOutDuration")) {
+		popOutDuration_ = derived->at("popOutDuration").get<float>();
+	}
 }
 
 void TutorialEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& derived) const {
@@ -344,6 +402,8 @@ void TutorialEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& 
 	derived["purposeTexture"] = purposeTexturePath_;
 	derived["spritePosition"] = spritePosition_;
 	derived["spriteScale"]	  = spriteScale_;
+	derived["popInDuration"]  = popInDuration_;
+	derived["popOutDuration"] = popOutDuration_;
 }
 
 void TutorialEvent::RemapSceneObjectReferences([[maybe_unused]] const std::unordered_map<Guid, Guid>& guidMap) {
