@@ -11,6 +11,7 @@
 #include <Game/Scene/Clear/PreClearScene.h>
 
 // engine
+#include <Engine/Assets/Animation/AnimationModel.h>
 #include <Engine/Collision/CollisionManager.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
@@ -64,6 +65,12 @@ void PreClearScene::Initialize() {
 	}
 	if(oni_) {
 		oni_->Initialize();
+		// 鬼のアニメーションは最初は止めておく（speed 0 で先頭フレーム固定）
+		if(auto* anim = oni_->AnimationModel()) {
+			anim->SetCurrentLoop(false);
+			anim->ResetCurrentTime();
+			anim->SetCurrentSpeed(0.0f);
+		}
 	}
 
 	animTime_ = 2.0f;
