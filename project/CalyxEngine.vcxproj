@@ -546,6 +546,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileFireEvent.cpp" />
     <ClCompile Include="Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.cpp" />
     <ClCompile Include="Game\StageGimmick\Prediction\PredictionCircle.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\Pitfall\PitfallEvent.cpp" />
+    <ClCompile Include="Game\StageGimmick\Gimmicks\Pitfall\PitfallObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Assets\Audio\Audio.h" />
@@ -928,6 +930,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\StageGimmick\Tutorial\TutorialEvent.h" />
     <ClInclude Include="Game\Stage\Stage.h" />
     <ClInclude Include="Game\StageGimmick\Prediction\PredictionCircle.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\Pitfall\PitfallEvent.h" />
+    <ClInclude Include="Game\StageGimmick\Gimmicks\Pitfall\PitfallObject.h" />
     <ClInclude Include="Resources\shaders\CRT.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
