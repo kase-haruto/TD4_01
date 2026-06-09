@@ -84,9 +84,6 @@ PsoFactory::Create(const GraphicsPipelineDesc& desc) {
 		throw std::runtime_error("PipelineState initialization failed");
 	}
 	psoObj->SetShaderBlobs(vsBlob, psBlob);
-	// Note: SetShaderBlobs might need to be updated if it needs to store GS blob too, 
-	// but usually blobs are just for lifetime during Create. 
-	// If PipelineStateObject keeps them, I should check its definition.
 	return psoObj;
 }
 
