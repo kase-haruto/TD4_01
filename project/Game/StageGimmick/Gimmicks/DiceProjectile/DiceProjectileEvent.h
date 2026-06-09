@@ -124,6 +124,10 @@ private:
 	// 建物
 	std::weak_ptr<GeneralObject> gate_;
 	Guid						 gateGuid_;
+	std::weak_ptr<GeneralObject> wallL_;
+	Guid						 wallLGuid_;
+	std::weak_ptr<GeneralObject> wallR_;
+	Guid						 wallRGuid_;
 	std::weak_ptr<GeneralObject> numbersUi_;
 	Guid						 numbersUiGuid_;
 	float clearTime_ = 0.0f;

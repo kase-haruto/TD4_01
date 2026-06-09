@@ -8,6 +8,21 @@ GeneralObject::GeneralObject(const std::string& modelName, std::optional<std::st
 
 }
 
+void GeneralObject::OnCollisionEnter(Collider*) {
+}
+
+void GeneralObject::ColliderInitialize(const CalyxEngine::Vector3&) {
+
+	// コライダーの初期化
+	BaseGameObject::InitializeCollider(ColliderKind::Box);
+	if(collider_) {
+		collider_->SetType(ColliderType::Type_Impediment);
+		collider_->SetTargetType(ColliderType::Type_Player);
+		collider_->SetOwner(this);
+		collider_->SetCollisionEnabled(true);
+	}
+}
+
 void GeneralObject::ObjectInitialize() {
 }
 

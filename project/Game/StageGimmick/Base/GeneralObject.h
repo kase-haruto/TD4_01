@@ -13,6 +13,11 @@ public:
 		return "GeneralObject";
 	}
 
+	// 衝突開始時コールバック
+	void OnCollisionEnter(Collider* other) override;
+
+	void ColliderInitialize(const CalyxEngine::Vector3& size);
+
 protected:
 	// 初期化
 	void ObjectInitialize() override;
