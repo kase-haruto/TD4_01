@@ -174,7 +174,12 @@ void SelectScene::SelectUpdate(float dt) {
 		if(oni_) {
 			if(shoujiL_ && shoujiR_) {
 				CalyxEngine::Vector3 oniPos = oni_->GetWorldTransform().translation;
-				oniPos.x					= (lBase_ + rBase_) * 0.5f;
+				CalyxEngine::Vector3 framePos;
+				if(stageFrame_) {
+					framePos = stageFrame_->GetWorldTransform().translation;
+				}
+
+				oniPos.x = framePos.x;
 				oni_->SetTranslate(oniPos);
 			}
 			if(auto* anim = oni_->AnimationModel()) {
