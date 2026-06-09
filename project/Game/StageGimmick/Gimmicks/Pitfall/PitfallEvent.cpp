@@ -1,5 +1,6 @@
 #include "PitfallEvent.h"
 
+#include <Game/DemoPlayer/DemoPlayer.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 
@@ -12,12 +13,27 @@ void PitfallEvent::SetTarget(const std::shared_ptr<PitfallObject>& target) {
 	targetObjectGuid_ = target ? target->GetGuid() : Guid{};
 }
 
-void PitfallEvent::OnCollisionEnter(Collider*) {
+void PitfallEvent::OnCollisionEnter(Collider* other) {
+	if(!other) {
+		return;
+	}
 
+	auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner());
+	if(!player) {
+		return;
+	}
+
+	player->StartPitfallRecovery();
+	if(param_.disableAfterHit) {
+		if(collider_) {
+			collider_->SetCollisionEnabled(false);
+		}
+	}
 }
 
 void PitfallEvent::EventInitialize() {
 
+	collider_->SetCollisionEnabled(true);
 	if(!hasSerializedParam_) {
 		param_.LoadParams();
 	}
