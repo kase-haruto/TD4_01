@@ -24,6 +24,7 @@ void PitfallEvent::OnCollisionEnter(Collider* other) {
 	}
 
 	player->StartPitfallRecovery();
+	player->TakeDamage(1);
 	if(param_.disableAfterHit) {
 		if(collider_) {
 			collider_->SetCollisionEnabled(false);

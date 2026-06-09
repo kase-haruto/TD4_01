@@ -25,8 +25,16 @@ void PitfallObject::ObjectInitialize() {
 		}
 	}
 
-	//effectData_.Load("PitfallEffect");
+	effectData_.Load("PitfallEffect");
 }
 
 void PitfallObject::ObjectUpdate(float) {
+
+	if(!drawEffect_) {
+		worldTransform_.Update();
+		auto offset = CalyxEngine::Vector3(0.0f, -0.1f, 0.0f);
+		EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() + offset);
+		drawEffect_ = true;
+	}
+
 }

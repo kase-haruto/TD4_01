@@ -28,4 +28,6 @@ protected:
 private:
 
 	CalyxEngine::EffectAsset effectData_;
+	bool drawEffect_ = false;
+
 };

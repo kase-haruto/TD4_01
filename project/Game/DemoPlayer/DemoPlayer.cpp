@@ -166,10 +166,6 @@ void DemoPlayer::OnCollisionEnter(Collider* other) {
 	if(!otherObj) {
 		return;
 	}
-
-	if(otherObj->GetObjectClassName() == "PitfallEvent") {
-		StartPitfallRecovery();
-	}
 }
 
 void DemoPlayer::StartPitfallRecovery() {
@@ -178,7 +174,7 @@ void DemoPlayer::StartPitfallRecovery() {
 	}
 
 	pitfallRecoveryState_  = PitfallRecoveryState::Falling;
-	pitfallReturnY_		   = 0.0f;
+	pitfallReturnY_		   = worldTransform_.translation.y;
 	velocity_			   = {0.0f, -param_.pitfallFallSpeed, 0.0f};
 	isJumping_			   = false;
 	isDiving_			   = false;
@@ -197,11 +193,13 @@ void DemoPlayer::UpdatePitfallRecovery(float dt) {
 		if(worldTransform_.translation.y <= param_.pitfallBottomY) {
 			worldTransform_.translation.y = param_.pitfallBottomY;
 			pitfallRecoveryState_		  = PitfallRecoveryState::JumpingBack;
-			float jumpHeight			  = (std::max)(0.0f, pitfallReturnY_ - param_.pitfallBottomY);
-			velocity_					  = {0.0f, std::sqrt(2.0f * param_.gravity * jumpHeight), 0.0f};
-			isJumping_					  = true;
-			worldTransform_.scale		  = param_.jumpScale;
-			scaleVelocity_				  = {0.0f, 0.0f, 0.0f};
+			// 元のY座標より少し上を頂点にする初速を計算し、重力で自然な放物線を描いて戻す。
+			float apexY			  = pitfallReturnY_ + (std::max)(0.0f, param_.pitfallJumpHeight);
+			float jumpHeight	  = (std::max)(0.0f, apexY - worldTransform_.translation.y);
+			velocity_			  = {0.0f, std::sqrt(2.0f * param_.gravity * jumpHeight), 0.0f};
+			isJumping_			  = true;
+			worldTransform_.scale = param_.jumpScale;
+			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
 		}
 		return;
 	}
@@ -209,7 +207,7 @@ void DemoPlayer::UpdatePitfallRecovery(float dt) {
 	if(pitfallRecoveryState_ == PitfallRecoveryState::JumpingBack) {
 		worldTransform_.translation.y += velocity_.y * dt;
 		velocity_.y -= param_.gravity * dt;
-		if(worldTransform_.translation.y >= pitfallReturnY_ || velocity_.y <= 0.0f) {
+		if(velocity_.y <= 0.0f && worldTransform_.translation.y <= pitfallReturnY_) {
 			worldTransform_.translation.y = pitfallReturnY_;
 			velocity_					  = {0.0f, 0.0f, 0.0f};
 			pitfallRecoveryState_		  = PitfallRecoveryState::None;

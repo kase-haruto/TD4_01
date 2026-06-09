@@ -74,8 +74,9 @@ private:
 
 		float variableJumpMultiplier = 2.0f;
 
-		float pitfallBottomY   = -2.0f;
-		float pitfallFallSpeed = 5.0f;
+		float pitfallBottomY	= -2.0f;
+		float pitfallFallSpeed	= 5.0f;
+		float pitfallJumpHeight = 1.0f;
 
 		CalyxEngine::Vector3 colliderOffset = {0.0f, 0.4f, 0.0f};
 		CalyxEngine::Vector3 colliderSize = {0.8f, 1.6f, 0.5f};
@@ -106,6 +107,7 @@ private:
 			AddField("Damage Flash Duration", damageFlashDuration).Category("Damage Param");
 			AddField("Pitfall Bottom Y", pitfallBottomY).Category("Pitfall Param").Tooltip("落とし穴で落下するY座標");
 			AddField("Pitfall Fall Speed", pitfallFallSpeed).Category("Pitfall Param").Tooltip("落とし穴に落ちる速度");
+			AddField("Pitfall Jump Height", pitfallJumpHeight).Category("Pitfall Param").Tooltip("落とし穴から復帰する時に元のY座標からどれだけ上まで跳ぶか");
 			AddField("Collider Offset", colliderOffset).Category("Collider Param");
 			AddField("Collider Size", colliderSize).Category("Collider Param");
 			AddField("Jump Scale", jumpScale).Category("Pop Scale");
