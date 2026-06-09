@@ -241,13 +241,24 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 			if(billboardSrv.ptr == 0) continue;
 			cmdList->SetGraphicsRootDescriptorTable(7, billboardSrv);
 
+			batch.model->BindMaterialCB(cmdList);
+			cmdList->SetGraphicsRootDescriptorTable(2, batch.model->GetTexSrv());
 			batch.model->BindVertexIndexBuffers(cmdList);
-			cmdList->DrawIndexedInstanced(
-				static_cast<UINT>(batch.model->GetModelData()->meshResource.Indices().size()),
-				count,
-				0,
-				0,
-				0);
+			const auto& meshResource = batch.model->GetModelData()->meshResource;
+			const auto& subMeshes = meshResource.SubMeshes();
+			if(subMeshes.empty()) {
+				cmdList->DrawIndexedInstanced(
+					static_cast<UINT>(meshResource.Indices().size()),
+					count,
+					0,
+					0,
+					0);
+			} else {
+				for(const auto& subMesh : subMeshes) {
+					cmdList->SetGraphicsRootDescriptorTable(2, batch.model->GetTexSrv(subMesh.materialIndex));
+					cmdList->DrawIndexedInstanced(subMesh.indexCount, count, subMesh.indexStart, 0, 0);
+				}
+			}
 			drewAny = true;
 		}
 	}
@@ -276,13 +287,24 @@ bool OutlineRenderer::RenderNormalBuffer(ID3D12GraphicsCommandList* cmdList,
 		auto* model = static_cast<CalyxEngine::AnimationModel*>(inst.model);
 		inst.transform->SetCommand(cmdList, 1);
 		model->SetCommandPalletSrv(7, cmdList);
+		model->BindMaterialCB(cmdList);
+		cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv());
 		model->BindVertexIndexBuffers(cmdList);
-		cmdList->DrawIndexedInstanced(
-			static_cast<UINT>(model->GetModelData()->meshResource.Indices().size()),
-			1,
-			0,
-			0,
-			0);
+		const auto& meshResource = model->GetModelData()->meshResource;
+		const auto& subMeshes = meshResource.SubMeshes();
+		if(subMeshes.empty()) {
+			cmdList->DrawIndexedInstanced(
+				static_cast<UINT>(meshResource.Indices().size()),
+				1,
+				0,
+				0,
+				0);
+		} else {
+			for(const auto& subMesh : subMeshes) {
+				cmdList->SetGraphicsRootDescriptorTable(2, model->GetTexSrv(subMesh.materialIndex));
+				cmdList->DrawIndexedInstanced(subMesh.indexCount, 1, subMesh.indexStart, 0, 0);
+			}
+		}
 		drewAny = true;
 	}
 
