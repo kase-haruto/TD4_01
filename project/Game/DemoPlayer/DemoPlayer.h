@@ -27,6 +27,7 @@ public:
 	void OnCollisionEnter(Collider* other) override;
 
 	void TakeDamage(int32_t damage);
+	void StartPitfallRecovery();
 
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoPlayer"; }
@@ -49,6 +50,7 @@ private:
 	void UpdatePopScale(float dt);
 	void HammerControl(float dt);
 	void DamageFlash(float dt);
+	void UpdatePitfallRecovery(float dt);
 
 private:
 
@@ -71,6 +73,10 @@ private:
 		float damageFlashDuration = 1.0f;
 
 		float variableJumpMultiplier = 2.0f;
+
+		float pitfallBottomY	= -2.0f;
+		float pitfallFallSpeed	= 5.0f;
+		float pitfallJumpHeight = 1.0f;
 
 		CalyxEngine::Vector3 colliderOffset = {0.0f, 0.4f, 0.0f};
 		CalyxEngine::Vector3 colliderSize = {0.8f, 1.6f, 0.5f};
@@ -99,6 +105,9 @@ private:
 			AddField("Default ShockScale", defaultShockScale).Category("Shock Power");
 			AddField("Strong ShockScale", strongShockScale).Category("Shock Power");
 			AddField("Damage Flash Duration", damageFlashDuration).Category("Damage Param");
+			AddField("Pitfall Bottom Y", pitfallBottomY).Category("Pitfall Param").Tooltip("落とし穴で落下するY座標");
+			AddField("Pitfall Fall Speed", pitfallFallSpeed).Category("Pitfall Param").Tooltip("落とし穴に落ちる速度");
+			AddField("Pitfall Jump Height", pitfallJumpHeight).Category("Pitfall Param").Tooltip("落とし穴から復帰する時に元のY座標からどれだけ上まで跳ぶか");
 			AddField("Collider Offset", colliderOffset).Category("Collider Param");
 			AddField("Collider Size", colliderSize).Category("Collider Param");
 			AddField("Jump Scale", jumpScale).Category("Pop Scale");
@@ -120,6 +129,15 @@ private:
 	bool					isDiving_  = false;
 	bool					isDivingInvincible_ = false;
 	CalyxEngine::Quaternion preRotate_;
+
+	// 落とし穴復帰用
+	enum class PitfallRecoveryState {
+		None,
+		Falling,
+		JumpingBack,
+	};
+	PitfallRecoveryState pitfallRecoveryState_ = PitfallRecoveryState::None;
+	float				 pitfallReturnY_	   = 0.0f;
 
 	// ダメージ点滅用
 	float damageFlashTimer_ = 0.0f;

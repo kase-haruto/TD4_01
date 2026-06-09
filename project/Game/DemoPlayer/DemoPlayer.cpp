@@ -47,6 +47,8 @@ void DemoPlayer::Initialize() {
 	jumpRotation_				= 0.0f;
 	jumpRotationSpeed_			= 0.0f;
 	jumpRotationRemaining_		= 0.0f;
+	pitfallRecoveryState_		= PitfallRecoveryState::None;
+	pitfallReturnY_				= 0.0f;
 
 	// Pop Scale
 	targetScale_   = {1.0f, 1.0f, 1.0f};
@@ -100,6 +102,16 @@ void DemoPlayer::Update(float dt) {
 
 	moveSpeed_ = param_.moveSpeed;
 
+	if(pitfallRecoveryState_ != PitfallRecoveryState::None) {
+		UpdatePitfallRecovery(dt);
+		UpdatePopScale(dt);
+		HammerControl(dt);
+		if(collider_) {
+			collider_->Update(worldTransform_.translation, worldTransform_.rotation);
+		}
+		return;
+	}
+
 	Move(dt);
 	LandingEvents landingEvents = ApplyGravity(dt);
 	if(landingEvents.hardLanded) {
@@ -117,7 +129,7 @@ void DemoPlayer::Update(float dt) {
 	HammerControl(dt);
 
 	if(collider_) {
-	collider_->Update(worldTransform_.translation, worldTransform_.rotation);
+		collider_->Update(worldTransform_.translation, worldTransform_.rotation);
 	}
 	
 }
@@ -153,6 +165,56 @@ void DemoPlayer::OnCollisionEnter(Collider* other) {
 	BaseGameObject* otherObj = other->GetOwner();
 	if(!otherObj) {
 		return;
+	}
+}
+
+void DemoPlayer::StartPitfallRecovery() {
+	if(pitfallRecoveryState_ != PitfallRecoveryState::None) {
+		return;
+	}
+
+	pitfallRecoveryState_  = PitfallRecoveryState::Falling;
+	pitfallReturnY_		   = worldTransform_.translation.y;
+	velocity_			   = {0.0f, -param_.pitfallFallSpeed, 0.0f};
+	isJumping_			   = false;
+	isDiving_			   = false;
+	isDivingInvincible_	   = false;
+	isRecovering_		   = false;
+	jumpRotation_		   = 0.0f;
+	jumpRotationSpeed_	   = 0.0f;
+	jumpRotationRemaining_ = 0.0f;
+	worldTransform_.scale  = param_.diveScale;
+	scaleVelocity_		   = {0.0f, 0.0f, 0.0f};
+}
+
+void DemoPlayer::UpdatePitfallRecovery(float dt) {
+	if(pitfallRecoveryState_ == PitfallRecoveryState::Falling) {
+		worldTransform_.translation.y -= param_.pitfallFallSpeed * dt;
+		if(worldTransform_.translation.y <= param_.pitfallBottomY) {
+			worldTransform_.translation.y = param_.pitfallBottomY;
+			pitfallRecoveryState_		  = PitfallRecoveryState::JumpingBack;
+			// 元のY座標より少し上を頂点にする初速を計算し、重力で自然な放物線を描いて戻す。
+			float apexY			  = pitfallReturnY_ + (std::max)(0.0f, param_.pitfallJumpHeight);
+			float jumpHeight	  = (std::max)(0.0f, apexY - worldTransform_.translation.y);
+			velocity_			  = {0.0f, std::sqrt(2.0f * param_.gravity * jumpHeight), 0.0f};
+			isJumping_			  = true;
+			worldTransform_.scale = param_.jumpScale;
+			scaleVelocity_		  = {0.0f, 0.0f, 0.0f};
+		}
+		return;
+	}
+
+	if(pitfallRecoveryState_ == PitfallRecoveryState::JumpingBack) {
+		worldTransform_.translation.y += velocity_.y * dt;
+		velocity_.y -= param_.gravity * dt;
+		if(velocity_.y <= 0.0f && worldTransform_.translation.y <= pitfallReturnY_) {
+			worldTransform_.translation.y = pitfallReturnY_;
+			velocity_					  = {0.0f, 0.0f, 0.0f};
+			pitfallRecoveryState_		  = PitfallRecoveryState::None;
+			isJumping_					  = false;
+			worldTransform_.scale		  = param_.landScale;
+			scaleVelocity_				  = {0.0f, 0.0f, 0.0f};
+		}
 	}
 }
 

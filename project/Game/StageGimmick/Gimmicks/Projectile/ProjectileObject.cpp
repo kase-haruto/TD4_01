@@ -73,7 +73,7 @@ void ProjectileObject::ObjectUpdate(float dt) {
 			}
 		}
 		// パリーされた時に飛んでいく座標と回転を設定する
-		targetPosition_	  = worldTransform_.GetWorldPosition();
+		targetPosition_	  = worldTransform_.translation;
 		targetPosition_.y = param_.parryPositionY;
 		targetRotation_	  = CalyxEngine::Quaternion::LookAt(
 			targetPosition_,
