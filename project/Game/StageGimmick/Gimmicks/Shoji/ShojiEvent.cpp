@@ -108,6 +108,45 @@ void ShojiEvent::EventInitialize() {
 		}
 	}
 
+	const std::string wallLName = "wallL";
+	auto			  wallL		= ResolveLinkedObjectByName<GeneralObject>(wallLGuid_, wallLName);
+	if(!wallL) wallL = FindOwnedObjectByName<GeneralObject>(wallLName);
+	if(wallL) {
+		wallL->SetName(wallLName);
+		wallL->Initialize();
+		wallL->ColliderInitialize({8.0f, 15.0f, 1.0f});
+		wallL_	   = wallL;
+		wallLGuid_ = wallL->GetGuid();
+	} else {
+		auto newWallL = SceneAPI::Instantiate<GeneralObject>("roomWall.obj", wallLName);
+		newWallL->SetParent(shared_from_this(), false);
+		newWallL->Initialize();
+		newWallL->ColliderInitialize({8.0f, 15.0f, 1.0f});
+		newWallL->SetScale({1.0f, 1.0f, 1.0f});
+		newWallL->SetTranslate({-5.0f, 0.0f, 40.0f});
+		wallL_	   = newWallL;
+		wallLGuid_ = newWallL->GetGuid();
+	}
+	const std::string wallRName = "wallR";
+	auto			  wallR		= ResolveLinkedObjectByName<GeneralObject>(wallRGuid_, wallRName);
+	if(!wallR) wallR = FindOwnedObjectByName<GeneralObject>(wallRName);
+	if(wallR) {
+		wallR->SetName(wallRName);
+		wallR->Initialize();
+		wallR->ColliderInitialize({8.0f, 15.0f, 1.0f});
+		wallR_	   = wallR;
+		wallRGuid_ = wallR->GetGuid();
+	} else {
+		auto newWallR = SceneAPI::Instantiate<GeneralObject>("roomWall.obj", wallRName);
+		newWallR->SetParent(shared_from_this(), false);
+		newWallR->Initialize();
+		newWallR->ColliderInitialize({8.0f, 15.0f, 1.0f});
+		newWallR->SetScale({1.0f, 1.0f, 1.0f});
+		newWallR->SetTranslate({5.0f, 0.0f, 40.0f});
+		wallR_	   = newWallR;
+		wallRGuid_ = newWallR->GetGuid();
+	}
+
 	const std::string numbersUiName = "shojiNumberUI";
 	auto			  numbersUi		= ResolveLinkedObjectByName<GeneralObject>(numbersUiGuid_, numbersUiName);
 	if(!numbersUi) numbersUi = FindOwnedObjectByName<GeneralObject>(numbersUiName);

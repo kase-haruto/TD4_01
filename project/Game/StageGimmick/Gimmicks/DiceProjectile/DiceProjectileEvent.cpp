@@ -112,14 +112,14 @@ void DiceProjectileEvent::EventInitialize() {
 	if(wallL) {
 		wallL->SetName(wallLName);
 		wallL->Initialize();
-		wallL->ColliderInitialize({});
+		wallL->ColliderInitialize({8.0f, 15.0f, 1.0f});
 		wallL_	   = wallL;
 		wallLGuid_ = wallL->GetGuid();
 	} else {
 		auto newWallL = SceneAPI::Instantiate<GeneralObject>("akamonWall.obj", wallLName);
 		newWallL->SetParent(shared_from_this(), false);
 		newWallL->Initialize();
-		newWallL->ColliderInitialize({});
+		newWallL->ColliderInitialize({8.0f, 15.0f, 1.0f});
 		newWallL->SetScale({1.0f, 1.0f, 1.0f});
 		newWallL->SetTranslate({-5.0f, 0.0f, 40.0f});
 		wallL_	   = newWallL;
@@ -131,14 +131,14 @@ void DiceProjectileEvent::EventInitialize() {
 	if(wallR) {
 		wallR->SetName(wallRName);
 		wallR->Initialize();
-		wallR->ColliderInitialize({});
+		wallR->ColliderInitialize({8.0f, 15.0f, 1.0f});
 		wallR_	   = wallR;
 		wallRGuid_ = wallR->GetGuid();
 	} else {
 		auto newWallR = SceneAPI::Instantiate<GeneralObject>("akamonWall.obj", wallRName);
 		newWallR->SetParent(shared_from_this(), false);
 		newWallR->Initialize();
-		newWallR->ColliderInitialize({});
+		newWallR->ColliderInitialize({8.0f, 15.0f, 1.0f});
 		newWallR->SetScale({1.0f, 1.0f, 1.0f});
 		newWallR->SetTranslate({5.0f, 0.0f, 40.0f});
 		wallR_	   = newWallR;

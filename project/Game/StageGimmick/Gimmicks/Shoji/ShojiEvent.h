@@ -117,6 +117,10 @@ private:
 	std::vector<std::weak_ptr<LuckyCatObject>> luckyCatObjs_;
 	std::vector<Guid> luckyCatGuids_;
 
+	std::weak_ptr<GeneralObject> wallL_;
+	Guid						 wallLGuid_;
+	std::weak_ptr<GeneralObject> wallR_;
+	Guid						 wallRGuid_;
 	// はめる数を表示するUI
 	std::weak_ptr<GeneralObject> numbersUi_;
 	Guid						 numbersUiGuid_;

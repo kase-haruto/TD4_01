@@ -87,6 +87,10 @@ private:
 	// 建物
 	std::weak_ptr<GeneralObject> gate_;
 	Guid						 gateGuid_;
+	std::weak_ptr<GeneralObject>	  wallL_;
+	Guid							  wallLGuid_;
+	std::weak_ptr<GeneralObject>	  wallR_;
+	Guid							  wallRGuid_;
 
 	// パラメータ
 	BellProjectileEventParam   eventParam_;
