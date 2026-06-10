@@ -25,6 +25,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "2d686ace-3d21-439f-acd3-775c136862b0",
             "modelConfig": {
@@ -153,6 +154,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "0ab23048-d8d0-4d1c-ba0e-7ee0dda116d5",
             "modelConfig": {
@@ -208,59 +210,6 @@
         {
             "cameraDitherEnabled": true,
             "castShadow": true,
-            "color": {
-                "w": 1.0,
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "decay": 1.0,
-            "drawEnable": true,
-            "guid": "d37c63ea-514a-4fc0-a882-4c841231b665",
-            "intensity": 0.25,
-            "name": "PointLight",
-            "objectType": 0,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "position": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "radius": 20.0,
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                }
-            },
-            "type": "PointLight"
-        },
-        {
-            "cameraDitherEnabled": false,
-            "castShadow": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -283,156 +232,7 @@
                 },
                 "targetType": 0
             },
-            "drawEnable": true,
-            "guid": "7d729f52-488a-4c70-9fe4-85abc54f411f",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "demonSelect.gltf",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "oni",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "surfaceStencilRole": 0,
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 1.0,
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.5,
-                    "y": 1.5,
-                    "z": 1.5
-                },
-                "translation": {
-                    "x": -0.2782149314880371,
-                    "y": -6.889720439910889,
-                    "z": 49.31268310546875
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "castShadow": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
-            "drawEnable": true,
-            "guid": "0099d4cc-fe32-4a13-a44a-a46fa3a318c2",
-            "modelConfig": {
-                "blendMode": 5,
-                "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "plane.obj",
-                "textureGuid": "00000000-0000-0000-0000-000000000000",
-                "uvTransConfig": {
-                    "rotation": 0.0,
-                    "scale": {
-                        "x": 1.0,
-                        "y": 1.0
-                    }
-                }
-            },
-            "name": "plane",
-            "objectType": 2,
-            "outlineColor": {
-                "w": 1.0,
-                "x": 0.019999999552965164,
-                "y": 0.019999999552965164,
-                "z": 0.02500000037252903
-            },
-            "outlineEnabled": true,
-            "outlineThickness": 0.03500000014901161,
-            "parentGuid": "00000000-0000-0000-0000-000000000000",
-            "surfaceStencilRole": 0,
-            "transform": {
-                "inheritRotate": true,
-                "inheritScale": true,
-                "inheritTranslate": true,
-                "rotation": {
-                    "w": 0.7071068286895752,
-                    "x": 0.7071068286895752,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 100.0,
-                    "y": 100.0,
-                    "z": 1.0
-                },
-                "translation": {
-                    "x": 0.0,
-                    "y": -7.0,
-                    "z": 0.0
-                }
-            },
-            "type": "BaseGameObject"
-        },
-        {
-            "cameraDitherEnabled": true,
-            "castShadow": true,
-            "colliderConfig": {
-                "colliderType": 0,
-                "isCollisionEnabled": false,
-                "isDraw": true,
-                "offset": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "radius": 1.0,
-                "rotate": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "targetType": 0
-            },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "7841e416-2869-4fbb-9479-509f11da43bb",
             "modelConfig": {
@@ -510,12 +310,13 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
-            "guid": "9390c6ee-2877-48b7-9736-ade8aca52dae",
+            "guid": "0099d4cc-fe32-4a13-a44a-a46fa3a318c2",
             "modelConfig": {
                 "blendMode": 5,
                 "materialGuid": "00000000-0000-0000-0000-000000000000",
-                "modelName": "shojiFull.obj",
+                "modelName": "plane.obj",
                 "textureGuid": "00000000-0000-0000-0000-000000000000",
                 "uvTransConfig": {
                     "rotation": 0.0,
@@ -525,7 +326,7 @@
                     }
                 }
             },
-            "name": "ShoujiR_1",
+            "name": "plane",
             "objectType": 2,
             "outlineColor": {
                 "w": 1.0,
@@ -535,9 +336,83 @@
             },
             "outlineEnabled": true,
             "outlineThickness": 0.03500000014901161,
-            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
-            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
-            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 0.7071068286895752,
+                    "x": 0.7071068286895752,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 100.0,
+                    "y": 100.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": -7.0,
+                    "z": 0.0
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": false,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 2,
+            "drawEnable": true,
+            "guid": "7d729f52-488a-4c70-9fe4-85abc54f411f",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "demonSelect.gltf",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "oni",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
             "surfaceStencilRole": 0,
             "transform": {
                 "inheritRotate": true,
@@ -550,14 +425,14 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 0.675000011920929,
-                    "y": 0.675000011920929,
-                    "z": 0.675000011920929
+                    "x": 1.5,
+                    "y": 1.5,
+                    "z": 1.5
                 },
                 "translation": {
-                    "x": 1.8585904836654663,
-                    "y": -7.09185266494751,
-                    "z": 0.5036017298698425
+                    "x": -0.2782149314880371,
+                    "y": -6.889720439910889,
+                    "z": 49.31268310546875
                 }
             },
             "type": "BaseGameObject"
@@ -644,6 +519,85 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
+            "drawEnable": true,
+            "guid": "9390c6ee-2877-48b7-9736-ade8aca52dae",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "shojiFull.obj",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "ShoujiR_1",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
+            "prefabAssetGuid": "6795717f-eb73-4fee-9fe7-74472d1a4a9d",
+            "prefabSourceGuid": "f0185783-581b-4515-b549-1431ec488536",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.675000011920929,
+                    "y": 0.675000011920929,
+                    "z": 0.675000011920929
+                },
+                "translation": {
+                    "x": 1.8585904836654663,
+                    "y": -7.09185266494751,
+                    "z": 0.5036023259162903
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": false,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "f9b52372-b4a9-4310-8020-c96028397d2d",
             "modelConfig": {
@@ -719,6 +673,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "578a4168-4130-4992-bdc3-cef9d073ac4b",
             "modelConfig": {
@@ -796,6 +751,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "ec1a5a72-f217-4aa7-b711-a56df0bdb143",
             "modelConfig": {
@@ -869,10 +825,10 @@
                 "inheritScale": true,
                 "inheritTranslate": true,
                 "rotation": {
-                    "w": 0.9988307952880859,
-                    "x": 0.005392346065491438,
-                    "y": -0.04804149270057678,
-                    "z": 0.00025935962912626565
+                    "w": 0.9832011461257935,
+                    "x": 0.17170843482017517,
+                    "y": 0.06097770854830742,
+                    "z": -0.010649282485246658
                 },
                 "scale": {
                     "x": 1.0,
@@ -880,9 +836,9 @@
                     "z": 1.0
                 },
                 "translation": {
-                    "x": -10.180130004882813,
-                    "y": 7.991260528564453,
-                    "z": -39.49372100830078
+                    "x": 17.56264305114746,
+                    "y": 22.16693878173828,
+                    "z": -79.30839538574219
                 }
             },
             "type": "DebugCamera"
@@ -912,6 +868,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "11083faa-50f8-4267-8a15-9bae740ae878",
             "modelConfig": {
@@ -989,6 +946,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "a565a39a-56d0-4a80-bc8e-a0a542c8b429",
             "modelConfig": {
@@ -1048,7 +1006,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -1080,6 +1038,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "01d40107-97f0-4e51-a119-6dd653645dce",
             "modelConfig": {
@@ -1157,6 +1116,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "8db48242-8fcc-4c08-9da2-6b7020042c18",
             "modelConfig": {
@@ -1234,6 +1194,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "0afbcfc4-b48d-43a1-a2b7-1afa1651215a",
             "modelConfig": {
@@ -1311,6 +1272,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "dda4aac1-d85b-4cfa-94bb-3fc0d42b571f",
             "modelConfig": {
@@ -1366,6 +1328,59 @@
         {
             "cameraDitherEnabled": true,
             "castShadow": true,
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 0.3700000047683716,
+            "drawEnable": true,
+            "guid": "3411e0bc-da2f-4c9c-be38-21a9aa1dd8a5",
+            "intensity": 0.25,
+            "name": "PointLight",
+            "objectType": 0,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 45.5,
+                "y": 6.900000095367432,
+                "z": -39.7599983215332
+            },
+            "radius": 80.41000366210938,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 45.5,
+                    "y": 6.900000095367432,
+                    "z": -39.7599983215332
+                }
+            },
+            "type": "PointLight"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -1388,6 +1403,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "a89c2ae4-d0b8-45b0-9b05-0d2411c9b91d",
             "modelConfig": {
@@ -1441,6 +1457,59 @@
             "type": "BaseGameObject"
         },
         {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 0.3700000047683716,
+            "drawEnable": true,
+            "guid": "d41d339a-6c9e-42da-a161-7da583a4199e",
+            "intensity": 0.25,
+            "name": "PointLight",
+            "objectType": 0,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 91.0999984741211,
+                "y": 6.900000095367432,
+                "z": -39.7599983215332
+            },
+            "radius": 80.41000366210938,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 91.0999984741211,
+                    "y": 6.900000095367432,
+                    "z": -39.7599983215332
+                }
+            },
+            "type": "PointLight"
+        },
+        {
             "Lantern": {
                 "color": {
                     "w": 1.0,
@@ -1449,7 +1518,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -1481,6 +1550,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "49d31d4f-c649-477b-9bfb-d939c3cfe306",
             "modelConfig": {
@@ -1542,7 +1612,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -1574,6 +1644,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "3206dd41-56a0-496d-b11c-5d223c10aa26",
             "modelConfig": {
@@ -1651,6 +1722,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "b56b8dcd-1110-4e85-ac7c-d68901a0411d",
             "modelConfig": {
@@ -1728,6 +1800,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "dd4c0c20-659b-42a1-b31b-c74bb23a2b31",
             "modelConfig": {
@@ -1805,6 +1878,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "405d368b-c3f7-46f2-9baa-f23b6f5f6f3f",
             "modelConfig": {
@@ -1882,6 +1956,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "1691f47c-b812-4f5b-a681-5617c436ec37",
             "modelConfig": {
@@ -1959,6 +2034,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "c86a7de8-151f-4260-b36f-44481df55c77",
             "modelConfig": {
@@ -2036,6 +2112,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "a65ac1ab-4497-46c0-a78b-5848aec879c5",
             "modelConfig": {
@@ -2113,6 +2190,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "d6050cf8-5449-405d-a807-f1ba351cba2b",
             "modelConfig": {
@@ -2190,6 +2268,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "1f613e00-8757-4577-b8dd-abdb35f71340",
             "modelConfig": {
@@ -2267,6 +2346,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "de33ad89-4a8c-4fbe-84fb-913f412a6cf2",
             "modelConfig": {
@@ -2344,6 +2424,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "5b9e2d63-89e4-4c1f-8252-5625a657bfb4",
             "modelConfig": {
@@ -2421,6 +2502,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "93088573-dc53-410c-b8da-d784c2f02b65",
             "modelConfig": {
@@ -2498,6 +2580,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "9cdd6dc9-608e-435d-9934-63c1e9104ebf",
             "modelConfig": {
@@ -2575,6 +2658,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "065a6010-8596-4ac1-b091-957d88256e94",
             "modelConfig": {
@@ -2652,6 +2736,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "9a46b134-dd2f-4d06-a15b-e447c5cfc1f0",
             "modelConfig": {
@@ -2729,6 +2814,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "acfec081-de4e-49dc-a9b3-3a6c5ba4e4f0",
             "modelConfig": {
@@ -2804,6 +2890,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "78c4f9ee-5fa2-411a-9993-856ce0ded57e",
             "modelConfig": {
@@ -2881,6 +2968,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "cf2ec42b-2da4-4043-bd96-9a95a0a27ea5",
             "modelConfig": {
@@ -2958,6 +3046,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "ef77ff87-7fb6-41e1-9a87-a88ffd6d87d7",
             "modelConfig": {
@@ -3035,6 +3124,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "d082a6a8-a8b9-4ab0-80ad-fb38418938c6",
             "modelConfig": {
@@ -3112,6 +3202,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "05d55fff-f211-41ad-968b-9e7040eae558",
             "modelConfig": {
@@ -3189,6 +3280,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "89bee36f-083b-4578-9ec0-6944a75bf805",
             "modelConfig": {
@@ -3244,6 +3336,59 @@
         {
             "cameraDitherEnabled": true,
             "castShadow": true,
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 0.3700000047683716,
+            "drawEnable": true,
+            "guid": "78d0a2a9-702a-49ca-baa0-2c9699ed24f6",
+            "intensity": 0.25,
+            "name": "PointLight",
+            "objectType": 0,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 0.0,
+                "y": 6.90000057220459,
+                "z": -39.7599983215332
+            },
+            "radius": 80.41000366210938,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 6.90000057220459,
+                    "z": -39.7599983215332
+                }
+            },
+            "type": "PointLight"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
             "colliderConfig": {
                 "colliderType": 0,
                 "isCollisionEnabled": false,
@@ -3266,6 +3411,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "9b1feeba-7716-42fa-b278-3ac0359700b5",
             "modelConfig": {
@@ -3343,6 +3489,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "1229d6fd-2eec-4e6e-93f3-1fd8195fa7ef",
             "modelConfig": {
@@ -3420,6 +3567,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "5be3d720-a1ac-4038-a2b7-3b1274a22007",
             "modelConfig": {
@@ -3497,6 +3645,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "f647374e-6556-4510-b1f4-99a7a97e14ea",
             "modelConfig": {
@@ -3574,6 +3723,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "831de9ae-97f8-463f-8b83-2010428ad796",
             "modelConfig": {
@@ -3651,6 +3801,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "de3b7d35-ea49-4935-af7d-d92d1b24658f",
             "modelConfig": {
@@ -3728,6 +3879,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "93b48742-23db-4fc0-a003-76f3d8ccdd85",
             "modelConfig": {
@@ -3805,6 +3957,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "ca4620d4-8983-491b-a3ee-11febf4e0425",
             "modelConfig": {
@@ -3882,6 +4035,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "001f9553-9a9e-4d82-b650-006a4746b8f7",
             "modelConfig": {
@@ -3943,7 +4097,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -3975,6 +4129,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "4bbe2c5b-3305-4c06-a03e-7d311be39e48",
             "modelConfig": {
@@ -4052,6 +4207,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "b5108fcf-80e6-4120-b688-13ee6985a6eb",
             "modelConfig": {
@@ -4113,7 +4269,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -4145,6 +4301,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "c60ac747-f6b0-4172-a7ed-03d6fa1487e3",
             "modelConfig": {
@@ -4222,6 +4379,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "df2055ad-d188-4164-b0df-2e5412d53c12",
             "modelConfig": {
@@ -4299,6 +4457,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "4a2260ba-1201-4607-b2c7-5a53ba443caf",
             "modelConfig": {
@@ -4376,6 +4535,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "b82381f1-6e50-4e24-959b-b11cd69fa944",
             "modelConfig": {
@@ -4453,6 +4613,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "3b388a08-9f57-4f03-8b5c-01be65c4885e",
             "modelConfig": {
@@ -4530,6 +4691,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "2453c42f-788b-4afb-b9ff-41f7ab84016f",
             "modelConfig": {
@@ -4607,6 +4769,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "8f5745ba-4de0-4e6e-bb53-496814bb8c05",
             "modelConfig": {
@@ -4668,7 +4831,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -4700,6 +4863,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "08d54ad1-2036-4fad-a695-57f6ce9a88c3",
             "modelConfig": {
@@ -4777,6 +4941,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "0192c7a3-4d82-4ceb-8709-42c6708ccc5b",
             "modelConfig": {
@@ -4854,6 +5019,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "435591b2-3980-4d3e-9674-a5fd6465f142",
             "modelConfig": {
@@ -4931,6 +5097,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "ae6c4516-82b5-4077-9a99-d63316d9d3a3",
             "modelConfig": {
@@ -5008,6 +5175,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "1892ef5e-331f-414c-83ef-88e403f73021",
             "modelConfig": {
@@ -5085,6 +5253,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "7804241a-7445-4e52-9afa-7f889fd9502a",
             "modelConfig": {
@@ -5162,6 +5331,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "e6c91a23-8e3b-4b74-8e4a-e552de27872e",
             "modelConfig": {
@@ -5239,6 +5409,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "c017c051-9bac-462a-b0e8-9c22a544b9a7",
             "modelConfig": {
@@ -5316,6 +5487,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "a4eda0e4-9b80-4931-9492-929944e4c3e4",
             "modelConfig": {
@@ -5393,6 +5565,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "0b9dcdb9-98ee-4fe9-9ba1-0e0fcb6c235e",
             "modelConfig": {
@@ -5454,7 +5627,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -5486,6 +5659,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "74e99148-fded-48f0-98cc-761265b0b36d",
             "modelConfig": {
@@ -5563,6 +5737,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "afdab7d3-6a7c-4849-99ac-076738e7845e",
             "modelConfig": {
@@ -5640,6 +5815,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "ef1ee68b-a536-4f44-8579-48ee4c9003c7",
             "modelConfig": {
@@ -5717,6 +5893,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "5ad95e66-9654-4e38-9c17-523127ad2dbc",
             "modelConfig": {
@@ -5794,6 +5971,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "2612b820-0af3-47f8-a136-609cff1d0ae7",
             "modelConfig": {
@@ -5871,6 +6049,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "261c344f-bbfe-4172-bfe6-d520a1e8cff0",
             "modelConfig": {
@@ -5948,6 +6127,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "cb39a408-08a3-4312-8604-90ec207c124e",
             "modelConfig": {
@@ -6025,6 +6205,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "90dedb8b-aacf-4f29-a456-a23cd7a6d4dd",
             "modelConfig": {
@@ -6102,6 +6283,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "d7155b55-28de-401d-bfbe-02883dfecdc7",
             "modelConfig": {
@@ -6179,6 +6361,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "b80b5e53-528d-489d-a5b4-9a7aaaeb1fc7",
             "modelConfig": {
@@ -6256,6 +6439,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "cc51df58-e077-4cd8-8429-4df22b055953",
             "modelConfig": {
@@ -6333,6 +6517,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "4d6f74cf-f158-4ad2-893e-6de6eefcea5b",
             "modelConfig": {
@@ -6410,6 +6595,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "7ebe4a60-782e-4d13-932c-1f3464d8607b",
             "modelConfig": {
@@ -6487,6 +6673,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "6192336a-b186-40dd-a23a-2de97e097743",
             "modelConfig": {
@@ -6564,6 +6751,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "e735084a-01cd-4e1d-ba50-a46f93e3c0eb",
             "modelConfig": {
@@ -6641,6 +6829,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "accc586e-579e-4776-9b6a-c209797146b2",
             "modelConfig": {
@@ -6702,7 +6891,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -6734,6 +6923,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "fec5bf84-9093-4ec9-92d1-caa2dfced232",
             "modelConfig": {
@@ -6811,6 +7001,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "d448ba69-9da1-4b2f-b63d-78f77d231e12",
             "modelConfig": {
@@ -6872,7 +7063,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -6904,6 +7095,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "410fbdd1-4db2-4d4a-a8dc-6b8f3851e09a",
             "modelConfig": {
@@ -6981,6 +7173,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "966e9cfc-caec-4503-896f-937f56072863",
             "modelConfig": {
@@ -7058,6 +7251,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "f25344fc-2724-46ee-85e1-809665ef182f",
             "modelConfig": {
@@ -7135,6 +7329,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "d6b7aac2-94f1-4015-845d-1b9e1e0c1ada",
             "modelConfig": {
@@ -7212,6 +7407,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "3c0aa403-be67-4b17-b1d9-5174b4f25469",
             "modelConfig": {
@@ -7289,6 +7485,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "e05ce1d4-7f25-471d-b60f-a15000511711",
             "modelConfig": {
@@ -7366,6 +7563,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "053ef1de-59bd-4cbb-9694-16f006db05dd",
             "modelConfig": {
@@ -7443,6 +7641,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "f2102faf-8a03-4961-9d5a-c3a529f9f580",
             "modelConfig": {
@@ -7520,6 +7719,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "1c428a3c-ad73-492d-9cef-ace7a05062c2",
             "modelConfig": {
@@ -7597,6 +7797,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "d4c6baf4-7384-4396-a23f-5a930cff91eb",
             "modelConfig": {
@@ -7674,6 +7875,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "5b71c8c8-14e7-4a80-8b29-f2feb3ba3b89",
             "modelConfig": {
@@ -7751,6 +7953,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "ed1419b7-4ebf-42f3-b446-f7cf04cea78e",
             "modelConfig": {
@@ -7828,6 +8031,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "58fadd46-e431-4674-92cb-cb05508cfbb6",
             "modelConfig": {
@@ -7905,6 +8109,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "aa08422b-abf9-4823-a303-c4266c4692ee",
             "modelConfig": {
@@ -7982,6 +8187,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "3644e554-b5c0-439d-9a17-e684bf2c545f",
             "modelConfig": {
@@ -8059,6 +8265,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "de84fd31-835a-47f8-89c5-5900880e28dc",
             "modelConfig": {
@@ -8136,6 +8343,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "dab007cf-e389-4899-9874-3e62de12fa2a",
             "modelConfig": {
@@ -8213,6 +8421,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "4d543fbd-61d1-4848-aef8-f3a6125566ed",
             "modelConfig": {
@@ -8290,6 +8499,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "856dfc1c-6f9e-4df3-afe4-cb4e8b0a16c8",
             "modelConfig": {
@@ -8351,7 +8561,7 @@
                     "z": 0.21568627655506134
                 },
                 "decay": 1.5,
-                "intensity": 1.8708181381225586,
+                "intensity": 2.6281380653381348,
                 "lightLocalPosition": {
                     "x": 0.0,
                     "y": 2.0,
@@ -8383,6 +8593,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "cb60094d-1056-46b3-ad27-01f7781b6f85",
             "modelConfig": {
@@ -8460,6 +8671,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "eb37c6cd-c3c9-481e-ac75-202574beb173",
             "modelConfig": {
@@ -8537,6 +8749,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "cc62b6d6-656a-4455-8b95-b3d57b933dbb",
             "modelConfig": {
@@ -8614,6 +8827,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "5a7341d2-47ea-45d9-961b-285d155195e0",
             "modelConfig": {
@@ -8691,6 +8905,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "99b9d06d-a9e6-4f8a-8cc4-e1e4564650c9",
             "modelConfig": {
@@ -8768,6 +8983,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "7b2fc19f-f475-493e-88be-12fe75ec835d",
             "modelConfig": {
@@ -8845,6 +9061,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "e41a5ea1-39dd-4f5b-b1a0-778d6c02b4d5",
             "modelConfig": {
@@ -8922,6 +9139,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "b41e6328-259e-4578-b174-85930be421ae",
             "modelConfig": {
@@ -8999,6 +9217,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "a70cad49-9a8c-4f52-ba3e-c5f44defdf0c",
             "modelConfig": {
@@ -9076,6 +9295,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "1aa674d8-ee7b-4c72-8334-a71c6c41fdd4",
             "modelConfig": {
@@ -9153,6 +9373,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "641adc6a-31fd-4562-9330-61b32ab02682",
             "modelConfig": {
@@ -9230,6 +9451,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "a86f1e33-4c74-4111-9fd0-f4e9c46d112a",
             "modelConfig": {
@@ -9307,6 +9529,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "4d3e0fb5-a29b-41c0-8876-cb7f69a047f5",
             "modelConfig": {
@@ -9384,6 +9607,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "101fdef1-7212-40b6-8178-2af398b82e10",
             "modelConfig": {
@@ -9461,6 +9685,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "b584f2df-da93-4b6b-9d98-d5a0f48a4f3c",
             "modelConfig": {
@@ -9538,6 +9763,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "996068ca-f220-498f-814f-904a8a263778",
             "modelConfig": {
@@ -9615,6 +9841,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "672280da-d029-4181-b0f4-4c7351b8e38e",
             "modelConfig": {
@@ -9692,6 +9919,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "84f06891-fddc-4f06-b4a1-79e53f69758f",
             "modelConfig": {
@@ -9769,6 +9997,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "f9b45992-c0a7-4021-8446-09a592988204",
             "modelConfig": {
@@ -9846,6 +10075,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "e072ef9c-6937-4dd8-924d-ac2802be916c",
             "modelConfig": {
@@ -9923,6 +10153,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "6c4d3744-2842-485e-b986-27b0967e1d72",
             "modelConfig": {
@@ -10000,6 +10231,7 @@
                 },
                 "targetType": 0
             },
+            "colliderKind": 2,
             "drawEnable": true,
             "guid": "02a0007f-a64a-42f8-90c5-071f382f24aa",
             "modelConfig": {
@@ -10046,6 +10278,492 @@
                     "x": 205.09100341796875,
                     "y": 6.196000099182129,
                     "z": 62.05699920654297
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 0,
+            "drawEnable": true,
+            "guid": "cb015e40-e4a8-440a-9f89-a2377cba8871",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "demonStand.gltf",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "demonStand",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.800000011920929,
+                    "y": 0.800000011920929,
+                    "z": 0.800000011920929
+                },
+                "translation": {
+                    "x": 0.0,
+                    "y": 0.20000004768371582,
+                    "z": 6.700000286102295
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 0,
+            "drawEnable": true,
+            "guid": "2266ccc5-f4cb-428f-bd6f-23fc7fd0a9e3",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "demonStand.gltf",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "demonStand",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.800000011920929,
+                    "y": 0.800000011920929,
+                    "z": 0.800000011920929
+                },
+                "translation": {
+                    "x": 45.5,
+                    "y": 0.20000004768371582,
+                    "z": 6.700000286102295
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 0,
+            "drawEnable": true,
+            "guid": "50fe1a66-109d-4ddc-b528-900ccfa710d1",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "demonStand.gltf",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "demonStand",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.800000011920929,
+                    "y": 0.800000011920929,
+                    "z": 0.800000011920929
+                },
+                "translation": {
+                    "x": 91.0999984741211,
+                    "y": 0.20000004768371582,
+                    "z": 6.700000286102295
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 0,
+            "drawEnable": true,
+            "guid": "c33c33df-7b01-48d6-9448-280e55c55b69",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "demonStand.gltf",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "demonStand",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.800000011920929,
+                    "y": 0.800000011920929,
+                    "z": 0.800000011920929
+                },
+                "translation": {
+                    "x": 136.63999938964844,
+                    "y": 0.20000004768371582,
+                    "z": 6.700000286102295
+                }
+            },
+            "type": "BaseGameObject"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 0.3700000047683716,
+            "drawEnable": true,
+            "guid": "1fb12f64-7312-4627-b0d8-e36dcc75ccae",
+            "intensity": 0.25,
+            "name": "PointLight",
+            "objectType": 0,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 136.63999938964844,
+                "y": 6.900000095367432,
+                "z": -39.7599983215332
+            },
+            "radius": 80.41000366210938,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 136.63999938964844,
+                    "y": 6.900000095367432,
+                    "z": -39.7599983215332
+                }
+            },
+            "type": "PointLight"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "color": {
+                "w": 1.0,
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "decay": 0.3700000047683716,
+            "drawEnable": true,
+            "guid": "0220d977-c31c-4006-8bf7-06cbdebea13a",
+            "intensity": 0.25,
+            "name": "PointLight",
+            "objectType": 0,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "position": {
+                "x": 182.19200134277344,
+                "y": 6.900000095367432,
+                "z": -39.7599983215332
+            },
+            "radius": 80.41000366210938,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "translation": {
+                    "x": 182.19200134277344,
+                    "y": 6.900000095367432,
+                    "z": -39.7599983215332
+                }
+            },
+            "type": "PointLight"
+        },
+        {
+            "cameraDitherEnabled": true,
+            "castShadow": true,
+            "colliderConfig": {
+                "colliderType": 0,
+                "isCollisionEnabled": true,
+                "isDraw": true,
+                "offset": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "radius": 1.0,
+                "rotate": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "targetType": 0
+            },
+            "colliderKind": 0,
+            "drawEnable": true,
+            "guid": "0a6bf46a-b17d-4c77-a13e-e816423a6954",
+            "modelConfig": {
+                "blendMode": 5,
+                "materialGuid": "00000000-0000-0000-0000-000000000000",
+                "modelName": "demonStand.gltf",
+                "textureGuid": "00000000-0000-0000-0000-000000000000",
+                "uvTransConfig": {
+                    "rotation": 0.0,
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                }
+            },
+            "name": "demonStand",
+            "objectType": 2,
+            "outlineColor": {
+                "w": 1.0,
+                "x": 0.019999999552965164,
+                "y": 0.019999999552965164,
+                "z": 0.02500000037252903
+            },
+            "outlineEnabled": true,
+            "outlineThickness": 0.03500000014901161,
+            "parentGuid": "00000000-0000-0000-0000-000000000000",
+            "surfaceStencilRole": 0,
+            "transform": {
+                "inheritRotate": true,
+                "inheritScale": true,
+                "inheritTranslate": true,
+                "rotation": {
+                    "w": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 0.800000011920929,
+                    "y": 0.800000011920929,
+                    "z": 0.800000011920929
+                },
+                "translation": {
+                    "x": 182.19200134277344,
+                    "y": 0.20000004768371582,
+                    "z": 6.700000286102295
                 }
             },
             "type": "BaseGameObject"
