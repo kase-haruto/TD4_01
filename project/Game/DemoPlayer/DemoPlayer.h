@@ -74,6 +74,8 @@ private:
 
 		float variableJumpMultiplier = 2.0f;
 
+		float jumpInvincibleTime = 0.3f;
+
 		float pitfallBottomY	= -2.0f;
 		float pitfallFallSpeed	= 5.0f;
 		float pitfallJumpHeight = 1.0f;
@@ -105,6 +107,7 @@ private:
 			AddField("Default ShockScale", defaultShockScale).Category("Shock Power");
 			AddField("Strong ShockScale", strongShockScale).Category("Shock Power");
 			AddField("Damage Flash Duration", damageFlashDuration).Category("Damage Param");
+			AddField("Jump Invincible Time", jumpInvincibleTime).Category("Damage Param").Tooltip("一回押しジャンプ開始時の無敵時間（秒）");
 			AddField("Pitfall Bottom Y", pitfallBottomY).Category("Pitfall Param").Tooltip("落とし穴で落下するY座標");
 			AddField("Pitfall Fall Speed", pitfallFallSpeed).Category("Pitfall Param").Tooltip("落とし穴に落ちる速度");
 			AddField("Pitfall Jump Height", pitfallJumpHeight).Category("Pitfall Param").Tooltip("落とし穴から復帰する時に元のY座標からどれだけ上まで跳ぶか");
@@ -128,6 +131,7 @@ private:
 	bool					isJumping_ = false;
 	bool					isDiving_  = false;
 	bool					isDivingInvincible_ = false;
+	float					jumpInvincibleTimer_ = 0.0f;
 	CalyxEngine::Quaternion preRotate_;
 
 	// 落とし穴復帰用
