@@ -58,9 +58,9 @@ private:
 	std::shared_ptr<GeneralObject> player_;
 	std::shared_ptr<GeneralObject> oni_;
 
-	std::unique_ptr<Sprite> pauseBg_ = nullptr;
-
-	CalyxEngine::Vector3 flyDir_   = {-2.0f, 0.5f, -1.75f};
+	CalyxEngine::Vector3 firstPos_;
+	CalyxEngine::Vector3 firstScale_;
+	CalyxEngine::Vector3 flyDir_   = {-2.0f, 0.5f, -2.75f};
 	float animTime_ = 2.0f;
 
 	std::unique_ptr<TransitionControl>			transitionControl_ = nullptr;

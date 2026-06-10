@@ -50,10 +50,6 @@ void ClearScene::Initialize() {
 	//=========================
 	// グラフィック関連
 	//=========================
-	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {640.0f, 360.0f});
-	pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
-	pauseBg_->Update();
 
 	transitionControl_ = std::make_unique<TransitionControl>();
 	transitionControl_->Initialize("Textures/uvChecker.dds", "Textures/uvChecker.dds");
@@ -96,7 +92,6 @@ void ClearScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoSe
 	//========================================================//
 	//	spriteの登録
 	//========================================================//
-	spriteRenderer_->Register(pauseBg_.get());
 
 	transitionControl_->Draw(spriteRenderer_.get());
 	// シーン上のオブジェクトの描画

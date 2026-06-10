@@ -12,6 +12,7 @@
 #include <Game\Scene\Transition\TransitionPayload.h>
 
 // engine
+#include <Engine/Assets/Animation/AnimationModel.h>
 #include <Engine/Collision/CollisionManager.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Foundation/Utility/Func/MyFunc.h>
@@ -79,9 +80,11 @@ void SelectScene::Initialize() {
 
 	oni_ = std::static_pointer_cast<GeneralObject>(sceneContext_->GetObjectLibrary()->FindByName("oni"));
 	if(oni_) {
-		// oni のアニメーションをループさせない
+		// oni のアニメーションはループさせず、決定するまでは先頭で止めておく
 		if(auto* anim = oni_->AnimationModel()) {
 			anim->SetCurrentLoop(false);
+			anim->ResetCurrentTime();
+			anim->SetCurrentSpeed(0.0f);
 		}
 	}
 }
@@ -98,18 +101,6 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 	}
 
 	SelectUpdate(dt);
-
-	// あとで削除
-	if(oni_) {
-		// Ctrl + 0 で アニメーション再生時間を0に
-		if((CalyxFoundation::Input::PushKey(DIK_LCONTROL) || CalyxFoundation::Input::PushKey(DIK_RCONTROL)) &&
-		   CalyxFoundation::Input::TriggerKey(DIK_0)) {
-			if(auto* anim = oni_->AnimationModel()) {
-				anim->ResetCurrentTime();
-			}
-		}
-	}
-
 
 	// 衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
@@ -179,6 +170,24 @@ void SelectScene::SelectUpdate(float dt) {
 			}
 		}
 
+		// 障子オープンと同時に、選んだ障子の正面へ
+		if(oni_) {
+			if(shoujiL_ && shoujiR_) {
+				CalyxEngine::Vector3 oniPos = oni_->GetWorldTransform().translation;
+				CalyxEngine::Vector3 framePos;
+				if(stageFrame_) {
+					framePos = stageFrame_->GetWorldTransform().translation;
+				}
+
+				oniPos.x = framePos.x;
+				oni_->SetTranslate(oniPos);
+			}
+			if(auto* anim = oni_->AnimationModel()) {
+				anim->ResetCurrentTime();
+				anim->SetCurrentSpeed(1.0f);
+			}
+		}
+
 		// 遷移用ペイロードを用意し、障子オープン演出へ移行
 		gamePayload_  = BuildGamePayload(selectedIndex_);
 		isShoujiOpen_ = true;
@@ -204,10 +213,18 @@ void SelectScene::ShoujiOpen(float dt) {
 		rt.x += (targetRX - rt.x) * t;
 	}
 
-	// 開き切るまでの時間をカウント
-	shoujiOpenTime_ -= dt;
-	if(shoujiOpenTime_ <= 0.0f) {
-		// 開き終わったらシーン遷移を開始
+	// 鬼のアニメーションが終了したら遷移
+	bool oniFinished = false;
+	if(oni_) {
+		if(auto* anim = oni_->AnimationModel()) {
+			oniFinished = anim->IsAnimationFinished();
+		}
+	} else {
+		shoujiOpenTime_ -= dt;
+		oniFinished = (shoujiOpenTime_ <= 0.0f);
+	}
+
+	if(oniFinished) {
 		IsPhase_ = true;
 		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
 		transitionControl_->StartClosing(0.5f, [this]() {
