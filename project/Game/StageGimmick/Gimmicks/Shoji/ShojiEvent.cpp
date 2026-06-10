@@ -189,6 +189,7 @@ void ShojiEvent::EventUpdate(float dt) {
 		if(count >= eventData_.clearCount) {
 			for(const auto& shoji : shojiObjs_) {
 				shoji->SetIsOpen(true);
+				shoji->OpenSetting();
 			}
 			isOpen_ = true;
 		}

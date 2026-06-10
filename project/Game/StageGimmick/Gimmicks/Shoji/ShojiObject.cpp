@@ -91,6 +91,12 @@ void ShojiObject::ObjectUpdate(float dt) {
 	}
 }
 
+void ShojiObject::OpenSetting() {
+	if(collider_) {
+		collider_->SetCollisionEnabled(false);
+	}
+}
+
 void ShojiObject::CreatePaperObjects() {
 
 	const std::string objectName = "ShojiPaperObject";
