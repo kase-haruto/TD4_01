@@ -51,10 +51,6 @@ void PreClearScene::Initialize() {
 	//=========================
 	// グラフィック関連
 	//=========================
-	pauseBg_ = std::make_unique<Sprite>("Textures/uvChecker.dds");
-	pauseBg_->Initialize({0.0f, 0.0f}, {320.0f, 180.0f});
-	pauseBg_->SetColor({1.0f, 1.0f, 0.0f, 1.0f});
-	pauseBg_->Update();
 
 	auto objectPlayer = sceneContext_->GetObjectLibrary()->FindByName("player");
 	player_			  = std::static_pointer_cast<GeneralObject>(objectPlayer);
@@ -62,14 +58,13 @@ void PreClearScene::Initialize() {
 	oni_			  = std::static_pointer_cast<GeneralObject>(objectOni);
 	if(player_) {
 		player_->Initialize();
+		firstPos_ = player_->GetWorldPosition();
+		firstScale_ = player_->GetWorldTransform().scale;
 	}
 	if(oni_) {
 		oni_->Initialize();
-		// 鬼のアニメーションは最初は止めておく（speed 0 で先頭フレーム固定）
 		if(auto* anim = oni_->AnimationModel()) {
 			anim->SetCurrentLoop(false);
-			anim->ResetCurrentTime();
-			anim->SetCurrentSpeed(0.0f);
 		}
 	}
 
@@ -108,7 +103,6 @@ void PreClearScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* ps
 	//========================================================//
 	//	spriteの登録
 	//========================================================//
-	spriteRenderer_->Register(pauseBg_.get());
 
 	transitionControl_->Draw(spriteRenderer_.get());
 	// シーン上のオブジェクトの描画
@@ -137,14 +131,22 @@ std::unique_ptr<TransitionPayload> PreClearScene::BuildNowTypePayload(SceneType 
 }
 
 void PreClearScene::AnimUpdate(float dt) {
-	animTime_ -= dt;
+	bool oniFinished = false;
+	if(oni_) {
+		if(auto* anim = oni_->AnimationModel()) {
+			oniFinished = anim->IsAnimationFinished();
+		}
+	}
+	if(oniFinished) {
+		animTime_ -= dt;
 
-	CalyxEngine::Vector3 pos = player_->GetWorldPosition();
-	CalyxEngine::Vector3 sca = player_->GetWorldTransform().scale;
-	pos += flyDir_ * dt;
-	sca += CalyxEngine::Vector3{0.65f, 0.65f, 0.65f} * dt;
-	player_->SetTranslate(pos);
-	player_->SetScale(sca);
+		CalyxEngine::Vector3 pos = player_->GetWorldPosition();
+		CalyxEngine::Vector3 sca = player_->GetWorldTransform().scale;
+		pos += flyDir_ * dt;
+		sca += CalyxEngine::Vector3{0.2f, 0.2f, 0.2f} * dt;
+		player_->SetTranslate(pos);
+		player_->SetScale(sca);
+	}
 
 	if(animTime_ < 0.0f) {
 		IsPhase_ = true;
