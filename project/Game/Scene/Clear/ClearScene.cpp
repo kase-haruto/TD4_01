@@ -60,6 +60,9 @@ void ClearScene::Initialize() {
 	});
 	IsOpening_ = true;
 	IsPhase_   = false;
+
+	effectData_.Load("GameClearEffect");
+	EffectAPI::Play(effectData_, CalyxEngine::Vector3(0.0f, 18.0f, 15.0f));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

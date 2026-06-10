@@ -68,4 +68,6 @@ private:
 	SceneType									preType_   = SceneType::SELECT;
 	bool										IsPhase_   = false;
 	bool										IsOpening_ = false;
+
+	CalyxEngine::EffectAsset effectData_;
 };
