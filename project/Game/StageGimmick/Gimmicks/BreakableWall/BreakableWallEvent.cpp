@@ -53,7 +53,7 @@ void BreakableWallEvent::EventInitialize() {
 		return;
 	}
 	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<BreakableWallObject>("debugCube.obj", objectPrefix);
+	targetObject_ = SceneAPI::Instantiate<BreakableWallObject>("nurikabeStand.gltf", objectPrefix);
 	targetObject_.lock()->SetParent(shared_from_this());
 	targetObjectGuid_ = targetObject_.lock()->GetGuid();
 	targetObject_.lock()->Initialize();
