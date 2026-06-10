@@ -21,7 +21,7 @@ public:
 	bool IsBroken() const { return isBroken_; }
 
 	// 壊れる床を壊す
-	void Break();
+	void Break(const CalyxEngine::Vector3& position);
 
 protected:
 
@@ -35,5 +35,8 @@ private:
 
 	// 壊れているか
 	bool isBroken_ = false;
+
+	CalyxEngine::Vector3 velocity_;
+	CalyxEngine::Quaternion breakRotation_;
 
 };

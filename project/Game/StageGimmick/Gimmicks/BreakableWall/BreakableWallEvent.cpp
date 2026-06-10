@@ -26,7 +26,7 @@ void BreakableWallEvent::OnCollisionEnter(Collider* other) {
 	if(!floor) {
 		return;
 	}
-	floor->Break();
+	floor->Break(otherObj->GetWorldPosition());
 
 	// イベントを無効化する
 
