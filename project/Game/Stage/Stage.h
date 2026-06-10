@@ -21,6 +21,7 @@ public:
 private:
 	std::unique_ptr<Sprite> baseUI_;
 	std::unique_ptr<Sprite> timeUI_;
+	std::unique_ptr<Sprite> hpUI_;
 	std::unique_ptr<Sprite> needleUI_;
 
 	std::unique_ptr<NumbersSprite> numbersSprite_;

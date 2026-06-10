@@ -27,6 +27,10 @@ public:
 		swingAxis_	= axis;
 		swingAngle_ = angle;
 	}
+	//< ボーン追従中の初期姿勢（スイングのベースとなる回転）
+	void SetBaseRotation(const CalyxEngine::Quaternion& rot) { baseRotation_ = rot; }
+	//< 親モデル(DemoPlayer)自体のワールド回転。毎フレーム渡してもらい、ハンマーの回転に合成する
+	void SetOwnerRotation(const CalyxEngine::Quaternion& rot) { ownerRotation_ = rot; }
 
 
 private:
@@ -44,6 +48,8 @@ private:
 
 	HammerParameter param_;
 
-	CalyxEngine::Vector3 swingAxis_	 = {1.0f, 0.0f, 0.0f};
-	float				 swingAngle_ = 0.0f;
+	CalyxEngine::Vector3	swingAxis_	   = {1.0f, 0.0f, 0.0f};
+	float					swingAngle_	   = 0.0f;
+	CalyxEngine::Quaternion baseRotation_  = CalyxEngine::Quaternion::MakeIdentity(); //< 初期姿勢
+	CalyxEngine::Quaternion ownerRotation_ = CalyxEngine::Quaternion::MakeIdentity(); //< 親モデルの回転
 };
