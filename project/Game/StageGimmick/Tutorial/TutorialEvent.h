@@ -103,9 +103,9 @@ private:
 		std::string name_;
 
 		TutorialEventData() {
-			AddField("TutorialType", type);
-			AddField("InputBlockDuration", inputBlockDuration);
-			AddField("DiveResumeDuration", diveResumeDuration);
+			AddField("TutorialType", type).Tooltip("チュートリアルのタイプ");
+			AddField("InputBlockDuration", inputBlockDuration).Tooltip("連打対策で入力を無視する時間");
+			AddField("DiveResumeDuration", diveResumeDuration).Tooltip("Dive時に時間を進める長さ");
 		}
 
 		void SetEventName(const std::string& name) {
