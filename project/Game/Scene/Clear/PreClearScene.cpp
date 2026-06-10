@@ -79,6 +79,8 @@ void PreClearScene::Initialize() {
 	});
 	IsOpening_ = true;
 	IsPhase_   = false;
+
+	effectData_.Load("PreClearEffect");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +140,9 @@ void PreClearScene::AnimUpdate(float dt) {
 		}
 	}
 	if(oniFinished) {
+		if(animTime_ == 2.0f) {
+			EffectAPI::Play(effectData_, player_->GetWorldPosition());
+		}
 		animTime_ -= dt;
 
 		CalyxEngine::Vector3 pos = player_->GetWorldPosition();
