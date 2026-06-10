@@ -89,12 +89,31 @@ void DemoPlayer::Update(float dt) {
 		for(auto& child : children_) {
 			if(auto h = std::dynamic_pointer_cast<DemoHammer>(child)) {
 				hammer_ = h;
-				firstSetting_ = false;
-				// 本来のサイズを保持
-				hammerInitialScale_ = hammer_->GetWorldTransform().scale;
-				hammerTargetScale_	= hammerInitialScale_;
 				break;
 			}
+		}
+
+		if(hammer_) {
+			// 既存の親子付け（通常の親子関係）を解除してからボーンにペアレントする
+			hammer_->SetParent(nullptr);
+
+			// ハンマーのトランスフォームをボーンへ追従させる
+			this->SetBoneParent(
+				hammer_->GetWorldTransform(),//< このトランスフォーム
+				"Bone.011",					 //< ボーン名
+				false						 //<親のスケールを継承するか
+			);
+
+			// 本来のサイズを保持
+			hammerInitialScale_ = hammer_->GetWorldTransform().scale;
+			hammerTargetScale_	= hammerInitialScale_;
+
+			hammer_->SetTranslate({-0.24f, 0.23f, 0.0f});
+			// 初期姿勢はスイングのベースとして渡す（DemoHammer 側で毎フレーム合成される）
+			// hammer_->SetBaseRotation(CalyxEngine::Quaternion::EulerToQuaternion({-0.6f, 0.1f, -1.6f}));
+			hammer_->SetBaseRotation(CalyxEngine::Quaternion::EulerToQuaternion({0.278f, 0.1f, 0.119f}));
+			firstSetting_ = false;
+			hammer_->GetWorldTransform().inheritRotate = false;
 		}
 	}
 
@@ -506,7 +525,11 @@ void DemoPlayer::HammerControl(float dt) {
 			hammer_->GetWorldTransform().scale = hammerInitialScale_;
 		}
 
-		CalyxEngine::Vector3 swingAxis = CalyxEngine::Quaternion::RotateVector({1.0f, 0.0f, .0f}, worldTransform_.rotation);
+
+		// 親モデル(自分)のワールド回転をハンマーへ渡す（inheritRotate=false の分を手動で合成させる）
+		hammer_->SetOwnerRotation(worldTransform_.rotation);
+
+		CalyxEngine::Vector3 swingAxis = CalyxEngine::Quaternion::RotateVector({1.0f, 0.0f, 0.0f}, worldTransform_.rotation);
 		hammer_->SetSwingAngle(swingAxis, -hammerAngle);
 	}
 }
