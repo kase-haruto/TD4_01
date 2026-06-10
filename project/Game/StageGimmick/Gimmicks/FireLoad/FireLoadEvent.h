@@ -53,11 +53,11 @@ private:
 		float		  defaultZSpace = 15.0f;
 
 		FireLoadEventParam() {
-			AddField("Time", param_.time).Category("FireLoadEvent");
-			AddField("Height", param_.burnHeight).Category("FireLoadEvent");
-			AddField("Width", param_.width).Category("FireLoadEvent");
-			AddField("Depth", param_.depth).Category("FireLoadEvent");
-			AddField("DefaultZSpace", defaultZSpace).Category("FireLoadEvent");
+			AddField("Time", param_.time).Category("FireLoadEvent").Tooltip("現在意味ない");
+			AddField("Height", param_.burnHeight).Category("FireLoadEvent").Tooltip("現在意味ない");
+			AddField("Width", param_.width).Category("FireLoadEvent").Tooltip("現在意味ない");
+			AddField("Depth", param_.depth).Category("FireLoadEvent").Tooltip("現在意味ない");
+			AddField("DefaultZSpace", defaultZSpace).Category("FireLoadEvent").Tooltip("グリッド全体のZ方向の開始オフセット（手前からどれだけ奥に置くか）");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

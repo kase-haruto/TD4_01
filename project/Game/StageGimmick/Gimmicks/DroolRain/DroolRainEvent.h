@@ -57,12 +57,12 @@ private:
 		DroolRainParam param_;
 
 		DroolRainEventParam() {
-			AddField("VelocityY", param_.velocityY_).Category("DroolRainEvent");
-			AddField("AccelerationY", param_.accelerationY_).Category("DroolRainEvent");
-			AddField("AirScaleSpeed", param_.airScaleSpeed_).Category("DroolRainEvent");
-			AddField("GroundLifeTime", param_.groundLifeTime_).Category("DroolRainEvent");
-			AddField("GroundScaleSpeed", param_.groundScaleSpeed_).Category("DroolRainEvent");
-			AddField("GroundVelocityY", param_.groundVelocityY_).Category("DroolRainEvent");
+			AddField("VelocityY", param_.velocityY_).Category("DroolRainEvent").Tooltip("落下中の初速");
+			AddField("AccelerationY", param_.accelerationY_).Category("DroolRainEvent").Tooltip("落下中の加速度");
+			AddField("AirScaleSpeed", param_.airScaleSpeed_).Category("DroolRainEvent").Tooltip("調整用：触らないで");
+			AddField("GroundLifeTime", param_.groundLifeTime_).Category("DroolRainEvent").Tooltip("地面に付いた後の生存時間");
+			AddField("GroundScaleSpeed", param_.groundScaleSpeed_).Category("DroolRainEvent").Tooltip("地面に付いた後のスケール変化速度");
+			AddField("GroundVelocityY", param_.groundVelocityY_).Category("DroolRainEvent").Tooltip("地面に付いた後のY速度（広がり/沈み込み）");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

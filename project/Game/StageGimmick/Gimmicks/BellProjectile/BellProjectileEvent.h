@@ -49,18 +49,18 @@ private:
 		BellProjectileDoorParam doorParam_;
 
 		BellProjectileEventParam() {
-			AddField("scale", param_.scale).Category("BellProjectileEvent");
-			AddField("hitScale", param_.hitScale).Category("BellProjectileEvent");
-			AddField("direction", param_.direction).Category("BellProjectileEvent");
-			AddField("speed", param_.speed).Category("BellProjectileEvent");
-			AddField("parryDuration", param_.parryDuration).Category("BellProjectileEvent");
+			AddField("scale", param_.scale).Category("BellProjectileEvent").Tooltip("撞木の通常スケール");
+			AddField("hitScale", param_.hitScale).Category("BellProjectileEvent").Tooltip("判定（パリィ）を取った時のスケール");
+			AddField("direction", param_.direction).Category("BellProjectileEvent").Tooltip("調整用：触らないで");
+			AddField("speed", param_.speed).Category("BellProjectileEvent").Tooltip("撞木の移動速度");
+			AddField("parryDuration", param_.parryDuration).Category("BellProjectileEvent").Tooltip("撞木が鐘に向かっていく時間");
 
-			AddField("targetScale", targetParam_.scale).Category("BellProjectileTarget");
-			AddField("targetHitScale", targetParam_.hitScale).Category("BellProjectileTarget");
-			AddField("targetMoveSpeed", targetParam_.moveSpeed).Category("BellProjectileTarget");
+			AddField("targetScale", targetParam_.scale).Category("BellProjectileTarget").Tooltip("鐘の通常スケール");
+			AddField("targetHitScale", targetParam_.hitScale).Category("BellProjectileTarget").Tooltip("鐘が鳴った時のスケール");
+			AddField("targetMoveSpeed", targetParam_.moveSpeed).Category("BellProjectileTarget").Tooltip("鳴った後に鐘が上へ上がる速度");
 
-			AddField("doorScale", doorParam_.scale).Category("BellProjectileDoor");
-			AddField("doorSpeed", doorParam_.speed).Category("BellProjectileDoor");
+			AddField("doorScale", doorParam_.scale).Category("BellProjectileDoor").Tooltip("調整用：触らないで");
+			AddField("doorSpeed", doorParam_.speed).Category("BellProjectileDoor").Tooltip("扉が開く速さ");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {
