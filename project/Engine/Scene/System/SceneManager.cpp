@@ -281,18 +281,16 @@ namespace CalyxEngine {
 					}
 					debugRT->SetRenderTarget(cmd);
 				}
+
+				if(auto* cam = CameraManager::GetActive()) {
+					GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
+					cam->SetCommand(cmd, PipelineType::Line);
+					PrimitiveDrawer::GetInstance()->Render();
+				}
 			}
 		}
 
 #endif
-
-		if(!editorPreviewCtx_) {
-			if(auto* cam = CameraManager::GetActive()) {
-				GraphicsGroup::GetInstance()->SetCommand(cmd, PipelineType::Line, BlendMode::NORMAL);
-				cam->SetCommand(cmd, PipelineType::Line);
-				PrimitiveDrawer::GetInstance()->Render();
-			}
-		}
 
 		if(auto* previewRT = dx_->GetRenderTargetCollection().Get("AssetPreview")) {
 			if(auto* previews = AssetPreviewManager::GetInstance()) {
