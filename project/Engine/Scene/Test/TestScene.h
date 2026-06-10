@@ -51,6 +51,8 @@ public:
 private:
 
 	void InitPauseResource();
+	void LoadStageSetting();
+	void SaveStageSetting();
 	void CheckStageState(float dt);
 	void PauseUpdate(float dt);
 	void PauseUIUpdate(float dt);
@@ -81,7 +83,12 @@ private:
 	std::unique_ptr<CalyxEngine::SpriteObject2d>   toSelectBtn_	  = nullptr;
 	std::vector<std::unique_ptr<CalyxEngine::SpriteObject2d>> cloud_;
 
-	int									 stageNum_			  = 0;
+	int									 stageNum_			  = 1;
+	static constexpr int				 kMinStageNum_		  = 1;
+	static constexpr int				 kMaxStageNum_		  = 5;
+	std::string							 settingPath_;
+	float								 stageHP_			  = 20.0f;
+	float								 stageLimitTime_	  = 60.0f;
 	std::unique_ptr<Stage>				 stage_				  = nullptr;
 	std::unique_ptr<StageGimmickManager> stageGimmickManager_ = nullptr;
 

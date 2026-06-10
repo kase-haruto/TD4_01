@@ -22,6 +22,11 @@
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Application/System/Environment.h>
 // lib
+#include <externals/nlohmann/json.hpp>
+#include <fstream>
+#include <filesystem>
+#include <iomanip>
+#include <algorithm>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //	コンストラクタ/デストラクタ
@@ -53,9 +58,10 @@ void TestScene::Initialize(){
 
 	LoadAssets();
 
-	//std::string settingPath = "Resources/Params/Game/StagesSettings/" + std::to_string(stageNum_) + "_Setting.json";
+	LoadStageSetting();
+
 	stage_ = std::make_unique<Stage>();
-	stage_->Initialize(20.0f, 60.0f);
+	stage_->Initialize(stageHP_, stageLimitTime_);
 
 	stageGimmickManager_ = std::make_unique<StageGimmickManager>();
 	stageGimmickManager_->Initialize();
@@ -127,6 +133,22 @@ void TestScene::Update([[maybe_unused]]float dt){
 	ShockwaveManager::GetInstance()->CheckTakeDamageForStage();
 	stage_->Update(dt);
 
+#ifdef DEVELOP
+	if(ImGui::Begin("StageSetting")) {
+		// ステージ番号を1~5で切り替え
+		if(ImGui::SliderInt("stageNum", &stageNum_, kMinStageNum_, kMaxStageNum_)) {
+			LoadStageSetting();
+		}
+		ImGui::Text("%s", settingPath_.c_str());
+		ImGui::DragFloat("hp", &stageHP_, 0.1f, 0.0f, 1000.0f);
+		ImGui::DragFloat("limitTime", &stageLimitTime_, 0.1f, 0.0f, 99.0f);
+		if(ImGui::Button("Save")) {
+			SaveStageSetting();
+		}
+	}
+	ImGui::End();
+#endif
+
 	stageGimmickManager_->ShowGui();
 	stageGimmickManager_->Update(dt);
 
@@ -179,6 +201,40 @@ void TestScene::CleanUp(){
 	// 3Dオブジェクトの描画を終了
 	sceneContext_->GetObjectLibrary()->Clear();
 	CollisionManager::GetInstance()->ClearColliders();
+}
+
+void TestScene::LoadStageSetting() {
+	stageNum_	 = std::clamp(stageNum_, kMinStageNum_, kMaxStageNum_);
+	settingPath_ = "Resources/Params/Game/StagesSettings/" + std::to_string(stageNum_) + "_Setting.json";
+
+	std::ifstream settingIfs(settingPath_);
+	if(settingIfs) {
+		nlohmann::json settingJson;
+		settingIfs >> settingJson;
+		stageHP_		= settingJson.value("hp", stageHP_);
+		stageLimitTime_ = settingJson.value("limitTime", stageLimitTime_);
+	} else {
+		// ファイルが無ければデフォルト値
+		SaveStageSetting();
+	}
+}
+
+void TestScene::SaveStageSetting() {
+	if(settingPath_.empty()) {
+		return;
+	}
+
+	std::filesystem::create_directories(
+		std::filesystem::path(settingPath_).parent_path());
+
+	nlohmann::json settingJson;
+	settingJson["hp"]		 = stageHP_;
+	settingJson["limitTime"] = stageLimitTime_;
+
+	std::ofstream settingOfs(settingPath_);
+	if(settingOfs) {
+		settingOfs << std::setw(4) << settingJson << std::endl;
+	}
 }
 
 void TestScene::InitPauseResource() {
