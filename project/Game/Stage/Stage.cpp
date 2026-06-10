@@ -7,22 +7,20 @@ void Stage::Initialize(float hp, float limitTime) {
 	timer_	   = limitTime;
 	limitTime_ = limitTime;
 
-	CalyxEngine::Vector2 centerPos = {120.0f, 120.0f};
-
 	baseUI_ = std::make_unique<Sprite>("Textures/UI/Demon/enemy_HPUI_Frame.png");
 	baseUI_->SetAnchorPoint({0.5f, 0.5f});
 	baseUI_->SetSize(hpUISize_);
-	baseUI_->SetPosition(centerPos);
+	baseUI_->SetPosition(centerPos_);
 
 	timeUI_ = std::make_unique<Sprite>("Textures/UI/Demon/enemy_HPUI_time.png");
 	timeUI_->SetAnchorPoint({0.5f, 0.5f});
 	timeUI_->SetSize(hpUISize_);
-	timeUI_->SetPosition(centerPos);
+	timeUI_->SetPosition(centerPos_);
 
 	hpUI_ = std::make_unique<Sprite>("Textures/UI/Demon/enemy_HPUI_solid.png");
 	hpUI_->SetAnchorPoint({0.5f, 0.5f});
 	hpUI_->SetSize({140.0f, 140.0f});
-	hpUI_->SetPosition({centerPos.x, centerPos.y + 13.0f});
+	hpUI_->SetPosition(centerDisPos_);
 	hpUI_->SetFillMethod(2);
 	hpUI_->SetFillOrigin(0.0f, 0.0f);
 	hpUI_->SetFillAmount(1.0f);
@@ -31,7 +29,7 @@ void Stage::Initialize(float hp, float limitTime) {
 	needleUI_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 	needleUI_->SetAnchorPoint({0.5f, 0.575f});
 	needleUI_->SetSize(hpUISize_);
-	needleUI_->SetPosition({centerPos.x, centerPos.y + 13.0f});
+	needleUI_->SetPosition(centerDisPos_);
 
 	//numbersSprite_ = std::make_unique<NumbersSprite>(
 	//	"Textures/Numbers", ".png");
@@ -60,6 +58,22 @@ void Stage::Update(float dt) {
 		float rotation	= (elapsed / limitTime_) * twoPi;
 		needleUI_->SetRotation(rotation);
 	}
+	if(shakeTimer_ > 0.0f) {
+		shakeTimer_ -= dt;
+
+		CalyxEngine::Vector2 offset = {0.0f, 0.0f};
+		if(shakeTimer_ > 0.0f) {
+			float strength = shakeStrong_ * (shakeTimeMax_ > 0.0f ? shakeTimer_ / shakeTimeMax_ : 1.0f);
+			offset = {Random::Generate<float>(-strength, strength), Random::Generate<float>(-strength, strength)};
+		} else {
+			shakeTimer_ = 0.0f;
+		}
+
+		baseUI_->SetPosition(centerPos_ + offset);
+		timeUI_->SetPosition(centerPos_ + offset);
+		hpUI_->SetPosition(centerDisPos_ + offset);
+		needleUI_->SetPosition(centerDisPos_ + offset);
+	}
 
 	if(baseUI_) baseUI_->Update();
 	if(timeUI_) timeUI_->Update();
@@ -79,6 +93,7 @@ void Stage::Draw(SpriteRenderer* renderer) {
 
 void Stage::TakeDamage(float damage) {
 	stageHP_ -= damage;
+	shakeTimer_ = shakeTimeMax_;
 	if(stageHP_ < 0.0f) {
 		stageHP_ = 0.0f;
 		isClear_ = true;

@@ -29,11 +29,15 @@ private:
 	float						   maxHP_	= 0.0f;
 	float						   timer_	= 0.0f;
 	float						   limitTime_ = 0.0f;
+	float						   shakeTimer_ = 0.0f;
+	float						   shakeTimeMax_ = 0.4f;
+	float						   shakeStrong_	 = 8.0f;
 
 	bool isGameOver_ = false;
 	bool isClear_	 = false;
 
-	CalyxEngine::Vector2 hpUISize_ = {240.0f, 240.0f};
-	CalyxEngine::Vector2 barSize_   = {500.0f, 50.0f};
-
+	CalyxEngine::Vector2 hpUISize_	  = {240.0f, 240.0f};
+	CalyxEngine::Vector2 barSize_	  = {500.0f, 50.0f};
+	CalyxEngine::Vector2 centerPos_	  = {120.0f, 120.0f};
+	CalyxEngine::Vector2 centerDisPos_ = {120.0f, 133.0f};
 };
