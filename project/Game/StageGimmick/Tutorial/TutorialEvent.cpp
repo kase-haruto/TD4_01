@@ -46,6 +46,9 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 
 void TutorialEvent::EventInitialize() {
 
+	worldTransform_.scale.x = 20.0f;
+	worldTransform_.scale.y = 10.0f;
+
 	const std::string eventPrefix = "TutorialEvent";
 	if(GetName() != eventPrefix) {
 		return;
