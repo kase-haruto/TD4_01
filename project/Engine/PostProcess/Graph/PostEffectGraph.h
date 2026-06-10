@@ -45,6 +45,7 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE ExecuteGraphNode(ID3D12GraphicsCommandList* cmd,
 												 int32_t nodeId,
 												 D3D12_GPU_DESCRIPTOR_HANDLE sceneSRV,
+												 D3D12_GPU_DESCRIPTOR_HANDLE depthSRV,
 												 CalyxEngine::DxCore* dxCore,
 												 std::unordered_map<int32_t, D3D12_GPU_DESCRIPTOR_HANDLE>& cache,
 												 std::unordered_map<int32_t, bool>& visiting,

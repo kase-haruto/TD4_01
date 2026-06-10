@@ -19,6 +19,15 @@ public:
 					   D3D12_GPU_DESCRIPTOR_HANDLE inputSRV,
 					   IRenderTarget* outputRT) = 0;
 
+	// 深度を使用するポストエフェクト用の拡張描画関数
+	// 既存エフェクトは深度を必要としないため、通常の Apply へフォールバックする
+	virtual void Apply(ID3D12GraphicsCommandList* cmd,
+					   D3D12_GPU_DESCRIPTOR_HANDLE inputSRV,
+					   D3D12_GPU_DESCRIPTOR_HANDLE /*depthSRV*/,
+					   IRenderTarget* outputRT) {
+		Apply(cmd, inputSRV, outputRT);
+	}
+
 	virtual void ShowImGui() {}
 
 	// 既定値へ戻す

@@ -75,6 +75,17 @@ void PostProcessCollection::Initialize(PipelineService* service){
 	}
 
 	//===================================================================*/
+	//		DepthOfField
+	//===================================================================*/
+	{
+		PipelineSet set = service->GetPipelineSet(PipelineTag::PostProcess::DepthOfField);
+		auto effect = std::make_unique<DepthOfFieldEffect>();
+		effect->Initialize(set);
+		effectNames_.push_back(effect->GetName());
+		effects_.push_back(std::move(effect));
+	}
+
+	//===================================================================*/
 	//		Blend
 	//===================================================================*/
 	{
