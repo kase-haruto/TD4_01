@@ -16,6 +16,7 @@ struct BaseGameObjectConfig
 	: public SceneObjectConfig {
 	ColliderConfig	colliderConfig;
 	BaseModelConfig modelConfig;
+	int				colliderKind = 2;	//< 0:None, 1:Box, 2:Sphere
 	bool cameraDitherEnabled = true;
 	// enum 定義ヘッダーの移動や変更に影響されにくいよう、SurfaceStencilRole は int として保存する。
 	int surfaceStencilRole = 0;
@@ -32,6 +33,7 @@ inline void to_json(nlohmann::json& j, const BaseGameObjectConfig& c) {
 		{"name", c.name},
 		{"transform", c.transform},
 		{"colliderConfig", c.colliderConfig},
+		{"colliderKind", c.colliderKind},
 		{"modelConfig", c.modelConfig},
 		{"cameraDitherEnabled", c.cameraDitherEnabled},
 		{"surfaceStencilRole", c.surfaceStencilRole},
@@ -47,6 +49,7 @@ inline void from_json(const nlohmann::json& j, BaseGameObjectConfig& c) {
 	if(j.contains("name")) j.at("name").get_to(c.name);
 	if(j.contains("transform")) j.at("transform").get_to(c.transform);
 	if(j.contains("colliderConfig")) j.at("colliderConfig").get_to(c.colliderConfig);
+	if(j.contains("colliderKind")) j.at("colliderKind").get_to(c.colliderKind);
 	if(j.contains("modelConfig")) j.at("modelConfig").get_to(c.modelConfig);
 	if(j.contains("cameraDitherEnabled")) j.at("cameraDitherEnabled").get_to(c.cameraDitherEnabled);
 	if(j.contains("surfaceStencilRole")) j.at("surfaceStencilRole").get_to(c.surfaceStencilRole);
