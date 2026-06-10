@@ -83,7 +83,7 @@ private:
 	std::unique_ptr<CalyxEngine::SpriteObject2d>   toSelectBtn_	  = nullptr;
 	std::vector<std::unique_ptr<CalyxEngine::SpriteObject2d>> cloud_;
 
-	int									 stageNum_			  = 1;
+	int									 stageNum_			  = 0;
 	static constexpr int				 kMinStageNum_		  = 1;
 	static constexpr int				 kMaxStageNum_		  = 5;
 	std::string							 settingPath_;
