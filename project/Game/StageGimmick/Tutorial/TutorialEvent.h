@@ -15,7 +15,9 @@ class SpriteRenderer;
 enum TutorialType {
 	Jump,
 	Dive,
-	Purpose
+	Purpose,
+	Teeth,
+	Open
 };
 
 /// <summary>
@@ -42,6 +44,10 @@ public:
 
 	// チュートリアルを表示中か（時間停止中か）
 	bool IsShowing() const { return state_ == TutorialState::Active; }
+
+	// 連打対策で入力をブロック中か（プレイヤーのジャンプ入力抑制に使用）
+	// 初回接触時とDiveの2回目停止時の両方でtrueになる
+	bool IsInputBlocking() const { return state_ == TutorialState::Active && inputBlockTimer_ > 0.0f; }
 
 protected:
 	// 初期化
@@ -130,9 +136,13 @@ private:
 	std::string jumpTexturePath_	   = "Textures/tutorial/key_rule01.png";
 	std::string diveTexturePath_	   = "Textures/tutorial/key_rule02.png";
 	std::string purposeTexturePath_	   = "Textures/tutorial/key_rule03.png";
+	std::string teethTexturePath_	   = "Textures/tutorial/key_rule04.png";
+	std::string openTexturePath_	   = "Textures/tutorial/key_rule06.png";
 	std::string jumpTexturePadPath_	   = "Textures/tutorial/cont_rule01.png";
 	std::string diveTexturePadPath_	   = "Textures/tutorial/cont_rule02.png";
 	std::string purposeTexturePadPath_ = "Textures/tutorial/cont_rule03.png";
+	std::string teethTexturePadPath_   = "Textures/tutorial/cont_rule04.png";
+	std::string openTexturePadPath_	   = "Textures/tutorial/cont_rule06.png";
 
 	// スプライトの表示レイアウト（GUIで変更・保存可）
 	CalyxEngine::Vector2 spritePosition_ = {960.0f, 360.0f};
