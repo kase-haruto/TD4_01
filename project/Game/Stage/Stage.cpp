@@ -19,11 +19,19 @@ void Stage::Initialize(float hp, float limitTime) {
 	timeUI_->SetSize(hpUISize_);
 	timeUI_->SetPosition(centerPos);
 
+	hpUI_ = std::make_unique<Sprite>("Textures/UI/Demon/enemy_HPUI_solid.png");
+	hpUI_->SetAnchorPoint({0.5f, 0.5f});
+	hpUI_->SetSize({140.0f, 140.0f});
+	hpUI_->SetPosition({centerPos.x, centerPos.y + 13.0f});
+	hpUI_->SetFillMethod(2);
+	hpUI_->SetFillOrigin(0.0f, 0.0f);
+	hpUI_->SetFillAmount(1.0f);
+
 	needleUI_ = std::make_unique<Sprite>("Textures/UI/Demon/enemy_HPUI_Needle.png");
 	needleUI_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 	needleUI_->SetAnchorPoint({0.5f, 0.575f});
 	needleUI_->SetSize(hpUISize_);
-	needleUI_->SetPosition({centerPos.x, centerPos.y + 12.0f});
+	needleUI_->SetPosition({centerPos.x, centerPos.y + 13.0f});
 
 	numbersSprite_ = std::make_unique<NumbersSprite>(
 		"Textures/Numbers", ".png");
@@ -55,11 +63,13 @@ void Stage::Update(float dt) {
 
 	if(baseUI_) baseUI_->Update();
 	if(timeUI_) timeUI_->Update();
+	if(hpUI_) hpUI_->Update();
 	if(needleUI_) needleUI_->Update();
 }
 
 void Stage::Draw(SpriteRenderer* renderer) {
 	if(baseUI_) renderer->Register(baseUI_.get());
+	if(hpUI_) renderer->Register(hpUI_.get());
 	if(timeUI_) renderer->Register(timeUI_.get());
 	if(needleUI_) renderer->Register(needleUI_.get());
 	if(numbersSprite_) {
@@ -75,5 +85,5 @@ void Stage::TakeDamage(float damage) {
 	}
 
 	float rate = stageHP_ / maxHP_;
-	rate;
+	hpUI_->SetFillAmount(rate);
 }

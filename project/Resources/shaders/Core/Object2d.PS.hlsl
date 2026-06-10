@@ -33,10 +33,20 @@ PSOutput main(VSOutput input) {
 	// フィル判定
 	//--------------------------------
 	if (gMaterial.fillMethod == 1) {
+		// 横方向フィル
 		if (gMaterial.fillOrigin.x < 0.5f) {
 			if (baseUV.x > gMaterial.fillAmount) discard;
 		} else {
 			if (baseUV.x < 1.0f - gMaterial.fillAmount) discard;
+		}
+	} else if (gMaterial.fillMethod == 2) {
+		// 縦方向フィル（baseUV.y は 0=上, 1=下）
+		// fillOrigin.y < 0.5 : 下が原点（下を残す＝上から削れる）
+		// fillOrigin.y >=0.5 : 上が原点（上を残す＝下から削れる）
+		if (gMaterial.fillOrigin.y < 0.5f) {
+			if (baseUV.y < 1.0f - gMaterial.fillAmount) discard;
+		} else {
+			if (baseUV.y > gMaterial.fillAmount) discard;
 		}
 	}
 
