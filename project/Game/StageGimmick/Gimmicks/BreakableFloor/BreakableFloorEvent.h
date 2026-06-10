@@ -2,6 +2,7 @@
 
 #include "Game\StageGimmick\Gimmicks\BreakableFloor\BreakableFloorObject.h"
 #include "Game\StageGimmick\Base\StageGimmickEventBase.h"
+#include "Game\StageGimmick\Base\GeneralObject.h"
 #include "Engine/Foundation/Reflection/CalyxReflection.h"
 #include "Engine/Foundation/Serialization/SerializableObject.h"
 
@@ -65,6 +66,9 @@ private:
 	// ターゲットの壊れる床オブジェクト
 	std::weak_ptr<BreakableFloorObject> targetObject_;
 	Guid targetObjectGuid_;
+
+	std::weak_ptr<GeneralObject> pitfall_;
+	Guid						 pitfallGuid_;
 
 	// 調整項目
 	BreakableFloorEventParam param_;

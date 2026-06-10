@@ -52,15 +52,35 @@ void BreakableFloorEvent::EventInitialize() {
 		targetObject_ = object;
 		object->SetName(objectPrefix);
 		SetTarget(object);
-		return;
+	} else {
+		// シーンから対応するオブジェクトが無ければ生成する
+		targetObject_ = SceneAPI::Instantiate<BreakableFloorObject>("breakableFloor.obj", objectPrefix);
+		targetObject_.lock()->SetParent(shared_from_this());
+		targetObjectGuid_ = targetObject_.lock()->GetGuid();
+		targetObject_.lock()->Initialize();
+		targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;
+		targetObject_.lock()->GetWorldTransform().inheritScale = false;
 	}
-	// シーンから対応するオブジェクトが無ければ生成する
-	targetObject_ = SceneAPI::Instantiate<BreakableFloorObject>("breakableFloor.obj", objectPrefix);
-	targetObject_.lock()->SetParent(shared_from_this());
-	targetObjectGuid_ = targetObject_.lock()->GetGuid();
-	targetObject_.lock()->Initialize();
-	targetObject_.lock()->GetWorldTransform().translation.y -= 0.5f;
-	targetObject_.lock()->GetWorldTransform().inheritScale = false;
+
+	const std::string pitfallName = "pitfall";
+	auto			  pitfall	  = ResolveLinkedObjectByName<GeneralObject>(pitfallGuid_, pitfallName);
+	if(!pitfall) pitfall = FindOwnedObjectByName<GeneralObject>(pitfallName);
+	if(pitfall) {
+		pitfall->SetName(pitfallName);
+		pitfall->Initialize();
+		pitfall->SetTexture("hole/hole.png");
+		pitfall_	 = pitfall;
+		pitfallGuid_ = pitfall->GetGuid();
+	} else {
+		auto newPitfall = SceneAPI::Instantiate<GeneralObject>("plane.obj", pitfallName);
+		newPitfall->SetParent(shared_from_this(), false);
+		newPitfall->Initialize();
+		newPitfall->SetTexture("hole/hole.png");
+		newPitfall->SetScale({1.0f, 1.0f, 1.0f});
+		newPitfall->SetTranslate({0.0f, -0.5f, 0.0f});
+		pitfall_	 = newPitfall;
+		pitfallGuid_ = newPitfall->GetGuid();
+	}
 }
 
 void BreakableFloorEvent::EventUpdate(float) {
