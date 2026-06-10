@@ -54,8 +54,8 @@ private:
 		GroundSpikeParam param_;
 
 		GroundSpikeEventParam() {
-			AddField("popUpSpeed", param_.popUpSpeed).Category("GroundSpikeEvent");
-			AddField("popUpHeight", param_.popUpHeight).Category("GroundSpikeEvent");
+			AddField("popUpSpeed", param_.popUpSpeed).Category("GroundSpikeEvent").Tooltip("出てくる速度");
+			AddField("popUpHeight", param_.popUpHeight).Category("GroundSpikeEvent").Tooltip("出てくる高さ、Y座標");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

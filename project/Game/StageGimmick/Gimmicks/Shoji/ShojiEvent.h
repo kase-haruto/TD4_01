@@ -54,22 +54,23 @@ private:
 		ShojiParam param_;
 
 		ShojiEventParam() {
-			AddField("centerPos", param_.centerPos).Speed(0.01f).Category("ShojiEvent");
-			AddField("shojiInterval", param_.shojiInterval).Speed(0.01f).Category("ShojiEvent");
-			AddField("wInterval", param_.wInterval).Speed(0.01f).Category("ShojiEvent");
-			AddField("hInterval", param_.hInterval).Speed(0.01f).Category("ShojiEvent");
+			AddField("centerPos", param_.centerPos).Speed(0.01f).Category("ShojiEvent").Tooltip("中心位置");
+			AddField("shojiInterval", param_.shojiInterval).Speed(0.01f).Category("ShojiEvent").Tooltip("障子の間隔");
+			AddField("wInterval", param_.wInterval).Speed(0.01f).Category("ShojiEvent").Tooltip("障子の紙と紙の幅の間隔");
+			AddField("hInterval", param_.hInterval).Speed(0.01f).Category("ShojiEvent").Tooltip("障子の紙と紙の高さの間隔");
 
-			AddField("openTimer", param_.openTimer).Speed(0.01f).Category("ShojiEvent");
-			AddField("openVelocityX", param_.openVelocityX).Speed(0.01f).Category("ShojiEvent");
-			AddField("openAccelerationX", param_.openAccelerationX).Speed(0.01f).Category("ShojiEvent");
-			AddField("wOpen", param_.wOpen).Speed(0.01f).Category("ShojiEvent");
+			AddField("openTimer", param_.openTimer).Speed(0.01f).Category("ShojiEvent").Tooltip("障子が開く時間");
+			AddField("openVelocityX", param_.openVelocityX).Speed(0.01f).Category("ShojiEvent").Tooltip("障子が開く速度X");
+			AddField("openAccelerationX", param_.openAccelerationX).Speed(0.01f).Category("ShojiEvent").Tooltip("障子が開く加速度X");
+			AddField("wOpen", param_.wOpen).Speed(0.01f).Category("ShojiEvent").Tooltip("障子が開く幅");
 
-			AddField("shojiScale", param_.shojiScale).Category("ShojiEvent");
-			AddField("luckyCatScale", param_.luckyCatScale).Category("ShojiEvent");
-			AddField("hitScale", param_.hitScale).Category("ShojiEvent");
-			AddField("direction", param_.direction).Category("ShojiEvent");
-			AddField("speed", param_.speed).Category("ShojiEvent");
-			AddField("parryDuration", param_.parryDuration).Category("ShojiEvent");
+			AddField("shojiScale", param_.shojiScale).Category("ShojiEvent").Tooltip("障子のデフォルトスケール");
+			AddField("luckyCatScale", param_.luckyCatScale).Category("ShojiEvent").Tooltip("招き猫のデフォルトスケール");
+			AddField("hitScale", param_.hitScale).Category("ShojiEvent").Tooltip("招き猫のヒット時のスケール");
+			AddField("direction", param_.direction).Category("ShojiEvent").Tooltip("招き猫が進む方向");
+
+			AddField("speed", param_.speed).Category("ShojiEvent").Tooltip("招き猫の速度");
+			AddField("parryDuration", param_.parryDuration).Category("ShojiEvent").Tooltip("招き猫が障子に刺さるまでの時間");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {
@@ -87,8 +88,8 @@ private:
 		std::string name_;
 
 		AllShojiEventData() {
-			AddField("ObjectCount", objectCount).ReadOnly();
-			AddField("ClearCount", clearCount);
+			AddField("ObjectCount", objectCount).ReadOnly().Tooltip("このイベントの招き猫の数");
+			AddField("ClearCount", clearCount).Tooltip("このイベントのクリアの数");
 		}
 
 		void SetEventName(const std::string& name) {

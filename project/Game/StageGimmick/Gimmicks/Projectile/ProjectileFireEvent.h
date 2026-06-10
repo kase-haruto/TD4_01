@@ -54,11 +54,11 @@ private:
 		CraneProjectileParam param;
 
 		ProjectileFireEventParam() {
-			AddField("scale", param.scale).Category("ProjectileFireEvent");
-			AddField("speed", param.speed).Category("ProjectileFireEvent");
-			AddField("targetTime", param.targetTime).Category("ProjectileFireEvent");
-			AddField("parryPositionY", param.parryPositionY).Category("ProjectileFireEvent");
-			AddField("parryTime", param.parryTime).Category("ProjectileFireEvent");
+			AddField("scale", param.scale).Category("ProjectileFireEvent").Tooltip("鶴のデフォルトスケール");
+			AddField("speed", param.speed).Category("ProjectileFireEvent").Tooltip("鶴の速度");
+			AddField("targetTime", param.targetTime).Category("ProjectileFireEvent").Tooltip("動いている時プレイヤーを追従する時間");
+			AddField("parryPositionY", param.parryPositionY).Category("ProjectileFireEvent").Tooltip("鶴が跳ね返された後のY座標");
+			AddField("parryTime", param.parryTime).Category("ProjectileFireEvent").Tooltip("鶴が跳ね返されてから刺さるまでの時間");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

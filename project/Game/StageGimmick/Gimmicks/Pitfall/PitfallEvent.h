@@ -47,8 +47,8 @@ private:
 		bool  disableAfterHit = true;
 
 		PitfallEventParam() {
-			AddField("Y Offset On Create", yOffsetOnCreate).Category("PitfallEvent").Range(-5.0f, 5.0f);
-			AddField("Disable After Hit", disableAfterHit).Category("PitfallEvent");
+			AddField("Y Offset On Create", yOffsetOnCreate).Category("PitfallEvent").Range(-5.0f, 5.0f).Tooltip("関係無し");
+			AddField("Disable After Hit", disableAfterHit).Category("PitfallEvent").Tooltip("関係無し");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {

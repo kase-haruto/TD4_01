@@ -53,18 +53,18 @@ private:
 		BellProjectileDoorParam doorParam_;
 
 		DiceProjectileEventParam() {
-			AddField("scale", param_.scale).Category("DiceProjectileEvent");
-			AddField("hitScale", param_.hitScale).Category("DiceProjectileEvent");
-			AddField("rotateSpeed", param_.rotateSpeed).Category("DiceProjectileEvent");
-			AddField("speed", param_.speed).Category("DiceProjectileEvent");
-			AddField("parryDuration", param_.parryDuration).Category("DiceProjectileEvent");
-			AddField("direction", param_.direction).Category("DiceProjectileEvent");
+			AddField("scale", param_.scale).Category("DiceProjectileEvent").Tooltip("サイコロのデフォルトスケール");
+			AddField("hitScale", param_.hitScale).Category("DiceProjectileEvent").Tooltip("サイコロがヒットしたときのスケール");
+			AddField("rotateSpeed", param_.rotateSpeed).Category("DiceProjectileEvent").Tooltip("サイコロの回転速度");
+			AddField("speed", param_.speed).Category("DiceProjectileEvent").Tooltip("サイコロの速度");
+			AddField("parryDuration", param_.parryDuration).Category("DiceProjectileEvent").Tooltip("サイコロがソケットに入るまでの時間");
+			AddField("direction", param_.direction).Category("DiceProjectileEvent").Tooltip("サイコロの飛ぶ方向");
 
-			AddField("crackerPos", param_.crackerPos).Category("DiceProjectileEvent");
-			AddField("crackerInterval", param_.crackerInterval).Category("DiceProjectileEvent");
-
-			AddField("doorScale", doorParam_.scale).Category("DiceProjectileDoor");
-			AddField("doorSpeed", doorParam_.speed).Category("DiceProjectileDoor");
+			AddField("crackerPos", param_.crackerPos).Category("DiceProjectileEvent").Tooltip("クラッカーの位置");
+			AddField("crackerInterval", param_.crackerInterval).Category("DiceProjectileEvent").Tooltip("クラッカーの間隔");
+			
+			AddField("doorScale", doorParam_.scale).Category("DiceProjectileDoor").Tooltip("扉のデフォルトスケール");
+			AddField("doorSpeed", doorParam_.speed).Category("DiceProjectileDoor").Tooltip("扉の速度");
 		}
 
 		CalyxEngine::ParamPath GetParamPath() const override {
@@ -82,8 +82,8 @@ private:
 		std::string name_;
 
 		AllDiceProjectileEventData() {
-			AddField("ObjectCount", objectCount).ReadOnly();
-			AddField("ClearCount", clearCount);
+			AddField("ObjectCount", objectCount).ReadOnly().Tooltip("このイベントのサイコロの数");
+			AddField("ClearCount", clearCount).Tooltip("このイベントのクリアの数");
 		}
 
 		void SetEventName(const std::string& name) {
