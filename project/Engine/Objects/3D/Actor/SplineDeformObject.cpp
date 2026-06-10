@@ -66,11 +66,13 @@ bool SplineDeformObject::Rebuild() {
 	}
 	spline->BuildArcTable();
 
-	const bool rebuilt = deformModel->Rebuild(
+	const bool rebuilt = deformModel->RebuildTiled(
 		*spline,
 		static_cast<SplineDeformedModel::Axis>(deformAxis_),
 		radiusScale_,
-		distanceOffset_);
+		distanceOffset_,
+		tileLength_,
+		maxTiles_);
 	if(rebuilt) {
 		lastSplineRevision_ = spline->Revision();
 		dirty_ = false;
@@ -107,6 +109,12 @@ void SplineDeformObject::DerivativeGui() {
 	if(ImGui::DragFloat("Distance Offset", &distanceOffset_, 0.05f)) {
 		MarkDirty();
 	}
+	if(ImGui::DragFloat("Tile Length (0 = Source)", &tileLength_, 0.05f, 0.0f, 10000.0f)) {
+		MarkDirty();
+	}
+	if(ImGui::DragInt("Max Tiles", &maxTiles_, 1, 0, 10000)) {
+		MarkDirty();
+	}
 	if(ImGui::Checkbox("Auto Rebuild", &autoRebuild_)) {
 		MarkDirty();
 	}
@@ -126,9 +134,13 @@ void SplineDeformObject::ApplyDerivedConfigFromJson(const nlohmann::json& root, 
 	deformAxis_ = src->value("deformAxis", deformAxis_);
 	radiusScale_ = src->value("radiusScale", radiusScale_);
 	distanceOffset_ = src->value("distanceOffset", distanceOffset_);
+	tileLength_ = src->value("tileLength", tileLength_);
+	maxTiles_ = src->value("maxTiles", maxTiles_);
 	autoRebuild_ = src->value("autoRebuild", autoRebuild_);
 
 	deformAxis_ = std::clamp(deformAxis_, 0, 2);
+	tileLength_ = (std::max)(tileLength_, 0.0f);
+	maxTiles_ = (std::max)(maxTiles_, 0);
 	lastSplineRevision_ = static_cast<uint64_t>(-1);
 	EnsureDeformModel();
 	MarkDirty();
@@ -140,6 +152,8 @@ void SplineDeformObject::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::j
 	derived["deformAxis"] = deformAxis_;
 	derived["radiusScale"] = radiusScale_;
 	derived["distanceOffset"] = distanceOffset_;
+	derived["tileLength"] = tileLength_;
+	derived["maxTiles"] = maxTiles_;
 	derived["autoRebuild"] = autoRebuild_;
 }
 

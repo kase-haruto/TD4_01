@@ -33,6 +33,8 @@ private:
 	int deformAxis_ = static_cast<int>(SplineDeformedModel::Axis::X);
 	float radiusScale_ = 1.0f;
 	float distanceOffset_ = 0.0f;
+	float tileLength_ = 0.0f;
+	int maxTiles_ = 0;
 	bool autoRebuild_ = true;
 	bool dirty_ = true;
 	uint64_t lastSplineRevision_ = static_cast<uint64_t>(-1);

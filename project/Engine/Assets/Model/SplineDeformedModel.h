@@ -27,6 +27,7 @@ public:
 
 	bool SetSourceModel(const std::string& sourceFile);
 	bool Rebuild(const SplineData& spline, Axis axis, float radiusScale, float distanceOffset);
+	bool RebuildTiled(const SplineData& spline, Axis axis, float radiusScale, float distanceOffset, float tileLength, int maxTiles);
 	bool IsSourceReady() const { return sourceReady_; }
 
 private:
@@ -45,6 +46,8 @@ private:
 private:
 	std::unique_ptr<ModelData> ownedModelData_;
 	std::vector<VertexPosUvN> originalVertices_;
+	std::vector<uint32_t> originalIndices_;
+	std::vector<MeshData::SubMesh> originalSubMeshes_;
 	bool sourceReady_ = false;
 	bool buffersReady_ = false;
 };

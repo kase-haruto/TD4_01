@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cfloat>
 #include <cmath>
+#include <cstdint>
+#include <limits>
 
 SplineDeformedModel::SplineDeformedModel() {
 	modelData_ = nullptr;
@@ -39,6 +41,8 @@ bool SplineDeformedModel::SetSourceModel(const std::string& sourceFile) {
 	ownedModelData_.reset();
 	modelData_ = nullptr;
 	originalVertices_.clear();
+	originalIndices_.clear();
+	originalSubMeshes_.clear();
 
 	return LoadSourceIfReady();
 }
@@ -71,6 +75,8 @@ bool SplineDeformedModel::LoadSourceIfReady() {
 	ownedModelData_->localAABB = source.localAABB;
 
 	originalVertices_ = ownedModelData_->meshResource.Vertices();
+	originalIndices_ = ownedModelData_->meshResource.Indices();
+	originalSubMeshes_ = ownedModelData_->meshResource.SubMeshes();
 	modelData_ = ownedModelData_.get();
 
 	ID3D12Device* device = GraphicsGroup::GetInstance()->GetDevice().Get();
@@ -153,6 +159,142 @@ bool SplineDeformedModel::Rebuild(const SplineData& spline, Axis axis, float rad
 
 	RecalculateLocalAABB();
 	UploadDeformedVertices();
+	blasBuilt_ = false;
+	return true;
+}
+
+bool SplineDeformedModel::RebuildTiled(
+	const SplineData& spline,
+	Axis axis,
+	float radiusScale,
+	float distanceOffset,
+	float tileLength,
+	int maxTiles) {
+	if(!LoadSourceIfReady()) return false;
+	if(!modelData_ || originalVertices_.empty() || spline.TotalLength() <= 0.0f || spline.SegmentCount() <= 0) {
+		return false;
+	}
+
+	const int along = AxisIndex(axis);
+	const int perpA = PerpIndexA(axis);
+	const int perpB = PerpIndexB(axis);
+
+	float minAlong = FLT_MAX;
+	float maxAlong = -FLT_MAX;
+	float centerA = 0.0f;
+	float centerB = 0.0f;
+	for(const auto& vertex : originalVertices_) {
+		const CalyxEngine::Vector3 local{vertex.position.x, vertex.position.y, vertex.position.z};
+		minAlong = (std::min)(minAlong, local[along]);
+		maxAlong = (std::max)(maxAlong, local[along]);
+		centerA += local[perpA];
+		centerB += local[perpB];
+	}
+	centerA /= static_cast<float>(originalVertices_.size());
+	centerB /= static_cast<float>(originalVertices_.size());
+
+	const float sourceLength = (std::max)(0.0001f, maxAlong - minAlong);
+	const float stepLength = tileLength > 0.0f ? tileLength : sourceLength;
+	int tileCount = static_cast<int>(std::ceil(spline.TotalLength() / stepLength));
+	if(maxTiles > 0) {
+		tileCount = (std::min)(tileCount, maxTiles);
+	}
+	tileCount = (std::max)(tileCount, 1);
+
+	if(originalVertices_.size() > static_cast<size_t>((std::numeric_limits<uint32_t>::max)()) / static_cast<size_t>(tileCount)) {
+		return false;
+	}
+
+	auto& vertices = modelData_->meshResource.Vertices();
+	auto& indices = modelData_->meshResource.Indices();
+	auto& subMeshes = modelData_->meshResource.SubMeshes();
+
+	vertices.clear();
+	indices.clear();
+	subMeshes.clear();
+	vertices.reserve(originalVertices_.size() * static_cast<size_t>(tileCount));
+	indices.reserve(originalIndices_.size() * static_cast<size_t>(tileCount));
+
+	CalyxEngine::Vector3 prevRight = CalyxEngine::Vector3::Zero();
+	for(int tile = 0; tile < tileCount; ++tile) {
+		const float tileStartDistance = distanceOffset + static_cast<float>(tile) * stepLength;
+
+		for(const auto& src : originalVertices_) {
+			const CalyxEngine::Vector3 local{src.position.x, src.position.y, src.position.z};
+			const float localDistance = ((local[along] - minAlong) / sourceLength) * stepLength;
+			const float distance = tileStartDistance + localDistance;
+			const float t = spline.DistanceToT(distance);
+
+			CalyxEngine::Vector3 forward = spline.Tangent(t);
+			if(forward.LengthSquared() <= 1e-8f) {
+				forward = CalyxEngine::Vector3::Forward();
+			}
+
+			CalyxEngine::Vector3 upSeed = CalyxEngine::Vector3::Up();
+			if(std::abs(CalyxEngine::Vector3::Dot(forward, upSeed)) > 0.95f) {
+				upSeed = {1.0f, 0.0f, 0.0f};
+			}
+
+			CalyxEngine::Vector3 right = CalyxEngine::Vector3::Cross(upSeed, forward).Normalize();
+			if(prevRight.LengthSquared() > 1e-8f && CalyxEngine::Vector3::Dot(prevRight, right) < 0.0f) {
+				right = -right;
+			}
+			prevRight = right;
+
+			CalyxEngine::Vector3 up = CalyxEngine::Vector3::Cross(forward, right).Normalize();
+			const CalyxEngine::Vector3 center = spline.Evaluate(t);
+
+			const float offsetA = (local[perpA] - centerA) * radiusScale;
+			const float offsetB = (local[perpB] - centerB) * radiusScale;
+			const CalyxEngine::Vector3 deformed = center + right * offsetA + up * offsetB;
+
+			VertexPosUvN dst = src;
+			dst.position = {deformed.x, deformed.y, deformed.z, src.position.w};
+
+			const CalyxEngine::Vector3 nLocal = src.normal;
+			const CalyxEngine::Vector3 n = (forward * nLocal[along] + right * nLocal[perpA] + up * nLocal[perpB]);
+			dst.normal = n.LengthSquared() > 1e-8f ? n.Normalize() : src.normal;
+			vertices.push_back(dst);
+		}
+
+	}
+
+	if(originalSubMeshes_.empty()) {
+		MeshData::SubMesh subMesh{};
+		subMesh.indexStart = 0;
+		subMesh.materialIndex = 0;
+		for(int tile = 0; tile < tileCount; ++tile) {
+			const uint32_t baseVertex = static_cast<uint32_t>(tile * originalVertices_.size());
+			for(uint32_t index : originalIndices_) {
+				indices.push_back(baseVertex + index);
+			}
+		}
+		subMesh.indexCount = static_cast<uint32_t>(indices.size());
+		subMeshes.push_back(subMesh);
+	} else {
+		for(const auto& sourceSubMesh : originalSubMeshes_) {
+			MeshData::SubMesh subMesh{};
+			subMesh.indexStart = static_cast<uint32_t>(indices.size());
+			subMesh.materialIndex = sourceSubMesh.materialIndex;
+			for(int tile = 0; tile < tileCount; ++tile) {
+				const uint32_t baseVertex = static_cast<uint32_t>(tile * originalVertices_.size());
+				for(uint32_t i = 0; i < sourceSubMesh.indexCount; ++i) {
+					indices.push_back(baseVertex + originalIndices_[sourceSubMesh.indexStart + i]);
+				}
+			}
+			subMesh.indexCount = static_cast<uint32_t>(indices.size()) - subMesh.indexStart;
+			if(subMesh.indexCount > 0) {
+				subMeshes.push_back(subMesh);
+			}
+		}
+	}
+
+	RecalculateLocalAABB();
+	modelData_->meshResource.VertexBuffer().Initialize(GraphicsGroup::GetInstance()->GetDevice().Get(), UINT(vertices.size()));
+	modelData_->meshResource.VertexBuffer().TransferVectorData(vertices);
+	modelData_->meshResource.IndexBuffer().Initialize(GraphicsGroup::GetInstance()->GetDevice().Get(), UINT(indices.size()));
+	modelData_->meshResource.IndexBuffer().TransferVectorData(indices);
+	buffersReady_ = true;
 	blasBuilt_ = false;
 	return true;
 }

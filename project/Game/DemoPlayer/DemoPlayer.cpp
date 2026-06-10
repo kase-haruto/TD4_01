@@ -36,6 +36,7 @@ void DemoPlayer::Initialize() {
 	isJumping_					= false;
 	isDiving_					= false;
 	isDivingInvincible_			= false;
+	jumpInvincibleTimer_		= 0.0f;
 	isRecovering_				= false;
 	recoveryTimer_				= 0.0f;
 
@@ -119,6 +120,13 @@ void DemoPlayer::Update(float dt) {
 
 	DamageFlash(dt);
 
+	if(jumpInvincibleTimer_ > 0.0f) {
+		jumpInvincibleTimer_ -= dt;
+		if(jumpInvincibleTimer_ < 0.0f) {
+			jumpInvincibleTimer_ = 0.0f;
+		}
+	}
+
 	moveSpeed_ = param_.moveSpeed;
 
 	if(pitfallRecoveryState_ != PitfallRecoveryState::None) {
@@ -160,6 +168,9 @@ void DemoPlayer::TakeDamage(int32_t damage) {
 	if(isDivingInvincible_) {
 		return;
 	}
+	if(jumpInvincibleTimer_ > 0.0f) {
+		return;
+	}
 
 	life_ -= damage;
 	if(life_ <= 0) {
@@ -198,6 +209,7 @@ void DemoPlayer::StartPitfallRecovery() {
 	isJumping_			   = false;
 	isDiving_			   = false;
 	isDivingInvincible_	   = false;
+	jumpInvincibleTimer_   = 0.0f;
 	isRecovering_		   = false;
 	jumpRotation_		   = 0.0f;
 	jumpRotationSpeed_	   = 0.0f;
@@ -321,6 +333,7 @@ DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
 			isJumping_	  = true;
 			isDiving_	  = false;
 			isDivingInvincible_ = false;
+			jumpInvincibleTimer_ = param_.jumpInvincibleTime;
 			jumpRotation_ = 0.0f;
 			// 接地状態からジャンプして着地するまでの時間を計算
 			float airTime		   = 2.0f * param_.jumpForce / param_.gravity;

@@ -39,6 +39,8 @@ public:
 	void SetIsOpen(bool flag) { isOpen_ = flag; }
 	const bool GetIsOpen() const { return isOpen_; }
 
+	void OpenSetting();
+
 	const uint32_t GetClearCount() const { return clearCount_; }
 
 	// 障子のクリアカウントを加算
