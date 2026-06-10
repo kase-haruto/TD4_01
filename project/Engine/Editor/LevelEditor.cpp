@@ -420,6 +420,10 @@ namespace CalyxEngine {
 			UpdateParticlePreviewContext(dt);
 		} else if(editToolMode_ == EngineEdit::EditToolMode::Prefab) {
 			UpdatePrefabEditContext(dt);
+		} else if(editToolMode_ == EngineEdit::EditToolMode::PostEffect) {
+			if(postEffectNodeEditorPanel_) {
+				postEffectNodeEditorPanel_->ApplyPreview();
+			}
 		}
 		ActivateModeContext(editToolMode_);
 

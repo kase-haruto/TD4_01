@@ -682,5 +682,16 @@ namespace CalyxEngine {
 	void PostEffectNodeEditorPanel::Apply() {
 		Save();
 		PostEffectManager::Get()->LoadPreset(pathBuffer_.data());
+		previewSignature_ = BuildPresetJson().dump();
+	}
+
+	void PostEffectNodeEditorPanel::ApplyPreview() {
+		nlohmann::json root = BuildPresetJson();
+		const std::string signature = root.dump();
+		if(signature == previewSignature_) return;
+
+		if(PostEffectManager::Get()->LoadPresetJson(root, pathBuffer_.data())) {
+			previewSignature_ = signature;
+		}
 	}
 }

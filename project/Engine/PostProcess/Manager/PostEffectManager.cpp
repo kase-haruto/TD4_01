@@ -4,6 +4,9 @@
 // engine
 #include <Engine/Graphics/Pipeline/Service/PipelineService.h>
 #include <Engine/Foundation/Utility/FileSystem/FileSystemHelper.h>
+#include <Engine/Assets/Database/AssetDatabase.h>
+#include <Engine/Assets/System/AssetRecord.h>
+#include <Engine/Assets/System/AssetType.h>
 
 // externals
 #include <externals/imgui/imgui.h>
@@ -100,13 +103,8 @@ void PostEffectManager::Initialize(PipelineService* service,bool enableAll){
 	// CopyImage と Blend はグラフ内の専用ノードとして扱う
 	for (auto& s : collection_.GetSlots()){ if (s.name == kCopyImageName || s.name == kBlendName) s.enabled = false; }
 
-	//defaultのeffectを使用する
-
-
 	dirty_ = true;
 	initialized_ = true;
-
-	LoadPreset(kDefaultPaht);
 }
 
 // ---------- Toggle ----------
@@ -274,6 +272,11 @@ bool PostEffectManager::LoadPreset(const std::string& filePath){
 		return false;
 	}
 
+	return LoadPresetJson(root, filePath, Guid::Empty());
+}
+
+bool PostEffectManager::LoadPresetJson(const nlohmann::json& root, const std::string& sourcePath, const Guid& sourceGuid) {
+	if(!initialized_) return false;
 	if(!root.contains("nodes") || !root["nodes"].is_array()) return false;
 	loadedPreset_ = root;
 	hasLoadedGraph_ = root.contains("graph") && root["graph"].is_object();
@@ -329,13 +332,50 @@ bool PostEffectManager::LoadPreset(const std::string& filePath){
 	}
 
 	for(auto& slot : old){
-		if(slot.name == kCopyImageName || slot.name == kBlendName) slot.enabled = false;
+		slot.enabled = false;
 		loaded.push_back(std::move(slot));
 	}
 
 	collection_.GetSlots() = std::move(loaded);
+	activePresetPath_ = sourcePath;
+	activePresetGuid_ = sourceGuid;
+	sceneOverrideActive_ = false;
 	MarkDirty();
 	return true;
+}
+
+bool PostEffectManager::LoadPresetFromAsset(const Guid& guid) {
+	if(!initialized_ || !guid.isValid()) return false;
+	const AssetRecord* record = AssetDatabase::GetInstance()->Get(guid);
+	if(!record || record->type != AssetType::PostEffect) return false;
+	if(activePresetGuid_ == guid) return true;
+
+	const bool loaded = LoadPreset(record->sourcePath.string());
+	if(loaded) {
+		activePresetGuid_ = guid;
+		activePresetPath_ = record->sourcePath.string();
+	}
+	return loaded;
+}
+
+void PostEffectManager::ClearPreset() {
+	if(!initialized_) return;
+
+	loadedPreset_ = nlohmann::json::object();
+	hasLoadedGraph_ = false;
+	activePresetPath_.clear();
+	activePresetGuid_ = Guid::Empty();
+	floatTweens_.clear();
+	DisableAll();
+}
+
+void PostEffectManager::RequestScenePreset(const Guid& guid, int priority) {
+	if(!initialized_ || !guid.isValid()) return;
+	if(!hasScenePresetRequest_ || priority >= requestedScenePresetPriority_) {
+		hasScenePresetRequest_ = true;
+		requestedScenePresetPriority_ = priority;
+		requestedScenePresetGuid_ = guid;
+	}
 }
 
 void PostEffectManager::PlayTriggeredEffects(){
@@ -401,6 +441,25 @@ void PostEffectManager::RebuildGraphIfDirty(){
 	dirty_ = false;
 }
 
+void PostEffectManager::ResolveScenePresetRequest() {
+	if(!initialized_) return;
+
+	if(hasScenePresetRequest_) {
+		if(LoadPresetFromAsset(requestedScenePresetGuid_)) {
+			sceneOverrideActive_ = true;
+		}
+		hasScenePresetRequest_ = false;
+		requestedScenePresetPriority_ = 0;
+		requestedScenePresetGuid_ = Guid::Empty();
+		return;
+	}
+
+	if(sceneOverrideActive_) {
+		sceneOverrideActive_ = false;
+		ClearPreset();
+	}
+}
+
 void PostEffectManager::Update(float dt){
 	if (!initialized_) return;
 
@@ -459,6 +518,7 @@ void PostEffectManager::Execute(ID3D12GraphicsCommandList* cmd,
 								IRenderTarget* finalTarget,
 								CalyxEngine::DxCore* dxCore){
 	if (!initialized_) return;
+	ResolveScenePresetRequest();
 	RebuildGraphIfDirty();
 	graph_.Execute(cmd,input,finalTarget,dxCore);
 }

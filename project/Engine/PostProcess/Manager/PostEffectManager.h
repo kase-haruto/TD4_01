@@ -10,6 +10,7 @@
 #include <Engine/Graphics/GpuResource/DxGpuResource.h>
 #include <Engine/Graphics/RenderTarget/Interface/IRenderTarget.h>
 #include <Engine/Foundation/Utility/Ease/CxEase.h>
+#include <Engine/Foundation/Utility/Guid/Guid.h>
 
 // local
 #include "../Graph/PostEffectGraph.h"
@@ -19,6 +20,7 @@
 #include <vector>
 #include <functional>
 #include <optional>
+#include <filesystem>
 #include <algorithm>
 #include <cmath>
 #include <externals/nlohmann/json.hpp>
@@ -51,6 +53,12 @@ public:
 
 	bool SavePreset(const std::string& filePath, const std::string& presetName = "PostEffectPreset") const;
 	bool LoadPreset(const std::string& filePath);
+	bool LoadPresetJson(const nlohmann::json& root, const std::string& sourcePath = {}, const Guid& sourceGuid = Guid::Empty());
+	bool LoadPresetFromAsset(const Guid& guid);
+	void ClearPreset();
+	void RequestScenePreset(const Guid& guid, int priority = 0);
+	const std::string& GetActivePresetPath() const { return activePresetPath_; }
+	const Guid& GetActivePresetGuid() const { return activePresetGuid_; }
 	void PlayTriggeredEffects();
 	void PlayTriggeredEffect(const std::string& name);
 
@@ -90,6 +98,7 @@ private:
 	int IndexOf(const std::string& name) const;
 	void MarkDirty(){ dirty_ = true; }
 	void RebuildGraphIfDirty();
+	void ResolveScenePresetRequest();
 
 private:
 	struct FloatTween{
@@ -117,8 +126,13 @@ private:
 	nlohmann::json loadedPreset_;
 	bool hasLoadedGraph_ = false;
 	bool outlineEnabled_ = true;
+	std::string activePresetPath_;
+	Guid activePresetGuid_;
+	bool sceneOverrideActive_ = false;
+	bool hasScenePresetRequest_ = false;
+	int requestedScenePresetPriority_ = 0;
+	Guid requestedScenePresetGuid_;
 
 	const std::string kCopyImageName = "CopyImage";
 	const std::string kBlendName = "Blend";
-	const std::string kDefaultPaht = "Resources/Assets/PostEffects/Default.postfx";
 };

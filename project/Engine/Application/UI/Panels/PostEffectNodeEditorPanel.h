@@ -12,6 +12,7 @@ namespace CalyxEngine {
 	public:
 		PostEffectNodeEditorPanel();
 		void Render() override;
+		void ApplyPreview();
 
 	private:
 		void DrawToolbar();
@@ -40,5 +41,6 @@ namespace CalyxEngine {
 		bool outlineEnabled_ = true;
 		bool nodeEditCommandActive_ = false;
 		NodeGraph nodeEditBefore_;
+		std::string previewSignature_;
 	};
 }
