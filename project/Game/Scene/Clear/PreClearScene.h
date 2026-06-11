@@ -70,4 +70,7 @@ private:
 	bool										IsOpening_ = false;
 
 	CalyxEngine::EffectAsset effectData_;
+
+	CalyxEngine::Audio comeoutAudio_;
+	CalyxEngine::Audio vomitAudio_;
 };

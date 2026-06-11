@@ -81,4 +81,8 @@ private:
 	SceneType preType_	 = SceneType::TITLE;
 	bool	  IsPhase_	 = false;
 	bool	  IsOpening_ = false;
+
+	CalyxEngine::Audio openAudio_;
+	CalyxEngine::Audio eatAudio_;
+
 };

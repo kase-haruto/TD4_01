@@ -53,7 +53,7 @@ void BellProjectileObject::ObjectInitialize() {
 	isParry_					 = false;
 	isRing_ = false;
 
-	AudioAPI::Load(bellAudio_, "test");
+	AudioAPI::Load(bellAudio_, "bell");
 }
 
 void BellProjectileObject::ObjectUpdate(float dt) {

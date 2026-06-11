@@ -87,6 +87,9 @@ void SelectScene::Initialize() {
 			anim->SetCurrentSpeed(0.0f);
 		}
 	}
+
+	openAudio_.Load("syouji_open");
+	eatAudio_.Load("eat");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -191,6 +194,7 @@ void SelectScene::SelectUpdate(float dt) {
 		// 遷移用ペイロードを用意し、障子オープン演出へ移行(selectedIndex_が0~4のため＋１)
 		gamePayload_  = BuildGamePayload(selectedIndex_ + 1);
 		isShoujiOpen_ = true;
+		AudioAPI::Play(openAudio_, false, 0.5f);
 	}
 }
 

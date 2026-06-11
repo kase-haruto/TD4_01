@@ -53,4 +53,7 @@ private:
 	bool isOnceSet_ = true; // 初期Offset用
 
 	CalyxEngine::EffectAsset effectData_;
+
+	CalyxEngine::Audio droolAudio_;
+
 };

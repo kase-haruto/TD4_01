@@ -58,7 +58,7 @@ void GroundSpikeObject::ObjectInitialize() {
 	effectData_.Load("GroundSpikeEffect");
 	dangerData_.Load("DangerEffect");
 
-	AudioAPI::Load(spikeAudio_, "test");
+	AudioAPI::Load(spikeAudio_, "teeth");
 }
 
 void GroundSpikeObject::ObjectUpdate(float dt) {

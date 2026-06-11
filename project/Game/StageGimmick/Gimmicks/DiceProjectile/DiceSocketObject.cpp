@@ -65,7 +65,7 @@ void DiceSocketObject::ObjectInitialize() {
 	effectLeftData_.Load("CrackerLeftEffect");
 	effectRightData_.Load("CrackerRightEffect");
 
-	AudioAPI::Load(socketAudio_, "test");
+	AudioAPI::Load(socketAudio_, "partyPopper");
 }
 
 void DiceSocketObject::ObjectUpdate(float dt) {

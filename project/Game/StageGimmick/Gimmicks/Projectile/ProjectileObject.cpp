@@ -49,8 +49,8 @@ void ProjectileObject::ObjectInitialize() {
 
 	effectData_.Load("CraneStarEffect");
 
-	AudioAPI::Load(startAudio_, "test");
-	AudioAPI::Load(parryAudio_, "test");
+	AudioAPI::Load(startAudio_, "appearance");
+	AudioAPI::Load(parryAudio_, "appearance");
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {
