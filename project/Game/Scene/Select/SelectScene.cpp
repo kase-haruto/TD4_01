@@ -239,6 +239,7 @@ void SelectScene::ShoujiOpen(float dt) {
 
 	if(oniFinished) {
 		IsPhase_ = true;
+		AudioAPI::Stop(bgmAudio_);
 		transitionControl_->SetAutoPreset(SceneType::SELECT, SceneType::TEST);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
