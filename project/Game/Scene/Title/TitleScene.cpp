@@ -49,19 +49,19 @@ void TitleScene::Initialize() {
 	// グラフィック関連
 	//=========================
 	pauseBg_ = std::make_unique<Sprite>("Textures/Title/title.png");
-	pauseBg_->Initialize({640.0f, -50.0f}, {960.0f, 540.0f});
+	pauseBg_->Initialize({640.0f, -50.0f}, {864.0f, 486.0f});
 	pauseBg_->SetAnchorPoint({0.5f, 0.0f});
 	pauseBg_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	pauseBg_->Update();
 
 	pressButton_ = std::make_unique<Sprite>("Textures/Title/titleUI_cont.png");
-	pressButton_->Initialize({640.0f, 250.0f}, {640.0f, 360.0f});
+	pressButton_->Initialize({640.0f, 450.0f}, {640.0f, 360.0f});
 	pressButton_->SetAnchorPoint({0.5f, 0.0f});
 	pressButton_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	pressButton_->Update();
 
 	pressKey_ = std::make_unique<Sprite>("Textures/Title/titleUI_key.png");
-	pressKey_->Initialize({640.0f, 250.0f}, {640.0f, 360.0f});
+	pressKey_->Initialize({640.0f, 450.0f}, {640.0f, 360.0f});
 	pressKey_->SetAnchorPoint({0.5f, 0.0f});
 	pressKey_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	pressKey_->Update();

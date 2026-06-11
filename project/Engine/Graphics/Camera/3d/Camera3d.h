@@ -65,6 +65,7 @@ public:
      * \return タイプ名
      */
     std::string_view GetObjectClassName() const override { return "Camera3d"; }
+	void SetFarZ(float farZ);
 
     //--------- follow target -------------------------------------------------
     /**

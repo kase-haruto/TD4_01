@@ -126,7 +126,9 @@ bool SceneSerializer::Save(const SceneContext& context, const std::string& path)
 bool SceneSerializer::Load(SceneContext& context, const std::string& path) {
 	nlohmann::json root;
 	if(!JsonUtils::Load(path, root)) return false;
-	return LoadJson(context, root);
+	if(!LoadJson(context, root)) return false;
+	context.SetScenePath(path);
+	return true;
 }
 
 // -----------------------------------------------------------------------------

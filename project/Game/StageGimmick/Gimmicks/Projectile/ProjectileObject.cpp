@@ -54,7 +54,11 @@ void ProjectileObject::ObjectInitialize() {
 }
 
 void ProjectileObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(worldTransform_.translation.y > param_.parryPositionY) {
 		return;
 	}

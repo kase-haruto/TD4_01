@@ -102,7 +102,7 @@ void TestScene::Initialize(){
 	selectedIndex_ = 0;
 	fadeTime_	   = 0.2f;
 	ClockManager::GetInstance()->SetTimeScale(1.0f);
-	buttunAudio_.Load("Buttun3");
+	buttunAudio_.Load("Buttun");
 	timeUpAudio_.Load("timeOver");
 }
 

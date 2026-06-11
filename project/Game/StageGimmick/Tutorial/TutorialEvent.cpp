@@ -48,6 +48,7 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 	// 中央から拡大して出すアニメーションを開始
 	StartPopIn();
 
+	isPad_ = CalyxFoundation::Input::IsGamepadConnected();
 	if(spritePad_) {
 		spritePad_->SetVisibility(true);
 	}
@@ -209,7 +210,21 @@ void TutorialEvent::UpdateInputDevice() {
 		PadButton::DPAD_RIGHT,
 	};
 
-	// いずれかのボタンに触れたらパッド表示に切り替え
+	// キーボードに触れたらキーボード表示に戻す（任意：不要なら削除）
+	for(uint32_t key = 0; key < 256; ++key) {
+		if(Input::PushKey(key)) {
+			isPad_ = false;
+			if(spritePad_) {
+				spritePad_->SetVisibility(false);
+			}
+			if(sprite_) {
+				sprite_->SetVisibility(true);
+			}
+			return;
+		}
+	}
+
+		// いずれかのボタンに触れたらパッド表示に切り替え
 	for(PadButton button : kButtons) {
 		if(Input::PushGamepadButton(button)) {
 			isPad_ = true;
@@ -223,7 +238,7 @@ void TutorialEvent::UpdateInputDevice() {
 		}
 	}
 
-	 // トリガー・スティックも「パッドに触った」として扱う
+	// トリガー・スティックも「パッドに触った」として扱う
 	constexpr float kTriggerThreshold = 0.1f;
 	if(Input::GetLeftTrigger() > kTriggerThreshold ||
 	   Input::GetRightTrigger() > kTriggerThreshold ||
@@ -236,20 +251,6 @@ void TutorialEvent::UpdateInputDevice() {
 			sprite_->SetVisibility(false);
 		}
 		return;
-	}
-
-	// キーボードに触れたらキーボード表示に戻す（任意：不要なら削除）
-	for(uint32_t key = 0; key < 256; ++key) {
-		if(Input::PushKey(key)) {
-			isPad_ = false;
-			if(spritePad_) {
-				spritePad_->SetVisibility(false);
-			}
-			if(sprite_) {
-				sprite_->SetVisibility(true);
-			}
-			return;
-		}
 	}
 }
 
@@ -349,15 +350,9 @@ void TutorialEvent::DrawSprite(SpriteRenderer* renderer) const {
 		if(spritePad_) {
 			spritePad_->Draw(renderer);
 		}
-		if(sprite_) {
-			sprite_->Draw(renderer);
-		}
 	} else {
 		if(sprite_) {
 			sprite_->Draw(renderer);
-		}
-		if(spritePad_) {
-			spritePad_->Draw(renderer);
 		}
 	}
 }

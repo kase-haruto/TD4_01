@@ -10,6 +10,24 @@
 #include <stdexcept>
 
 namespace {
+	void ValidateTexture2DExtent(const char* kind, ID3D12Device* device, uint32_t width, uint32_t height) {
+		if(!device) {
+			throw std::invalid_argument(std::string(kind) + " resource requires a valid D3D12 device.");
+		}
+		if(width == 0 || height == 0) {
+			std::ostringstream oss;
+			oss << kind << " resource size must be greater than zero. size=" << width << "x" << height;
+			throw std::invalid_argument(oss.str());
+		}
+		if(width > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || height > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION) {
+			std::ostringstream oss;
+			oss << kind << " resource size exceeds D3D12 texture2D limit. size="
+				<< width << "x" << height
+				<< " limit=" << D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION;
+			throw std::invalid_argument(oss.str());
+		}
+	}
+
 	std::runtime_error MakeResourceCreateError(const char* kind, HRESULT hr, uint32_t width, uint32_t height, DXGI_FORMAT format) {
 		std::ostringstream oss;
 		oss << "Failed to create " << kind << " resource. HRESULT=0x"
@@ -26,6 +44,8 @@ void DxGpuResource::InitializeAsRenderTarget(ID3D12Device*				 device,
 											 DXGI_FORMAT				 format,
 											 std::optional<std::wstring> name,
 											 const float*				 clearColor) {
+	ValidateTexture2DExtent("render target", device, width, height);
+
 	D3D12_RESOURCE_DESC texDesc = {};
 	texDesc.Dimension			= D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	texDesc.Width				= width;
@@ -70,6 +90,7 @@ void DxGpuResource::InitializeAsRenderTarget(ID3D12Device*				 device,
 	if(name.has_value()) {
 		resource_->SetName(name->c_str());
 	}
+	currentState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 }
 
 void DxGpuResource::InitializeAsDepthStencil(ID3D12Device*				 device,
@@ -77,6 +98,8 @@ void DxGpuResource::InitializeAsDepthStencil(ID3D12Device*				 device,
 											 uint32_t					 height,
 											 DXGI_FORMAT				 format,
 											 std::optional<std::wstring> name) {
+	ValidateTexture2DExtent("depth stencil", device, width, height);
+
 	D3D12_RESOURCE_DESC texDesc = {};
 	texDesc.Dimension			= D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	texDesc.Width				= width;

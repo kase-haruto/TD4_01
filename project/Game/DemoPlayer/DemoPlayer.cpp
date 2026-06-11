@@ -89,6 +89,11 @@ void DemoPlayer::Initialize() {
 
 void DemoPlayer::Update(float dt) {
 	if(firstSetting_) {
+		if(collider_) {
+			if(!collider_->GetOwner()) {
+				collider_->SetOwner(this);
+			}
+		}
 		// 子オブジェクトからハンマーを探す
 		hammer_ = nullptr;
 		for(auto& child : children_) {
