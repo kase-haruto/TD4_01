@@ -64,7 +64,11 @@ void ShojiObject::ObjectInitialize() {
 }
 
 void ShojiObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(isOpen_ && openTime_ < param_.openTimer) {
 		if(openTime_ == 0.0f) {
 			AudioAPI::Play(openAudio_, false, 0.5f);

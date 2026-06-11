@@ -92,7 +92,11 @@ void BreakableWallObject::ObjectInitialize() {
 }
 
 void BreakableWallObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(isBroken_) {
 		if(worldTransform_.GetWorldPosition().y >= 0.0f) {
 			const float speed = 5.0f;

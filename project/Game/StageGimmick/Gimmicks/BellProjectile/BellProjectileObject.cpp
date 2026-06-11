@@ -57,6 +57,11 @@ void BellProjectileObject::ObjectInitialize() {
 }
 
 void BellProjectileObject::ObjectUpdate(float dt) {
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	// スケールを戻す処理
 	ChangeScale();
 
