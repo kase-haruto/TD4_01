@@ -61,6 +61,10 @@ void ClearScene::Initialize() {
 	IsOpening_ = true;
 	IsPhase_   = false;
 
+	buttunAudio_.Load("Buttun");
+	bgmAudio_.Load("Gameclear");
+	AudioAPI::Play(bgmAudio_, true, 0.2f);
+
 	effectData_.Load("GameClearEffect");
 	EffectAPI::Play(effectData_, CalyxEngine::Vector3(0.0f, 18.0f, 15.0f));
 }
@@ -78,6 +82,8 @@ void ClearScene::Update([[maybe_unused]] float dt) {
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
+		AudioAPI::Play(buttunAudio_, false, 0.3f);
+		AudioAPI::Stop(bgmAudio_);
 		payload_ = BuildNowTypePayload(SceneType::CLEAR);
 		transitionControl_->SetAutoPreset(SceneType::CLEAR, SceneType::SELECT);
 		transitionControl_->StartClosing(0.5f, [this]() {
