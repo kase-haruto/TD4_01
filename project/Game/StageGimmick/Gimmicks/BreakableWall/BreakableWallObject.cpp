@@ -26,6 +26,9 @@ void BreakableWallObject::OnCollisionEnter(Collider* other) {
 	auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner());
 	if(!player) { return; }
 
+	if(isBroken_) {
+		return;
+	}
 	player->TakeDamage(1);
 }
 

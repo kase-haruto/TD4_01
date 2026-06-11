@@ -3,6 +3,8 @@
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
+#include "Game\DemoShockwave\Shockwave.h"
+
 REGISTER_SCENE_OBJECT(BreakableWallEvent)
 
 BreakableWallEvent::BreakableWallEvent(const std::string& name) : StageGimmickEventBase(name) {}
@@ -27,6 +29,10 @@ void BreakableWallEvent::OnCollisionEnter(Collider* other) {
 		return;
 	}
 	floor->Break(otherObj->GetWorldPosition());
+	if(auto* wave = dynamic_cast<Shockwave*>(otherObj)) {
+		// ヒットごとに1件積む（複数ヒットが上書きで潰れないように）
+		wave->SetPendingDamage(0.0f, 1);
+	}
 
 	// イベントを無効化する
 
