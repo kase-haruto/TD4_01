@@ -324,22 +324,22 @@ void TestScene::InitPauseResource() {
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
 	if(stage_->IsClear()) {
-		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		/*ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::PRECLEAR);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::PRECLEAR), std::move(payload_));
-		});
+		});*/
 	}
 	if(stage_->IsGameOver()) {
-		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		/*ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::GAMEOVER);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
-		});
+		});*/
 	}
 }
 
