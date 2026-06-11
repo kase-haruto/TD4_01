@@ -161,7 +161,9 @@ void DiceProjectileEvent::EventInitialize() {
 		numbersUiGuid_ = newNumbersUi->GetGuid();
 	}
 	if(auto ui = numbersUi_.lock()) {
-		ui->SetTexture("Numbers/" + std::to_string(eventData_.clearCount) + ".png");
+		uint32_t number = eventData_.clearCount;
+		number = std::clamp(number, 1u, 9u);
+		ui->SetTexture("Numbers/" + std::to_string(number) + ".png");
 	}
 
 }
