@@ -68,8 +68,9 @@ private:
 	float cameraLerpRate_ = 5.0f; 
 
 	bool						 isShoujiOpen_	 = false;
+	bool						   isEat_		   = false;
 	float						 shoujiOpenTime_ = 2.0f;
-	float						 openRate_		 = 3.0f;
+	float						 openRate_		 = 4.0f;
 	float						 openDistance_	 = 4.0f;
 	float						 lBase_			 = 0.0f;
 	float						 rBase_			 = 0.0f;
@@ -84,5 +85,7 @@ private:
 
 	CalyxEngine::Audio openAudio_;
 	CalyxEngine::Audio eatAudio_;
+	CalyxEngine::Audio bgmAudio_;
+	CalyxEngine::Audio buttunAudio_;
 
 };
