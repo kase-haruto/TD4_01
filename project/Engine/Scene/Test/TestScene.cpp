@@ -105,6 +105,7 @@ void TestScene::Initialize(){
 	fadeTime_	   = 0.2f;
 	ClockManager::GetInstance()->SetTimeScale(1.0f);
 	buttunAudio_.Load("Buttun3");
+	timeUpAudio_.Load("timeOver");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -335,6 +336,7 @@ void TestScene::CheckStageState([[maybe_unused]] float dt) {
 		});*/
 	}
 	if(stage_->IsGameOver()) {
+		AudioAPI::Play(timeUpAudio_, false, 0.3f);
 		/*ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;

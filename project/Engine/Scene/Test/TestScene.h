@@ -124,4 +124,6 @@ private:
 	// 遷移用
 	bool IsPhase_	= false;
 	bool IsOpening_ = false;
+
+	CalyxEngine::Audio timeUpAudio_;
 };
