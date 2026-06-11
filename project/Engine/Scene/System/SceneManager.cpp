@@ -365,13 +365,18 @@ namespace CalyxEngine {
 		editorPreviewCtx_->GetFxSystem()->Render(pso, cmd);
 	}
 
-	void SceneManager::DrawSpritesToRenderTarget(IRenderTarget* rt, ID3D12GraphicsCommandList* cmd, PipelineService* pso, bool transitionToShaderResource) {
+	void SceneManager::DrawSpritesToRenderTarget(IRenderTarget* rt,
+												 ID3D12GraphicsCommandList* cmd,
+												 PipelineService* pso,
+												 bool transitionToShaderResource,
+												 bool collectSceneSprites,
+												 bool clearAfterDraw) {
 		if(!rt) return;
 
 		rt->TransitionTo(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		rt->SetRenderTarget(cmd);
 
-		slots_[currentIdx_].scene->DrawSpritesOnly(cmd, pso);
+		slots_[currentIdx_].scene->DrawSpritesOnly(cmd, pso, collectSceneSprites, clearAfterDraw);
 
 		if(transitionToShaderResource) {
 			rt->TransitionTo(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -395,10 +400,10 @@ namespace CalyxEngine {
 	void SceneManager::DrawNotAffectedFromPE(ID3D12GraphicsCommandList* cmd, PipelineService* pso) {
 		if(slots_.empty()) return;
 		auto* postOutput = dx_->GetRenderTargetCollection().Get("PostEffectOutput");
-		DrawSpritesToRenderTarget(postOutput, cmd, pso, true);
+		DrawSpritesToRenderTarget(postOutput, cmd, pso, true, true, false);
 
 		auto* backBuffer = dx_->GetRenderTargetCollection().Get("BackBuffer");
-		DrawSpritesToRenderTarget(backBuffer, cmd, pso, false);
+		DrawSpritesToRenderTarget(backBuffer, cmd, pso, false, false, true);
 	}
 
 	void SceneManager::RequestSceneChangeInternal(SceneId next) {

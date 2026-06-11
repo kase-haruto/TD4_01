@@ -142,13 +142,15 @@ void BaseScene::Draw(ID3D12GraphicsCommandList* cmd,
 }
 
 void BaseScene::DrawSpritesOnly(ID3D12GraphicsCommandList* cmd,
-								PipelineService*		   pso) {
-	if(sceneContext_) {
+								PipelineService*		   pso,
+								bool					   collectSceneSprites,
+								bool					   clearAfterDraw) {
+	if(sceneContext_ && collectSceneSprites) {
 		for(auto* object : sceneContext_->GetObjectLibrary()->GetAllObjectsRaw()) {
 			if(auto* spriteObject = dynamic_cast<CalyxEngine::SpriteSceneObject2d*>(object)) {
 				spriteObject->DrawSprite(spriteRenderer_.get());
 			}
 		}
 	}
-	spriteRenderer_->Draw(cmd, pso, RenderTargetType::BackBuffer);
+	spriteRenderer_->Draw(cmd, pso, RenderTargetType::BackBuffer, clearAfterDraw);
 }

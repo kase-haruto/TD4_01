@@ -11,22 +11,33 @@ void SpriteRenderer::Register(Sprite* sprite){
 
 void SpriteRenderer::Draw(ID3D12GraphicsCommandList* cmdList,
 						  PipelineService* psoService,
-						  RenderTargetType renderTarget){
+						  RenderTargetType renderTarget,
+						  bool clearAfterDraw){
 	if (sprites_.empty()) return;
 
-	sprites_.erase(
-		std::remove_if(sprites_.begin(), sprites_.end(),
-		[renderTarget] (Sprite* s){ return s->GetTargetRt() != renderTarget; }),
-		sprites_.end());
+	bool hasTargetSprite = false;
+	for(Sprite* sprite : sprites_) {
+		if(sprite && sprite->GetTargetRt() == renderTarget) {
+			hasTargetSprite = true;
+			break;
+		}
+	}
 
-	if (sprites_.empty()){ Clear(); return; }
+	if (!hasTargetSprite){
+		if(clearAfterDraw) Clear();
+		return;
+	}
 
 	auto desc = PipelinePresets::MakeObject2D();
 	psoService->SetCommand(desc, cmdList);
 
-	for (Sprite* sprite : sprites_) sprite->Draw(cmdList);
+	for (Sprite* sprite : sprites_) {
+		if(sprite && sprite->GetTargetRt() == renderTarget) {
+			sprite->Draw(cmdList);
+		}
+	}
 
-	Clear();
+	if(clearAfterDraw) Clear();
 }
 
 

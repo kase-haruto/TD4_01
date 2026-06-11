@@ -31,7 +31,8 @@ public:
 	 */
 	void Draw(ID3D12GraphicsCommandList* cmdList,
 			  class PipelineService* psoService,
-			  RenderTargetType renderTargetType);
+			  RenderTargetType renderTargetType,
+			  bool clearAfterDraw = true);
 
 	/**
 	 * \brief 登録解除（クリア）
