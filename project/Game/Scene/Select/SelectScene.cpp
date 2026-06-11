@@ -91,6 +91,8 @@ void SelectScene::Initialize() {
 
 	openAudio_.Load("syouji_open");
 	eatAudio_.Load("eat");
+	bgmAudio_.Load("select_2");
+	AudioAPI::Play(bgmAudio_, true, 0.3f);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
