@@ -90,6 +90,8 @@ namespace CalyxEngine {
 				return "Effect";
 			case AssetType::SpriteAnimation:
 				return "Sprite Animation";
+			case AssetType::PostEffect:
+				return "PostFx";
 			case AssetType::Unknown:
 			default:
 				return "Unknown";
@@ -225,6 +227,9 @@ namespace CalyxEngine {
 				break;
 			case AssetType::SpriteAnimation:
 				tname = "SpriteAnimation";
+				break;
+			case AssetType::PostEffect:
+				tname = "PostFx";
 				break;
 			default:
 				break;
@@ -718,6 +723,10 @@ namespace CalyxEngine {
 				typeFilter_ = AssetType::SpriteAnimation;
 				scope_		= Scope::All;
 			}
+			if(ImGui::Selectable("All PostFx")) {
+				typeFilter_ = AssetType::PostEffect;
+				scope_		= Scope::All;
+			}
 			ImGui::TreePop();
 		}
 	}
@@ -753,6 +762,9 @@ namespace CalyxEngine {
 			break;
 		case AssetType::SpriteAnimation:
 			label = "Drop Sprite Animation here";
+			break;
+		case AssetType::PostEffect:
+			label = "Drop PostFx here";
 			break;
 		default:
 			break;
