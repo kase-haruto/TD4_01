@@ -82,6 +82,9 @@ void TitleScene::Initialize() {
 	IsOpening_ = true;
 	IsPhase_ = false;
 
+	buttunAudio_.Load("Buttun");
+	bgmAudio_.Load("Title");
+	AudioAPI::Play(bgmAudio_, true, 0.2f);
 	// 初期化時にパッドが接続されていればパッド表示、なければキーボード表示
 	isPad_ = CalyxFoundation::Input::IsGamepadConnected();
 }
@@ -101,6 +104,8 @@ void TitleScene::Update([[maybe_unused]] float dt) {
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
+		AudioAPI::Play(buttunAudio_, false, 0.3f);
+		AudioAPI::Stop(bgmAudio_);
 		payload_ = BuildNowTypePayload(SceneType::TITLE);
 		transitionControl_->SetAutoPreset(SceneType::TITLE, SceneType::SELECT);
 		transitionControl_->StartClosing(1.0f, [this]() {
