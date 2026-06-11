@@ -2,6 +2,7 @@
 
 #include <numbers>
 
+#include "Game/DemoPlayer/DemoPlayer.h"
 #include "Engine/Objects/Collider/BoxCollider.h"
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
@@ -13,6 +14,21 @@ BreakableWallObject::BreakableWallObject(
 	: StageGimmickObjectBase(modelName, objectName) {
 }
 
+void BreakableWallObject::OnCollisionEnter(Collider* other) {
+
+	BaseGameObject* otherObj = other->GetOwner();
+	if(otherObj && other->GetType() != ColliderType::Type_PlayerAttack && other->GetType() != ColliderType::Type_Player) {
+		return;
+	}
+	if(collider_) {
+		collider_->SetCollisionEnabled(false);
+	}
+	auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner());
+	if(!player) { return; }
+
+	player->TakeDamage(1);
+}
+
 void BreakableWallObject::Break(const CalyxEngine::Vector3& position) {
 
 	// 壊れているなら何もしない
@@ -20,14 +36,6 @@ void BreakableWallObject::Break(const CalyxEngine::Vector3& position) {
 		return;
 	}
 	isBroken_ = true;
-
-	// コライダーとモデルを無効化
-	if(collider_) {
-		collider_->SetCollisionEnabled(false);
-	}
-	if(model_) {
-		BaseGameObject::SetDrawEnable(false);
-	}
 
 	const CalyxEngine::Vector3 wallPosition = worldTransform_.GetWorldPosition();
 	const float				   maxYaw		= std::numbers::pi_v<float> / 4.0f;
@@ -72,11 +80,12 @@ void BreakableWallObject::ObjectInitialize() {
 	BaseGameObject::InitializeCollider(ColliderKind::Box);
 	if(collider_) {
 		collider_->SetType(ColliderType::Type_StageGimmick);
-		collider_->SetTargetType(ColliderType::Type_Player);
+		collider_->SetTargetType(ColliderType::Type_Player | ColliderType::Type_PlayerAttack);
 		collider_->SetOwner(this);
 		collider_->SetCollisionEnabled(true);
 		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
-			radius->SetSize(worldTransform_.scale);
+			radius->SetOffset({0.0f, 2.2f, 0.0f});
+			radius->SetSize({3.0f, 4.0f, 1.0f});
 		}
 	}
 	isBroken_ = false;

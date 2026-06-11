@@ -27,6 +27,7 @@ public:
 
 	// 衝突開始時コールバック
 	void OnCollisionEnter(Collider* other) override;
+	void OnCollisionStay(Collider* other) override;
 
 protected:
 
