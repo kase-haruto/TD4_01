@@ -126,4 +126,5 @@ private:
 	bool IsOpening_ = false;
 
 	CalyxEngine::Audio timeUpAudio_;
+	CalyxEngine::Audio bgmAudio_;
 };
