@@ -25,6 +25,9 @@ void ProjectileObject::OnCollisionEnter(Collider* other) {
 	// コライダーとモデルを無効化
 	isHit_		= isPlayer;
 	isParry_	= isPlayerAttack;
+	if(isParry_) {
+		isHit_ = false;
+	}
 	if(isHit_) {
 		isFlying_ = false;
 	}
