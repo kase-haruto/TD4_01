@@ -17,7 +17,8 @@ enum TutorialType {
 	Dive,
 	Purpose,
 	Teeth,
-	Open
+	Open,
+	Choco
 };
 
 /// <summary>
@@ -137,11 +138,13 @@ private:
 	std::string diveTexturePath_	   = "Textures/tutorial/key_rule02.png";
 	std::string purposeTexturePath_	   = "Textures/tutorial/key_rule03.png";
 	std::string teethTexturePath_	   = "Textures/tutorial/key_rule04.png";
+	std::string chocoTexturePath_	   = "Textures/tutorial/key_rule05.png";
 	std::string openTexturePath_	   = "Textures/tutorial/key_rule06.png";
 	std::string jumpTexturePadPath_	   = "Textures/tutorial/cont_rule01.png";
 	std::string diveTexturePadPath_	   = "Textures/tutorial/cont_rule02.png";
 	std::string purposeTexturePadPath_ = "Textures/tutorial/cont_rule03.png";
 	std::string teethTexturePadPath_   = "Textures/tutorial/cont_rule04.png";
+	std::string chocoTexturePadPath_   = "Textures/tutorial/cont_rule05.png";
 	std::string openTexturePadPath_	   = "Textures/tutorial/cont_rule06.png";
 
 	// スプライトの表示レイアウト（GUIで変更・保存可）

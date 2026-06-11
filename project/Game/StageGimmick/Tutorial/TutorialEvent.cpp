@@ -121,6 +121,7 @@ void TutorialEvent::EventUpdate(float dt) {
 	case Purpose:
 	case Teeth:
 	case Open:
+	case Choco:
 	default:
 		// Aボタン または スペースで解除（一回停止）
 		if(IsConfirmTriggered()) {
@@ -314,6 +315,10 @@ void TutorialEvent::ApplyTextureForType() {
 		sprite_->SetTexture(openTexturePath_);
 		spritePad_->SetTexture(openTexturePadPath_);
 		break;
+	case Choco:
+		sprite_->SetTexture(chocoTexturePath_);
+		spritePad_->SetTexture(chocoTexturePadPath_);
+		break;
 	}
 }
 
@@ -344,7 +349,7 @@ void TutorialEvent::DerivativeGui() {
 	eventData_.ShowGui();
 
 	ImGui::SeparatorText("Tutorial Type");
-	const char* typeNames[] = {"Jump", "Dive", "Purpose", "Teeth", "Open"};
+	const char* typeNames[] = {"Jump", "Dive", "Purpose", "Teeth", "Open", "Choco"};
 	int			currentType = std::clamp(eventData_.type, 0, static_cast<int>(IM_ARRAYSIZE(typeNames) - 1));
 	if(ImGui::Combo("Type", &currentType, typeNames, IM_ARRAYSIZE(typeNames))) {
 		eventData_.type = currentType;
@@ -387,6 +392,7 @@ void TutorialEvent::DerivativeGui() {
 	editTexturePath("Purpose Texture", purposeTexturePath_);
 	editTexturePath("Teeth Texture", teethTexturePath_);
 	editTexturePath("Open Texture", openTexturePath_);
+	editTexturePath("Choco Texture", chocoTexturePath_);
 }
 
 void TutorialEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
@@ -410,6 +416,9 @@ void TutorialEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nloh
 	if(derived->contains("openTexture")) {
 		openTexturePath_ = derived->at("openTexture").get<std::string>();
 	}
+	if(derived->contains("chocoTexture")) {
+		chocoTexturePath_ = derived->at("chocoTexture").get<std::string>();
+	}
 	if(derived->contains("spritePosition")) {
 		spritePosition_ = derived->at("spritePosition").get<CalyxEngine::Vector2>();
 	}
@@ -431,6 +440,7 @@ void TutorialEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& 
 	derived["purposeTexture"] = purposeTexturePath_;
 	derived["teethTexture"]	  = teethTexturePath_;
 	derived["openTexture"]	  = openTexturePath_;
+	derived["chocoTexture"]	  = chocoTexturePath_;
 	derived["spritePosition"] = spritePosition_;
 	derived["spriteScale"]	  = spriteScale_;
 	derived["popInDuration"]  = popInDuration_;
