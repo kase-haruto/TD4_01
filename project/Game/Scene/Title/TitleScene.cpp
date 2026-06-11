@@ -55,13 +55,13 @@ void TitleScene::Initialize() {
 	pauseBg_->Update();
 
 	pressButton_ = std::make_unique<Sprite>("Textures/Title/titleUI_cont.png");
-	pressButton_->Initialize({640.0f, 250.0f}, {640.0f, 360.0f});
+	pressButton_->Initialize({640.0f, 600.0f}, {640.0f, 360.0f});
 	pressButton_->SetAnchorPoint({0.5f, 0.0f});
 	pressButton_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	pressButton_->Update();
 
 	pressKey_ = std::make_unique<Sprite>("Textures/Title/titleUI_key.png");
-	pressKey_->Initialize({640.0f, 250.0f}, {640.0f, 360.0f});
+	pressKey_->Initialize({640.0f, 600.0f}, {640.0f, 360.0f});
 	pressKey_->SetAnchorPoint({0.5f, 0.0f});
 	pressKey_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 	pressKey_->Update();
