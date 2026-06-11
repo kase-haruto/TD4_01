@@ -483,8 +483,10 @@ namespace CalyxEngine {
 		if(ImGuiFileDialog::Instance()->Display("SceneSaveDialog")) {
 			if(ImGuiFileDialog::Instance()->IsOk()) {
 				std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-				SceneSerializer::Save(*ctx, filePath);
-				notifySceneSaved(filePath);
+				if(SceneSerializer::Save(*ctx, filePath)) {
+					ctx->SetScenePath(filePath);
+					notifySceneSaved(filePath);
+				}
 			}
 			ImGuiFileDialog::Instance()->Close();
 		}
@@ -532,8 +534,14 @@ namespace CalyxEngine {
 		if(CalyxFoundation::Input::PushKey(DIK_LCONTROL)) {
 			if(CalyxFoundation::Input::TriggerKey(DIK_S)) {
 				if(SceneContext* scene = SceneContext::Current()) {
-					SceneSerializer::Save(*scene, scene->GetScenePath());
-					notifySceneSaved(scene->GetScenePath());
+					std::string scenePath = scene->GetScenePath();
+					if(scenePath.empty()) {
+						scenePath = "Resources/Assets/Scenes/" + scene->GetSceneName() + ".scene";
+					}
+					if(SceneSerializer::Save(*scene, scenePath)) {
+						scene->SetScenePath(scenePath);
+						notifySceneSaved(scenePath);
+					}
 				}
 			}
 		}
@@ -1281,8 +1289,13 @@ namespace CalyxEngine {
 		SceneContext* ctx = SceneContext::Current();
 		if(!ctx) return;
 
-		std::string scenePath = "Resources/Assets/Scenes/" + ctx->GetSceneName() + ".scene";
-		SceneSerializer::Save(*ctx, scenePath);
+		std::string scenePath = ctx->GetScenePath();
+		if(scenePath.empty()) {
+			scenePath = "Resources/Assets/Scenes/" + ctx->GetSceneName() + ".scene";
+		}
+		if(SceneSerializer::Save(*ctx, scenePath)) {
+			ctx->SetScenePath(scenePath);
+		}
 	}
 
 	//=============================================================================
