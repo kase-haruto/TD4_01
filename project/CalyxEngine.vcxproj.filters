@@ -580,6 +580,9 @@
     <Filter Include="Engine\Objects\Event\Camera">
       <UniqueIdentifier>{2F346CB6-BA86-4962-8767-0308B7D4947F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Objects\Event\PostEffect">
+      <UniqueIdentifier>{6F8F67DA-F10E-40A7-9346-69C33C6AFBD4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\PostProcess\Blur\RadialBlur">
       <UniqueIdentifier>{D5C0EF24-C7A5-42AC-9A50-5AED12B43446}</UniqueIdentifier>
     </Filter>
@@ -998,6 +1001,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Objects\Event\Camera\CameraEventObject.cpp">
       <Filter>Engine\Objects\Event\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Event\PostEffect\PostEffectEvent.cpp">
+      <Filter>Engine\Objects\Event\PostEffect</Filter>
     </ClCompile>
     <ClCompile Include="Engine\PostProcess\Blend\BlendEffect.cpp">
       <Filter>Engine\PostProcess</Filter>
@@ -1731,6 +1737,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Objects\Event\Camera\CameraEventObject.h">
       <Filter>Engine\Objects\Event\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Event\PostEffect\PostEffectEvent.h">
+      <Filter>Engine\Objects\Event\PostEffect</Filter>
     </ClInclude>
     <ClInclude Include="Engine\PostProcess\Blend\BlendEffect.h">
       <Filter>Engine\PostProcess</Filter>
@@ -2688,6 +2697,7 @@
     <ClCompile Include="Engine\Graphics\Camera\Action\BaseCameraAction.cpp" />
     <ClCompile Include="Engine\Objects\Event\BaseEventObject.cpp" />
     <ClCompile Include="Engine\Objects\Event\Camera\CameraEventObject.cpp" />
+    <ClCompile Include="Engine\Objects\Event\PostEffect\PostEffectEvent.cpp" />
     <ClCompile Include="Engine\PostProcess\Manager\PostEffectManager.cpp" />
     <ClCompile Include="Game\DemoPlayer\DemoPlayer.cpp" />
     <ClCompile Include="Game\DemoPlayer\PlayerUI.cpp" />
@@ -2951,6 +2961,7 @@
     <ClInclude Include="Engine\Objects\base\BaseObject.h" />
     <ClInclude Include="Engine\Objects\Event\BaseEventObject.h" />
     <ClInclude Include="Engine\Objects\Event\Camera\CameraEventObject.h" />
+    <ClInclude Include="Engine\Objects\Event\PostEffect\PostEffectEvent.h" />
     <ClInclude Include="Engine\PostProcess\Manager\PostEffectManager.h" />
     <ClInclude Include="Engine\Scene\Transitioner\IScenePayload.h" />
     <ClInclude Include="Engine\System\Component\IComponent.h" />

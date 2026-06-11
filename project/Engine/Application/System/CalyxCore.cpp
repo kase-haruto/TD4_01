@@ -26,6 +26,8 @@
 
 // lib
 #include "Engine/Assets/Manager/AssetManager.h"
+#include "Engine/Objects/3D/Actor/Library/SceneObjectLibrary.h"
+#include "Engine/Scene/Context/SceneContext.h"
 #include "Engine/Scene/System/SceneManager.h"
 #include <Engine/Editor/AssetPreviewManager.h>
 #include <Engine/Editor/PickingPass.h>
@@ -178,6 +180,16 @@ namespace CalyxEngine {
 
 		if(auto* scTarget = dynamic_cast<SwapChainRenderTarget*>(backBuffer)) {
 			scTarget->SetBufferIndex(dxCore_->GetSwapChain().GetCurrentBackBufferIndex());
+		}
+
+		bool hasPostEffectEvent = false;
+		if(auto* ctx = SceneContext::Current()) {
+			if(auto* library = ctx->GetObjectLibrary()) {
+				hasPostEffectEvent = !library->FindByClassName("PostEffectEvent").empty();
+			}
+		}
+		if(!hasPostEffectEvent) {
+			PostEffectManager::Get()->ClearScenePostEffect();
 		}
 
 		PostEffectManager::Get()->Execute(cmd, offscreenRes, postOutput, dxCore_.get());

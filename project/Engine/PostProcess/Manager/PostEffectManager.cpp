@@ -105,8 +105,6 @@ void PostEffectManager::Initialize(PipelineService* service,bool enableAll){
 
 	dirty_ = true;
 	initialized_ = true;
-
-	LoadPreset(kDefaultPaht);
 }
 
 // ---------- Toggle ----------
@@ -176,8 +174,14 @@ void PostEffectManager::EnableAll(){
 
 void PostEffectManager::DisableAll(){
 	if (!initialized_) return;
-	for (auto& s : collection_.GetSlots()) s.enabled = false;
-	MarkDirty();
+	bool changed = false;
+	for (auto& s : collection_.GetSlots()) {
+		if(s.enabled) {
+			s.enabled = false;
+			changed = true;
+		}
+	}
+	if(changed) MarkDirty();
 }
 
 // ---------- Order ----------
@@ -336,6 +340,31 @@ bool PostEffectManager::LoadPreset(const std::string& filePath){
 	collection_.GetSlots() = std::move(loaded);
 	MarkDirty();
 	return true;
+}
+
+void PostEffectManager::ClearScenePostEffect(){
+	if(!initialized_) return;
+
+	bool changed = false;
+	for(auto& slot : collection_.GetSlots()){
+		if(slot.enabled){
+			slot.enabled = false;
+			changed = true;
+		}
+	}
+
+	if(hasLoadedGraph_ || !loadedPreset_.is_null()){
+		loadedPreset_ = nlohmann::json{};
+		hasLoadedGraph_ = false;
+		changed = true;
+	}
+
+	if(!floatTweens_.empty()){
+		floatTweens_.clear();
+		changed = true;
+	}
+
+	if(changed) MarkDirty();
 }
 
 void PostEffectManager::PlayTriggeredEffects(){

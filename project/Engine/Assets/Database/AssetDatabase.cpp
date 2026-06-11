@@ -72,6 +72,7 @@ AssetType AssetDatabase::GuessTypeFromExtension(const std::string& extIn) {
 	if(ext == ".prefab") return AssetType::Prefab;
 	if(ext == ".effect" || ext == ".fxasset") return AssetType::Effect;
 	if(ext == ".spriteanim") return AssetType::SpriteAnimation;
+	if(ext == ".postfx") return AssetType::PostEffect;
 	if(ext == ".wav" || ext == ".mp3" || ext == ".ogg") return AssetType::Audio;
 	return AssetType::Unknown;
 }
