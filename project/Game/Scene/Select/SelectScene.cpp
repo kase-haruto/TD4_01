@@ -188,8 +188,8 @@ void SelectScene::SelectUpdate(float dt) {
 			}
 		}
 
-		// 遷移用ペイロードを用意し、障子オープン演出へ移行
-		gamePayload_  = BuildGamePayload(selectedIndex_);
+		// 遷移用ペイロードを用意し、障子オープン演出へ移行(selectedIndex_が0~4のため＋１)
+		gamePayload_  = BuildGamePayload(selectedIndex_ + 1);
 		isShoujiOpen_ = true;
 	}
 }

@@ -146,7 +146,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 		}
 		ImGui::Text("%s", settingPath_.c_str());
 		ImGui::DragFloat("hp", &stageHP_, 0.1f, 0.0f, 1000.0f);
-		ImGui::DragFloat("limitTime", &stageLimitTime_, 0.1f, 0.0f, 99.0f);
+		ImGui::DragFloat("limitTime", &stageLimitTime_, 0.1f, 0.0f, 120.0f);
 		if(ImGui::Button("Save")) {
 			SaveStageSetting();
 		}
