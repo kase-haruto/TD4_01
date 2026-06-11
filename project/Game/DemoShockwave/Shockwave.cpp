@@ -2,6 +2,7 @@
 #include "Engine/Objects/Collider/SphereCollider.h"
 #include "Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h"
 #include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
+#include "Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.h"
 #include <algorithm>
 
 Shockwave::Shockwave() : Actor() {
@@ -110,6 +111,11 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 	if(auto* projectile = dynamic_cast<ProjectileObject*>(otherObj)) {
 		// ヒットごとに1件積む（複数ヒットが上書きで潰れないように）
 		pendingDamages_.push_back({projectile->GetDamageTime(), 1});
+	}
+
+	if(auto* wallEvent = dynamic_cast<BreakableWallObject*>(otherObj)) {
+		// ヒットごとに1件積む（複数ヒットが上書きで潰れないように）
+		pendingDamages_.push_back({0.0f, 1});
 	}
 
 }
