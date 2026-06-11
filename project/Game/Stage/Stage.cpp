@@ -1,5 +1,6 @@
 #include "Stage.h"
 #include <Engine/Application/System/Environment.h>
+#include <cmath>
 
 void Stage::Initialize(float hp, float limitTime) {
 	stageHP_   = hp;
@@ -19,7 +20,7 @@ void Stage::Initialize(float hp, float limitTime) {
 
 	hpUI_ = std::make_unique<Sprite>("Textures/UI/Demon/enemy_HPUI_solid.png");
 	hpUI_->SetAnchorPoint({0.5f, 0.5f});
-	hpUI_->SetSize({140.0f, 140.0f});
+	hpUI_->SetSize(hpFillSize_);
 	hpUI_->SetPosition(centerDisPos_);
 	hpUI_->SetFillMethod(2);
 	hpUI_->SetFillOrigin(0.0f, 0.0f);
@@ -73,6 +74,26 @@ void Stage::Update(float dt) {
 		timeUI_->SetPosition(centerPos_ + offset);
 		hpUI_->SetPosition(centerDisPos_ + offset);
 		needleUI_->SetPosition(centerDisPos_ + offset);
+	}
+
+	// 残り時間が少ない時は危機感を出すため点滅(拡縮)させる
+	if(timer_ <= dangerThreshold_ && timer_ > 0.0f) {
+		blinkTimer_ += dt;
+		float s = std::sinf(blinkTimer_ * blinkSpeed_); // -1.0 ~ 1.0
+		float scale = 1.0f + blinkScale_ * s;			// 1.0 ± blinkScale_
+		float alpha = 0.6f + 0.4f * (0.5f * (s + 1.0f)); // 0.6 ~ 1.0
+
+		if(baseUI_) { baseUI_->SetSize(hpUISize_ * scale); baseUI_->SetAlpha(alpha); }
+		if(timeUI_) { timeUI_->SetSize(hpUISize_ * scale); timeUI_->SetAlpha(alpha); }
+		if(hpUI_) { hpUI_->SetSize(hpFillSize_ * scale); hpUI_->SetAlpha(alpha); }
+		if(needleUI_) { needleUI_->SetSize(hpUISize_ * scale); needleUI_->SetAlpha(alpha); }
+	} else if(blinkTimer_ != 0.0f) {
+		// 点滅終了時に元のサイズ・不透明度へ戻す
+		blinkTimer_ = 0.0f;
+		if(baseUI_) { baseUI_->SetSize(hpUISize_); baseUI_->SetAlpha(1.0f); }
+		if(timeUI_) { timeUI_->SetSize(hpUISize_); timeUI_->SetAlpha(1.0f); }
+		if(hpUI_) { hpUI_->SetSize(hpFillSize_); hpUI_->SetAlpha(1.0f); }
+		if(needleUI_) { needleUI_->SetSize(hpUISize_); needleUI_->SetAlpha(1.0f); }
 	}
 
 	if(baseUI_) baseUI_->Update();
