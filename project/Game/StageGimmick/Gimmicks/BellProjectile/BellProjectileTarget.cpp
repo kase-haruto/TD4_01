@@ -36,6 +36,11 @@ void BellProjectileTarget::ObjectInitialize() {
 }
 
 void BellProjectileTarget::ObjectUpdate(float dt) {
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	ChangeScale();
 
 	if (isRing_) {

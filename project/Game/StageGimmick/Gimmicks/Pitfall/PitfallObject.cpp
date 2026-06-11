@@ -29,7 +29,11 @@ void PitfallObject::ObjectInitialize() {
 }
 
 void PitfallObject::ObjectUpdate(float) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(!drawEffect_) {
 		worldTransform_.Update();
 		auto offset = CalyxEngine::Vector3(0.0f, -0.1f, 0.0f);

@@ -69,7 +69,11 @@ void DiceSocketObject::ObjectInitialize() {
 }
 
 void DiceSocketObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(!isCracker_ && clearCount_ <= diceSocketCount_) {
 		if(crackerInterval_ > 0.0f) {
 			crackerInterval_ -= dt;

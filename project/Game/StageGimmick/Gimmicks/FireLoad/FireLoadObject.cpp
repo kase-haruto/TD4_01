@@ -64,7 +64,11 @@ void FireLoadObject::ObjectInitialize() {
 }
 
 void FireLoadObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(!isBurn_) {
 		worldTransform_.scale = {0.0f, 0.0f, 0.0f};
 		if(model_ && IsDrawEnable()) {

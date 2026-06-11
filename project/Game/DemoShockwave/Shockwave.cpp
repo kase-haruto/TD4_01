@@ -43,6 +43,11 @@ void Shockwave::Update(float dt) {
 			++it;
 		}
 	}
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if (!isActive_) return;
 
 	timer_ += dt;
