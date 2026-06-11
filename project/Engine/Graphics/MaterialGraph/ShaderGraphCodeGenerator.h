@@ -337,7 +337,7 @@ namespace CalyxEngine {
 			out << "cbuffer MaterialConstants : register(b0) { Material gMaterial; }\n";
 			out << "cbuffer DirectionalLightConstants : register(b2) { DirectionalLight gDirectionalLight; }\n";
 			out << "cbuffer ShadowConstants : register(b3) { float4x4 gLightVP; float gShadowBias; float3 _shadowPad; };\n";
-			out << "cbuffer PointLightConstants : register(b4) { uint gPointLightCount; uint gPointLightShadowsEnabled; uint gMaxPointShadowLights; float gPointShadowContributionThreshold; PointLight gPointLights[16]; }\n";
+			out << "cbuffer PointLightConstants : register(b4) { uint gPointLightCount; uint gPointLightShadowsEnabled; uint gMaxPointShadowLights; float gPointShadowContributionThreshold; PointLight gPointLights[64]; }\n";
 			out << "cbuffer RaytracingShadowParamConstants : register(b5) { float gShadowRayEps; float gBaseAngularRadius; float gMinShadow; bool gIsSoft; };\n\n";
 			out << "Texture2D<float4> gTexture : register(t0);\n";
 			out << "TextureCube<float4> gEnvironmentMap : register(t1);\n";

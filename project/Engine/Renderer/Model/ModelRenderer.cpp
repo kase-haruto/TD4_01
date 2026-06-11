@@ -16,6 +16,8 @@
 #include <Engine/Lighting/LightLibrary.h>
 #include <Engine/Scene/Context/SceneContext.h>
 
+#include <algorithm>
+#include <cmath>
 #include <cstring>
 
 ModelRenderer::ModelRenderer() {
@@ -130,7 +132,8 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCu
 			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
-			inst.visible = !enableFrustumCulling || !camera || camera->IsVisible(inst.worldAABB);
+			inst.visible = !enableFrustumCulling || !camera ||
+						   (camera->IsVisible(inst.worldAABB) && PassesScreenSpaceCulling(camera, inst.worldAABB));
 		}
 	}
 
@@ -154,7 +157,8 @@ void ModelRenderer::PreCullAndBatch(const Camera3d* camera, bool enableFrustumCu
 			// -------------------------
 			// MainPass：カメラカリング
 			// -------------------------
-			inst.visible = !enableFrustumCulling || !camera || camera->IsVisible(inst.worldAABB);
+			inst.visible = !enableFrustumCulling || !camera ||
+						   (camera->IsVisible(inst.worldAABB) && PassesScreenSpaceCulling(camera, inst.worldAABB));
 		}
 	}
 
@@ -251,6 +255,30 @@ void ModelRenderer::BindRaytracingScene(ID3D12GraphicsCommandList* cmdList) cons
 	cmdList->SetGraphicsRootShaderResourceView(
 		10, // Space0, t3
 		tlas->GetGPUVirtualAddress());
+}
+
+bool ModelRenderer::PassesScreenSpaceCulling(const Camera3d* camera, const AABB& worldAABB) const {
+	if(!screenSpaceCulling_.enabled || !camera) return true;
+
+	const CalyxEngine::Vector3 center = worldAABB.GetCenter();
+	const CalyxEngine::Vector3 extent = (worldAABB.max_ - worldAABB.min_) * 0.5f;
+	const float radius = extent.Length();
+	if(radius <= 0.0f) return true;
+
+	const CalyxEngine::Vector3 toObject = center - camera->GetWorldTransform().matrix.world.GetTranslationMatrix();
+	const float distance = toObject.Length();
+	if(distance < screenSpaceCulling_.minDistance) return true;
+
+	const auto* graphics = GraphicsGroup::GetInstance();
+	const float viewportHeight = graphics ? static_cast<float>(graphics->GetClientHeight()) : 720.0f;
+	if(viewportHeight <= 0.0f) return true;
+
+	const float safeDistance = (std::max)(distance, 0.001f);
+	const float projectedDiameterPixels =
+		(2.0f * radius / safeDistance) *
+		(viewportHeight * 0.5f / std::tan(camera->GetFovY() * 0.5f));
+
+	return projectedDiameterPixels >= screenSpaceCulling_.minScreenPixels;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

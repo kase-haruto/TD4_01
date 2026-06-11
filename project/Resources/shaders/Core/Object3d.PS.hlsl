@@ -72,7 +72,7 @@ cbuffer PointLightConstants : register(b4) {
     uint gPointLightShadowsEnabled;
     uint gMaxPointShadowLights;
     float gPointShadowContributionThreshold;
-    PointLight gPointLights[16];
+    PointLight gPointLights[64];
 }
 
 // NOTE:
