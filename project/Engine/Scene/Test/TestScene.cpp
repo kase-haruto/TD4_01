@@ -104,6 +104,8 @@ void TestScene::Initialize(){
 	ClockManager::GetInstance()->SetTimeScale(1.0f);
 	buttunAudio_.Load("Buttun");
 	timeUpAudio_.Load("timeOver");
+	bgmAudio_.Load("Game");
+	AudioAPI::Play(bgmAudio_, true, 0.3f);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -112,6 +114,10 @@ void TestScene::Initialize(){
 void TestScene::Update([[maybe_unused]]float dt){
 
 	transitionControl_->Update(dt);
+
+	if(player_) {
+		playerUI_->Update(dt, player_->GetLife());
+	}
 
 	if(IsPhase_ || IsOpening_) return;
 
@@ -159,9 +165,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 	stageGimmickManager_->ShowGui();
 	stageGimmickManager_->Update(dt);
 
-	if (player_) {
-		playerUI_->Update(dt, player_->GetLife());
-	}
+
 
 	//衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
@@ -325,23 +329,25 @@ void TestScene::InitPauseResource() {
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
 	if(stage_->IsClear() || player_->GetIsTutorialClear()) {
-		/*ClockManager::GetInstance()->SetTimeScale(1.0f);
-		payload_ = BuildNowTypePayload(SceneType::TEST);
-		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::PRECLEAR);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::PRECLEAR), std::move(payload_));
-		});*/
-	}
-	if(stage_->IsGameOver() || player_->GetLife() <= 0) {
-		/*AudioAPI::Play(timeUpAudio_, false, 0.3f);
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
+		AudioAPI::Stop(bgmAudio_);
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::PRECLEAR);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::PRECLEAR), std::move(payload_));
+		});
+	}
+	if(stage_->IsGameOver() || player_->GetLife() <= 0) {
+		AudioAPI::Play(timeUpAudio_, false, 0.3f);
+		ClockManager::GetInstance()->SetTimeScale(1.0f);
+		payload_ = BuildNowTypePayload(SceneType::TEST);
+		IsPhase_ = true;
+		AudioAPI::Stop(bgmAudio_);
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::GAMEOVER);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
-		});*/
+		});
 	}
 }
 
@@ -382,6 +388,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildGamePayload(stageNum_);
 		IsPhase_ = true;
+		AudioAPI::Stop(bgmAudio_);
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::TEST);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(payload_));
@@ -392,6 +399,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
+		AudioAPI::Stop(bgmAudio_);
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::SELECT);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::SELECT), std::move(payload_));
