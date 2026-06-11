@@ -73,7 +73,8 @@ void DroolRainObject::ObjectUpdate(float dt) {
 		scaleY += runtimeParam_.airScaleSpeed_ * dt;
 		worldTransform_.scale.y = scaleY;
 		// よだれが落ちたら
-		if(worldTransform_.translation.y <= 0.0f) {
+		if(worldTransform_.translation.y <= 0.0f && !isEffect_) {
+			isEffect_ = true;
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() - CalyxEngine::Vector3{0.0f, 1.3f, 0.0f});
 
 			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer")->GetWorldTransform().GetWorldPosition();
@@ -106,6 +107,7 @@ void DroolRainObject::ObjectUpdate(float dt) {
 			runtimeParam_				  = param_;
 			dropTime_					  = Random::Generate<float>(0.0f, 1.0f);
 			isRaining_					  = false;
+			isEffect_					  = false;
 			SetDrawEnable(false);
 		}
 	}

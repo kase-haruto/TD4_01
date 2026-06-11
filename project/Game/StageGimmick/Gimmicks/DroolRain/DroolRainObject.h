@@ -52,6 +52,8 @@ private:
 	bool isRaining_ = false;
 	bool isOnceSet_ = true; // 初期Offset用
 
+	bool isEffect_ = false;
+
 	CalyxEngine::EffectAsset effectData_;
 
 	CalyxEngine::Audio droolAudio_;
