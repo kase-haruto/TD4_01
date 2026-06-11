@@ -43,6 +43,7 @@ public:
 
 	//確定したステージダメージを取り出して消費する
 	int				 ConsumeStageDamage();
+	void SetPendingDamage(float time, int damage);
 
 private:
 	struct ShockwaveParameter : public CalyxEngine::SerializableObject {
