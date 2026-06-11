@@ -77,6 +77,7 @@ void SelectScene::Initialize() {
 
 	shoujiOpenTime_ = 2.0f;
 	isShoujiOpen_ = false;
+	isEat_			= false;
 
 	oni_ = std::static_pointer_cast<GeneralObject>(sceneContext_->GetObjectLibrary()->FindByName("oni"));
 	if(oni_) {
@@ -221,6 +222,11 @@ void SelectScene::ShoujiOpen(float dt) {
 	bool oniFinished = false;
 	if(oni_) {
 		if(auto* anim = oni_->AnimationModel()) {
+			shoujiOpenTime_ -= dt;
+			if(!isEat_ && shoujiOpenTime_ < -3.4f) {
+				isEat_ = true;
+				AudioAPI::Play(eatAudio_, false, 0.25f);
+			}
 			oniFinished = anim->IsAnimationFinished();
 		}
 	} else {
