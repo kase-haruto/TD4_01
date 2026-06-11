@@ -4,7 +4,7 @@
       1.0,
       1.0,
       1.0,
-      1.0
+      0.7882353067398071
     ],
     "emissiveColor": [
       0.0,
@@ -15,7 +15,7 @@
     "emissiveIntensity": 0.0,
     "envirometCoefficient": 0.5,
     "isReflect": false,
-    "lightingMode": 0,
+    "lightingMode": 2,
     "normalMapFlipY": false,
     "normalMapGuid": "00000000-0000-0000-0000-000000000000",
     "normalMapStrength": 1.0,
@@ -32,9 +32,9 @@
     "toonBaseStep": 0.25,
     "toonEdgeSoftness": 0.029999999329447746,
     "toonHighlightColor": [
-      1.149999976158142,
-      1.100000023841858,
-      1.0,
+      1.0800000429153442,
+      1.059999942779541,
+      1.0199999809265137,
       1.0
     ],
     "toonMidShadowColor": [
@@ -65,11 +65,6 @@
         "fromPinId": 10,
         "id": 16,
         "toPinId": 12
-      },
-      {
-        "fromPinId": 14,
-        "id": 18,
-        "toPinId": 4
       },
       {
         "fromPinId": 20,
@@ -107,17 +102,97 @@
         "toPinId": 55
       },
       {
-        "fromPinId": 56,
-        "id": 58,
-        "toPinId": 13
-      },
-      {
         "fromPinId": 33,
         "id": 59,
         "toPinId": 48
+      },
+      {
+        "fromPinId": 14,
+        "id": 64,
+        "toPinId": 61
+      },
+      {
+        "fromPinId": 73,
+        "id": 79,
+        "toPinId": 75
+      },
+      {
+        "fromPinId": 56,
+        "id": 80,
+        "toPinId": 76
+      },
+      {
+        "fromPinId": 63,
+        "id": 100,
+        "toPinId": 84
+      },
+      {
+        "fromPinId": 99,
+        "id": 101,
+        "toPinId": 2
+      },
+      {
+        "fromPinId": 105,
+        "id": 108,
+        "toPinId": 62
+      },
+      {
+        "fromPinId": 77,
+        "id": 109,
+        "toPinId": 103
+      },
+      {
+        "fromPinId": 107,
+        "id": 110,
+        "toPinId": 104
+      },
+      {
+        "fromPinId": 115,
+        "id": 134,
+        "toPinId": 13
+      },
+      {
+        "fromPinId": 127,
+        "id": 135,
+        "toPinId": 131
+      },
+      {
+        "fromPinId": 129,
+        "id": 136,
+        "toPinId": 132
+      },
+      {
+        "fromPinId": 125,
+        "id": 137,
+        "toPinId": 121
+      },
+      {
+        "fromPinId": 122,
+        "id": 142,
+        "toPinId": 139
+      },
+      {
+        "fromPinId": 133,
+        "id": 143,
+        "toPinId": 140
+      },
+      {
+        "fromPinId": 141,
+        "id": 144,
+        "toPinId": 117
+      },
+      {
+        "fromPinId": 141,
+        "id": 145,
+        "toPinId": 118
+      },
+      {
+        "fromPinId": 119,
+        "id": 147,
+        "toPinId": 114
       }
     ],
-    "nextId": 60,
+    "nextId": 148,
     "nodes": [
       {
         "boolValue": false,
@@ -135,37 +210,13 @@
             "kind": 0,
             "name": "Surface",
             "valueType": 5
-          },
-          {
-            "id": 3,
-            "kind": 0,
-            "name": "Lighting Mode",
-            "valueType": 4
-          },
-          {
-            "id": 4,
-            "kind": 0,
-            "name": "BaseColor",
-            "valueType": 2
-          },
-          {
-            "id": 5,
-            "kind": 0,
-            "name": "Emissive",
-            "valueType": 2
-          },
-          {
-            "id": 6,
-            "kind": 0,
-            "name": "Emissive Intensity",
-            "valueType": 1
           }
         ],
         "intValue": 0,
         "outputs": [],
         "position": [
-          2959.0,
-          -44.0
+          3906.0,
+          -24.0
         ],
         "properties": {},
         "title": "Output",
@@ -192,8 +243,8 @@
           }
         ],
         "position": [
-          2250.0,
-          42.0
+          2378.0,
+          -49.0
         ],
         "properties": {
           "textureGuid": "afb5e6e4-ba33-4514-8948-ba2b13f8cd84"
@@ -241,8 +292,8 @@
           }
         ],
         "position": [
-          2597.0,
-          60.0
+          2661.0,
+          49.0
         ],
         "properties": {},
         "title": "Texture Sample",
@@ -269,8 +320,8 @@
           }
         ],
         "position": [
-          1603.0,
-          493.0
+          1523.0,
+          573.0
         ],
         "properties": {},
         "title": "UV",
@@ -310,8 +361,8 @@
           }
         ],
         "position": [
-          1924.0,
-          465.0
+          1844.0,
+          545.0
         ],
         "properties": {},
         "title": "Split Float2",
@@ -351,8 +402,8 @@
           }
         ],
         "position": [
-          2173.0,
-          493.0
+          2090.0,
+          544.0
         ],
         "properties": {},
         "title": "Add Float",
@@ -379,8 +430,8 @@
           }
         ],
         "position": [
-          1635.0,
-          701.0
+          1555.0,
+          781.0
         ],
         "properties": {},
         "title": "Time",
@@ -394,7 +445,7 @@
           1.0,
           1.0
         ],
-        "floatValue": -0.25999999046325684,
+        "floatValue": 0.05999999865889549,
         "id": 37,
         "inputs": [],
         "intValue": 0,
@@ -407,8 +458,8 @@
           }
         ],
         "position": [
-          1635.0,
-          851.0
+          1555.0,
+          931.0
         ],
         "properties": {},
         "title": "Float",
@@ -448,8 +499,8 @@
           }
         ],
         "position": [
-          1936.0,
-          748.0
+          1856.0,
+          828.0
         ],
         "properties": {},
         "title": "Multiply Float",
@@ -489,8 +540,8 @@
           }
         ],
         "position": [
-          2238.0,
-          672.0
+          2158.0,
+          752.0
         ],
         "properties": {},
         "title": "Combine Float2",
@@ -536,8 +587,8 @@
           }
         ],
         "position": [
-          2522.0,
-          644.0
+          2442.0,
+          724.0
         ],
         "properties": {
           "offsetX": 0.0,
@@ -547,6 +598,651 @@
         },
         "title": "UV Transform",
         "type": "UVTransform"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 60,
+        "inputs": [
+          {
+            "id": 61,
+            "kind": 0,
+            "name": "A",
+            "valueType": 2
+          },
+          {
+            "id": 62,
+            "kind": 0,
+            "name": "B",
+            "valueType": 2
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 63,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          3019.0,
+          193.0
+        ],
+        "properties": {},
+        "title": "Multiply Color",
+        "type": "MultiplyColor"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 72,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 73,
+            "kind": 1,
+            "name": "Texture",
+            "valueType": 6
+          }
+        ],
+        "position": [
+          2778.0,
+          639.0
+        ],
+        "properties": {
+          "textureGuid": "20985d27-2f12-4556-8b4e-6924b16bae09"
+        },
+        "title": "Texture2D",
+        "type": "Texture2D"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 74,
+        "inputs": [
+          {
+            "id": 75,
+            "kind": 0,
+            "name": "Texture",
+            "valueType": 6
+          },
+          {
+            "id": 76,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 77,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          },
+          {
+            "id": 78,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          3127.0,
+          764.0
+        ],
+        "properties": {},
+        "title": "Texture Sample",
+        "type": "TextureSample"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 83,
+        "inputs": [
+          {
+            "id": 84,
+            "kind": 0,
+            "name": "Base Color",
+            "valueType": 2
+          },
+          {
+            "id": 85,
+            "kind": 0,
+            "name": "Emissive",
+            "valueType": 2
+          },
+          {
+            "id": 86,
+            "kind": 0,
+            "name": "Emissive Intensity",
+            "valueType": 1
+          },
+          {
+            "id": 87,
+            "kind": 0,
+            "name": "Highlight",
+            "valueType": 2
+          },
+          {
+            "id": 88,
+            "kind": 0,
+            "name": "1st Shade",
+            "valueType": 2
+          },
+          {
+            "id": 89,
+            "kind": 0,
+            "name": "2nd Shade",
+            "valueType": 2
+          },
+          {
+            "id": 90,
+            "kind": 0,
+            "name": "Base Step",
+            "valueType": 1
+          },
+          {
+            "id": 91,
+            "kind": 0,
+            "name": "Base Feather",
+            "valueType": 1
+          },
+          {
+            "id": 92,
+            "kind": 0,
+            "name": "Shade Step",
+            "valueType": 1
+          },
+          {
+            "id": 93,
+            "kind": 0,
+            "name": "Shade Feather",
+            "valueType": 1
+          },
+          {
+            "id": 94,
+            "kind": 0,
+            "name": "Spec Threshold",
+            "valueType": 1
+          },
+          {
+            "id": 95,
+            "kind": 0,
+            "name": "Spec Softness",
+            "valueType": 1
+          },
+          {
+            "id": 96,
+            "kind": 0,
+            "name": "Spec Intensity",
+            "valueType": 1
+          },
+          {
+            "id": 97,
+            "kind": 0,
+            "name": "Normal Map",
+            "valueType": 2
+          },
+          {
+            "id": 98,
+            "kind": 0,
+            "name": "Normal Strength",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 99,
+            "kind": 1,
+            "name": "Surface",
+            "valueType": 5
+          }
+        ],
+        "position": [
+          3507.0,
+          -260.0
+        ],
+        "properties": {
+          "baseColor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "baseFeather": 0.029999999329447746,
+          "baseStep": 0.25,
+          "emissiveColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "emissiveIntensity": 0.0,
+          "firstShadeColor": [
+            0.7200000286102295,
+            0.7599999904632568,
+            0.8600000143051147,
+            1.0
+          ],
+          "highlightColor": [
+            1.0800000429153442,
+            1.059999942779541,
+            1.0199999809265137,
+            1.0
+          ],
+          "secondShadeColor": [
+            0.41999998688697815,
+            0.46000000834465027,
+            0.5799999833106995,
+            1.0
+          ],
+          "shadeFeather": 0.029999999329447746,
+          "shadeStep": -0.15000000596046448,
+          "specularIntensity": 0.3499999940395355,
+          "specularSoftness": 0.019999999552965164,
+          "specularThreshold": 0.9599999785423279
+        },
+        "title": "Toon Master",
+        "type": "ToonMaster"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 102,
+        "inputs": [
+          {
+            "id": 103,
+            "kind": 0,
+            "name": "A",
+            "valueType": 2
+          },
+          {
+            "id": 104,
+            "kind": 0,
+            "name": "B",
+            "valueType": 2
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 105,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          3178.0,
+          544.0
+        ],
+        "properties": {},
+        "title": "Multiply Color",
+        "type": "MultiplyColor"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          0.7882353067398071
+        ],
+        "floatValue": 0.0,
+        "id": 106,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 107,
+            "kind": 1,
+            "name": "Color",
+            "valueType": 2
+          }
+        ],
+        "position": [
+          2929.0,
+          503.0
+        ],
+        "properties": {},
+        "title": "Color",
+        "type": "Color"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 111,
+        "inputs": [
+          {
+            "id": 112,
+            "kind": 0,
+            "name": "UV",
+            "valueType": 7
+          },
+          {
+            "id": 113,
+            "kind": 0,
+            "name": "Scale",
+            "valueType": 7
+          },
+          {
+            "id": 114,
+            "kind": 0,
+            "name": "Offset",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 115,
+            "kind": 1,
+            "name": "UV",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          2214.0,
+          197.0
+        ],
+        "properties": {
+          "offsetX": -2.5999999046325684,
+          "offsetY": 0.0,
+          "scaleX": 1.0,
+          "scaleY": 1.0
+        },
+        "title": "UV Transform",
+        "type": "UVTransform"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 116,
+        "inputs": [
+          {
+            "id": 117,
+            "kind": 0,
+            "name": "X",
+            "valueType": 1
+          },
+          {
+            "id": 118,
+            "kind": 0,
+            "name": "Y",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 119,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          1979.0,
+          256.0
+        ],
+        "properties": {},
+        "title": "Combine Float2",
+        "type": "CombineFloat2"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 120,
+        "inputs": [
+          {
+            "id": 121,
+            "kind": 0,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 122,
+            "kind": 1,
+            "name": "X",
+            "valueType": 1
+          },
+          {
+            "id": 123,
+            "kind": 1,
+            "name": "Y",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1697.0,
+          -43.0
+        ],
+        "properties": {},
+        "title": "Split Float2",
+        "type": "SplitFloat2"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 124,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 125,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 7
+          }
+        ],
+        "position": [
+          1312.0,
+          1.0
+        ],
+        "properties": {},
+        "title": "UV",
+        "type": "UV"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 126,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 127,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1472.0,
+          193.0
+        ],
+        "properties": {},
+        "title": "Time",
+        "type": "Time"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": -0.07999999821186066,
+        "id": 128,
+        "inputs": [],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 129,
+            "kind": 1,
+            "name": "Value",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1472.0,
+          343.0
+        ],
+        "properties": {},
+        "title": "Float",
+        "type": "Float"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 130,
+        "inputs": [
+          {
+            "id": 131,
+            "kind": 0,
+            "name": "A",
+            "valueType": 1
+          },
+          {
+            "id": 132,
+            "kind": 0,
+            "name": "B",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 133,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1770.0,
+          196.0
+        ],
+        "properties": {},
+        "title": "Multiply Float",
+        "type": "MultiplyFloat"
+      },
+      {
+        "boolValue": false,
+        "colorValue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "floatValue": 0.0,
+        "id": 138,
+        "inputs": [
+          {
+            "id": 139,
+            "kind": 0,
+            "name": "A",
+            "valueType": 1
+          },
+          {
+            "id": 140,
+            "kind": 0,
+            "name": "B",
+            "valueType": 1
+          }
+        ],
+        "intValue": 0,
+        "outputs": [
+          {
+            "id": 141,
+            "kind": 1,
+            "name": "Result",
+            "valueType": 1
+          }
+        ],
+        "position": [
+          1949.0,
+          32.0
+        ],
+        "properties": {},
+        "title": "Add Float",
+        "type": "AddFloat"
       }
     ]
   },

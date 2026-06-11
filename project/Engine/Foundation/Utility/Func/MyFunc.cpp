@@ -14,12 +14,109 @@
 #include <numbers>
 #include<sstream>
 #include <filesystem>
+#include <cstring>
+#include <vector>
 
 // externals
 #include "Engine/Foundation/Math/MathUtil.h"
 
 #include<assimp/Importer.hpp>
 #include<assimp/postprocess.h>
+
+namespace {
+bool IsRgba8Format(DXGI_FORMAT format) {
+	return format == DXGI_FORMAT_R8G8B8A8_UNORM || format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+}
+
+void BleedTransparentPixelColors(DirectX::ScratchImage& image) {
+	using namespace DirectX;
+
+	TexMetadata metadata = image.GetMetadata();
+	if(!IsRgba8Format(metadata.format)) {
+		return;
+	}
+
+	for(size_t item = 0; item < metadata.arraySize; ++item) {
+		const Image* img = image.GetImage(0, item, 0);
+		if(!img || !img->pixels || img->width == 0 || img->height == 0) {
+			continue;
+		}
+
+		const size_t width = img->width;
+		const size_t height = img->height;
+		const size_t count = width * height;
+		std::vector<uint8_t> source(img->pixels, img->pixels + img->slicePitch);
+		std::vector<uint8_t> filled(count, 0);
+
+		for(size_t y = 0; y < height; ++y) {
+			for(size_t x = 0; x < width; ++x) {
+				const size_t offset = y * img->rowPitch + x * 4;
+				filled[y * width + x] = source[offset + 3] > 0 ? 1 : 0;
+			}
+		}
+
+		bool changed = true;
+		while(changed) {
+			changed = false;
+			std::vector<uint8_t> next = source;
+			std::vector<uint8_t> nextFilled = filled;
+
+			for(size_t y = 0; y < height; ++y) {
+				for(size_t x = 0; x < width; ++x) {
+					const size_t index = y * width + x;
+					if(filled[index]) {
+						continue;
+					}
+
+					int r = 0;
+					int g = 0;
+					int b = 0;
+					int samples = 0;
+
+					for(int dy = -1; dy <= 1; ++dy) {
+						const int ny = static_cast<int>(y) + dy;
+						if(ny < 0 || ny >= static_cast<int>(height)) {
+							continue;
+						}
+
+						for(int dx = -1; dx <= 1; ++dx) {
+							const int nx = static_cast<int>(x) + dx;
+							if((dx == 0 && dy == 0) || nx < 0 || nx >= static_cast<int>(width)) {
+								continue;
+							}
+
+							const size_t neighborIndex = static_cast<size_t>(ny) * width + static_cast<size_t>(nx);
+							if(!filled[neighborIndex]) {
+								continue;
+							}
+
+							const size_t neighborOffset = static_cast<size_t>(ny) * img->rowPitch + static_cast<size_t>(nx) * 4;
+							r += source[neighborOffset + 0];
+							g += source[neighborOffset + 1];
+							b += source[neighborOffset + 2];
+							++samples;
+						}
+					}
+
+					if(samples > 0) {
+						const size_t offset = y * img->rowPitch + x * 4;
+						next[offset + 0] = static_cast<uint8_t>(r / samples);
+						next[offset + 1] = static_cast<uint8_t>(g / samples);
+						next[offset + 2] = static_cast<uint8_t>(b / samples);
+						nextFilled[index] = 1;
+						changed = true;
+					}
+				}
+			}
+
+			source.swap(next);
+			filled.swap(nextFilled);
+		}
+
+		std::memcpy(img->pixels, source.data(), source.size());
+	}
+}
+} // namespace
 
 
 CalyxEngine::Matrix4x4 MakeOrthographicMatrix(float l, float t, float r, float b, float nearClip, float farClip) {
@@ -272,6 +369,10 @@ DirectX::ScratchImage LoadTextureImage(const std::string& filePath, bool forceSr
 		hr = LoadFromWICFile(filePathW.c_str(), forceSrgb ? WIC_FLAGS_FORCE_SRGB : WIC_FLAGS_NONE, nullptr, image);
 	}
 	CX_CHECK(SUCCEEDED(hr), "Assertion failed");
+
+	if(!useDDS) {
+		BleedTransparentPixelColors(image);
+	}
 
 	// ミップマップ生成
 	const TexMetadata& meta = image.GetMetadata();
