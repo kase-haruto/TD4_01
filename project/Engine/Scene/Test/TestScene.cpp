@@ -58,6 +58,8 @@ void TestScene::Initialize(){
 	} else {
 		scenePath = "Resources/Assets/Scenes/Stage_" + std::to_string(stageNum_) + ".scene";
 	}
+	//デバック用
+	scenePath = "Resources/Assets/Scenes/test.scene";
 	SceneSerializer::Load(*sceneContext_, scenePath);
 	sceneContext_->SetScenePath(scenePath);
 
