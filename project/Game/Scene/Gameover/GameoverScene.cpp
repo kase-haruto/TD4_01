@@ -71,7 +71,7 @@ void GameoverScene::Update([[maybe_unused]] float dt) {
 		return;
 	}
 
-	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE)) {
+	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
 		payload_ = BuildNowTypePayload(SceneType::GAMEOVER);
 		transitionControl_->SetAutoPreset(SceneType::GAMEOVER, SceneType::SELECT);

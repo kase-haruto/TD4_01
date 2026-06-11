@@ -106,7 +106,8 @@ private:
 	float fadeTime_		   = 0.0f;
 	float currentFadeTime_ = 0.0f;
 	bool  isFadeFinish_	   = false;
-	
+	CalyxEngine::Audio buttunAudio_;
+
 	// ポーズ用（扇子）
 	float openingTime_		  = 0.0f;
 	float currentOpeningTime_ = 0.0f;
@@ -123,4 +124,6 @@ private:
 	// 遷移用
 	bool IsPhase_	= false;
 	bool IsOpening_ = false;
+
+	CalyxEngine::Audio timeUpAudio_;
 };

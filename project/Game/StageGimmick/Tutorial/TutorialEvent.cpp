@@ -27,7 +27,11 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 	// プレイヤーに自分を登録する。連打対策中は
 	// プレイヤー側でジャンプ入力が無視される（Diveの2回目停止にも対応）ジャンプ中に入ったら知らん
 	if(auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner())) {
-		player->SetActiveTutorial(this);
+		if(eventData_.type == TutorialType::Clear) {
+			player->SetIsTutorialClear(true);
+		} else {
+			player->SetActiveTutorial(this);
+		}
 	}
 
 	// 時間を止めてチュートリアルを表示
@@ -73,6 +77,9 @@ void TutorialEvent::EventUpdate(float dt) {
 		EventInitialize();
 	}
 	if(state_ == TutorialState::Idle) lastDt_ = dt;
+	if(eventData_.type == TutorialType::Clear) {
+		return;
+	}
 
 	// ポップイン/アウトの進行
 	if(popInTimer_ > 0.0f) {
@@ -119,6 +126,8 @@ void TutorialEvent::EventUpdate(float dt) {
 	switch(static_cast<TutorialType>(eventData_.type)) {
 	case Dive:
 		UpdateDive(dt);
+		break;
+	case Clear:
 		break;
 	case Jump:
 	case Purpose:
@@ -322,6 +331,8 @@ void TutorialEvent::ApplyTextureForType() {
 		sprite_->SetTexture(chocoTexturePath_);
 		spritePad_->SetTexture(chocoTexturePadPath_);
 		break;
+	case Clear:
+		break;
 	}
 }
 
@@ -329,6 +340,9 @@ void TutorialEvent::DrawSprite(SpriteRenderer* renderer) const {
 	// Active、Closing中描画する
 	const bool visible = (state_ == TutorialState::Active || state_ == TutorialState::Closing);
 	if(!renderer || !visible) {
+		return;
+	}
+	if(eventData_.type == TutorialType::Clear) {
 		return;
 	}
 	if(isPad_) {
@@ -352,7 +366,7 @@ void TutorialEvent::DerivativeGui() {
 	eventData_.ShowGui();
 
 	ImGui::SeparatorText("Tutorial Type");
-	const char* typeNames[] = {"Jump", "Dive", "Purpose", "Teeth", "Open", "Choco"};
+	const char* typeNames[] = {"Jump", "Dive", "Purpose", "Teeth", "Open", "Choco", "Clear"};
 	int			currentType = std::clamp(eventData_.type, 0, static_cast<int>(IM_ARRAYSIZE(typeNames) - 1));
 	if(ImGui::Combo("Type", &currentType, typeNames, IM_ARRAYSIZE(typeNames))) {
 		eventData_.type = currentType;
