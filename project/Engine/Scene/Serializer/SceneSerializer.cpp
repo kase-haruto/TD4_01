@@ -179,6 +179,11 @@ nlohmann::json SceneSerializer::DumpJson(const SceneContext& context) {
 			jOne["worldTransform"] = const_cast<WorldTransform&>(sp->GetWorldTransform()).ExtractConfig();
 		}
 
+		// Some configurable objects also export legacy hierarchy fields such as
+		// parentGuid from their cached config. Keep live SceneObject metadata
+		// authoritative so prefab sync GUID remaps cannot be overwritten here.
+		WriteSceneObjectMetadata(*sp, jOne);
+
 		jObjects.push_back(std::move(jOne));
 	}
 
