@@ -54,6 +54,9 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 
 void TutorialEvent::EventInitialize() {
 
+	// 初期化時にパッドが接続されていればパッド表示、なければキーボード表示
+	isPad_ = CalyxFoundation::Input::IsGamepadConnected();
+
 	worldTransform_.scale.x = 20.0f;
 	worldTransform_.scale.y = 10.0f;
 

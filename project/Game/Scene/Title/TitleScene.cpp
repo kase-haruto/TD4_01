@@ -81,6 +81,9 @@ void TitleScene::Initialize() {
 	});
 	IsOpening_ = true;
 	IsPhase_ = false;
+
+	// 初期化時にパッドが接続されていればパッド表示、なければキーボード表示
+	isPad_ = CalyxFoundation::Input::IsGamepadConnected();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
