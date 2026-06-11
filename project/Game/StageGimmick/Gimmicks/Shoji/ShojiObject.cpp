@@ -58,11 +58,16 @@ void ShojiObject::ObjectInitialize() {
 	velocityX_ = param_.openVelocityX;
 
 	effectData_.Load("ConfettiEffect");
+
+	AudioAPI::Load(openAudio_, "syouji_open");
 }
 
 void ShojiObject::ObjectUpdate(float dt) {
 
 	if(isOpen_ && openTime_ < param_.openTimer) {
+		if(openTime_ == 0.0f) {
+			AudioAPI::Play(openAudio_, false, 0.5f);
+		}
 		openTime_ += dt;
 		return;
 	}

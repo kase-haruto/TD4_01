@@ -81,6 +81,9 @@ void PreClearScene::Initialize() {
 	IsPhase_   = false;
 
 	effectData_.Load("PreClearEffect");
+
+	comeoutAudio_.Load("comeout");
+	vomitAudio_.Load("vomit");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +145,8 @@ void PreClearScene::AnimUpdate(float dt) {
 	if(oniFinished) {
 		if(animTime_ == 2.0f) {
 			EffectAPI::Play(effectData_, player_->GetWorldPosition());
+			AudioAPI::Play(comeoutAudio_, false, 0.2f);
+			AudioAPI::Play(vomitAudio_, false, 0.2f);
 		}
 		animTime_ -= dt;
 

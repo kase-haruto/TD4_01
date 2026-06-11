@@ -21,6 +21,7 @@ void FireLoadObject::BurnActive() {
 		collider_->SetCollisionEnabled(true);
 	}
 	fxHandle_ = EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition());
+
 }
 
 void FireLoadObject::OnCollisionEnter(Collider* other) {
@@ -40,6 +41,7 @@ void FireLoadObject::OnCollisionEnter(Collider* other) {
 	EffectAPI::Stop(fxHandle_);
 	EffectAPI::Play(smokeData_, worldTransform_.GetWorldPosition());
 	fxHandle_ = {};
+	AudioAPI::Play(fireOutAudio_, false, 0.5f);
 }
 
 void FireLoadObject::ObjectInitialize() {
@@ -55,6 +57,8 @@ void FireLoadObject::ObjectInitialize() {
 
 	effectData_.Load("FireLoadEffect");
 	smokeData_.Load("FireSmoke");
+
+	AudioAPI::Load(fireOutAudio_, "fireOut");
 
 	defaultScale_ = {1.0f, 1.0f, 1.0f};
 }

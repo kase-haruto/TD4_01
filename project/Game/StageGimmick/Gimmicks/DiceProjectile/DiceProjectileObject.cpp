@@ -57,7 +57,7 @@ void DiceProjectileObject::ObjectInitialize() {
 
 	effectData_.Load("DiceStarEffect");
 
-	AudioAPI::Load(hitAudio_, "test");
+	AudioAPI::Load(hitAudio_, "fit");
 }
 
 void DiceProjectileObject::SameNumberRotation() {

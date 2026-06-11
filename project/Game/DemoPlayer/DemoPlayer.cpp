@@ -79,8 +79,9 @@ void DemoPlayer::Initialize() {
 	rollingEffect_.Load("PlayerRolling");
 	jumpEffect_.Load("PlayerJumpEffect");
 
-	AudioAPI::Load(playerAudio_, "test");
-	AudioAPI::Load(damageAudio_, "test2");
+	AudioAPI::Load(hitAudio_, "hit");
+	AudioAPI::Load(shockwaveAudio_, "shockwave");
+	AudioAPI::Load(damageAudio_, "damage");
 }
 
 void DemoPlayer::Update(float dt) {
@@ -150,7 +151,7 @@ void DemoPlayer::Update(float dt) {
 		CameraManager::GetMain3d()->StartShake(param_.shakeParm.duration, param_.shakeParm.intensity);
 		PostEffectManager::Get()->PlayTriggeredEffect("PlayerShock");
 		//EffectAPI::PlayFromName("shockwave", worldTransform_.GetWorldPosition());
-		AudioAPI::Play(playerAudio_, false, 0.5f);
+		AudioAPI::Play(shockwaveAudio_, false, 0.5f);
 	}
 	UpdatePopScale(dt);
 	HammerControl(dt);
@@ -300,7 +301,7 @@ void DemoPlayer::Move(float dt) {
 		auto offset = CalyxEngine::Vector3{0.0f, 0.5f, 1.0f};
 		EffectAPI::Play(jumpEffect_, worldTransform_.GetWorldPosition() + offset);
 		ShockwaveManager::GetInstance()->Emit(worldTransform_.GetWorldPosition(), param_.defaultShockScale);
-		AudioAPI::Play(playerAudio_, false, 0.5f);
+		AudioAPI::Play(hitAudio_, false, 0.5f);
 	}
 
 	// 速度の更新（水平成分のみ上書き、垂直成分は維持）

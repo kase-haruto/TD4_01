@@ -4,6 +4,8 @@
 #include <Engine\Foundation\Utility\Random\Random.h>
 #include <Engine\Foundation\Utility\Ease\CxEase.h>
 
+#include <Game\DemoPlayer\DemoPlayer.h>
+
 REGISTER_SCENE_OBJECT(DroolRainObject)
 
 DroolRainObject::DroolRainObject(
@@ -32,6 +34,8 @@ void DroolRainObject::ObjectInitialize() {
 	isOnceSet_					 = true;
 
 	effectData_.Load("DroolSplashEffect");
+
+	AudioAPI::Load(droolAudio_, "drool");
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {
@@ -67,6 +71,13 @@ void DroolRainObject::ObjectUpdate(float dt) {
 		// よだれが落ちたら
 		if(worldTransform_.translation.y <= 0.0f) {
 			EffectAPI::Play(effectData_, worldTransform_.GetWorldPosition() - CalyxEngine::Vector3{0.0f, 1.3f, 0.0f});
+
+			auto player = SceneContext::Current()->FindObjectByName<DemoPlayer>("DemoPlayer")->GetWorldTransform().GetWorldPosition();
+			float volume = 1.0f - ((worldTransform_.GetWorldPosition() - player).Length() / 30.0f);
+			volume		 = std::clamp(volume, 0.0f, 1.0f);
+			if(volume > 0.0f) {
+				AudioAPI::Play(droolAudio_, false, 0.5f * volume);
+			}
 		}
 
 

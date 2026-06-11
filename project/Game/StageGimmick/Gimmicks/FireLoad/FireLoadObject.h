@@ -62,4 +62,6 @@ private:
 	CalyxEngine::EffectAsset  effectData_;
 	CalyxEngine::EffectAsset  smokeData_;
 	CalyxEngine::EffectHandle fxHandle_{};
+
+	CalyxEngine::Audio fireOutAudio_;
 };

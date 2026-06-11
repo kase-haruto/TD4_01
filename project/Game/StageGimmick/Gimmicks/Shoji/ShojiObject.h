@@ -83,4 +83,6 @@ private:
 	float openTime_ = 0.0f;
 
 	CalyxEngine::EffectAsset effectData_;
+
+	CalyxEngine::Audio openAudio_;
 };
