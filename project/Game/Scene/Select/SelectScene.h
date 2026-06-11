@@ -86,5 +86,6 @@ private:
 	CalyxEngine::Audio openAudio_;
 	CalyxEngine::Audio eatAudio_;
 	CalyxEngine::Audio bgmAudio_;
+	CalyxEngine::Audio buttunAudio_;
 
 };
