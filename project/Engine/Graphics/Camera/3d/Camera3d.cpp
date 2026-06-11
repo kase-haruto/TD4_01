@@ -197,9 +197,10 @@ void Camera3d::ShowGui() {
 	}
 
 	if (GuiCmd::BeginSection(CalyxEngine::ParamFilterSection::ParameterData)) {
-		follow_.ShowGui();
+		GuiCmd::DragFloat("FarZ", farZ_, 0.1f, 0.1f, 10000.0f);
 		GuiCmd::EndSection();
 	}
+
 }
 
 void Camera3d::GetShadowFrustumCorners(CalyxEngine::Vector3 outCorners[8], float shadowFar) const {
@@ -211,7 +212,10 @@ void Camera3d::GetShadowFrustumCorners(CalyxEngine::Vector3 outCorners[8], float
 }
 
 
-bool Camera3d::IsVisible(const AABB& aabb) const { return frustum_.IsAABBInside(aabb.min_,aabb.max_); }
+bool Camera3d::IsVisible(const AABB& aabb) const { return frustum_.IsAABBInside(aabb.min_, aabb.max_); }
+void Camera3d::SetFarZ(float farZ) {
+	farZ_ = farZ;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //		FollowSettings
