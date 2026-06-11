@@ -330,7 +330,7 @@ void BaseGameObject::ExtractConfig() {
 	cfg.name	   = name_;
 	cfg.guid	   = id_;
 	cfg.parentGuid = parentId_;
-	drawConfig_.surfaceStencilRole = static_cast<SurfaceStencilRole>(cfg.surfaceStencilRole);
+	cfg.surfaceStencilRole = static_cast<int>(drawConfig_.surfaceStencilRole);
 	cfg.cameraDitherEnabled = drawConfig_.cameraDitherEnabled;
 	cfg.outlineEnabled	 = drawConfig_.outline.enabled;
 	cfg.outlineThickness = drawConfig_.outline.thickness;
