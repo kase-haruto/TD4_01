@@ -62,7 +62,11 @@ void GroundSpikeObject::ObjectInitialize() {
 }
 
 void GroundSpikeObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(!dangerEffect_) {
 		worldTransform_.Update();
 		const auto position = worldTransform_.GetWorldPosition();

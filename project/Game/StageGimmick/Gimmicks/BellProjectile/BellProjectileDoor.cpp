@@ -48,6 +48,11 @@ void BellProjectileDoor::ObjectInitialize() {
 }
 
 void BellProjectileDoor::ObjectUpdate(float dt) {
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if (isOpened_) return;
 
 	if(isOpenRequested_ || (target_ && target_->GetIsRing())) {

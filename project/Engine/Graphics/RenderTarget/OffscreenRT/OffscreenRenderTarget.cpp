@@ -187,14 +187,25 @@ void OffscreenRenderTarget::InitializeMRT(ID3D12Device* device, uint32_t width, 
 
 	rtvHandle_ = rtvHandles[0];
 
-	mrtResources_.clear();
+	if(mrtResources_.size() != formats.size()) {
+		mrtResources_.clear();
+		mrtResources_.resize(formats.size());
+	}
+
 	for(size_t i = 0; i < formats.size(); ++i) {
-		auto resource = std::make_unique<DxGpuResource>();
+		if(!mrtResources_[i]) {
+			mrtResources_[i] = std::make_unique<DxGpuResource>();
+		}
+
+		auto& resource = mrtResources_[i];
 		resource->InitializeAsRenderTarget(device, width, height, formats[i]);
 		resource->CreateRTV(device, rtvHandles[i].cpu);
-		resource->CreateSRV(device);
+		if(resource->GetSRVCpuHandle().ptr) {
+			resource->UpdateSRV(device);
+		} else {
+			resource->CreateSRV(device);
+		}
 		resource->SetCurrentState(D3D12_RESOURCE_STATE_RENDER_TARGET);
-		mrtResources_.push_back(std::move(resource));
 	}
 
 	if(!mrtResources_.empty()) {

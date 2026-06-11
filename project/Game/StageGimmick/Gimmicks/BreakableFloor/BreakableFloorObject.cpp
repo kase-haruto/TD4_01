@@ -51,6 +51,10 @@ void BreakableFloorObject::ObjectInitialize() {
 }
 
 void BreakableFloorObject::ObjectUpdate(float) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	
 }

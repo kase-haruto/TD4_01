@@ -31,4 +31,9 @@ void GeneralObject::ObjectInitialize() {
 }
 
 void GeneralObject::ObjectUpdate(float) {
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 }

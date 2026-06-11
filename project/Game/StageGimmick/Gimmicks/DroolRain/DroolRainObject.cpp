@@ -39,7 +39,11 @@ void DroolRainObject::ObjectInitialize() {
 }
 
 void DroolRainObject::ObjectUpdate(float dt) {
-
+	if(collider_) {
+		if(!collider_->GetOwner()) {
+			collider_->SetOwner(this);
+		}
+	}
 	if(isOnceSet_) {
 		offsetY_ = worldTransform_.translation.y;
 		isOnceSet_ = false;

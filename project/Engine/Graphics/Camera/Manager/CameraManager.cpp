@@ -12,6 +12,8 @@ void CameraManager::Initialize(SceneContext*){
 	debug_ = SceneAPI::Instantiate<DebugCamera>("DebugCamera");
 	cameras_[CameraType::Default] = main_.get();
 	cameras_[CameraType::Debug] = debug_.get();
+
+	main_->SetFarZ(300.0f);
 }
 void CameraManager::Update(float){ TransferToGPU(); }
 void CameraManager::TransferToGPU() {
