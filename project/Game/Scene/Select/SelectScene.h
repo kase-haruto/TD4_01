@@ -47,6 +47,7 @@ private:
 	void SelectUpdate(float dt);
 	void PhaseUpdate(float dt);
 	void ShoujiOpen(float dt);
+	void UpdateInputDevice();
 	std::unique_ptr<GameTransitionPayload> BuildGamePayload(int num);
 
 private:
@@ -78,6 +79,12 @@ private:
 	std::shared_ptr<SceneObject> shoujiL_;
 	std::shared_ptr<SceneObject> shoujiR_;
 	std::shared_ptr<GeneralObject> oni_;
+
+	bool isPad_ = false;
+	std::unique_ptr<Sprite> left_	 = nullptr;
+	std::unique_ptr<Sprite> right_	 = nullptr;
+	std::unique_ptr<Sprite> pressButton_ = nullptr;
+	std::unique_ptr<Sprite> pressKey_	 = nullptr;
 
 	SceneType preType_	 = SceneType::TITLE;
 	bool	  IsPhase_	 = false;

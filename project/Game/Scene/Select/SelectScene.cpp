@@ -89,11 +89,37 @@ void SelectScene::Initialize() {
 		}
 	}
 
+	left_ = std::make_unique<Sprite>("Textures/UI/Select/arrow_left.png");
+	left_->Initialize({80.0f, 360.0f}, {160.0f, 90.0f});
+	left_->SetAnchorPoint({0.5f, 0.5f});
+	left_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	left_->Update();
+
+	right_ = std::make_unique<Sprite>("Textures/UI/Select/arrow_right.png");
+	right_->Initialize({1200.0f, 360.0f}, {160.0f, 90.0f});
+	right_->SetAnchorPoint({0.5f, 0.5f});
+	right_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	right_->Update();
+
+	pressButton_ = std::make_unique<Sprite>("Textures/UI/Select/selectUI_cont.png");
+	pressButton_->Initialize({640.0f, 450.0f}, {640.0f, 360.0f});
+	pressButton_->SetAnchorPoint({0.5f, 0.0f});
+	pressButton_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	pressButton_->Update();
+
+	pressKey_ = std::make_unique<Sprite>("Textures/UI/Select/selectUI_key.png");
+	pressKey_->Initialize({640.0f, 450.0f}, {640.0f, 360.0f});
+	pressKey_->SetAnchorPoint({0.5f, 0.0f});
+	pressKey_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+	pressKey_->Update();
+
 	openAudio_.Load("syouji_open");
 	eatAudio_.Load("eat");
 	bgmAudio_.Load("select_2");
-	buttunAudio_.Load("Buttun3");
+	buttunAudio_.Load("Buttun");
 	AudioAPI::Play(bgmAudio_, true, 0.3f);
+
+	isPad_ = CalyxFoundation::Input::IsGamepadConnected();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +128,8 @@ void SelectScene::Initialize() {
 void SelectScene::Update([[maybe_unused]] float dt) {
 
 	transitionControl_->Update(dt);
+
+	UpdateInputDevice();
 
 	if(IsPhase_ || IsOpening_) {
 		return;
@@ -118,6 +146,17 @@ void SelectScene::Draw(ID3D12GraphicsCommandList* cmdList, PipelineService* psoS
 	//========================================================//
 	//	sprite の 登録
 	//========================================================//
+	if(!isShoujiOpen_) {
+		spriteRenderer_->Register(left_.get());
+		spriteRenderer_->Register(right_.get());
+
+		if(isPad_) {
+			spriteRenderer_->Register(pressButton_.get());
+		} else {
+			spriteRenderer_->Register(pressKey_.get());
+		}
+	}
+
 	transitionControl_->Draw(spriteRenderer_.get());
 
 	// シーン上のオブジェクトの描画
@@ -198,6 +237,7 @@ void SelectScene::SelectUpdate(float dt) {
 		// 遷移用ペイロードを用意し、障子オープン演出へ移行(selectedIndex_が0~4のため＋１)
 		gamePayload_  = BuildGamePayload(selectedIndex_ + 1);
 		isShoujiOpen_ = true;
+		AudioAPI::Play(buttunAudio_, false, 0.3f);
 		AudioAPI::Play(openAudio_, false, 0.5f);
 	}
 }
@@ -244,6 +284,54 @@ void SelectScene::ShoujiOpen(float dt) {
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TEST), std::move(gamePayload_));
 		});
+	}
+}
+
+void SelectScene::UpdateInputDevice() {
+	using CalyxFoundation::Input;
+	using CalyxFoundation::PadButton;
+
+	// チェック対象のパッドボタン一覧（PadButtonはXInputのビットフラグなので明示列挙）
+	static constexpr PadButton kButtons[] = {
+		PadButton::A,
+		PadButton::B,
+		PadButton::X,
+		PadButton::Y,
+		PadButton::LB,
+		PadButton::RB,
+		PadButton::BACK,
+		PadButton::START,
+		PadButton::L_STICK,
+		PadButton::R_STICK,
+		PadButton::DPAD_UP,
+		PadButton::DPAD_DOWN,
+		PadButton::DPAD_LEFT,
+		PadButton::DPAD_RIGHT,
+	};
+
+	// いずれかのボタンに触れたらパッド表示に切り替え
+	for(PadButton button : kButtons) {
+		if(Input::PushGamepadButton(button)) {
+			isPad_ = true;
+			return;
+		}
+	}
+
+	// トリガー・スティックも「パッドに触った」として扱う
+	constexpr float kTriggerThreshold = 0.1f;
+	if(Input::GetLeftTrigger() > kTriggerThreshold ||
+	   Input::GetRightTrigger() > kTriggerThreshold ||
+	   Input::IsLeftStickMoved()) {
+		isPad_ = true;
+		return;
+	}
+
+	// キーボードに触れたらキーボード表示に戻す（任意：不要なら削除）
+	for(uint32_t key = 0; key < 256; ++key) {
+		if(Input::PushKey(key)) {
+			isPad_ = false;
+			return;
+		}
 	}
 }
 

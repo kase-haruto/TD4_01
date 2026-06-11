@@ -41,7 +41,9 @@ public:
 					  [[maybe_unused]] class PipelineService*,
 					  [[maybe_unused]] class IRenderTarget* rt){}
 	virtual void DrawSpritesOnly([[maybe_unused]] ID3D12GraphicsCommandList* cmdList,
-								 [[maybe_unused]] class PipelineService* psoService) {}
+								 [[maybe_unused]] class PipelineService* psoService,
+								 [[maybe_unused]] bool collectSceneSprites = true,
+								 [[maybe_unused]] bool clearAfterDraw = true) {}
 	virtual void CleanUp() = 0;
 	virtual void LoadAssets() = 0;
 	virtual void SetTransitionRequestor(CalyxEngine::ISceneTransitionRequestor* requestor) = 0;

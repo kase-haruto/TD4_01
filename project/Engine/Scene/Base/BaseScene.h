@@ -70,7 +70,9 @@ public:
 	 * \param psoService PSOサービス
 	 */
 	void DrawSpritesOnly(ID3D12GraphicsCommandList* cmdList,
-					class PipelineService* psoService)override;
+					class PipelineService* psoService,
+					bool collectSceneSprites = true,
+					bool clearAfterDraw = true)override;
 	/**
 	 * \brief 終了処理
 	 */
