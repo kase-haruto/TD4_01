@@ -6,6 +6,8 @@
 
 #include <Game\DemoHammer\DemoHammer.h>
 
+class TutorialEvent;
+
 class DemoPlayer :
 public Actor {
 public:
@@ -28,6 +30,9 @@ public:
 
 	void TakeDamage(int32_t damage);
 	void StartPitfallRecovery();
+
+	// 触れているチュートリアルイベントを登録する（連打対策中はジャンプ入力を止める）
+	void SetActiveTutorial(const TutorialEvent* tutorial) { activeTutorial_ = tutorial; }
 
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoPlayer"; }
@@ -132,6 +137,9 @@ private:
 	bool					isDiving_  = false;
 	bool					isDivingInvincible_ = false;
 	float					jumpInvincibleTimer_ = 0.0f;
+
+	// 触れているチュートリアルイベント（連打対策中はジャンプ入力を止める）
+	const TutorialEvent*	activeTutorial_ = nullptr;
 	CalyxEngine::Quaternion preRotate_;
 
 	// 落とし穴復帰用

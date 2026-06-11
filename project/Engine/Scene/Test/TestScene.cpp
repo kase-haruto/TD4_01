@@ -52,7 +52,12 @@ void TestScene::Initialize(){
 
 	BaseScene::Initialize();
 
-	std::string scenePath = "Resources/Assets/Scenes/test.scene";
+	std::string scenePath;
+	if(stageNum_ == 0) {
+		scenePath = "Resources/Assets/Scenes/test.scene";
+	} else {
+		scenePath = "Resources/Assets/Scenes/Stage_" + std::to_string(stageNum_) + ".scene";
+	}
 	SceneSerializer::Load(*sceneContext_, scenePath);
 	sceneContext_->SetScenePath(scenePath);
 

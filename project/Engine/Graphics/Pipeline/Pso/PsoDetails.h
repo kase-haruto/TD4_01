@@ -58,6 +58,7 @@ namespace PipelineTag {
 		OutlineComposite,
 		Blend,
 		Bloom,
+		DepthOfField,
 
 		Count
 	};

@@ -8,6 +8,7 @@
 #include "Engine/PostProcess/Manager/PostEffectManager.h"
 
 #include <Game/DemoShockwave/ShockwaveManager.h>
+#include <Game/StageGimmick/Tutorial/TutorialEvent.h>
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -37,6 +38,7 @@ void DemoPlayer::Initialize() {
 	isDiving_					= false;
 	isDivingInvincible_			= false;
 	jumpInvincibleTimer_		= 0.0f;
+	activeTutorial_				= nullptr;
 	isRecovering_				= false;
 	recoveryTimer_				= 0.0f;
 
@@ -325,6 +327,12 @@ DemoPlayer::JumpEvents DemoPlayer::HandleJump(float dt) {
 	JumpEvents events{};
 	// ジャンプ入力
 	bool jumpTrigger = CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A);
+
+	// チュートリアルの連打対策中はジャンプ入力を無視する
+	// （Diveの2回目停止時もTutorialEvent側でブロックされるため自動で対応）
+	if(activeTutorial_ && activeTutorial_->IsInputBlocking()) {
+		jumpTrigger = false;
+	}
 
 	float pi = std::numbers::pi_v<float>;
 	if(jumpTrigger && !isRecovering_) {

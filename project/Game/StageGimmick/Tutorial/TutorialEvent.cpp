@@ -1,5 +1,7 @@
 #include "TutorialEvent.h"
 
+#include <Game/DemoPlayer/DemoPlayer.h>
+
 #include <Engine/Foundation/Clock/ClockManager.h>
 #include <Engine/Foundation/Input/Input.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
@@ -21,6 +23,12 @@ void TutorialEvent::OnCollisionEnter(Collider* other) {
 
 	// 一度きり。発火済み/完了済みなら何もしない
 	if(state_ != TutorialState::Idle) return;
+
+	// プレイヤーに自分を登録する。連打対策中は
+	// プレイヤー側でジャンプ入力が無視される（Diveの2回目停止にも対応）ジャンプ中に入ったら知らん
+	if(auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner())) {
+		player->SetActiveTutorial(this);
+	}
 
 	// 時間を止めてチュートリアルを表示
 	ClockManager::GetInstance()->SetTimeScale(0.0f);
@@ -111,8 +119,10 @@ void TutorialEvent::EventUpdate(float dt) {
 		break;
 	case Jump:
 	case Purpose:
+	case Teeth:
+	case Open:
 	default:
-		// Aボタン または スペースで解除
+		// Aボタン または スペースで解除（一回停止）
 		if(IsConfirmTriggered()) {
 			Finish();
 		}
@@ -296,6 +306,14 @@ void TutorialEvent::ApplyTextureForType() {
 		sprite_->SetTexture(purposeTexturePath_);
 		spritePad_->SetTexture(purposeTexturePadPath_);
 		break;
+	case Teeth:
+		sprite_->SetTexture(teethTexturePath_);
+		spritePad_->SetTexture(teethTexturePadPath_);
+		break;
+	case Open:
+		sprite_->SetTexture(openTexturePath_);
+		spritePad_->SetTexture(openTexturePadPath_);
+		break;
 	}
 }
 
@@ -326,8 +344,8 @@ void TutorialEvent::DerivativeGui() {
 	eventData_.ShowGui();
 
 	ImGui::SeparatorText("Tutorial Type");
-	const char* typeNames[] = {"Jump", "Dive", "Purpose"};
-	int			currentType = std::clamp(eventData_.type, 0, 2);
+	const char* typeNames[] = {"Jump", "Dive", "Purpose", "Teeth", "Open"};
+	int			currentType = std::clamp(eventData_.type, 0, static_cast<int>(IM_ARRAYSIZE(typeNames) - 1));
 	if(ImGui::Combo("Type", &currentType, typeNames, IM_ARRAYSIZE(typeNames))) {
 		eventData_.type = currentType;
 		// 表示中なら即座に反映
@@ -367,6 +385,8 @@ void TutorialEvent::DerivativeGui() {
 	editTexturePath("Jump Texture", jumpTexturePath_);
 	editTexturePath("Dive Texture", diveTexturePath_);
 	editTexturePath("Purpose Texture", purposeTexturePath_);
+	editTexturePath("Teeth Texture", teethTexturePath_);
+	editTexturePath("Open Texture", openTexturePath_);
 }
 
 void TutorialEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nlohmann::json* derived) {
@@ -383,6 +403,12 @@ void TutorialEvent::ApplyDerivedConfigFromJson(const nlohmann::json&, const nloh
 	}
 	if(derived->contains("purposeTexture")) {
 		purposeTexturePath_ = derived->at("purposeTexture").get<std::string>();
+	}
+	if(derived->contains("teethTexture")) {
+		teethTexturePath_ = derived->at("teethTexture").get<std::string>();
+	}
+	if(derived->contains("openTexture")) {
+		openTexturePath_ = derived->at("openTexture").get<std::string>();
 	}
 	if(derived->contains("spritePosition")) {
 		spritePosition_ = derived->at("spritePosition").get<CalyxEngine::Vector2>();
@@ -403,6 +429,8 @@ void TutorialEvent::ExtractDerivedConfigToJson(nlohmann::json&, nlohmann::json& 
 	derived["jumpTexture"]	  = jumpTexturePath_;
 	derived["diveTexture"]	  = diveTexturePath_;
 	derived["purposeTexture"] = purposeTexturePath_;
+	derived["teethTexture"]	  = teethTexturePath_;
+	derived["openTexture"]	  = openTexturePath_;
 	derived["spritePosition"] = spritePosition_;
 	derived["spriteScale"]	  = spriteScale_;
 	derived["popInDuration"]  = popInDuration_;

@@ -20,6 +20,7 @@ namespace CalyxEngine {
 			"Vignette",
 			"CRTEffect",
 			"Bloom",
+			"DepthOfField",
 			"Blend"
 		};
 		constexpr const char* kFloatParams[] = {
@@ -34,6 +35,10 @@ namespace CalyxEngine {
 			"tint.r",
 			"tint.g",
 			"tint.b",
+			"focusDepth",
+			"focusRange",
+			"maxBlurRadius",
+			"foregroundBlur",
 			"opacity",
 			"mode"
 		};
@@ -44,6 +49,7 @@ namespace CalyxEngine {
 			if(type == "Vignette") return {{"strength", 1.0f}, {"radius", 0.0f}};
 			if(type == "CRTEffect") return {{"screenSize", {1280.0f, 720.0f}}};
 			if(type == "Bloom") return {{"intensity", 0.7f}, {"threshold", 0.8f}, {"softKnee", 0.5f}, {"radius", 1.0f}, {"tint", {1.0f, 1.0f, 1.0f}}};
+			if(type == "DepthOfField") return {{"focusDepth", 0.03f}, {"focusRange", 0.02f}, {"maxBlurRadius", 6.0f}, {"intensity", 1.0f}, {"nearPlane", 0.1f}, {"farPlane", 100.0f}, {"foregroundBlur", 0.0f}};
 			if(type == "Blend") return {{"opacity", 0.5f}, {"mode", 0}};
 			return nlohmann::json::object();
 		}
@@ -86,6 +92,14 @@ namespace CalyxEngine {
 					   name == "tint.r" ||
 					   name == "tint.g" ||
 					   name == "tint.b";
+			}
+			if(nodeType == "DepthOfField") {
+				const std::string name(parameter);
+				return name == "focusDepth" ||
+					   name == "focusRange" ||
+					   name == "maxBlurRadius" ||
+					   name == "foregroundBlur" ||
+					   name == "intensity";
 			}
 			if(nodeType == "Blend") {
 				return std::string(parameter) == "opacity";
@@ -255,6 +269,8 @@ namespace CalyxEngine {
 			ImGui::TextDisabled("strength %.2f", params.value("strength", 1.0f));
 		} else if(node.type == "Bloom") {
 			ImGui::TextDisabled("intensity %.2f", params.value("intensity", 0.7f));
+		} else if(node.type == "DepthOfField") {
+			ImGui::TextDisabled("focus %.3f", params.value("focusDepth", 0.03f));
 		} else if(node.type == "Blend") {
 			ImGui::TextDisabled("opacity %.2f", params.value("opacity", 0.5f));
 		}
@@ -415,6 +431,49 @@ namespace CalyxEngine {
 				changed = true;
 			}
 			HelpTooltip("Color multiplier for the bloom contribution.");
+		} else if(node.type == "DepthOfField") {
+			float focusDepth = params.value("focusDepth", 0.03f);
+			float focusRange = params.value("focusRange", 0.02f);
+			float maxBlurRadius = params.value("maxBlurRadius", 6.0f);
+			float intensity = params.value("intensity", 1.0f);
+			float foregroundBlur = params.value("foregroundBlur", 0.0f);
+			float nearPlane = params.value("nearPlane", 0.1f);
+			float farPlane = params.value("farPlane", 100.0f);
+			if(ImGui::DragFloat("Focus Depth", &focusDepth, 0.001f, 0.0f, 1.0f)) {
+				params["focusDepth"] = focusDepth;
+				changed = true;
+			}
+			HelpTooltip("Linearized depth that stays in focus. 0 is near and 1 is far.");
+			if(ImGui::DragFloat("Focus Range", &focusRange, 0.001f, 0.001f, 0.25f)) {
+				params["focusRange"] = focusRange;
+				changed = true;
+			}
+			HelpTooltip("Linearized depth width that remains sharp around Focus Depth.");
+			if(ImGui::DragFloat("Max Blur Radius", &maxBlurRadius, 0.1f, 0.0f, 24.0f)) {
+				params["maxBlurRadius"] = maxBlurRadius;
+				changed = true;
+			}
+			HelpTooltip("Maximum blur radius in pixels. The shader reads the current texture size, so this follows resize.");
+			if(ImGui::DragFloat("Intensity", &intensity, 0.01f, 0.0f, 2.0f)) {
+				params["intensity"] = intensity;
+				changed = true;
+			}
+			HelpTooltip("Overall depth-of-field strength.");
+			if(ImGui::DragFloat("Foreground Blur", &foregroundBlur, 0.01f, 0.0f, 1.0f)) {
+				params["foregroundBlur"] = foregroundBlur;
+				changed = true;
+			}
+			HelpTooltip("Blur amount for pixels in front of the focus depth. 0 keeps the foreground sharp.");
+			if(ImGui::DragFloat("Near Plane", &nearPlane, 0.01f, 0.001f, 100.0f)) {
+				params["nearPlane"] = nearPlane;
+				changed = true;
+			}
+			HelpTooltip("Camera near plane used to linearize the hardware depth.");
+			if(ImGui::DragFloat("Far Plane", &farPlane, 1.0f, 1.0f, 10000.0f)) {
+				params["farPlane"] = farPlane;
+				changed = true;
+			}
+			HelpTooltip("Camera far plane used to linearize the hardware depth.");
 		} else if(node.type == "Blend") {
 			float opacity = params.value("opacity", 0.5f);
 			int blendMode = params.value("mode", 0);

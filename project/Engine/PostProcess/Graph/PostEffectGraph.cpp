@@ -1,6 +1,7 @@
 #include "PostEffectGraph.h"
 #include <Engine/PostProcess/Collection/PostProcessCollection.h>
 #include <Engine/PostProcess/Blend/BlendEffect.h>
+#include <Engine/Graphics/RenderTarget/OffscreenRT/OffscreenRenderTarget.h>
 #include <Engine/Graphics/RenderTarget/Interface/IRenderTarget.h>
 #include <Engine/Graphics/Device/DxCore.h>
 #include <Engine/Foundation/Debug/CxAssert.h>
@@ -92,11 +93,15 @@ void PostEffectGraph::Execute(ID3D12GraphicsCommandList* cmd,
 							  DxGpuResource* input,
 							  IRenderTarget* finalTarget,
 							  CalyxEngine::DxCore* dxCore){
-
-
-
-
 	input->Transition(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	// DepthOfField など、シーン深度を参照するポストエフェクトへ渡す深度SRVを取得する。
+	// Offscreen の深度は次フレームの Clear で DEPTH_WRITE に戻るため、ここでは参照状態へ遷移するだけでよい。
+	D3D12_GPU_DESCRIPTOR_HANDLE depthSRV{};
+	if(auto* offscreen = dynamic_cast<OffscreenRenderTarget*>(dxCore->GetRenderTargetCollection().Get("Offscreen"))) {
+		offscreen->TransitionDepthTo(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		depthSRV = offscreen->GetDepthSRV();
+	}
 
 	if(useNodeGraph_){
 		std::unordered_map<int32_t, D3D12_GPU_DESCRIPTOR_HANDLE> cache;
@@ -105,7 +110,7 @@ void PostEffectGraph::Execute(ID3D12GraphicsCommandList* cmd,
 		D3D12_GPU_DESCRIPTOR_HANDLE currentSRV = input->GetSRVGpuHandle();
 		const int32_t sourceNode = FindOutputSourceNode();
 		if(sourceNode != 0){
-			currentSRV = ExecuteGraphNode(cmd, sourceNode, currentSRV, dxCore, cache, visiting, tempIndex);
+			currentSRV = ExecuteGraphNode(cmd, sourceNode, currentSRV, depthSRV, dxCore, cache, visiting, tempIndex);
 		}
 		finalTarget->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		postProcessCollection_->GetEffectByName("CopyImage")->Apply(cmd, currentSRV, finalTarget);
@@ -122,7 +127,7 @@ void PostEffectGraph::Execute(ID3D12GraphicsCommandList* cmd,
 
 	for (size_t i = 0; i < passes_.size(); ++i){
 		currentOutput->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		passes_[i]->Apply(cmd, currentSRV, currentOutput);
+		passes_[i]->Apply(cmd, currentSRV, depthSRV, currentOutput);
 		currentOutput->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 		currentSRV = currentOutput->GetSRV();
@@ -140,6 +145,7 @@ void PostEffectGraph::Execute(ID3D12GraphicsCommandList* cmd,
 D3D12_GPU_DESCRIPTOR_HANDLE PostEffectGraph::ExecuteGraphNode(ID3D12GraphicsCommandList* cmd,
 															 int32_t nodeId,
 															 D3D12_GPU_DESCRIPTOR_HANDLE sceneSRV,
+															 D3D12_GPU_DESCRIPTOR_HANDLE depthSRV,
 															 CalyxEngine::DxCore* dxCore,
 															 std::unordered_map<int32_t, D3D12_GPU_DESCRIPTOR_HANDLE>& cache,
 															 std::unordered_map<int32_t, bool>& visiting,
@@ -184,7 +190,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE PostEffectGraph::ExecuteGraphNode(ID3D12GraphicsComm
 		for(const int32_t inputPin : node.inputPins){
 			const int32_t sourceNode = FindInputSourceNode(inputPin);
 			if(sourceNode == 0) continue;
-			inputs.push_back(ExecuteGraphNode(cmd, sourceNode, sceneSRV, dxCore, cache, visiting, tempIndex));
+			inputs.push_back(ExecuteGraphNode(cmd, sourceNode, sceneSRV, depthSRV, dxCore, cache, visiting, tempIndex));
 		}
 
 		if(inputs.empty()){
@@ -196,7 +202,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE PostEffectGraph::ExecuteGraphNode(ID3D12GraphicsComm
 		if(auto* blend = dynamic_cast<BlendEffect*>(node.pass)){
 			if(inputs.size() == 1){
 				output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
-				node.pass->Apply(cmd, inputs.front(), output);
+				node.pass->Apply(cmd, inputs.front(), depthSRV, output);
 			}else{
 				D3D12_GPU_DESCRIPTOR_HANDLE current = inputs.front();
 				for(size_t i = 1; i < inputs.size(); ++i){
@@ -210,15 +216,15 @@ D3D12_GPU_DESCRIPTOR_HANDLE PostEffectGraph::ExecuteGraphNode(ID3D12GraphicsComm
 			}
 		}else{
 			output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			node.pass->Apply(cmd, inputs.front(), output);
+			node.pass->Apply(cmd, inputs.front(), depthSRV, output);
 		}
 	}else{
 		D3D12_GPU_DESCRIPTOR_HANDLE inputSRV = sceneSRV;
 		if(!node.inputPins.empty()){
-			inputSRV = ExecuteGraphNode(cmd, FindInputSourceNode(node.inputPins[0]), sceneSRV, dxCore, cache, visiting, tempIndex);
+			inputSRV = ExecuteGraphNode(cmd, FindInputSourceNode(node.inputPins[0]), sceneSRV, depthSRV, dxCore, cache, visiting, tempIndex);
 		}
 		output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		node.pass->Apply(cmd, inputSRV, output);
+		node.pass->Apply(cmd, inputSRV, depthSRV, output);
 	}
 
 	output->GetResource()->Transition(cmd, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);

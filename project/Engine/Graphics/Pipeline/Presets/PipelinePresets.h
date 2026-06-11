@@ -53,4 +53,5 @@ namespace PipelinePresets {
 	GraphicsPipelineDesc MakeOutlineComposite();
 	GraphicsPipelineDesc MakeBlend();
 	GraphicsPipelineDesc MakeBloom();
+	GraphicsPipelineDesc MakeDepthOfField();
 }
