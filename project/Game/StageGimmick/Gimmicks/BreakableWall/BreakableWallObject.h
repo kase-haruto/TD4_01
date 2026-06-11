@@ -18,6 +18,8 @@ public:
 		return "BreakableWallObject";
 	}
 
+	void OnCollisionEnter(Collider* other) override;
+
 	bool IsBroken() const { return isBroken_; }
 
 	// 壊れる床を壊す

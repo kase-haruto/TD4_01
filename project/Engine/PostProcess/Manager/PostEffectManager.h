@@ -51,6 +51,7 @@ public:
 
 	bool SavePreset(const std::string& filePath, const std::string& presetName = "PostEffectPreset") const;
 	bool LoadPreset(const std::string& filePath);
+	void ClearScenePostEffect();
 	void PlayTriggeredEffects();
 	void PlayTriggeredEffect(const std::string& name);
 
@@ -120,5 +121,4 @@ private:
 
 	const std::string kCopyImageName = "CopyImage";
 	const std::string kBlendName = "Blend";
-	const std::string kDefaultPaht = "Resources/Assets/PostEffects/Default.postfx";
 };

@@ -26,9 +26,9 @@ void ShockwaveManager::Initialize(int poolSize) {
 }
 
 void ShockwaveManager::Emit(const CalyxEngine::Vector3& pos, float scaleMultiplier, bool strong) {
-	// 非アクティブを探して再利用する
+	// 非アクティブ かつ 未発行ダメージが残っていないものを探して再利用する
 	for (auto& sw : pool_) {
-		if (!sw->IsActive()) {
+		if (sw->IsReusable()) {
 			sw->Activate(pos, scaleMultiplier,strong);
 			return;
 		}
@@ -44,11 +44,9 @@ void ShockwaveManager::Clear() {
 void ShockwaveManager::CheckTakeDamageForStage() {
 	if(!stage_) return;
 	for(auto& sw : pool_) {
-		if(!sw->IsTakeDamageForStage()) continue;
-		if(sw->IsStrongDamage()) {
-			stage_->TakeDamage(2);
-		} else {
-			stage_->TakeDamage(1);
+		int damage = sw->ConsumeStageDamage();
+		if(damage > 0) {
+			stage_->TakeDamage(float(damage));
 		}
 	}
 }

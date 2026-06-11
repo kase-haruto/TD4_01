@@ -2,6 +2,7 @@
 #include "Engine/Objects/Collider/SphereCollider.h"
 #include "Game\StageGimmick\Gimmicks\GroundSpike\GroundSpikeObject.h"
 #include "Game\StageGimmick\Gimmicks\Projectile\ProjectileObject.h"
+#include "Game\StageGimmick\Gimmicks\BreakableWall\BreakableWallEvent.h"
 #include <algorithm>
 
 Shockwave::Shockwave() : Actor() {
@@ -27,16 +28,19 @@ void Shockwave::Initialize() {
 	SetDrawEnable(false);
 	isActive_ = false;
 	isStrong_ = false;
-	isTakeDamageForStage_ = false;
-	isTakeDamageTime_	  = false;
+	pendingDamages_.clear();
+	readyStageDamage_ = 0;
 }
 
 void Shockwave::Update(float dt) {
-	if(damageTimer_ >= 0.0f && isTakeDamageTime_) {
-		damageTimer_ -= dt;
-		if(damageTimer_ < 0.0f) {
-			isTakeDamageTime_ = false;
-			isTakeDamageForStage_ = true;
+	// 遅延中のダメージを各々カウントダウンし、確定したものを加算する
+	for(auto it = pendingDamages_.begin(); it != pendingDamages_.end();) {
+		it->timer -= dt;
+		if(it->timer <= 0.0f) {
+			readyStageDamage_ += it->amount;
+			it = pendingDamages_.erase(it);
+		} else {
+			++it;
 		}
 	}
 	if (!isActive_) return;
@@ -69,12 +73,10 @@ void Shockwave::Activate(const CalyxEngine::Vector3& pos, float scaleMultiplier,
 	currentMaxScale_			= param_.endScale * scaleMultiplier;
 	scaleMultiplier_			= scaleMultiplier;
 	timer_						= 0.0f;
-	damageTimer_				= 0.0f;
 	isActive_					= true;
  	isStrong_					= strong;
-	isStrongDamage_				= false;
-	isTakeDamageForStage_		= false;
-	isTakeDamageTime_			= false;
+	pendingDamages_.clear();
+	readyStageDamage_			= 0;
 
 	//SetDrawEnable(true);
 	if (collider_) {
@@ -102,22 +104,24 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 	if(!otherObj) return;
 
 	if(auto* spike = dynamic_cast<GroundSpikeObject*>(otherObj)) {
-		isTakeDamageForStage_ = true;
-		if(isStrong_) {
-			isStrongDamage_ = true;
-		}
+		// スパイクは即時確定（強衝撃波なら2ダメージ）
+		pendingDamages_.push_back({0.0f, isStrong_ ? 2 : 1});
 	}
 
 	if(auto* projectile = dynamic_cast<ProjectileObject*>(otherObj)) {
-		isTakeDamageTime_ = true;
-		damageTimer_ = projectile->GetDamageTime();
+		// ヒットごとに1件積む（複数ヒットが上書きで潰れないように）
+		pendingDamages_.push_back({projectile->GetDamageTime(), 1});
+	}
+
+	if(auto* wallEvent = dynamic_cast<BreakableWallObject*>(otherObj)) {
+		// ヒットごとに1件積む（複数ヒットが上書きで潰れないように）
+		pendingDamages_.push_back({0.0f, 1});
 	}
 
 }
 
-bool Shockwave::IsTakeDamageForStage() {
-	if(!isTakeDamageForStage_) return false;
-	bool result = isTakeDamageForStage_;
-	isTakeDamageForStage_ = !isTakeDamageForStage_;
+int Shockwave::ConsumeStageDamage() {
+	int result = readyStageDamage_;
+	readyStageDamage_ = 0;
 	return result;
 }

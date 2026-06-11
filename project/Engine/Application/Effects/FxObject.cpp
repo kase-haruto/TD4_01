@@ -9,6 +9,8 @@
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <filesystem>
 
+#include <externals/imgui/ImGuiFileDialog.h>
+
 namespace CalyxEngine {
 
 
@@ -127,7 +129,7 @@ namespace CalyxEngine {
 	//		デバッグui
 	/////////////////////////////////////////////////////////////////////////////////////////
 	void FxObject::ShowGui() {
-
+#if defined(_DEBUG) || defined(DEVELOP)
 		// コンフィグのセーブ・ローど
 		if(ImGui::Button("Load Effect")) {
 			std::filesystem::create_directories(kConfigRoot_);
@@ -286,6 +288,7 @@ namespace CalyxEngine {
 
 			ImGui::EndTabBar();
 		}
+#endif
 	}
 
 	void FxObject::LoadFromPath(const std::string& path) {

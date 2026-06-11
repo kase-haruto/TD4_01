@@ -1,5 +1,6 @@
 #include "BreakableFloorEvent.h"
 
+#include <Game/DemoPlayer/DemoPlayer.h>
 #include <Engine/Scene/Utility/SceneUtility.h>
 #include <Engine/Objects/3D/Actor/Registry/SceneObjectRegistry.h>
 
@@ -17,20 +18,42 @@ void BreakableFloorEvent::OnCollisionEnter(Collider* other) {
 	// ハンマー判定かどうか確認する
 	// ギミックなどへの干渉 or 相手側に追加する
 	BaseGameObject* otherObj = other->GetOwner();
-	if (otherObj && other->GetType() != ColliderType::Type_PlayerAttack) {
+	if(!otherObj) {
 		return;
 	}
 
 	// プレイヤーの攻撃に当たったら床を壊す
 	auto floor = targetObject_.lock();
-	if(!floor) {
-		return;
+	if(other->GetType() == ColliderType::Type_PlayerAttack) {
+		if(!floor) {
+			return;
+		} else if(!floor->IsBroken()) {
+			floor->Break();
+		}
 	}
-	floor->Break();
 
 	// イベントを無効化する
-	
 	isActive_ = false;
+}
+
+void BreakableFloorEvent::OnCollisionStay(Collider* other) {
+
+	// プレイヤーが当たったらダメージを出す
+	auto floor = targetObject_.lock();
+	if(other->GetType() == ColliderType::Type_Player) {
+		auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner());
+		if(!player || !floor->IsBroken()) {
+			return;
+		}
+
+		player->StartPitfallRecovery();
+		player->TakeDamage(1);
+		if(param_.disableAfterHit) {
+			if(collider_) {
+				collider_->SetCollisionEnabled(false);
+			}
+		}
+	}
 }
 
 void BreakableFloorEvent::EventInitialize() {

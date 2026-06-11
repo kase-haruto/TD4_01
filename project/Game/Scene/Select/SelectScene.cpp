@@ -77,6 +77,7 @@ void SelectScene::Initialize() {
 
 	shoujiOpenTime_ = 2.0f;
 	isShoujiOpen_ = false;
+	isEat_			= false;
 
 	oni_ = std::static_pointer_cast<GeneralObject>(sceneContext_->GetObjectLibrary()->FindByName("oni"));
 	if(oni_) {
@@ -90,6 +91,9 @@ void SelectScene::Initialize() {
 
 	openAudio_.Load("syouji_open");
 	eatAudio_.Load("eat");
+	bgmAudio_.Load("select_2");
+	buttunAudio_.Load("Buttun3");
+	AudioAPI::Play(bgmAudio_, true, 0.3f);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -191,8 +195,8 @@ void SelectScene::SelectUpdate(float dt) {
 			}
 		}
 
-		// 遷移用ペイロードを用意し、障子オープン演出へ移行
-		gamePayload_  = BuildGamePayload(selectedIndex_);
+		// 遷移用ペイロードを用意し、障子オープン演出へ移行(selectedIndex_が0~4のため＋１)
+		gamePayload_  = BuildGamePayload(selectedIndex_ + 1);
 		isShoujiOpen_ = true;
 		AudioAPI::Play(openAudio_, false, 0.5f);
 	}
@@ -221,6 +225,11 @@ void SelectScene::ShoujiOpen(float dt) {
 	bool oniFinished = false;
 	if(oni_) {
 		if(auto* anim = oni_->AnimationModel()) {
+			shoujiOpenTime_ -= dt;
+			if(!isEat_ && shoujiOpenTime_ < -3.4f) {
+				isEat_ = true;
+				AudioAPI::Play(eatAudio_, false, 0.25f);
+			}
 			oniFinished = anim->IsAnimationFinished();
 		}
 	} else {

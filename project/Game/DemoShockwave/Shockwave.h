@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Objects/3D/Actor/Actor.h"
 #include "Engine\Foundation\Serialization\SerializableObject.h"
+#include <vector>
 
 class Shockwave : public Actor {
 public:
@@ -34,8 +35,14 @@ public:
 	float			 GetPushForce() const { return param_.pushForce * scaleMultiplier_; }
 	bool			 IsActive() const { return isActive_; }
 	bool			 IsStrong() const { return isStrong_; }
-	bool			 IsStrongDamage() const { return isStrongDamage_; }
-	bool			 IsTakeDamageForStage();
+
+	// 再利用可能か（非アクティブ かつ 未発行のダメージが残っていない）
+	bool			 IsReusable() const {
+		return !isActive_ && pendingDamages_.empty() && readyStageDamage_ == 0;
+	}
+
+	//確定したステージダメージを取り出して消費する
+	int				 ConsumeStageDamage();
 
 private:
 	struct ShockwaveParameter : public CalyxEngine::SerializableObject {
@@ -56,14 +63,18 @@ private:
 		}
 	};
 
-	ShockwaveParameter param_;
-	float			   scaleMultiplier_ = 1.0f;
-	float			   timer_				 = 0.0f;
-	float			   currentMaxScale_ = 5.0f;
-	float			   damageTimer_			 = 0.0f;
-	bool			   isActive_			 = false;
-	bool			   isStrong_			 = false;
-	bool			   isStrongDamage_		 = false;
-	bool			   isTakeDamageForStage_ = false;
-	bool			   isTakeDamageTime_	 = false;
+	// 確定待ちのダメージ（ヒットごとに1件積む。timer_が0以下で確定）
+	struct PendingDamage {
+		float timer	 = 0.0f; // 確定までの残り時間
+		int	  amount = 1;	 // ダメージ量
+	};
+
+	ShockwaveParameter		   param_;
+	float					   scaleMultiplier_	 = 1.0f;
+	float					   timer_			 = 0.0f;
+	float					   currentMaxScale_	 = 5.0f;
+	std::vector<PendingDamage> pendingDamages_;
+	int						   readyStageDamage_ = 0;
+	bool					   isActive_		 = false;
+	bool					   isStrong_		 = false;
 };

@@ -212,6 +212,7 @@ namespace CalyxFoundation {
 
 		XINPUT_STATE state;
 		DWORD		 result = XInputGetState(0, &state);
+		gamepadConnected_ = (result == ERROR_SUCCESS);
 		if(result == ERROR_SUCCESS) {
 			gamepadState_ = state.Gamepad;
 
@@ -259,6 +260,10 @@ namespace CalyxFoundation {
 
 	bool Input::IsLeftStickMoved() {
 		return std::sqrt(instance_->leftThumbX_ * instance_->leftThumbX_ + instance_->leftThumbY_ * instance_->leftThumbY_) > DEFAULT_DEAD_ZONE;
+	}
+
+	bool Input::IsGamepadConnected() {
+		return instance_->gamepadConnected_;
 	}
 
 } // namespace CalyxFoundation

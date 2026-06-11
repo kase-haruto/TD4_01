@@ -187,6 +187,11 @@ namespace CalyxFoundation {
 		 * \return 動かされているか
 		 */
 		static bool				  IsLeftStickMoved();
+		/**
+		 * \brief ゲームパッドが接続されているか
+		 * \return 接続されているか
+		 */
+		static bool				  IsGamepadConnected();
 
 	private:
 		Input() = default;
@@ -223,5 +228,6 @@ namespace CalyxFoundation {
 		float rightThumbY_ = 0.0f; //< 右スティックY
 		float leftTrigger_ = 0.0f; //< 左トリガー
 		float rightTrigger_ = 0.0f; //< 右トリガー
+		bool  gamepadConnected_ = false; //< ゲームパッドが接続されているか
 	};
 } // namespace CalyxFoundation

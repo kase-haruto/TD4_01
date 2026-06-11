@@ -58,6 +58,8 @@ void TestScene::Initialize(){
 	} else {
 		scenePath = "Resources/Assets/Scenes/Stage_" + std::to_string(stageNum_) + ".scene";
 	}
+	//デバック用
+	scenePath = "Resources/Assets/Scenes/test.scene";
 	SceneSerializer::Load(*sceneContext_, scenePath);
 	sceneContext_->SetScenePath(scenePath);
 
@@ -102,6 +104,8 @@ void TestScene::Initialize(){
 	selectedIndex_ = 0;
 	fadeTime_	   = 0.2f;
 	ClockManager::GetInstance()->SetTimeScale(1.0f);
+	buttunAudio_.Load("Buttun3");
+	timeUpAudio_.Load("timeOver");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +150,7 @@ void TestScene::Update([[maybe_unused]]float dt){
 		}
 		ImGui::Text("%s", settingPath_.c_str());
 		ImGui::DragFloat("hp", &stageHP_, 0.1f, 0.0f, 1000.0f);
-		ImGui::DragFloat("limitTime", &stageLimitTime_, 0.1f, 0.0f, 99.0f);
+		ImGui::DragFloat("limitTime", &stageLimitTime_, 0.1f, 0.0f, 120.0f);
 		if(ImGui::Button("Save")) {
 			SaveStageSetting();
 		}
@@ -322,41 +326,24 @@ void TestScene::InitPauseResource() {
 }
 
 void TestScene::CheckStageState([[maybe_unused]] float dt) {
-	if(stage_->IsClear()) {
-		ClockManager::GetInstance()->SetTimeScale(1.0f);
+	if(stage_->IsClear() || player_->GetIsTutorialClear()) {
+		/*ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::PRECLEAR);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::PRECLEAR), std::move(payload_));
-		});
+		});*/
 	}
-	if(stage_->IsGameOver()) {
+	if(stage_->IsGameOver() || player_->GetLife() <= 0) {
+		/*AudioAPI::Play(timeUpAudio_, false, 0.3f);
 		ClockManager::GetInstance()->SetTimeScale(1.0f);
 		payload_ = BuildNowTypePayload(SceneType::TEST);
 		IsPhase_ = true;
 		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::GAMEOVER);
 		transitionControl_->StartClosing(0.5f, [this]() {
 			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
-		});
-	}
-	if(CalyxFoundation::Input::PushKey(DIK_LCONTROL) && CalyxFoundation::Input::TriggerKey(DIK_9)) {
-		ClockManager::GetInstance()->SetTimeScale(1.0f);
-		payload_ = BuildNowTypePayload(SceneType::TEST);
-		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::PRECLEAR);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::PRECLEAR), std::move(payload_));
-		});
-	}
-	if(CalyxFoundation::Input::PushKey(DIK_LCONTROL) && CalyxFoundation::Input::TriggerKey(DIK_8)) {
-		ClockManager::GetInstance()->SetTimeScale(1.0f);
-		payload_ = BuildNowTypePayload(SceneType::TEST);
-		IsPhase_ = true;
-		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::GAMEOVER);
-		transitionControl_->StartClosing(0.5f, [this]() {
-			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::GAMEOVER), std::move(payload_));
-		});
+		});*/
 	}
 }
 
@@ -380,6 +367,7 @@ void TestScene::PauseUpdate([[maybe_unused]] float dt) {
 		if(selectedIndex_ == index) {
 			btn->SetColor({0.8f, 0.8f, 0.3f, 1.0f}); // 選択中は黄色っぽく
 			if(isConfirmed) {
+				AudioAPI::Play(buttunAudio_, false, 0.3f);
 				onClick();
 			}
 		} else {
