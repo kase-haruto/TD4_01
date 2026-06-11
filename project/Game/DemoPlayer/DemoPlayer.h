@@ -33,11 +33,14 @@ public:
 
 	// 触れているチュートリアルイベントを登録する（連打対策中はジャンプ入力を止める）
 	void SetActiveTutorial(const TutorialEvent* tutorial) { activeTutorial_ = tutorial; }
+	void SetIsTutorialClear(bool is) { isTutorialClear_ = is; }
 
 	//--------- accessor ------------------------------------------------
 	std::string_view GetObjectClassName() const override { return "DemoPlayer"; }
 	int32_t			 GetLife() const { return life_; }
 	int32_t			 GetMaxHP() const { return param_.playerHP; }
+	bool			 GetIsTutorialClear() { return isTutorialClear_; }
+
 private:
 	struct JumpEvents {
 		bool jumpStart = false;
@@ -141,6 +144,7 @@ private:
 	// 触れているチュートリアルイベント（連打対策中はジャンプ入力を止める）
 	const TutorialEvent*	activeTutorial_ = nullptr;
 	CalyxEngine::Quaternion preRotate_;
+	bool					isTutorialClear_ = false;
 
 	// 落とし穴復帰用
 	enum class PitfallRecoveryState {

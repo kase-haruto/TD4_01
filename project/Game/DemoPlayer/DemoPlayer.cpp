@@ -41,6 +41,7 @@ void DemoPlayer::Initialize() {
 	activeTutorial_				= nullptr;
 	isRecovering_				= false;
 	recoveryTimer_				= 0.0f;
+	isTutorialClear_			= false;
 
 	damageFlashTimer_ = 0.0f;
 	isInvincible_	  = false;

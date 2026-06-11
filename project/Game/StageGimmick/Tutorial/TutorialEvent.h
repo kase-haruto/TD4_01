@@ -18,7 +18,8 @@ enum TutorialType {
 	Purpose,
 	Teeth,
 	Open,
-	Choco
+	Choco,
+	Clear
 };
 
 /// <summary>
