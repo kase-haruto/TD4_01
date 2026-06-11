@@ -49,6 +49,7 @@ void ShojiObject::ObjectInitialize() {
 		collider_->SetCollisionEnabled(true);
 		if(auto* radius = dynamic_cast<BoxCollider*>(collider_.get())) {
 			radius->SetSize({15.0f, 7.5f, 1.0f});
+			radius->SetOffset({0.0f, 4.0f, 0.0f});
 		}
 	}
 	worldTransform_.scale = CalyxEngine::Vector3::One() * param_.shojiScale;
