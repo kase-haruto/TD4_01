@@ -45,7 +45,7 @@ void Stage::Update(float dt) {
 		timer_ -= dt;
 	} else {
 		timer_ = 0.0f;
-		//isGameOver_ = true;
+		isGameOver_ = true;
 	}
 	
 	/*if(numbersSprite_) {
