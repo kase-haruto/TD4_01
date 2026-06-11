@@ -40,9 +40,12 @@ void BreakableFloorEvent::OnCollisionStay(Collider* other) {
 
 	// プレイヤーが当たったらダメージを出す
 	auto floor = targetObject_.lock();
+	if(!floor->IsBroken()) {
+		return;
+	}
 	if(other->GetType() == ColliderType::Type_Player) {
 		auto* player = dynamic_cast<DemoPlayer*>(other->GetOwner());
-		if(!player || !floor->IsBroken()) {
+		if(!player) {
 			return;
 		}
 
