@@ -82,12 +82,17 @@ namespace CalyxEngine {
 				cfg->ApplyConfigFromJson(snapshot);
 			}
 			ApplyMetadata(clone, snapshot);
-			clone->SetGuid(Guid::New());
-			clone->ClearPrefabLink();
-			clone->SetPickingID(0);
+			const Guid newGuid = Guid::New();
 			clone->BeginSerializableParamCapture(paramOverrides);
 			clone->Initialize();
 			clone->EndSerializableParamCapture();
+			if(auto* cfg = dynamic_cast<IConfigurable*>(clone.get())) {
+				cfg->ApplyConfigFromJson(snapshot);
+			}
+			ApplyMetadata(clone, snapshot);
+			clone->SetGuid(newGuid);
+			clone->ClearPrefabLink();
+			clone->SetPickingID(0);
 			return clone;
 		}
 
