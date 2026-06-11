@@ -60,5 +60,8 @@ private:
 	bool										IsPhase_   = false;
 	bool										IsOpening_ = false;
 
+	CalyxEngine::Audio buttunAudio_;
+	CalyxEngine::Audio bgmAudio_;
+
 	CalyxEngine::EffectAsset effectData_;
 };

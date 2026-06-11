@@ -44,6 +44,12 @@ public:
 		BillboardMode		  billboardMode = BillboardMode::None;
 	};
 
+	struct ScreenSpaceCullingSettings {
+		bool  enabled		   = true;
+		float minDistance	   = 80.0f;
+		float minScreenPixels = 2.0f;
+	};
+
 private:
 	//===================================================================*/
 	//                    private types
@@ -125,6 +131,8 @@ public:
 	 */
 	void PreCullAndBatch(const class Camera3d* camera, bool enableFrustumCulling = true);
 	void BuildAllVisibleBatches();
+	void SetScreenSpaceCullingSettings(const ScreenSpaceCullingSettings& settings) { screenSpaceCulling_ = settings; }
+	const ScreenSpaceCullingSettings& GetScreenSpaceCullingSettings() const { return screenSpaceCulling_; }
 
 	/**
 	 * \brief 一括描画処理
@@ -204,6 +212,7 @@ private:
 	void BuildSkinnedBatches();
 	void CollectShadowCasters();
 	void BindRaytracingScene(ID3D12GraphicsCommandList* cmdList) const;
+	bool PassesScreenSpaceCulling(const class Camera3d* camera, const AABB& worldAABB) const;
 
 	//===================================================================*/
 	//                    private member variables
@@ -223,6 +232,7 @@ private:
 	std::unordered_map<BaseModel*, std::vector<WorldTransform>>					  staticVisibleForShadow_;	//< シャドウ用可視スタティックリスト
 	std::unordered_map<CalyxEngine::AnimationModel*, std::vector<WorldTransform>> skinnedVisibleForShadow_; //< シャドウ用可視スキンメッシュリスト
 	CalyxEngine::MaterialGraphRuntimeShaderCache runtimeMaterialShaderCache_;
+	ScreenSpaceCullingSettings screenSpaceCulling_{};
 
 	// Raytracing
 	std::unique_ptr<CalyxEngine::RaytracingSystem> raytracingSystem_; //< レイトレーシングシステム

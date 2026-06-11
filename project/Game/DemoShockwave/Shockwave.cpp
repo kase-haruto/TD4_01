@@ -118,15 +118,14 @@ void Shockwave::OnCollisionEnter(Collider* other) {
 		pendingDamages_.push_back({projectile->GetDamageTime(), 1});
 	}
 
-	if(auto* wallEvent = dynamic_cast<BreakableWallObject*>(otherObj)) {
-		// ヒットごとに1件積む（複数ヒットが上書きで潰れないように）
-		pendingDamages_.push_back({0.0f, 1});
-	}
-
 }
 
 int Shockwave::ConsumeStageDamage() {
 	int result = readyStageDamage_;
 	readyStageDamage_ = 0;
 	return result;
+}
+
+void Shockwave::SetPendingDamage(float time, int damage) {
+	pendingDamages_.push_back({time, damage});
 }

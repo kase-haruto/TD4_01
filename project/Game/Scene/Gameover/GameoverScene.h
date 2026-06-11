@@ -54,6 +54,9 @@ private:
 	std::unique_ptr<Sprite>			testSprite_;
 	std::shared_ptr<CalyxHuman>		animationHuman_;
 
+	CalyxEngine::Audio buttunAudio_;
+	CalyxEngine::Audio bgmAudio_;
+
 	std::unique_ptr<TransitionControl> transitionControl_ = nullptr;
 	std::unique_ptr<CalyxEngine::IScenePayload> payload_;
 	SceneType									preType_   = SceneType::SELECT;

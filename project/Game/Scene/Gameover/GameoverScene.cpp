@@ -58,6 +58,10 @@ void GameoverScene::Initialize() {
 	});
 	IsOpening_ = true;
 	IsPhase_   = false;
+
+	buttunAudio_.Load("Buttun");
+	bgmAudio_.Load("Gameover");
+	AudioAPI::Play(bgmAudio_, true, 0.2f);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +77,8 @@ void GameoverScene::Update([[maybe_unused]] float dt) {
 
 	if(CalyxFoundation::Input::TriggerKey(DIK_SPACE) || CalyxFoundation::Input::TriggerGamepadButton(CalyxFoundation::PadButton::A)) {
 		IsPhase_ = true;
+		AudioAPI::Play(buttunAudio_, false, 0.3f);
+		AudioAPI::Stop(bgmAudio_);
 		payload_ = BuildNowTypePayload(SceneType::GAMEOVER);
 		transitionControl_->SetAutoPreset(SceneType::GAMEOVER, SceneType::SELECT);
 		transitionControl_->StartClosing(0.5f, [this]() {

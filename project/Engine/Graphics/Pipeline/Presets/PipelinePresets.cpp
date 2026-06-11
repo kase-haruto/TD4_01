@@ -655,7 +655,7 @@ GraphicsPipelineDesc PipelinePresets::MakeObject2D() {
 		.CBV(0, D3D12_SHADER_VISIBILITY_PIXEL)
 		.CBV(0, D3D12_SHADER_VISIBILITY_VERTEX)
 		.SRVTable(0, 1, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, D3D12_SHADER_VISIBILITY_PIXEL)
-		.SamplerWrapLinear(0);
+		.SampleClampLinear(0);
 
 	return desc;
 }

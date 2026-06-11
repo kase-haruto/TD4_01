@@ -16,7 +16,7 @@ struct PointLightConstants {
 	uint32_t pointLightShadowsEnabled = 1;
 	uint32_t maxPointShadowLights = 2;
 	float pointShadowContributionThreshold = 0.01f;
-	std::array<PointLightData, 128> lights = {};
+	std::array<PointLightData, 64> lights = {};
 };
 
 /*-----------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ private:
 	void CleanupPointLights();
 	bool ContainsPointLight(const PointLight* light) const;
 
-	static constexpr uint32_t kMaxPointLightCount = 16;
+	static constexpr uint32_t kMaxPointLightCount = 64;
 
 	std::shared_ptr<DirectionalLight> directionalLight_;
 	std::vector<std::weak_ptr<PointLight>> pointLights_;
