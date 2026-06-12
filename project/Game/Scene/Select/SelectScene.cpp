@@ -137,6 +137,15 @@ void SelectScene::Update([[maybe_unused]] float dt) {
 
 	SelectUpdate(dt);
 
+	if(CalyxFoundation::Input::PushKey(DIK_LCONTROL)&&CalyxFoundation::Input::TriggerKey(DIK_0)) {
+		IsPhase_ = true;
+		AudioAPI::Stop(bgmAudio_);
+		transitionControl_->SetAutoPreset(SceneType::TEST, SceneType::TITLE);
+		transitionControl_->StartClosing(0.5f, [this]() {
+			transitionRequestor_->RequestSceneChange(GameSceneUtil::ToSceneId(SceneType::TITLE));
+		});
+	}
+
 	// 衝突判定
 	CollisionManager::GetInstance()->UpdateCollisionAllCollider();
 }
