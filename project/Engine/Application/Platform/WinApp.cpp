@@ -44,7 +44,7 @@ void WinApp::CreateWnd() {
 	hwnd = CreateWindow(
 		wc.lpszClassName,
 		// マルチバイト→ワイド文字変換が必要な場合は適宜対応する
-		_T("MyGameWindow"),
+		_T("4104_issunsakihayummy"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
